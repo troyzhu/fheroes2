@@ -23,12 +23,16 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iterator>
 #include <optional>
 #include <ostream>
 #include <set>
+#include <string>
 #include <utility>
 
 // Managing compiler warnings for SDL headers
@@ -62,6 +66,7 @@
 #endif
 
 #include "image_palette.h"
+#include "image_tool.h"
 #include "logging.h"
 #include "math_tools.h"
 #include "system.h"
@@ -1519,12 +1524,41 @@ namespace fheroes2
         return display;
     }
 
+    namespace
+    {
+        // Play-harness support (local experiment, not for upstream): when the FHEROES2_HARNESS environment
+        // variable is set to a directory path, periodically dump the rendered frame as "frame.bmp" into that
+        // directory so that an external agent can observe the game.
+        void harnessDumpFrame( const Display & display )
+        {
+            static const char * const harnessDir = std::getenv( "FHEROES2_HARNESS" );
+            if ( harnessDir == nullptr || *harnessDir == '\0' ) {
+                return;
+            }
+
+            static std::chrono::steady_clock::time_point lastDumpTime{};
+            const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+            if ( now - lastDumpTime < std::chrono::milliseconds( 150 ) ) {
+                return;
+            }
+            lastDumpTime = now;
+
+            // Save to a temporary file first and then rename it so that readers never see a partially written frame.
+            const std::string tmpPath = std::string( harnessDir ) + "/frame.tmp.bmp";
+            if ( Save( display, tmpPath ) ) {
+                std::rename( tmpPath.c_str(), ( std::string( harnessDir ) + "/frame.bmp" ).c_str() );
+            }
+        }
+    }
+
     void Display::render( const Rect & roi )
     {
         Rect temp( roi );
         if ( !getActiveArea( temp, width(), height() ) ) {
             return;
         }
+
+        harnessDumpFrame( *this );
 
         if ( _cursor->isVisible() && _cursor->isSoftwareEmulation() && !_cursor->_image.empty() ) {
             const Sprite & cursorImage = _cursor->_image;

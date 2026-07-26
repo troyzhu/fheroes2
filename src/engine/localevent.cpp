@@ -24,12 +24,20 @@
 #include "localevent.h"
 
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <deque>
+#include <fstream>
 #include <map>
+#include <mutex>
 #include <ostream>
 #include <set>
+#include <sstream>
+#include <string>
+#include <thread>
 #include <utility>
+#include <vector>
 
 // Managing compiler warnings for SDL headers
 #if defined( __GNUC__ )
@@ -65,6 +73,224 @@
 #include "logging.h"
 #include "render_processor.h"
 #include "screen.h"
+
+// Play-harness support (local experiment, not for upstream): when the FHEROES2_HARNESS environment
+// variable is set to a directory path, a background thread reads input commands (one per line) from
+// the "input" FIFO in that directory and queues them. LocalEvent::HandleEvents() applies at most one
+// queued command per call, mirroring the engine's one-immediate-event-per-call processing model.
+//
+// Command grammar:
+//   m X Y      - move mouse cursor to game coordinates (X, Y)
+//   c X Y      - left click at (X, Y) (expands to move + press + release)
+//   rc X Y     - right click at (X, Y) (expands to move + press + release)
+//   ld/lu X Y  - left button press/release at (X, Y)
+//   rd/ru X Y  - right button press/release at (X, Y)
+//   k NAME     - key press + release (enter, escape, space, tab, left, right, up, down, a-z, 0-9, f1-f12, ...)
+//   kd/ku NAME - key press/release only
+//   w Y        - mouse wheel scroll by Y (positive is up)
+namespace fh2harness
+{
+    enum class CmdType : uint8_t
+    {
+        MOUSE_MOVE,
+        MOUSE_BUTTON,
+        KEY,
+        WHEEL
+    };
+
+    struct Cmd
+    {
+        CmdType type{ CmdType::MOUSE_MOVE };
+        int32_t x{ 0 };
+        int32_t y{ 0 };
+        bool isPressed{ false };
+        bool isRightButton{ false };
+        fheroes2::Key key{ fheroes2::Key::NONE };
+    };
+
+    std::mutex cmdMutex;
+    std::deque<Cmd> cmdQueue;
+
+    const char * harnessDir()
+    {
+        static const char * const dir = std::getenv( "FHEROES2_HARNESS" );
+        return ( dir != nullptr && *dir != '\0' ) ? dir : nullptr;
+    }
+
+    fheroes2::Key keyFromName( const std::string & name )
+    {
+        static const std::map<std::string, fheroes2::Key> keyMap = []() {
+            std::map<std::string, fheroes2::Key> result{ { "enter", fheroes2::Key::KEY_ENTER },
+                                                         { "escape", fheroes2::Key::KEY_ESCAPE },
+                                                         { "esc", fheroes2::Key::KEY_ESCAPE },
+                                                         { "space", fheroes2::Key::KEY_SPACE },
+                                                         { "tab", fheroes2::Key::KEY_TAB },
+                                                         { "backspace", fheroes2::Key::KEY_BACKSPACE },
+                                                         { "delete", fheroes2::Key::KEY_DELETE },
+                                                         { "left", fheroes2::Key::KEY_LEFT },
+                                                         { "right", fheroes2::Key::KEY_RIGHT },
+                                                         { "up", fheroes2::Key::KEY_UP },
+                                                         { "down", fheroes2::Key::KEY_DOWN },
+                                                         { "pageup", fheroes2::Key::KEY_PAGE_UP },
+                                                         { "pagedown", fheroes2::Key::KEY_PAGE_DOWN },
+                                                         { "home", fheroes2::Key::KEY_HOME },
+                                                         { "end", fheroes2::Key::KEY_END } };
+
+            for ( int32_t i = 0; i < 26; ++i ) {
+                result.emplace( std::string( 1, static_cast<char>( 'a' + i ) ), static_cast<fheroes2::Key>( static_cast<int32_t>( fheroes2::Key::KEY_A ) + i ) );
+            }
+            for ( int32_t i = 0; i < 10; ++i ) {
+                result.emplace( std::string( 1, static_cast<char>( '0' + i ) ), static_cast<fheroes2::Key>( static_cast<int32_t>( fheroes2::Key::KEY_0 ) + i ) );
+            }
+            for ( int32_t i = 0; i < 12; ++i ) {
+                result.emplace( "f" + std::to_string( i + 1 ), static_cast<fheroes2::Key>( static_cast<int32_t>( fheroes2::Key::KEY_F1 ) + i ) );
+            }
+
+            return result;
+        }();
+
+        const auto iter = keyMap.find( name );
+        return ( iter == keyMap.end() ) ? fheroes2::Key::NONE : iter->second;
+    }
+
+    void parseLine( const std::string & line )
+    {
+        std::istringstream stream( line );
+
+        std::string op;
+        if ( !( stream >> op ) ) {
+            return;
+        }
+
+        std::vector<Cmd> cmds;
+
+        const auto makeButton = []( const int32_t x, const int32_t y, const bool isPressed, const bool isRight ) {
+            Cmd cmd;
+            cmd.type = CmdType::MOUSE_BUTTON;
+            cmd.x = x;
+            cmd.y = y;
+            cmd.isPressed = isPressed;
+            cmd.isRightButton = isRight;
+            return cmd;
+        };
+
+        if ( op == "m" || op == "c" || op == "rc" || op == "ld" || op == "lu" || op == "rd" || op == "ru" ) {
+            int32_t x = 0;
+            int32_t y = 0;
+            if ( !( stream >> x >> y ) ) {
+                return;
+            }
+
+            if ( op == "m" || op == "c" || op == "rc" ) {
+                Cmd move;
+                move.type = CmdType::MOUSE_MOVE;
+                move.x = x;
+                move.y = y;
+                cmds.push_back( move );
+            }
+
+            if ( op == "c" || op == "ld" ) {
+                cmds.push_back( makeButton( x, y, true, false ) );
+            }
+            if ( op == "c" || op == "lu" ) {
+                cmds.push_back( makeButton( x, y, false, false ) );
+            }
+            if ( op == "rc" || op == "rd" ) {
+                cmds.push_back( makeButton( x, y, true, true ) );
+            }
+            if ( op == "rc" || op == "ru" ) {
+                cmds.push_back( makeButton( x, y, false, true ) );
+            }
+        }
+        else if ( op == "k" || op == "kd" || op == "ku" ) {
+            std::string name;
+            if ( !( stream >> name ) ) {
+                return;
+            }
+
+            const fheroes2::Key key = keyFromName( name );
+            if ( key == fheroes2::Key::NONE ) {
+                return;
+            }
+
+            Cmd cmd;
+            cmd.type = CmdType::KEY;
+            cmd.key = key;
+
+            if ( op == "k" || op == "kd" ) {
+                cmd.isPressed = true;
+                cmds.push_back( cmd );
+            }
+            if ( op == "k" || op == "ku" ) {
+                cmd.isPressed = false;
+                cmds.push_back( cmd );
+            }
+        }
+        else if ( op == "w" ) {
+            Cmd cmd;
+            cmd.type = CmdType::WHEEL;
+            if ( !( stream >> cmd.y ) ) {
+                return;
+            }
+            cmds.push_back( cmd );
+        }
+
+        if ( cmds.empty() ) {
+            return;
+        }
+
+        const std::lock_guard<std::mutex> lock( cmdMutex );
+        for ( const Cmd & cmd : cmds ) {
+            cmdQueue.push_back( cmd );
+        }
+    }
+
+    void readerLoop( const std::string & fifoPath )
+    {
+        while ( true ) {
+            std::ifstream fifo( fifoPath );
+            if ( !fifo.is_open() ) {
+                std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+                continue;
+            }
+
+            std::string line;
+            while ( std::getline( fifo, line ) ) {
+                parseLine( line );
+            }
+
+            // The writer has closed the pipe (EOF). Reopen it and wait for the next writer.
+            std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );
+        }
+    }
+
+    void ensureStarted()
+    {
+        static const bool started = []() {
+            const char * dir = harnessDir();
+            if ( dir == nullptr ) {
+                return false;
+            }
+
+            std::thread( readerLoop, std::string( dir ) + "/input" ).detach();
+            return true;
+        }();
+
+        (void)started;
+    }
+
+    bool popCommand( Cmd & cmd )
+    {
+        const std::lock_guard<std::mutex> lock( cmdMutex );
+        if ( cmdQueue.empty() ) {
+            return false;
+        }
+
+        cmd = cmdQueue.front();
+        cmdQueue.pop_front();
+        return true;
+    }
+}
 
 namespace
 {
@@ -1264,6 +1490,34 @@ bool LocalEvent::HandleEvents( const bool sleepAfterEventProcessing /* = true */
 
     if ( !_engine->handleEvents( *this, allowExit, isDisplayRefreshRequired ) ) {
         return false;
+    }
+
+    // Play-harness support: apply at most one injected input command per call, mirroring the engine's
+    // one-immediate-event-per-call processing model for native events.
+    if ( fh2harness::harnessDir() != nullptr ) {
+        fh2harness::ensureStarted();
+
+        fh2harness::Cmd cmd;
+        if ( fh2harness::popCommand( cmd ) ) {
+            switch ( cmd.type ) {
+            case fh2harness::CmdType::MOUSE_MOVE:
+                onMouseMotionEvent( { cmd.x, cmd.y } );
+                break;
+            case fh2harness::CmdType::MOUSE_BUTTON:
+                onMouseButtonEvent( cmd.isPressed, cmd.isRightButton ? MouseButtonType::MOUSE_BUTTON_RIGHT : MouseButtonType::MOUSE_BUTTON_LEFT, { cmd.x, cmd.y } );
+                break;
+            case fh2harness::CmdType::KEY:
+                onKeyboardEvent( cmd.key, 0, cmd.isPressed ? KeyboardEventState::KEY_DOWN : KeyboardEventState::KEY_UP );
+                break;
+            case fh2harness::CmdType::WHEEL:
+                onMouseWheelEvent( { cmd.x, cmd.y } );
+                break;
+            default:
+                break;
+            }
+
+            isDisplayRefreshRequired = true;
+        }
     }
 
     if ( _engine->isControllerValid() ) {
