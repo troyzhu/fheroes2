@@ -1,19 +1,21 @@
 #!/bin/bash
-# Build and run every agent C++ test (agent_play/tests/test_*.cpp).
+# Build fheroes2_agent_worker against the Makefile-built game objects.
 #
-# Same strategy as build_spike.sh: each test TU is compiled on its own and relinked against the
-# already-built game objects minus fheroes2.o (the game's main). Honors FHEROES2_WITH_ASAN /
-# FHEROES2_WITH_TSAN the same way the engine Makefile does.
+# Same relink strategy as agent_play/spike/build_spike.sh: the worker's main.cpp is the only new
+# translation unit; everything else (including src/fheroes2/agent/*) is already compiled into
+# src/dist/fheroes2/*.o by `make -C src/dist`. fheroes2.o (the game's main) is excluded.
+# Honors FHEROES2_WITH_ASAN / FHEROES2_WITH_TSAN like the engine Makefile.
 #
-# Prerequisite: `make -C src/dist -j…` has been run.
+# The CMake target for the worker (option ENABLE_AGENT) is planned for Milestone 4.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-TESTS_DIR="${REPO_ROOT}/agent_play/tests"
+WORKER_DIR="${REPO_ROOT}/src/agent_worker"
 OBJ_DIR="${REPO_ROOT}/src/dist/fheroes2"
 ENGINE_LIB="${REPO_ROOT}/src/dist/engine/libengine.a"
 SMACKER_LIB="${REPO_ROOT}/src/dist/thirdparty/libsmacker/libsmacker.a"
+OUT="${WORKER_DIR}/fheroes2_agent_worker"
 
 if [ ! -f "${OBJ_DIR}/fheroes2.o" ]; then
     echo "error: game objects not built. Run 'make -C src/dist -j…' first." >&2
@@ -44,33 +46,22 @@ if [ -n "${FHEROES2_WITH_ASAN:-}" ] || [ -n "${FHEROES2_WITH_TSAN:-}" ]; then
     SAN_FLAGS=( "-fsanitize=${SANITIZERS}" )
 fi
 
+echo "[1/2] compiling agent_worker main.cpp"
+c++ -c -o "${WORKER_DIR}/main.o" "${WORKER_DIR}/main.cpp" \
+    "${INCLUDES[@]}" "${SDL_CFLAGS[@]}" ${SAN_FLAGS[@]+"${SAN_FLAGS[@]}"} \
+    -fsigned-char -pthread -O2 -std=c++17 -Wall -Wextra
+
 GAME_OBJS=()
 for o in "${OBJ_DIR}"/*.o; do
     [ "$(basename "$o")" = "fheroes2.o" ] && continue
     GAME_OBJS+=( "$o" )
 done
 
-overall=0
-for src in "${TESTS_DIR}"/test_*.cpp; do
-    name="$(basename "${src}" .cpp)"
-    bin="${TESTS_DIR}/${name}"
+echo "[2/2] linking ${#GAME_OBJS[@]} game objects (fheroes2.o excluded) -> $(basename "${OUT}")"
+c++ -o "${OUT}" \
+    "${WORKER_DIR}/main.o" \
+    "${GAME_OBJS[@]}" \
+    "${ENGINE_LIB}" "${SMACKER_LIB}" \
+    ${SAN_FLAGS[@]+"${SAN_FLAGS[@]}"} -lSDL2_mixer "${SDL_LIBS[@]}" -lz -pthread
 
-    echo "== ${name}: build"
-    c++ -c -o "${bin}.o" "${src}" \
-        "${INCLUDES[@]}" "${SDL_CFLAGS[@]}" ${SAN_FLAGS[@]+"${SAN_FLAGS[@]}"} \
-        -fsigned-char -pthread -O2 -std=c++17 -Wall -Wextra
-    c++ -o "${bin}" "${bin}.o" "${GAME_OBJS[@]}" "${ENGINE_LIB}" "${SMACKER_LIB}" \
-        ${SAN_FLAGS[@]+"${SAN_FLAGS[@]}"} -lSDL2_mixer "${SDL_LIBS[@]}" -lz -pthread
-
-    echo "== ${name}: run"
-    if ! "${bin}"; then
-        overall=1
-    fi
-done
-
-if [ "${overall}" -eq 0 ]; then
-    echo "ALL TESTS PASSED"
-else
-    echo "TEST FAILURES PRESENT" >&2
-fi
-exit "${overall}"
+echo "built: ${OUT}"

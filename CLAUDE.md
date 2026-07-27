@@ -9,11 +9,14 @@ projects live on their own branches; the branch you are on determines which appl
 entry point: project goal, current status, findings that overturned the original plan, build and
 verification commands, ordered next steps, and the decisions not to relitigate.
 
-Quick orientation: Phase 0 is complete and passing (7/7); nothing beyond it is implemented. The
-branch modifies no engine source. Verify the build with:
+Quick orientation: Phase 0 and Milestone 1 (deterministic runner foundation) are complete and
+verified on both the M3 MacBook and the target Mac mini M2. Engine changes are minimal by design:
+the shared `Battle::computeBattleSeed` helper (`src/fheroes2/battle/battle_seed.{h,cpp}`) plus the
+entry-point-free agent library under `src/fheroes2/agent/` that both build systems compile into
+the normal executable without behavior change. Verify everything with:
 
 ```bash
-make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh && ./agent_play/spike/verify_phase0.sh
+make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh && ./agent_play/spike/verify_phase0.sh && ./agent_play/verify_m1.sh
 ```
 
 ## Branch `play-harness` — Claude plays the game through the real UI

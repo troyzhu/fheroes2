@@ -1,0 +1,81 @@
+/***************************************************************************
+ *   fheroes2: https://github.com/ihhub/fheroes2                           *
+ *   Copyright (C) 2026                                                    *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#pragma once
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <vector>
+
+namespace fheroes2::agent
+{
+    // One slot per army position. Slot order is part of the engine-compatible combat seed and of
+    // initial battlefield placement, so positions are always represented explicitly (agent spec,
+    // section 11.2).
+    struct StackSpec
+    {
+        // Monster id as defined by the Monster class; 0 is Monster::UNKNOWN and marks an empty slot.
+        int monsterId{ 0 };
+        uint32_t count{ 0 };
+
+        bool isEmpty() const
+        {
+            return count == 0;
+        }
+    };
+
+    // Checked against Army::maximumTroopCount where the Army headers are available.
+    inline constexpr size_t scenarioSlotCount{ 5 };
+
+    // Safety cap from the scenario validation rules (agent spec, section 11.1).
+    inline constexpr uint32_t scenarioMaxStackCount{ 500000 };
+
+    struct SideSpec
+    {
+        std::array<StackSpec, scenarioSlotCount> slots{};
+    };
+
+    // A fixed creature-only field battle on the 2 x 2 Battle Only world: the C++ counterpart of
+    // scenario schema v1 (agent spec, section 11) restricted to what Milestone 1 needs. JSON
+    // parsing arrives with the protocol worker; until then scenarios are constructed in code.
+    struct Scenario
+    {
+        std::string scenarioId;
+        // A Maps::Ground ground type value. UNKNOWN (0) is rejected by validation.
+        int groundType{ 0 };
+        // Fixed by the battle profile; anything except 1 is rejected (agent spec, section 7.5).
+        int32_t tileIndex{ 1 };
+        uint32_t worldSeed{ 0 };
+        int32_t maxRounds{ 100 };
+        SideSpec attacker;
+        SideSpec defender;
+    };
+
+    // Returns an empty string when the scenario is valid, otherwise a human-readable reason for
+    // the first violated rule.
+    std::string validateScenario( const Scenario & scenario );
+
+    // The fixed Milestone 1 fixture suite: tiny one-stack, three-stack, five-stack, ranged-heavy
+    // and a longer balanced battle (the workload shapes of agent spec, section 19.2). All
+    // fixtures pass validateScenario().
+    const std::vector<Scenario> & milestone1Fixtures();
+}

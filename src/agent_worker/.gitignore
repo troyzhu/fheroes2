@@ -1,0 +1,3 @@
+# Build outputs of build_worker.sh.
+*.o
+fheroes2_agent_worker

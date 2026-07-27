@@ -17,7 +17,10 @@ automation. Build a trustworthy substrate first.
 
 **Not to be confused with** the `play-harness` branch, which is a *different* project on this same
 repo: frame-dumping + an input FIFO so Claude can play the game through the real UI. That one is
-pixels-and-GUI by design. Keep them separate; this branch has no engine modifications.
+pixels-and-GUI by design. Keep them separate. Engine modifications on this branch are minimal and
+deliberate: the shared `Battle::computeBattleSeed` helper (Milestone 1, behavior-preserving —
+digest-verified) and the entry-point-free `src/fheroes2/agent/` library that compiles into the
+normal executable without changing it.
 
 ---
 
@@ -35,11 +38,18 @@ beyond it.**
   ~4.6k eps/s tiny-melee, 12 MB RSS, multi-process sweet spot at 4 workers)
 - ✅ CMake normal-game regression builds and launches on the mini; ASan+UBSan pass clean over
   1 900 episodes across five compositions (2026-07-27)
+- ✅ **Milestone 1 complete** (2026-07-27): shared `Battle::computeBattleSeed` helper (extraction
+  digest-verified, golden unit tests), agent library under `src/fheroes2/agent/` (scenario
+  fixtures + validation, SHA-256 canonical terminal digest, headless AI-vs-AI runner), worker
+  entry point in `src/agent_worker/`, and `agent_play/verify_m1.sh` — ten-run determinism holds
+  for all five fixtures, cross-process output is byte-identical, both build systems still build
+  the normal game
 - ⚠️ One runbook item needs a human: a real Battle Only battle played through the UI (§6.3)
-- ❌ Milestone 1 onward: **not started**
+- ❌ Milestone 2 onward (decision hook, passive logging): **not started**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
-No engine source is modified on this branch — verify with `git diff master --stat`.
+Engine-source changes are limited to the Milestone 1 seed-helper extraction plus the additive
+`src/fheroes2/agent/` library — enumerate with `git diff master --stat -- src/`.
 
 ---
 
@@ -133,8 +143,17 @@ because it would mean determinism does not hold on the target hardware.
    episodes across five compositions (mirror melee 50/1000, archer-vs-peasant, ranger duel,
    archer-vs-ranger): **zero ASan/UBSan reports**, all runs deterministic. ~700 eps/s, 207 MB RSS
    under instrumentation.
-5. **Then Milestone 1** per spec §20 — now smaller than written, since the world-seed engine patch
-   is no longer needed.
+5. ✅ **Milestone 1** — done 2026-07-27, exit criterion met (`./agent_play/verify_m1.sh`: ten
+   identical runs per fixture, cross-process byte-identical). The world-seed reseed (spec §7.2
+   option 1) is used as planned; no `World` API overload was needed. `m1_tiny_melee` reproduces
+   the historical map/combat seeds (2227197244 / 1356111745); note its terminal digest is the new
+   canonical SHA-256 (`agent_terminal_v1`), intentionally not comparable to the spike's FNV fold.
+6. **Next: Milestone 2** per spec §20 — optional `Battle::DecisionController` seam in
+   `Arena::UnitTurn` (§9), typed `CommandSnapshot` (§10.5), passive built-in-AI trajectory
+   logging. Exit: built-in behavior unchanged with a null controller (digest-verified) and
+   passive logs replay deterministically. The §9 dispatch sketch and §9.3 invariants are the
+   contract; read §3.6–§3.8 (turn dispatch, RNG stream semantics) before touching
+   `battle_arena.cpp`.
 
 ---
 
@@ -143,9 +162,9 @@ because it would mean determinism does not hold on the target hardware.
 - Agent work lives on `agent-env`, branched from `master`, **not** on top of `play-harness`. Both
   trees produce the identical battle digest, proving the harness patch is inert, but the baseline
   stays clean anyway.
-- The spike **duplicates** `computeBattleSeed` from `battle_main.cpp` verbatim rather than extracting
-  it, so the spike stays a pure add-on. Extraction into a shared helper (spec §7.3) is still the
-  right production move — that duplication is the argument for it.
+- ~~The spike duplicates `computeBattleSeed` from `battle_main.cpp` verbatim.~~ Resolved in
+  Milestone 1: the helper lives in `src/fheroes2/battle/battle_seed.{h,cpp}`, used by the engine,
+  the spike and the agent runner, with golden-value tests in `agent_play/tests/`.
 - The spike's digest is an FNV fold, not SHA-256. Enough to detect divergence; the real environment
   needs the canonical digest in spec §12.5.
 - Baseline is the current `master` lineage, **not** the `1.1.17` tag the spec originally pinned. The
