@@ -1,5 +1,7 @@
 # Phase 0 spike — headless battle smoke test
 
+> New here? Read **`docs/agent/START_HERE.md`** first.
+
 Throwaway diagnostic that answers the Phase 0 questions in
 `agent_play/fheroes2_agent_system_spec_v0.3.md` §2.4. **Not** the eventual agent worker:
 there is no decision hook, no candidate generation, no protocol, and no Python here.
