@@ -68,8 +68,9 @@ Protocol-ish output goes to stdout; the config banner goes to stderr.
   identical to Release, and an ASan+UBSan build ran 1 900 episodes across five compositions with
   zero reports. (Note: the Makefile's `-O3` build never defines `-DNDEBUG`, so asserts were live
   in every "Release" run all along.)
-- `computeBattleSeed` is duplicated verbatim from `battle_main.cpp` because the engine does not
-  export it. That duplication is the argument for the shared helper in spec §7.3.
+- ~~`computeBattleSeed` is duplicated verbatim from `battle_main.cpp`.~~ Resolved by Milestone 1:
+  the helper now lives in `src/fheroes2/battle/battle_seed.{h,cpp}` and both the engine and this
+  spike call it; `agent_play/tests/test_battle_seed.cpp` pins its golden values.
 - The digest is an FNV-style fold, not SHA-256. Sufficient to detect divergence between runs; the
   real environment needs the canonical digest defined in spec §12.5.
 - ~~Measured on an Apple M3, not the target Mac mini M2.~~ Resolved 2026-07-27: reproduced on the

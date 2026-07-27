@@ -38,6 +38,7 @@
 #include "battle.h" // IWYU pragma: associated
 #include "battle_arena.h"
 #include "battle_army.h"
+#include "battle_seed.h"
 #include "campaign_savedata.h"
 #include "captain.h"
 #include "dialog.h"
@@ -129,35 +130,6 @@ namespace
 
             *art = Artifact::UNKNOWN;
         }
-    }
-
-    uint32_t computeBattleSeed( const int32_t mapIndex, const uint32_t mapSeed, const Army & attackingArmy, const Army & defendingArmy )
-    {
-        uint32_t seed = static_cast<uint32_t>( mapIndex ) + mapSeed;
-
-        for ( size_t i = 0; i < attackingArmy.Size(); ++i ) {
-            const Troop * troop = attackingArmy.GetTroop( i );
-            if ( troop->isValid() ) {
-                Rand::combineSeedWithValueHash( seed, troop->GetID() );
-                Rand::combineSeedWithValueHash( seed, troop->GetCount() );
-            }
-            else {
-                Rand::combineSeedWithValueHash( seed, 0 );
-            }
-        }
-
-        for ( size_t i = 0; i < defendingArmy.Size(); ++i ) {
-            const Troop * troop = defendingArmy.GetTroop( i );
-            if ( troop->isValid() ) {
-                Rand::combineSeedWithValueHash( seed, troop->GetID() );
-                Rand::combineSeedWithValueHash( seed, troop->GetCount() );
-            }
-            else {
-                Rand::combineSeedWithValueHash( seed, 0 );
-            }
-        }
-
-        return seed;
     }
 
     uint32_t getBattleResult( const uint32_t army )

@@ -1,0 +1,4 @@
+# Built test binaries and their objects (test sources are test_*.cpp and re-included below).
+*.o
+test_*
+!test_*.cpp

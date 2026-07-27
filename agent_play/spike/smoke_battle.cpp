@@ -25,6 +25,7 @@
 #include "battle.h"
 #include "battle_arena.h"
 #include "battle_army.h"
+#include "battle_seed.h"
 #include "battle_troop.h"
 #include "color.h"
 #include "ground.h"
@@ -38,38 +39,11 @@
 
 namespace
 {
-    // NOTE: this is a verbatim copy of the anonymous-namespace computeBattleSeed() in
-    // src/fheroes2/battle/battle_main.cpp. It is duplicated here ONLY because the engine
-    // does not currently export it. Confirming that this duplicate reproduces the engine's
-    // own seed is precisely why the spec asks for it to be extracted into a shared helper.
-    uint32_t computeBattleSeed( const int32_t mapIndex, const uint32_t mapSeed, const Army & attackingArmy, const Army & defendingArmy )
-    {
-        uint32_t seed = static_cast<uint32_t>( mapIndex ) + mapSeed;
-
-        for ( size_t i = 0; i < attackingArmy.Size(); ++i ) {
-            const Troop * troop = attackingArmy.GetTroop( i );
-            if ( troop->isValid() ) {
-                Rand::combineSeedWithValueHash( seed, troop->GetID() );
-                Rand::combineSeedWithValueHash( seed, troop->GetCount() );
-            }
-            else {
-                Rand::combineSeedWithValueHash( seed, 0 );
-            }
-        }
-
-        for ( size_t i = 0; i < defendingArmy.Size(); ++i ) {
-            const Troop * troop = defendingArmy.GetTroop( i );
-            if ( troop->isValid() ) {
-                Rand::combineSeedWithValueHash( seed, troop->GetID() );
-                Rand::combineSeedWithValueHash( seed, troop->GetCount() );
-            }
-            else {
-                Rand::combineSeedWithValueHash( seed, 0 );
-            }
-        }
-
-        return seed;
-    }
+    // NOTE: this spike originally carried a verbatim copy of the anonymous-namespace
+    // computeBattleSeed() from src/fheroes2/battle/battle_main.cpp, because the engine did not
+    // export it. That duplicate proved the engine's seed was reproducible externally and became
+    // the argument for the shared helper the spec asked for; the spike now calls the extracted
+    // Battle::computeBattleSeed() from battle_seed.h like the engine itself does.
 
     struct EpisodeResult
     {
@@ -203,7 +177,7 @@ namespace
         defendingArmy.GetTroop( 0 )->Set( Monster( monsterB ), countB );
 
         const int32_t tileIndex = 1;
-        result.combatSeed = computeBattleSeed( tileIndex, result.mapSeed, attackingArmy, defendingArmy );
+        result.combatSeed = Battle::computeBattleSeed( tileIndex, result.mapSeed, attackingArmy, defendingArmy );
 
         Rand::PCG32 randomGenerator( result.combatSeed );
 
