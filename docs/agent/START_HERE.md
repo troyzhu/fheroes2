@@ -26,8 +26,8 @@ normal executable without changing it.
 
 ## 2. Status as of 2026-07-27
 
-**Phase 0 is complete and passing, including on the target Mac mini M2. Nothing is implemented
-beyond it.**
+**Phase 0 and Milestone 1 are complete and verified on the target Mac mini M2. Milestone 2 is
+next.**
 
 - ✅ Spec written, source-cross-checked, then corrected against runtime evidence (v0.3)
 - ✅ Phase 0 validated: 7/7 automated experiments pass, reproduced from a clean clone
@@ -112,9 +112,11 @@ git switch agent-env
 make -C src/dist -j"$(sysctl -n hw.ncpu)"
 ./agent_play/spike/build_spike.sh
 ./agent_play/spike/verify_phase0.sh
+./agent_play/verify_m1.sh                    # Milestone 1: unit tests + worker + determinism
 ```
 
-**Expected: `7 passed, 0 failed`**, with map seed `2227197244` and melee digest `2cfd42cb104aa5e7`.
+**Expected: `7 passed, 0 failed`**, with map seed `2227197244` and melee digest `2cfd42cb104aa5e7`,
+then `4 passed, 0 failed` from the Milestone 1 verification.
 
 Those two values are machine-independent and have reproduced across three separate working trees.
 **A mismatch on the mini is a real finding** — stop and investigate before building anything on top,
