@@ -33,6 +33,9 @@ beyond it.**
   and identical between the two build types
 - ✅ M2 benchmark measured and written up: `docs/agent/benchmark_m2.md` (Mode A only —
   ~4.6k eps/s tiny-melee, 12 MB RSS, multi-process sweet spot at 4 workers)
+- ✅ CMake normal-game regression builds and launches on the mini; ASan+UBSan pass clean over
+  1 900 episodes across five compositions (2026-07-27)
+- ⚠️ One runbook item needs a human: a real Battle Only battle played through the UI (§6.3)
 - ❌ Milestone 1 onward: **not started**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
@@ -120,8 +123,16 @@ because it would mean determinism does not hold on the target hardware.
 2. ✅ **Re-measure on the mini** — done 2026-07-27: `docs/agent/benchmark_m2.md` (Mode A via
    `agent_play/spike/bench_m2.sh`). Headline: ~4.6k eps/s tiny-melee (M2 ≈ 9 % slower than M3),
    12 MB RSS, startup 10 ms, scaling linear to 4 workers then flat. Modes B/C blocked on M4–M5.
-3. **CMake normal-game regression** plus one real Battle Only run through the UI.
-4. **Sanitizers** (ASan/UBSan) on a representative battle.
+3. ◐ **CMake normal-game regression** — done 2026-07-27: `cmake -S . -B build/cmake-regression
+   -DCMAKE_BUILD_TYPE=Release` configures and builds to 100 % on the mini, and both the CMake and
+   the Makefile binaries launch to the main menu against the local `devdata/` root and survive
+   12 s with clean logs. **Still open (needs a human at the screen): one real Battle Only battle
+   played through the UI.** Launch: `FHEROES2_DATA="$PWD/devdata" ./src/dist/fheroes2/fheroes2`.
+4. ✅ **Sanitizers** — done 2026-07-27: full `FHEROES2_WITH_ASAN=1` engine build (implies UBSan),
+   spike relinked with matching flags (`build_spike.sh` now honors the same env vars). 1 900
+   episodes across five compositions (mirror melee 50/1000, archer-vs-peasant, ranger duel,
+   archer-vs-ranger): **zero ASan/UBSan reports**, all runs deterministic. ~700 eps/s, 207 MB RSS
+   under instrumentation.
 5. **Then Milestone 1** per spec §20 — now smaller than written, since the world-seed engine patch
    is no longer needed.
 
@@ -145,6 +156,12 @@ because it would mean determinism does not hold on the target hardware.
 
 ## 8. Gotchas that will bite
 
+- **A `FHEROES2_DATA` root needs the repo's own h2d bundle, not just the GOG extraction.**
+  Non-bundle builds resolve `files/data/resurrection.h2d` against each data root
+  (`h2d.cpp:110`) and throw at startup if it is nowhere. A root made only of extracted HoMM2
+  assets fails ~9 s in, after the intro. Fix: `mkdir -p "$FHEROES2_DATA/files/data" && cp
+  files/data/resurrection.h2d "$FHEROES2_DATA/files/data/"`. (Running the repo-root `./fheroes2`
+  copy masks this, because the executable-directory search root then contains `files/data/`.)
 - **Repo paths with spaces.** The Mac mini's clone lives at `/Volumes/External Drive/…`.
   `build_spike.sh` originally kept its `-I` flags in a whitespace-joined string and broke there;
   it now uses bash arrays. Any future build script must pass flag lists as arrays

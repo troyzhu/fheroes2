@@ -44,9 +44,22 @@ else
     SDL_LIBS=( -L/opt/homebrew/lib -lSDL2 )
 fi
 
+# Mirror the engine Makefile's sanitizer convention (src/dist/Makefile): if the game
+# objects were built with FHEROES2_WITH_ASAN / FHEROES2_WITH_TSAN, the spike must be
+# compiled AND linked with the same -fsanitize set, or the link fails on missing
+# sanitizer runtime symbols. The ${arr[@]+...} expansion below is required because
+# macOS ships bash 3.2, where "${arr[@]}" on an empty array trips `set -u`.
+SAN_FLAGS=()
+if [ -n "${FHEROES2_WITH_ASAN:-}" ] || [ -n "${FHEROES2_WITH_TSAN:-}" ]; then
+    SANITIZERS="undefined"
+    [ -n "${FHEROES2_WITH_ASAN:-}" ] && SANITIZERS="${SANITIZERS},address"
+    [ -n "${FHEROES2_WITH_TSAN:-}" ] && SANITIZERS="${SANITIZERS},thread"
+    SAN_FLAGS=( "-fsanitize=${SANITIZERS}" )
+fi
+
 echo "[1/2] compiling smoke_battle.cpp"
 c++ -c -o "${SPIKE_DIR}/smoke_battle.o" "${SPIKE_DIR}/smoke_battle.cpp" \
-    "${INCLUDES[@]}" "${SDL_CFLAGS[@]}" \
+    "${INCLUDES[@]}" "${SDL_CFLAGS[@]}" ${SAN_FLAGS[@]+"${SAN_FLAGS[@]}"} \
     -fsigned-char -pthread -O2 -std=c++17 -Wall -Wextra
 
 # Every game object except the one carrying the real main().
@@ -61,6 +74,6 @@ c++ -o "${OUT}" \
     "${SPIKE_DIR}/smoke_battle.o" \
     "${GAME_OBJS[@]}" \
     "${ENGINE_LIB}" "${SMACKER_LIB}" \
-    -lSDL2_mixer "${SDL_LIBS[@]}" -lz -pthread
+    ${SAN_FLAGS[@]+"${SAN_FLAGS[@]}"} -lSDL2_mixer "${SDL_LIBS[@]}" -lz -pthread
 
 echo "built: ${OUT}"

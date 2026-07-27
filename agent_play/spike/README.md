@@ -15,6 +15,14 @@ make -C src/dist -j10          # once, from the repo root — produces the game 
 ./agent_play/spike/build_spike.sh
 ```
 
+For a sanitizer run, build the engine and the spike with the same switch (the script mirrors the
+`src/dist` Makefile convention and adds the matching `-fsanitize` flags to compile and link):
+
+```bash
+FHEROES2_WITH_ASAN=1 make -C src/dist -j10
+FHEROES2_WITH_ASAN=1 ./agent_play/spike/build_spike.sh
+```
+
 `build_spike.sh` compiles only `smoke_battle.cpp` and relinks it against the existing
 `src/dist/fheroes2/*.o`, **excluding `fheroes2.o`** — the translation unit holding the game's real
 `main()`. That is deliberate: it is the cheapest possible test of the spec's constraint that the
@@ -56,9 +64,13 @@ Protocol-ish output goes to stdout; the config banner goes to stderr.
 
 ## Known limitations
 
-- **Release-only.** The Debug assertion run in spec §2.4 has not been done.
+- ~~Release-only.~~ Resolved 2026-07-27: the `FHEROES2_WITH_DEBUG` run passed 7/7 with digests
+  identical to Release, and an ASan+UBSan build ran 1 900 episodes across five compositions with
+  zero reports. (Note: the Makefile's `-O3` build never defines `-DNDEBUG`, so asserts were live
+  in every "Release" run all along.)
 - `computeBattleSeed` is duplicated verbatim from `battle_main.cpp` because the engine does not
   export it. That duplication is the argument for the shared helper in spec §7.3.
 - The digest is an FNV-style fold, not SHA-256. Sufficient to detect divergence between runs; the
   real environment needs the canonical digest defined in spec §12.5.
-- Measured on an Apple M3, **not** the target Mac mini M2.
+- ~~Measured on an Apple M3, not the target Mac mini M2.~~ Resolved 2026-07-27: reproduced on the
+  M2 with identical seed and digest; see `docs/agent/benchmark_m2.md`.
