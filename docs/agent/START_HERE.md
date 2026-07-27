@@ -23,12 +23,17 @@ pixels-and-GUI by design. Keep them separate; this branch has no engine modifica
 
 ## 2. Status as of 2026-07-27
 
-**Phase 0 is complete and passing. Nothing is implemented beyond it.**
+**Phase 0 is complete and passing, including on the target Mac mini M2. Nothing is implemented
+beyond it.**
 
 - ✅ Spec written, source-cross-checked, then corrected against runtime evidence (v0.3)
 - ✅ Phase 0 validated: 7/7 automated experiments pass, reproduced from a clean clone
+- ✅ Reproduced on the target **Mac mini M2** (2026-07-27): 7/7 in both the `-O3` and the
+  `FHEROES2_WITH_DEBUG` (`-O0 -g`) builds; map seed and digest identical to the M3 baseline,
+  and identical between the two build types
+- ✅ M2 benchmark measured and written up: `docs/agent/benchmark_m2.md` (Mode A only —
+  ~4.6k eps/s tiny-melee, 12 MB RSS, multi-process sweet spot at 4 workers)
 - ❌ Milestone 1 onward: **not started**
-- ⚠️ All measurements so far are from an Apple **M3 MacBook, not the target Mac mini M2**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
 No engine source is modified on this branch — verify with `git diff master --stat`.
@@ -106,18 +111,15 @@ because it would mean determinism does not hold on the target hardware.
 
 ## 6. What to do next, in order
 
-1. **Debug-build assertion run.** Highest value. Release compiles out the asserts in `ApplyAction`
-   and the `assert( _interface != nullptr )` on the non-AI path, so this is the real test that the
-   action pipeline is sound. The spike has only ever run Release.
-   ```bash
-   make -C src/dist clean
-   FHEROES2_WITH_DEBUG=1 make -C src/dist -j"$(sysctl -n hw.ncpu)"
-   ./agent_play/spike/build_spike.sh && ./agent_play/spike/verify_phase0.sh
-   make -C src/dist clean   # then rebuild Release
-   ```
-2. **Re-measure on the mini** and create `docs/agent/benchmark_m2.md` (does not exist yet — it is
-   your output, per spec §19.4). The M3 figures (~5000 episodes/s, 12.9 MB peak RSS) are indicative
-   only and must not be quoted as a baseline.
+1. ✅ **Debug-build assertion run** — done 2026-07-27 on the M2: 7/7, no assertion fired, digest
+   identical to Release. Correction discovered on the way: the `src/dist` Makefile never defines
+   `-DNDEBUG`, so its `-O3` build already had `assert()` live — every Phase 0 run on both machines
+   exercised the `ApplyAction` asserts. (The original rationale here — "Release compiles out the
+   asserts" — is true only for CMake Release builds.) The `FHEROES2_WITH_DEBUG` run still added
+   `-O0` codegen and `-DWITH_DEBUG` coverage.
+2. ✅ **Re-measure on the mini** — done 2026-07-27: `docs/agent/benchmark_m2.md` (Mode A via
+   `agent_play/spike/bench_m2.sh`). Headline: ~4.6k eps/s tiny-melee (M2 ≈ 9 % slower than M3),
+   12 MB RSS, startup 10 ms, scaling linear to 4 workers then flat. Modes B/C blocked on M4–M5.
 3. **CMake normal-game regression** plus one real Battle Only run through the UI.
 4. **Sanitizers** (ASan/UBSan) on a representative battle.
 5. **Then Milestone 1** per spec §20 — now smaller than written, since the world-seed engine patch
@@ -143,6 +145,13 @@ because it would mean determinism does not hold on the target hardware.
 
 ## 8. Gotchas that will bite
 
+- **Repo paths with spaces.** The Mac mini's clone lives at `/Volumes/External Drive/…`.
+  `build_spike.sh` originally kept its `-I` flags in a whitespace-joined string and broke there;
+  it now uses bash arrays. Any future build script must pass flag lists as arrays
+  (`"${FLAGS[@]}"`), never as unquoted strings.
+- **The Makefile build has no `-DNDEBUG`.** `assert()` is live even in the `-O3` "Release"
+  `src/dist` build. Do not reason from CMake habits: a CMake `Release` build *does* define
+  `NDEBUG` and strips asserts. Benchmark numbers from the two systems are not interchangeable.
 - **`make -C src/dist clean` after every upstream sync.** The `-MD` depfiles hard-code header paths,
   so an upstream header rename breaks incremental builds with `No rule to make target '.../x.h'`.
   This is a stale-depfile artifact, never a code fault.
