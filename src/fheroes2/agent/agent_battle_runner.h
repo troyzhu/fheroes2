@@ -78,6 +78,8 @@ namespace fheroes2::agent
         std::string stateDigest;
     };
 
+    struct EpisodeRecording;
+
     // Runs one complete headless AI-vs-AI episode for a scenario that has already passed
     // validateScenario(). Reseeds the process-global thread-local random device to make the
     // generated world reproducible -- deliberate for a dedicated worker process, unacceptable
@@ -85,5 +87,9 @@ namespace fheroes2::agent
     //
     // One live Battle::Arena is allowed per process; this function owns its arena for the whole
     // call, so callers must not hold another one.
-    EpisodeOutcome runEpisode( const Scenario & scenario );
+    //
+    // When `recording` is non-null, every full-fledged built-in-AI decision is captured
+    // passively (typed command snapshots plus a decision-stream digest) through the
+    // Battle::DecisionController observer; the battle outcome itself is unaffected.
+    EpisodeOutcome runEpisode( const Scenario & scenario, EpisodeRecording * recording = nullptr );
 }

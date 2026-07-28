@@ -22,13 +22,18 @@
 
 #include <cassert>
 #include <cstddef>
+#include <utility>
 
+#include "agent_command_snapshot.h"
 #include "agent_digest.h"
+#include "agent_trajectory.h"
 #include "army.h"
 #include "army_troop.h"
 #include "battle.h"
 #include "battle_arena.h"
 #include "battle_army.h"
+#include "battle_command.h"
+#include "battle_decision_controller.h"
 #include "battle_seed.h"
 #include "battle_troop.h"
 #include "color.h"
@@ -41,12 +46,47 @@
 
 namespace
 {
+    using fheroes2::agent::DecisionRecord;
     using fheroes2::agent::EpisodeOutcome;
     using fheroes2::agent::Scenario;
     using fheroes2::agent::SideSummary;
     using fheroes2::agent::StackSpec;
     using fheroes2::agent::Termination;
     using fheroes2::agent::UnitTerminalState;
+
+    // Records every full-fledged built-in-AI decision without ever influencing one: it claims
+    // no decisions and only observes the chosen actions before they are applied (agent spec,
+    // sections 9 and 15.2). Digest equality with recorder attached vs detached is part of the
+    // Milestone 2 verification.
+    class PassiveTeacherRecorder final : public Battle::DecisionController
+    {
+    public:
+        bool handlesDecision( const Battle::Arena & /* arena */, const Battle::Unit & /* currentUnit */ ) const override
+        {
+            return false;
+        }
+
+        void chooseActions( Battle::Arena & /* arena */, const Battle::Unit & /* currentUnit */, Battle::Actions & /* output */ ) override
+        {
+            // Unreachable: handlesDecision() is always false.
+            assert( 0 );
+        }
+
+        void observeChosenActions( const Battle::Arena & arena, const Battle::Unit & currentUnit, const Battle::Actions & actions ) override
+        {
+            DecisionRecord record;
+            record.engineDecisionIndex = arena.GetEngineDecisionIndex();
+            record.unitUid = currentUnit.GetUID();
+            record.actions.reserve( actions.size() );
+            for ( const Battle::Command & command : actions ) {
+                record.actions.push_back( fheroes2::agent::snapshotCommand( command ) );
+            }
+
+            decisions.push_back( std::move( record ) );
+        }
+
+        std::vector<DecisionRecord> decisions;
+    };
 
     void fillArmy( Army & army, const PlayerColor color, const fheroes2::agent::SideSpec & side )
     {
@@ -131,9 +171,11 @@ const char * fheroes2::agent::terminationName( const Termination termination )
     }
 }
 
-fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & scenario )
+fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & scenario, EpisodeRecording * recording /* = nullptr */ )
 {
     assert( validateScenario( scenario ).empty() );
+
+    PassiveTeacherRecorder recorder;
 
     EpisodeOutcome outcome;
     outcome.effectiveWorldSeed = scenario.worldSeed;
@@ -168,7 +210,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     {
         // Scoped: the engine allows one arena per process and asserts on a second, so the arena
         // must be destroyed before this function can run again.
-        Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, false, randomGenerator );
+        Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, false, randomGenerator, ( recording != nullptr ) ? &recorder : nullptr );
 
         while ( arena.BattleValid() && outcome.rounds < scenario.maxRounds ) {
             arena.Turns();
@@ -201,6 +243,11 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     }
 
     outcome.stateDigest = computeStateDigest( outcome );
+
+    if ( recording != nullptr ) {
+        recording->decisions = std::move( recorder.decisions );
+        recording->decisionDigest = computeDecisionDigest( recording->decisions );
+    }
 
     return outcome;
 }

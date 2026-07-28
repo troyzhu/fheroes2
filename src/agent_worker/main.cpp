@@ -37,12 +37,14 @@
 
 #include "agent_battle_runner.h"
 #include "agent_scenario.h"
+#include "agent_trajectory.h"
 #include "logging.h"
 
 int main( int argc, char ** argv )
 {
     int runs = 10;
     std::string onlyFixture;
+    std::string trajectoryDir;
     bool quiet = false;
 
     for ( int i = 1; i < argc; ++i ) {
@@ -66,12 +68,15 @@ int main( int argc, char ** argv )
             }
             return 0;
         }
+        else if ( std::strcmp( argv[i], "--trajectory-dir" ) == 0 ) {
+            trajectoryDir = next( "--trajectory-dir" );
+        }
         else if ( std::strcmp( argv[i], "--quiet" ) == 0 ) {
             quiet = true;
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--fixture ID] [--list] [--quiet]\n"
+                          "usage: fheroes2_agent_worker [--runs N] [--fixture ID] [--trajectory-dir DIR] [--list] [--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
             return 2;
@@ -107,19 +112,44 @@ int main( int argc, char ** argv )
     std::fprintf( stderr, "[worker] fixtures=%zu runs=%d\n", scenarios.size(), runs );
 
     std::map<std::string, std::set<std::string>> digestsPerScenario;
+    std::map<std::string, std::set<std::string>> decisionDigestsPerScenario;
 
     for ( const auto & scenario : scenarios ) {
         for ( int run = 0; run < runs; ++run ) {
-            const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario );
+            // Passive teacher recording is always on: it must never change the outcome (that
+            // invariance is exactly what the golden state digests verify), and it yields the
+            // decision-stream digest reported below.
+            fheroes2::agent::EpisodeRecording recording;
+            const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, &recording );
+
             digestsPerScenario[scenario.scenarioId].insert( outcome.stateDigest );
+            decisionDigestsPerScenario[scenario.scenarioId].insert( recording.decisionDigest );
+
+            if ( !trajectoryDir.empty() ) {
+                char runSuffix[16];
+                std::snprintf( runSuffix, sizeof( runSuffix ), "-run%02d", run );
+
+                const std::string path = trajectoryDir + "/" + scenario.scenarioId + runSuffix + ".jsonl";
+                fheroes2::agent::TrajectoryWriter writer( path );
+                if ( !writer.isOpen() ) {
+                    std::fprintf( stderr, "cannot open trajectory file: %s\n", path.c_str() );
+                    return 2;
+                }
+
+                writer.writeHeader( scenario, outcome.mapSeed, outcome.combatSeed );
+                for ( const fheroes2::agent::DecisionRecord & decision : recording.decisions ) {
+                    writer.writeDecision( decision );
+                }
+                writer.writeTerminal( outcome, recording.decisions.size(), recording.decisionDigest );
+            }
 
             if ( !quiet && run == 0 ) {
                 std::printf( "fixture=%s map_seed=%u combat_seed=%u rounds=%d termination=%s a_stacks=%u a_creatures=%u a_hp=%u d_stacks=%u d_creatures=%u "
-                             "d_hp=%u digest=%s\n",
+                             "d_hp=%u decisions=%zu decision_digest=%s digest=%s\n",
                              scenario.scenarioId.c_str(), outcome.mapSeed, outcome.combatSeed, outcome.rounds,
                              fheroes2::agent::terminationName( outcome.termination ), outcome.attacker.liveStacks, outcome.attacker.liveCreatures,
                              outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints,
-                             outcome.stateDigest.c_str() );
+                             recording.decisions.size(), recording.decisionDigest.c_str(), outcome.stateDigest.c_str() );
             }
         }
     }
@@ -127,8 +157,10 @@ int main( int argc, char ** argv )
     bool deterministic = true;
     for ( const auto & scenario : scenarios ) {
         const size_t distinct = digestsPerScenario[scenario.scenarioId].size();
-        std::printf( "RESULT fixture=%s runs=%d distinct_digests=%zu\n", scenario.scenarioId.c_str(), runs, distinct );
-        if ( distinct != 1 ) {
+        const size_t distinctDecisions = decisionDigestsPerScenario[scenario.scenarioId].size();
+        std::printf( "RESULT fixture=%s runs=%d distinct_digests=%zu distinct_decision_digests=%zu\n", scenario.scenarioId.c_str(), runs, distinct,
+                     distinctDecisions );
+        if ( distinct != 1 || distinctDecisions != 1 ) {
             deterministic = false;
         }
     }
