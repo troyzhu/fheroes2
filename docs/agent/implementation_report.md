@@ -26,6 +26,9 @@
    | `21f1fb1ed` | **Milestone 1**: agent library, worker, tests | the bulk of new code |
    | `a0e1540a2` | Doc polish | trivial |
    | `85c30a11f` | Verified RL research + ADRs 0001/0002 | design review — read the ADRs |
+   | `45f73397b` | Implementation report + ADR 0003 (config management) | docs only |
+   | `e155f9b22` | **Engine seam**: optional `Battle::DecisionController` in `Arena::UnitTurn` | the second behavior-relevant engine diff — see below |
+   | `8b884582c` | **Milestone 2**: `CommandSnapshot`, passive teacher logging, `verify_m2.sh` | agent-side code + gate |
 
 ## Engine-source surface (what could possibly affect the game)
 
@@ -36,6 +39,13 @@ Everything the branch changes under `src/` (enumerate: `git diff master --stat -
   identical before/after the refactor; 7/7 verification green.
 - **`src/fheroes2/battle/battle_seed.{h,cpp}`** — new shared helper (spec §7.3). Pinned by
   golden-value unit tests (four engine-derived seeds + sensitivity invariants).
+- **`src/fheroes2/battle/battle_decision_controller.h`** + **`battle_arena.{h,cpp}`** (Milestone
+  2) — optional `DecisionController *` constructor parameter (default `nullptr` preserves every
+  caller), dispatch + observer in the full-fledged branch of `UnitTurn` (§9.2; observer runs
+  before the command stream updates the combat RNG), and a full-fledged decision counter
+  (`GetEngineDecisionIndex`, §9.4). **Proof of inertness**: spike digest `2cfd42cb104aa5e7` and
+  all five Milestone 1 fixture digests unchanged; with the passive recorder *attached*, state
+  digests still equal the goldens (the observer perturbs nothing).
 - **`src/fheroes2/agent/`** (6 files) — entry-point-free library, compiled into the normal
   executable by both build systems (spec §6.1 sanctions this) but **unreachable from game code**:
   no game translation unit includes an `agent_*` header. Launch smoke tests of both binaries pass.
@@ -55,6 +65,10 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | `src/agent_worker/main.cpp` + `build_worker.sh` | `fheroes2_agent_worker` CLI (`--runs/--fixture/--list/--quiet`); JSONL protocol replaces it at M4 | §6.1 | `verify_m1.sh` |
 | `agent_play/tests/` + `build_and_run_tests.sh` | 36 assert-based checks, relink strategy, sanitizer-aware | §18.2 | self |
 | `agent_play/verify_m1.sh` | M1 gate: unit tests + worker build + ten-run determinism + cross-process byte-identity | §20-M1 | self |
+| `src/fheroes2/agent/agent_command_snapshot.{h,cpp}` | Typed decode of a `Battle::Command` copy via `GetNextValue()` (never consumes the original); canonical keys | §10.5 | `test_agent_command_snapshot` (16 checks) |
+| `src/fheroes2/agent/agent_trajectory.{h,cpp}` | `DecisionRecord`/`EpisodeRecording`, SHA-256 decision-stream digest (`agent_decisions_v0`), JSONL `TrajectoryWriter` (`agent_passive_v0`, no wall-clock fields) | §15 subset | `verify_m2.sh` byte-identity |
+| `PassiveTeacherRecorder` in `agent_battle_runner.cpp` + worker `--trajectory-dir` | Passive capture of every full-fledged built-in-AI decision; worker reports decision digests | §15.2 | `verify_m2.sh` |
+| `agent_play/verify_m2.sh` | M2 gate: 8 checks — unit tests, golden state digests with recorder attached, one decision digest per fixture × 10 runs, null-controller spike digest, cross-process trajectory byte-identity | §20-M2 | self |
 | `agent_play/spike/bench_m2.sh` + `docs/agent/benchmark_m2.md` | Mode A benchmark deliverable on target hardware | §19 | reproducible via script |
 | `docs/agent/research_rl_approaches.md` | Adversarially verified literature consolidation (23 sources) | — | citations + verification votes inline |
 | `docs/agent/decisions/000{1,2,3}-*.md` | Accepted ADRs: observation profiles; action space; config management | amend §10, §12 | — |
@@ -65,6 +79,7 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 |---|---|---|
 | Phase 0 invariants (headless, determinism, reuse, seeds) | `verify_phase0.sh` | `7 passed, 0 failed`, map seed `2227197244`, digest `2cfd42cb104aa5e7` |
 | M1 exit: ten identical runs × 5 fixtures | `verify_m1.sh` | `4 passed, 0 failed`, `deterministic=yes` |
+| M2 exit: null-controller inertness + deterministic passive logs | `verify_m2.sh` | `8 passed, 0 failed` |
 | Cross-machine | (M3 MacBook baseline) | same seed + digest — reproduced |
 | Build-type invariance | Debug `-O0` vs Release `-O3` | identical digests — verified |
 | Sanitizers | `FHEROES2_WITH_ASAN=1` build + suite | 0 reports (1 900 spike episodes + full M1 suite) |
@@ -84,9 +99,9 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 
 ## Not implemented yet
 
-- M2: `Battle::DecisionController` seam, `CommandSnapshot`, passive teacher logging (next).
-- M3: shared non-mutating move/attack resolvers (top project risk), capability audit,
-  `simple_v1` candidate generation + canonical action indexing (ADR 0002).
+- M3 (next; top project risk): shared non-mutating move/attack resolvers, capability audit,
+  `simple_v1` candidate generation + canonical action indexing (ADR 0002), teacher matching,
+  observation serialization per ADR 0001.
 - M4: JSONL worker + protocol v1 + scenario JSON parsing; CMake `ENABLE_AGENT` target.
 - M5: Python package, policies, replay, worker pool. M6: hardening + full benchmark modes B/C.
 - Runbook §6.3 human item: one Battle Only battle through the real UI — **accepted-risk

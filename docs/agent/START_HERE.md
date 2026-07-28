@@ -53,7 +53,12 @@ next.**
   Purely a normal-game regression checkbox — **not** a training/data prerequisite; teacher
   demonstrations come from the built-in AI automatically at Milestone 2. Risk is minimal: the
   battle path is digest-proven unchanged and both binaries launch cleanly.
-- ❌ Milestone 2 onward (decision hook, passive logging): **not started**
+- ✅ **Milestone 2 complete** (2026-07-28): optional `Battle::DecisionController` seam in
+  `Arena::UnitTurn` (null controller digest-proven inert against every golden), engine decision
+  indices, typed `CommandSnapshot` decoding, passive teacher recording with a SHA-256
+  decision-stream digest, JSONL trajectory writer (`agent_passive_v0`), worker
+  `--trajectory-dir` — `./agent_play/verify_m2.sh` passes 8/8
+- ❌ Milestone 3 onward (`simple_v1` legal actions — the top-risk milestone): **not started**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
 Engine-source changes are limited to the Milestone 1 seed-helper extraction plus the additive
@@ -163,16 +168,20 @@ because it would mean determinism does not hold on the target hardware.
    option 1) is used as planned; no `World` API overload was needed. `m1_tiny_melee` reproduces
    the historical map/combat seeds (2227197244 / 1356111745); note its terminal digest is the new
    canonical SHA-256 (`agent_terminal_v1`), intentionally not comparable to the spike's FNV fold.
-6. **Next: Milestone 2** per spec §20 — optional `Battle::DecisionController` seam in
-   `Arena::UnitTurn` (§9), typed `CommandSnapshot` (§10.5), passive built-in-AI trajectory
-   logging. Exit: built-in behavior unchanged with a null controller (digest-verified) and
-   passive logs replay deterministically. The §9 dispatch sketch and §9.3 invariants are the
-   contract; read §3.6–§3.8 (turn dispatch, RNG stream semantics) before touching
-   `battle_arena.cpp`. **Two accepted ADRs bind the design from here**: observation
-   serialization must implement the `full_v1`/`observable_v1` profiles (ADR 0001), and the
-   Milestone 3 action interface is a fixed canonical space + legal mask with candidates derived
-   from the same enumeration (ADR 0002, amending spec §10.4). Rationale and citations:
-   `research_rl_approaches.md`.
+6. ✅ **Milestone 2** — done 2026-07-28 (`./agent_play/verify_m2.sh`, 8/8). The
+   `DecisionController` seam lives in the full-fledged branch of `Arena::UnitTurn` exactly per
+   the §9.2 sketch; the observer fires before the command stream touches the combat RNG;
+   automatic bad-morale/pending-UI actions are never intercepted. Passive teacher logs
+   (`agent_passive_v0` JSONL) are byte-identical across processes; state digests with the
+   recorder attached equal the Milestone 1 goldens, proving the observer inert.
+7. **Next: Milestone 3** per spec §20 — `simple_v1` legal actions, **the top-risk milestone**
+   (§3.9/§9 of this file): extract shared non-mutating move/attack resolvers from
+   `battle_action.cpp` (§10.2 — do not duplicate battle rules, do not test legality on the live
+   arena), generate the monster capability audit (§4.2), implement candidate generation with the
+   **fixed canonical action indexing + legal mask of ADR 0002**, deterministic ordering (§10.4),
+   and built-in teacher matching (§10.6). Observation serialization along the way must follow
+   ADR 0001's `full_v1`/`observable_v1` profiles. Exit: every supported fixture state has valid
+   candidates and 100 % teacher-action coverage.
 
 ---
 
