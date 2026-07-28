@@ -44,6 +44,11 @@ next.**
   entry point in `src/agent_worker/`, and `agent_play/verify_m1.sh` — ten-run determinism holds
   for all five fixtures, cross-process output is byte-identical, both build systems still build
   the normal game
+- ✅ RL literature consolidated (2026-07-27): verified research report
+  `docs/agent/research_rl_approaches.md` (23 sources, adversarially verified claims) and two
+  accepted ADRs — `decisions/0001-observation-profiles.md` (dual `full_v1`/`observable_v1`
+  observation modes) and `decisions/0002-action-space.md` (fixed canonical action space + legal
+  mask derived from the same engine enumeration as the candidate list; amends spec §10.4)
 - ⚠️ One runbook item needs a human: a real Battle Only battle played through the UI (§6.3)
 - ❌ Milestone 2 onward (decision hook, passive logging): **not started**
 
@@ -90,6 +95,8 @@ Full evidence and a 25-row assumption table: `local_source_audit.md`.
 | `docs/agent/local_source_audit.md` | Phase 0 report; assumption table; exact file:line evidence | before touching battle code |
 | `agent_play/spike/README.md` | how to drive the spike, its limitations | before running it |
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` (rest) | the full 2600-line design: protocol, schemas, milestones | when implementing a milestone |
+| `docs/agent/research_rl_approaches.md` | verified RL literature consolidation; per-topic recommendations and design deltas | before Milestone 2/3 design work |
+| `docs/agent/decisions/` | accepted ADRs that amend the spec (0001 observation profiles, 0002 action space) | before implementing the area they touch |
 
 The spec is large. §0.1 (validation), §4 (scope), §9 (decision hook), §10 (legal actions) and §22
 (definition of done) are the sections that matter for Milestone 1–3.
@@ -155,7 +162,11 @@ because it would mean determinism does not hold on the target hardware.
    logging. Exit: built-in behavior unchanged with a null controller (digest-verified) and
    passive logs replay deterministically. The §9 dispatch sketch and §9.3 invariants are the
    contract; read §3.6–§3.8 (turn dispatch, RNG stream semantics) before touching
-   `battle_arena.cpp`.
+   `battle_arena.cpp`. **Two accepted ADRs bind the design from here**: observation
+   serialization must implement the `full_v1`/`observable_v1` profiles (ADR 0001), and the
+   Milestone 3 action interface is a fixed canonical space + legal mask with candidates derived
+   from the same enumeration (ADR 0002, amending spec §10.4). Rationale and citations:
+   `research_rl_approaches.md`.
 
 ---
 
