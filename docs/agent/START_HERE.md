@@ -49,7 +49,10 @@ next.**
   accepted ADRs — `decisions/0001-observation-profiles.md` (dual `full_v1`/`observable_v1`
   observation modes) and `decisions/0002-action-space.md` (fixed canonical action space + legal
   mask derived from the same engine enumeration as the candidate list; amends spec §10.4)
-- ⚠️ One runbook item needs a human: a real Battle Only battle played through the UI (§6.3)
+- ◻ Optional QA (accepted risk, owner's call): one Battle Only battle through the real UI (§6.3).
+  Purely a normal-game regression checkbox — **not** a training/data prerequisite; teacher
+  demonstrations come from the built-in AI automatically at Milestone 2. Risk is minimal: the
+  battle path is digest-proven unchanged and both binaries launch cleanly.
 - ❌ Milestone 2 onward (decision hook, passive logging): **not started**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
@@ -96,7 +99,8 @@ Full evidence and a 25-row assumption table: `local_source_audit.md`.
 | `agent_play/spike/README.md` | how to drive the spike, its limitations | before running it |
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` (rest) | the full 2600-line design: protocol, schemas, milestones | when implementing a milestone |
 | `docs/agent/research_rl_approaches.md` | verified RL literature consolidation; per-topic recommendations and design deltas | before Milestone 2/3 design work |
-| `docs/agent/decisions/` | accepted ADRs that amend the spec (0001 observation profiles, 0002 action space) | before implementing the area they touch |
+| `docs/agent/implementation_report.md` | review-oriented inventory: commits, engine surface, component/verification matrices, deviations | to review what exists |
+| `docs/agent/decisions/` | accepted ADRs that amend the spec (0001 observation profiles, 0002 action space, 0003 config management) | before implementing the area they touch |
 
 The spec is large. §0.1 (validation), §4 (scope), §9 (decision hook), §10 (legal actions) and §22
 (definition of done) are the sections that matter for Milestone 1–3.
@@ -145,8 +149,10 @@ because it would mean determinism does not hold on the target hardware.
 3. ◐ **CMake normal-game regression** — done 2026-07-27: `cmake -S . -B build/cmake-regression
    -DCMAKE_BUILD_TYPE=Release` configures and builds to 100 % on the mini, and both the CMake and
    the Makefile binaries launch to the main menu against the local `devdata/` root and survive
-   12 s with clean logs. **Still open (needs a human at the screen): one real Battle Only battle
-   played through the UI.** Launch: `FHEROES2_DATA="$PWD/devdata" ./src/dist/fheroes2/fheroes2`.
+   12 s with clean logs. Remaining sub-item downgraded to **optional QA, accepted risk** (owner
+   decision 2026-07-27): one real Battle Only battle through the UI, purely as normal-game
+   regression — not related to training data. Launch if desired:
+   `FHEROES2_DATA="$PWD/devdata" ./src/dist/fheroes2/fheroes2`.
 4. ✅ **Sanitizers** — done 2026-07-27: full `FHEROES2_WITH_ASAN=1` engine build (implies UBSan),
    spike relinked with matching flags (`build_spike.sh` now honors the same env vars). 1 900
    episodes across five compositions (mirror melee 50/1000, archer-vs-peasant, ranger duel,
