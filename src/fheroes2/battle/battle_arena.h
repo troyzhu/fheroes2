@@ -57,6 +57,7 @@ namespace Battle
     class Bridge;
     class Catapult;
     class Force;
+    class DecisionController;
     class Interface;
     class Status;
     class Tower;
@@ -94,7 +95,8 @@ namespace Battle
     class Arena
     {
     public:
-        Arena( Army & attackingArmy, Army & defendingArmy, const int32_t tileIndex, const bool isShowInterface, Rand::PCG32 & randomGenerator );
+        Arena( Army & attackingArmy, Army & defendingArmy, const int32_t tileIndex, const bool isShowInterface, Rand::PCG32 & randomGenerator,
+               DecisionController * decisionController = nullptr );
         Arena( const Arena & ) = delete;
         Arena( Arena && ) = delete;
 
@@ -105,6 +107,14 @@ namespace Battle
 
         void Turns();
         bool BattleValid() const;
+
+        // Monotonically increasing count of full-fledged unit decisions made in this battle so
+        // far (by the built-in AI, a human, or an external decision controller). A good-morale
+        // re-decision of the same unit counts separately. Zero before the first decision.
+        uint32_t GetEngineDecisionIndex() const
+        {
+            return _engineDecisionIndex;
+        }
 
         bool AutoCombatInProgress() const;
         bool EnemyOfAIHasAutoCombatInProgress() const;
@@ -336,6 +346,10 @@ namespace Battle
 
         // The unit that is currently active. Please note that some battle actions (e.g. catapult or castle tower shots) can be performed without an active unit.
         Unit * _currentUnit{ nullptr };
+
+        // Optional external decision hook; nullptr preserves the original engine behavior.
+        DecisionController * _decisionController{ nullptr };
+        uint32_t _engineDecisionIndex{ 0 };
 
         // The color of the army of the last unit that performed a full-fledged action (skipping a turn due to
         // bad morale is not considered as such).

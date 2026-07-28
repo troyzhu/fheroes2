@@ -45,6 +45,7 @@
 #include "battle_catapult.h"
 #include "battle_cell.h"
 #include "battle_command.h"
+#include "battle_decision_controller.h"
 #include "battle_interface.h"
 #include "battle_tower.h"
 #include "battle_troop.h"
@@ -343,8 +344,10 @@ bool Battle::Arena::isAnyTowerPresent()
     return std::any_of( arena->_towers.begin(), arena->_towers.end(), []( const auto & twr ) { return twr && twr->isValid(); } );
 }
 
-Battle::Arena::Arena( Army & attackingArmy, Army & defendingArmy, const int32_t tileIndex, const bool isShowInterface, Rand::PCG32 & randomGenerator )
-    : castle( world.getCastleEntrance( Maps::GetPoint( tileIndex ) ) )
+Battle::Arena::Arena( Army & attackingArmy, Army & defendingArmy, const int32_t tileIndex, const bool isShowInterface, Rand::PCG32 & randomGenerator,
+                      DecisionController * decisionController /* = nullptr */ )
+    : _decisionController( decisionController )
+    , castle( world.getCastleEntrance( Maps::GetPoint( tileIndex ) ) )
     , _isTown( castle != nullptr )
     , _randomGenerator( randomGenerator )
 {
@@ -504,13 +507,38 @@ void Battle::Arena::UnitTurn( const Units & orderHistory )
                 _bridge->SetPassability( *_currentUnit );
             }
 
-            if ( ( _currentUnit->GetCurrentControl() & CONTROL_AI ) || ( _autoCombatColors & _currentUnit->GetCurrentColor() ) ) {
-                AI::BattlePlanner::Get().BattleTurn( *this, *_currentUnit, actions );
-            }
-            else {
-                assert( _interface != nullptr );
+            // Every full-fledged decision gets a distinct index, including a good-morale
+            // re-decision of the same unit. Automatic actions (bad morale, pending UI) are
+            // deliberately not counted and never reach the decision controller.
+            ++_engineDecisionIndex;
 
-                _interface->HumanTurn( *_currentUnit, actions );
+            bool handledExternally = false;
+
+            if ( _decisionController != nullptr && _decisionController->handlesDecision( *this, *_currentUnit ) ) {
+                _decisionController->chooseActions( *this, *_currentUnit, actions );
+
+                // A controller that claims a decision must produce at least one action,
+                // otherwise the unit would neither act nor end its turn.
+                assert( !actions.empty() );
+
+                handledExternally = true;
+            }
+
+            if ( !handledExternally ) {
+                if ( ( _currentUnit->GetCurrentControl() & CONTROL_AI ) || ( _autoCombatColors & _currentUnit->GetCurrentColor() ) ) {
+                    AI::BattlePlanner::Get().BattleTurn( *this, *_currentUnit, actions );
+                }
+                else {
+                    assert( _interface != nullptr );
+
+                    _interface->HumanTurn( *_currentUnit, actions );
+                }
+            }
+
+            if ( _decisionController != nullptr ) {
+                // Observe before the command stream updates the random generator below and
+                // before any command is applied.
+                _decisionController->observeChosenActions( *this, *_currentUnit, actions );
             }
         }
 
