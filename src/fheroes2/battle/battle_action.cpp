@@ -35,6 +35,7 @@
 #include <vector>
 
 #include "battle.h"
+#include "battle_action_validation.h"
 #include "battle_arena.h" // IWYU pragma: associated
 #include "battle_army.h"
 #include "battle_board.h"
@@ -61,84 +62,10 @@
 #include "translations.h"
 #include "world.h"
 
-namespace
-{
-    int32_t calculateAttackTarget( const Battle::Unit & attackingUnit, const Battle::Position & attackPosition, const Battle::Unit & defendingUnit )
-    {
-        const int32_t attackPositionHeadIdx = attackPosition.GetHead() ? attackPosition.GetHead()->GetIndex() : -1;
-        const int32_t attackPositionTailIdx = attackPosition.GetTail() ? attackPosition.GetTail()->GetIndex() : -1;
-
-        assert( attackPositionHeadIdx != -1 && ( attackingUnit.isWide() ? attackPositionTailIdx != -1 : attackPositionTailIdx == -1 ) );
-
-        if ( Battle::Board::CanAttackFromCell( attackingUnit, attackPositionHeadIdx ) ) {
-            // The defender's head cell is near the head cell of the attack position
-            if ( Battle::Board::isNearIndexes( attackPositionHeadIdx, defendingUnit.GetHeadIndex() ) ) {
-                return defendingUnit.GetHeadIndex();
-            }
-
-            // The defender's tail cell is near the head cell of the attack position
-            if ( defendingUnit.isWide() && Battle::Board::isNearIndexes( attackPositionHeadIdx, defendingUnit.GetTailIndex() ) ) {
-                return defendingUnit.GetTailIndex();
-            }
-        }
-
-        if ( Battle::Board::CanAttackFromCell( attackingUnit, attackPositionTailIdx ) ) {
-            // The defender's head cell is near the tail cell of the attack position
-            if ( Battle::Board::isNearIndexes( attackPositionTailIdx, defendingUnit.GetHeadIndex() ) ) {
-                return defendingUnit.GetHeadIndex();
-            }
-
-            // The defender's tail cell is near the tail cell of the attack position
-            if ( defendingUnit.isWide() && Battle::Board::isNearIndexes( attackPositionTailIdx, defendingUnit.GetTailIndex() ) ) {
-                return defendingUnit.GetTailIndex();
-            }
-        }
-
-        // Attack position is not near the defender, this is most likely a shot
-        return defendingUnit.GetHeadIndex();
-    }
-
-    Battle::CellDirection calculateAttackDirection( const Battle::Unit & attackingUnit, const Battle::Position & attackPosition, const int32_t attackTargetIdx )
-    {
-        const int32_t attackPositionHeadIdx = attackPosition.GetHead() ? attackPosition.GetHead()->GetIndex() : -1;
-        const int32_t attackPositionTailIdx = attackPosition.GetTail() ? attackPosition.GetTail()->GetIndex() : -1;
-
-        assert( attackPositionHeadIdx != -1 && ( attackingUnit.isWide() ? attackPositionTailIdx != -1 : attackPositionTailIdx == -1 ) );
-
-        // The target cell of the attack is near the head cell of the attack position
-        if ( Battle::Board::CanAttackFromCell( attackingUnit, attackPositionHeadIdx ) && Battle::Board::isNearIndexes( attackPositionHeadIdx, attackTargetIdx ) ) {
-            return Battle::Board::GetDirection( attackPositionHeadIdx, attackTargetIdx );
-        }
-
-        // The target cell of the attack is near the tail cell of the attack position
-        if ( Battle::Board::CanAttackFromCell( attackingUnit, attackPositionTailIdx ) && Battle::Board::isNearIndexes( attackPositionTailIdx, attackTargetIdx ) ) {
-            return Battle::Board::GetDirection( attackPositionTailIdx, attackTargetIdx );
-        }
-
-        // Attack position is not near the defender, this is most likely a shot
-        return Battle::CellDirection::UNKNOWN;
-    }
-
-    bool checkMoveParams( const Battle::Unit * unit, const int32_t dst )
-    {
-        assert( unit != nullptr && unit->isValid() );
-
-        // "Moving" a unit to its current position is not allowed
-        if ( unit->GetHeadIndex() == dst ) {
-            return false;
-        }
-
-        const Battle::Position pos = Battle::Position::GetReachable( *unit, dst );
-        if ( pos.GetHead() == nullptr ) {
-            return false;
-        }
-
-        assert( pos.isValidForUnit( unit ) );
-
-        // Index of the destination cell should correspond to the index of the head cell of the target position and nothing else
-        return pos.GetHead()->GetIndex() == dst;
-    }
-}
+// The command legality rules that used to live in this file's anonymous namespace and in the
+// checkParameters lambdas of the ApplyAction methods were extracted verbatim into
+// battle_action_validation.{h,cpp} so that external candidate enumeration (the agent
+// environment) validates through exactly the same implementation as command execution.
 
 void Battle::Arena::BattleProcess( Unit & attacker, Unit & defender, int32_t tgt /* = -1 */, int dir /* = -1 */ )
 {
@@ -281,7 +208,7 @@ void Battle::Arena::moveUnit( Unit * unit, const int32_t dst )
         return;
     }
 
-    assert( checkMoveParams( unit, dst ) );
+    assert( isMoveDestinationValid( unit, dst ) );
 
     Position pos = Position::GetReachable( *unit, dst );
     assert( pos.isValidForUnit( unit ) );
@@ -480,89 +407,6 @@ void Battle::Arena::ApplyActionSpellCast( Command & cmd )
 
 void Battle::Arena::ApplyActionAttack( Command & cmd )
 {
-    const auto checkParameters = []( const Unit * attacker, const Unit * defender, const int32_t dst, int32_t tgt, int dir ) {
-        if ( attacker == nullptr || !attacker->isValid() ) {
-            return false;
-        }
-
-        if ( defender == nullptr || !defender->isValid() ) {
-            return false;
-        }
-
-        if ( attacker->Modes( TR_MOVED ) ) {
-            return false;
-        }
-
-        if ( attacker->GetCurrentColor() == defender->GetColor() ) {
-            return false;
-        }
-
-        // Attacker can attack from his current position without performing a move (in this case, the index of the destination cell should be -1)
-        if ( dst != -1 && !checkMoveParams( attacker, dst ) ) {
-            return false;
-        }
-
-        if ( attacker->isArchers() && !attacker->isHandFighting() ) {
-            // Non-blocked archer can only attack by shooting from his current position
-            if ( dst != -1 ) {
-                return false;
-            }
-
-            if ( tgt < 0 ) {
-                tgt = calculateAttackTarget( *attacker, attacker->GetPosition(), *defender );
-            }
-
-            const CellDirection cellDir = dir < 0 ? calculateAttackDirection( *attacker, attacker->GetPosition(), tgt ) : static_cast<CellDirection>( dir );
-
-            if ( !defender->GetPosition().contains( tgt ) ) {
-                return false;
-            }
-
-            // Non-blocked archers cannot attack "from a direction"
-            if ( cellDir != CellDirection::UNKNOWN ) {
-                return false;
-            }
-
-            return true;
-        }
-
-        const Position attackPos = ( dst == -1 ? attacker->GetPosition() : Position::GetReachable( *attacker, dst ) );
-        if ( attackPos.GetHead() == nullptr ) {
-            return false;
-        }
-
-        assert( attackPos.isValidForUnit( attacker ) );
-
-        if ( tgt < 0 ) {
-            tgt = calculateAttackTarget( *attacker, attackPos, *defender );
-        }
-
-        const CellDirection cellDir = dir < 0 ? calculateAttackDirection( *attacker, attackPos, tgt ) : static_cast<CellDirection>( dir );
-
-        if ( !defender->GetPosition().contains( tgt ) ) {
-            return false;
-        }
-
-        // Melee attacks are only possible from a certain direction
-        if ( cellDir == CellDirection::UNKNOWN ) {
-            return false;
-        }
-
-        const CellDirection reflectDir = Board::GetReflectDirection( cellDir );
-        const int32_t attackIdx = ( Board::isValidDirection( tgt, reflectDir ) ? Board::GetIndexDirection( tgt, reflectDir ) : -1 );
-
-        if ( !attackPos.contains( attackIdx ) ) {
-            return false;
-        }
-
-        // Attack from a specified cell may be prohibited - for example, if this cell belongs to a castle moat
-        if ( !Board::CanAttackFromCell( *attacker, attackIdx ) ) {
-            return false;
-        }
-
-        return true;
-    };
-
     const uint32_t attackerUID = cmd.GetNextValue();
     const uint32_t defenderUID = cmd.GetNextValue();
     const int32_t dst = cmd.GetNextValue();
@@ -572,7 +416,7 @@ void Battle::Arena::ApplyActionAttack( Command & cmd )
     Unit * attacker = GetTroopUID( attackerUID );
     Unit * defender = GetTroopUID( defenderUID );
 
-    if ( !checkParameters( attacker, defender, dst, tgt, dir ) ) {
+    if ( !resolveAttackCommand( attacker, defender, dst, tgt, dir ) ) {
         ERROR_LOG( "Invalid parameters: "
                    << "attacker uid: " << GetHexString( attackerUID ) << ", defender uid: " << GetHexString( defenderUID ) << ", dst: " << dst << ", tgt: " << tgt
                    << ", dir: " << dir )
@@ -628,28 +472,12 @@ void Battle::Arena::ApplyActionAttack( Command & cmd )
 
 void Battle::Arena::ApplyActionMove( Command & cmd )
 {
-    const auto checkParameters = []( const Unit * unit, const int32_t dst ) {
-        if ( unit == nullptr || !unit->isValid() ) {
-            return false;
-        }
-
-        if ( unit->Modes( TR_MOVED ) ) {
-            return false;
-        }
-
-        if ( !checkMoveParams( unit, dst ) ) {
-            return false;
-        }
-
-        return true;
-    };
-
     const uint32_t uid = cmd.GetNextValue();
     const int32_t dst = cmd.GetNextValue();
 
     Unit * unit = GetTroopUID( uid );
 
-    if ( !checkParameters( unit, dst ) ) {
+    if ( !isMoveCommandValid( unit, dst ) ) {
         ERROR_LOG( "Invalid parameters: "
                    << "uid: " << GetHexString( uid ) << ", dst: " << dst )
 
@@ -667,23 +495,11 @@ void Battle::Arena::ApplyActionMove( Command & cmd )
 
 void Battle::Arena::ApplyActionSkip( Command & cmd )
 {
-    const auto checkParameters = []( const Unit * unit ) {
-        if ( unit == nullptr || !unit->isValid() ) {
-            return false;
-        }
-
-        if ( unit->Modes( TR_MOVED ) ) {
-            return false;
-        }
-
-        return true;
-    };
-
     const uint32_t uid = cmd.GetNextValue();
 
     Unit * unit = GetTroopUID( uid );
 
-    if ( !checkParameters( unit ) ) {
+    if ( !isSkipCommandValid( unit ) ) {
         ERROR_LOG( "Invalid parameters: "
                    << "uid: " << GetHexString( uid ) )
 
