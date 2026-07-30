@@ -62,7 +62,15 @@ next.**
   `research_minimap_observations.md` (24/25 claims verified) + **ADR 0004** — a semantic
   spatial-plane modality (`planes_v1`, SC2-feature-layer style, derived from the same state as
   the entity list) joins the schema at Milestone 3/4; true pixel rendering rejected for the env
-- ❌ Milestone 3 onward (`simple_v1` legal actions — the top-risk milestone): **not started**
+- ✅ **Milestone 3 complete** (2026-07-29) — **the project's top risk is closed**: command
+  legality extracted verbatim into the shared module `battle_action_validation.{h,cpp}`
+  (ApplyAction* now executes through it; digest-proven byte-exact), machine-generated
+  71-monster capability audit + `simple_v1` allowlist
+  (`python/fheroes2_agent/data/monster_capabilities_v1.json`), ADR-0002 canonical
+  `Discrete(793)` action space with mask + candidates from one enumeration, and built-in
+  teacher matching — `./agent_play/verify_m3.sh` passes 8/8 with **100 % teacher coverage**
+  (116/116 decisions across all fixtures)
+- ❌ Milestone 4 onward (JSONL worker, protocol v1, observation serialization): **not started**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
 Engine-source changes are limited to the Milestone 1 seed-helper extraction plus the additive
@@ -180,15 +188,20 @@ because it would mean determinism does not hold on the target hardware.
    automatic bad-morale/pending-UI actions are never intercepted. Passive teacher logs
    (`agent_passive_v0` JSONL) are byte-identical across processes; state digests with the
    recorder attached equal the Milestone 1 goldens, proving the observer inert.
-7. **Next: Milestone 3** per spec §20 — `simple_v1` legal actions, **the top-risk milestone**
-   (§3.9/§9 of this file): extract shared non-mutating move/attack resolvers from
-   `battle_action.cpp` (§10.2 — do not duplicate battle rules, do not test legality on the live
-   arena), generate the monster capability audit (§4.2), implement candidate generation with the
-   **fixed canonical action indexing + legal mask of ADR 0002**, deterministic ordering (§10.4),
-   and built-in teacher matching (§10.6). Observation serialization along the way must follow
-   ADR 0001's `full_v1`/`observable_v1` profiles and include the `planes_v1` semantic spatial
-   modality of ADR 0004 (derived tensor, same state source, no rendering). Exit: every supported
-   fixture state has valid candidates and 100 % teacher-action coverage.
+7. ✅ **Milestone 3** — done 2026-07-29 (`./agent_play/verify_m3.sh`, 8/8; 100 % teacher
+   coverage, 116/116 decisions). The legality rules were lifted *verbatim* out of
+   `battle_action.cpp`'s lambdas/anonymous namespace into `battle_action_validation.{h,cpp}` and
+   the engine now executes through them — enumeration and execution share one implementation by
+   construction, proven by unchanged golden digests. Canonical action space per ADR 0002:
+   `Discrete(793)` = SKIP + 99·MOVE + 99·RANGED + 594·MELEE(target×direction). Capability audit
+   is generated from engine data; scenario validation enforces the allowlist.
+8. **Next: Milestone 4** per spec §20 — JSONL worker: protocol v1 (§13), strict scenario JSON
+   parsing (§11, vendored JSON lib per §6.5), blocking external control through the
+   `DecisionController` seam, observation serialization implementing ADR 0001's
+   `full_v1`/`observable_v1` profiles **and** ADR 0004's `planes_v1` modality, lifecycle/error
+   handling (§5.4), and the `ENABLE_AGENT` CMake target (§6.2) — settling the two-build-systems
+   decision (§2 finding 4). Exit: scripted stdin/stdout tests control both sides without a
+   single invalid command.
 
 ---
 
@@ -239,8 +252,19 @@ because it would mean determinism does not hold on the target hardware.
 
 ## 9. The real remaining risk
 
-With the asset and seed risks closed, the top risk is now **legal-action generation** (spec §3.9 and
-§10). The engine has no public API returning the complete legal action set for a unit, and the
-validation helpers live in anonymous namespaces in `battle_action.cpp`. Enumerating legal actions
-without either extracting those helpers or duplicating battle rules incorrectly is the hard part of
-this project. Budget accordingly, and do not test legality by applying candidates to the live arena.
+**The historical top risk — legal-action generation (spec §3.9/§10) — is closed as of Milestone
+3.** The anonymous-namespace validation helpers were extracted verbatim into
+`battle_action_validation.{h,cpp}`; execution and enumeration share one implementation, and 100 %
+built-in-teacher coverage held on every fixture without a single live-arena probe.
+
+What remains, in risk order:
+
+1. **Protocol/JSON surface (Milestone 4)** — a strict parser boundary and a vendored JSON
+   dependency enter the tree; stdout discipline and invalid-input handling are where workers rot
+   (spec §5.4, §13, §18.7).
+2. **BC→RL transition recipe** — no verified small-scale precedent exists
+   (`research_rl_approaches.md` open question 2); expect iteration at the training stage.
+3. **MPS/CPU learner throughput on the M2 mini** — unmeasured anywhere in the literature;
+   benchmark before committing to model sizes (open question 3).
+4. **Phase 1b mechanics expansion** (wide/flying/special targeting) — deliberately deferred;
+   re-audit `simple_v1` assumptions before widening the allowlist (spec §4.4).
