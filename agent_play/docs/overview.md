@@ -96,6 +96,8 @@ Board constants: 11 by 9 gives 99 cells, six hex directions, and an action space
 
 ## Scope
 
+The scope below is Phase 1a only, and it is narrow on purpose. The intended end state covers the adventure map as well, meaning hero movement, resource collection, recruitment, and town management, with the battle policy invoked as a component. [[roadmap]] records that plan, why the battle came first, and the research still owed before any of it is designed.
+
 Phase 1a aims at a trustworthy substrate, so the environment itself contains no learner, no language model, no screenshot parsing, and no interface automation.
 
 | In scope (`creature_field_v1` with `simple_v1`) | Deferred to Phase 1b | Excluded from this branch |

@@ -16,6 +16,11 @@ literature; `implementation/` holds one primer per built mechanism; `decisions/`
 records; and `archive/` holds dated logs, benchmarks, and raw research runs, which are provenance
 rather than a reading path.
 
+Scope note: everything built so far is the **battle** environment. `agent_play/docs/roadmap.md`
+records the wider goal, including the adventure-map agent covering movement, recruitment, and town
+management, and the research owed before any of it is designed. `decisions/0005-training-and-reward.md`
+covers how a policy will be trained and what it will be rewarded for.
+
 Quick orientation: Phase 0 and Milestones 1 through 3 are complete and verified on the target
 Apple M2 Mac mini. Engine changes are deliberately small: two verbatim lifts
 (`battle_seed.{h,cpp}`, `battle_action_validation.{h,cpp}`), one optional hook

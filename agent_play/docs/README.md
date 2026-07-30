@@ -20,6 +20,8 @@ This tree lives under `agent_play/` rather than under the repository's `docs/` d
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] to look up a source |
 | Understand what is implemented and how | [[implementation/inventory]] for what exists, then [[implementation/README]] for how each mechanism works |
 | Understand why an interface is the way it is | [[decisions/README]] |
+| Know how a policy will be trained and what it is rewarded for | [[decisions/0005-training-and-reward]] |
+| Know what is planned beyond battles, including the navigation agent | [[roadmap]] |
 | Trace a number back to the run that produced it | [[archive/README]] |
 
 ## The tree
@@ -29,6 +31,7 @@ agent_play/docs/
 ├── INDEX.md                     this file
 ├── README.md                    orientation, notation, scope, build, current state
 ├── rl-and-the-battle-domain.md  RL vocabulary, the battle domain, comparison to other games
+├── roadmap.md                   scope: battles now, wider battles and the adventure map later
 ├── research/                    the literature and what it establishes
 ├── implementation/              how the built mechanisms work
 ├── decisions/                   accepted decision records
