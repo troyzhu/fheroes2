@@ -1,94 +1,127 @@
 ---
-title: "Teacher coverage and behavior cloning: proving the action space is complete"
-type: concept-primer
-depth: standard
-grounded-in: "fheroes2 agent-env branch (Milestones 2–3, spec §10.6, §21)"
-related_concepts: ["[[legal-actions-and-masking]]", "[[battle-turn-dispatch]]"]
-tags: [concept, behavior-cloning, evaluation, agent-env]
+title: Teacher coverage and behavior cloning — a primer
+aliases:
+  - teacher-coverage
+  - behavior-cloning
+tags:
+  - agent-env
+  - primer
+concept: measuring action-space completeness against a scripted teacher
+domain: imitation learning and RL evaluation
+grounded_in: "docs/agent/references/ (AlphaStar, Gym-µRTS, vcmi-gym); this repo's Milestones 2 and 3"
+depth: quick
+updated: 2026-07-30
 ---
 
-> **What this is.** What "the teacher" means here, why *teacher coverage* is the sharpest
-> completeness test available for an action space, and how it feeds the training plan. Nobody has
-> to play the game for any of this.
+# Teacher coverage and behavior cloning — a primer
 
-## The one-sentence version
+The engine's own tactical AI plays every battle we run, and recording it serves two purposes at
+once. Checking that each of its decisions maps onto a legal action in our canonical space measures
+whether that space is complete, and the same recordings become the dataset for behavior cloning.
 
-The built-in engine AI plays both sides; we record every decision it makes and check that each
-one maps onto a legal action in our canonical space — 100 % coverage means our action space can
-express everything a competent player does, and the same recordings become the behavior-cloning
-dataset.
+## Motivation
 
-## Who the teacher is
+An action space can be incomplete in a way that ordinary testing never reveals. If the enumerator
+silently omits a legal move, nothing crashes: episodes run, gates pass, and the policy simply never
+learns a move it was never offered. The defect surfaces much later as a capability ceiling that
+looks like a training problem.
 
-The **teacher is `AI::BattlePlanner`**, the game's own tactical AI — not a human, not an LLM. It
-already plays every headless battle we run. The passive recorder observes its choices through the
-`DecisionController` hook without influencing them.
+Exhaustively proving completeness is impractical, because it would mean deriving the legal set
+independently of the engine, which is the duplication the whole design avoids. What is available
+instead is a competent player whose choices can be checked against our set.
 
-This is worth stating plainly because it is a common misreading: *demonstration data requires no
-human play*. Running the worker generates it.
+## The idea in one sentence
 
-## Coverage as a completeness proof
+Record what the built-in AI does at every decision and measure the fraction of its choices our
+action space can express.
 
-For each full-fledged decision we compute two things at the same pre-application state:
+## Intuition
 
-1. the set of legal candidates our enumerator produces, and
-2. the canonical index of what the teacher actually chose.
+This is recall over a candidate set, the metric a retrieval system reports as recall@k. A retriever
+is useless if the gold document never appears among the candidates, however good the reranker is.
+Here the built-in AI's move is the gold label and our enumeration is the candidate set, so coverage
+asks whether the right answer was on the menu at all.
 
-Then:
+The choice of teacher matters for the same reason. A random player would exercise few interesting
+actions, so its coverage would prove little, while a competent one probes the parts of the space
+that competent play actually uses.
 
-$$\text{coverage} = \frac{\#\{\text{decisions where the teacher's action is in our legal set}\}}{\#\{\text{decisions}\}}$$
+## How it works
 
-**Why this is a strong test.** A missing legal action is invisible to ordinary testing — the
-environment runs fine, the policy just never learns a move it was never offered. But the teacher
-*does* use those moves, so any gap in our enumeration shows up immediately as a coverage miss.
-Coverage below 100 % means one of:
+The teacher is `AI::BattlePlanner`, the game's own tactical AI, which already plays both sides of
+every headless battle. The passive recorder observes its choices through the decision hook without
+influencing them.
 
-- our enumeration missed a legal action (a bug in the generator), or
-- the canonical indexing cannot express that action (a design gap), or
-- the creature is outside `simple_v1` (a scenario that should have been rejected).
+At each full-fledged decision, computed at the same pre-application state, we take the legal
+candidate set our enumerator produces and the canonical index of the action the teacher actually
+chose. Coverage is then
 
-All three are things you want to know before training, not after.
+$$\text{coverage} = \frac{\left|\{\, d : a^{\text{teacher}}_d \in \mathcal{A}^{\text{legal}}_d \,\}\right|}{\left|\{\, d \,\}\right|}$$
 
-**Current state:** 116/116 decisions, all five fixtures, 100 %. Minimum candidate count per
-decision ≥ 5.
+over decisions $d$. A value below 1 means one of three things: the enumeration missed a legal
+action, the canonical indexing cannot express it, or the creature lies outside the `simple_v1`
+allowlist and the scenario should have been rejected. All three are worth knowing before training
+rather than after.
 
-## From coverage to behavior cloning
+The current measurement is 116 of 116 decisions across all five fixtures, with a minimum candidate
+count of 5 per decision.
 
-The same recordings are the BC dataset. The staging the literature supports:
+**From coverage to cloning.** The same recordings are the imitation dataset, and the staging the
+evidence supports runs in four steps. Collect passive teacher trajectories, which Milestone 2
+completed. Behavior-clone $\pi(a \mid s)$ from those decisions, the step AlphaStar's purely
+supervised stage carried to an 87% win rate against the game's Elite bot before any reinforcement
+learning. Correct the distribution shift with a DAgger-style pass, rolling out the student and
+asking the teacher what it would have done in the states the student actually visits. Then
+reinforce with masked PPO against a mixture of scripted opponents, since single-opponent training
+produces agents that lose to simple rushes.
 
-1. **Collect** — passive teacher trajectories (done: `agent_passive_v0` JSONL).
-2. **Behavior-clone** — supervised learning of $\pi(a \mid s)$ from teacher decisions. AlphaStar's
-   purely supervised stage reached 87 % win rate against the game's Elite bot *before any RL*,
-   which is the strongest available evidence that this step is worth doing first.
-3. **Correct** (DAgger-style) — roll out the student, ask the teacher what it would have done in
-   the states the student actually visits, add those labels. Fixes the distribution shift that
-   pure BC suffers.
-4. **Reinforce** — masked PPO against a *mixture* of scripted opponents (single-opponent training
-   produces agents that lose to simple rushes).
+The third and fourth steps carry a documented evidence gap at this scale, because no verified
+small-scale transition recipe exists.
 
-Steps 3–4 have a documented evidence gap at our scale: no verified small-scale BC→RL recipe
-exists. Expect iteration.
+## Comparison with alternatives
 
-## Calibration: what "good" looks like
+| Method | What it proves | Cost | Blind spot | When preferred |
+|---|---|---|---|---|
+| Teacher coverage (ours) | the space expresses competent play | free, the AI already plays | actions no AI ever chooses | Any environment with a scripted opponent |
+| Unit tests on the enumerator | specific cases behave | cheap | the cases you thought of | Regression pinning, alongside coverage |
+| Random-action fuzzing | no crash on valid input | cheap | rarely reaches interesting states | Robustness, not completeness |
+| Independent legality derivation | genuine completeness | high, and duplicates battle rules | its own bugs | Never here, by design |
+| Human play traces | expresses human strategy | needs a human | small samples | Late-stage evaluation |
 
-From the only shipped comparable system (vcmi-gym, HoMM3): the first working model reached ~75 %
-against the weak scripted bot and ~45 % against the strong one; a much later iteration averaged
-~65 % against the strong bot. **Parity with the engine's AI is a multi-iteration goal, not a
-first-run outcome.**
+Coverage is preferred because it is continuous and free. It re-measures on every gate run, so a
+refactor that quietly drops an action type fails immediately.
 
-## Why it matters here
+## When to use it
 
-Coverage is Milestone 3's exit criterion precisely because it converts "we think enumeration is
-complete" into a measured number. It also runs continuously — `verify_m3.sh` re-measures it on
-every check, so a future refactor that quietly drops an action type fails the gate.
+Measure coverage on every verification run and treat any value below 100% as a defect in the
+enumerator or the scenario filter, not as a tolerance to accept.
 
-## What this does *not* say
+## Key terms
 
-100 % coverage proves our space contains everything *the teacher does*. It does not prove it
-contains every legal action in principle — a move no AI ever plays could still be missing. That
-residual is bounded by the capability audit (which excludes creatures whose action space we do
-not model) rather than by coverage itself.
+- Teacher: the built-in `AI::BattlePlanner`, the source of demonstrations.
+- Coverage: fraction of teacher decisions expressible as a legal canonical action.
+- Behavior cloning: supervised learning of the policy from recorded teacher decisions.
+- DAgger: iterative correction that labels states the student visits, fixing distribution shift.
 
-## See also
+## Why it came up here
+
+Coverage is Milestone 3's exit criterion because it converts a belief about enumeration into a
+measured number, and because it keeps measuring afterward.
+
+Calibration for what follows comes from the one shipped comparable system: its first working model
+reached roughly 75% against the weak scripted bot and 45% against the strong one, and a much later
+iteration averaged about 65% against the strong bot. Parity with the engine's AI is a
+multi-iteration goal.
+
+## What this does not say
+
+Full coverage proves our space contains everything the teacher does, not everything legal in
+principle. A move no AI ever plays could still be missing, and that residual is bounded by the
+capability audit, which excludes creatures whose action space we do not model, rather than by
+coverage itself.
+
+## Go deeper
+
 - [[legal-actions-and-masking]] — the space coverage is measured against.
 - [[battle-turn-dispatch]] — the hook that observes the teacher.
+- `docs/agent/references/summary.md` — the training-staging evidence and its gaps.

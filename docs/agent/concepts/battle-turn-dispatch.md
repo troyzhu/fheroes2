@@ -1,83 +1,138 @@
 ---
-title: "Battle turn dispatch: rounds, unit turns, and where the agent hooks in"
-type: concept-primer
+title: Battle turn dispatch — a primer
+aliases:
+  - turn-dispatch
+  - unit-turn
+  - decision-hook
+tags:
+  - agent-env
+  - primer
+concept: engine turn loop and the external decision seam
+domain: RL environment engineering
+grounded_in: "this repo's Milestone 2; battle_arena.cpp"
 depth: quick
-grounded-in: "fheroes2 agent-env branch (Milestone 2)"
-related_concepts: ["[[determinism-seeds-and-digests]]", "[[legal-actions-and-masking]]", "[[command-encoding-and-snapshots]]"]
-tags: [concept, engine, control-flow, agent-env]
+updated: 2026-07-30
 ---
 
-> **What this is.** How an fheroes2 battle actually advances, why "one RL step" does not
-> correspond to any engine function, and the precise seam where an external policy is allowed to
-> decide. Read before editing `battle_arena.cpp`.
+# Battle turn dispatch — a primer
 
-## The one-sentence version
+An fheroes2 battle advances in rounds, not in policy steps, so nothing in the engine corresponds
+to a Gymnasium `step()`. This primer traces how a round actually runs, identifies the one branch
+where an external policy may decide, and explains why that placement forces a blocking worker
+process rather than a callable environment object.
 
-`Arena::Turns()` advances a whole **round** (every unit acts once), so the only place an agent can
-make a single decision is *inside* `Arena::UnitTurn`, at the one branch where the engine would
-otherwise ask the built-in AI or a human.
+## Motivation
 
-## The two nested loops
+An RL environment needs a single-decision boundary. The engine offers none: `Arena::Turns()`
+advances an entire round in which every eligible unit acts, and returns `void`. Calling it
+repeatedly from Python gives round-level granularity, which is far too coarse, since a five-stack
+battle makes roughly ten decisions per round.
 
-**Round loop — `Arena::Turns()`** (`battle_arena.cpp:552`). Increments the turn counter, calls
-`NewTurn()` on both forces, then repeatedly picks the next eligible unit and calls `UnitTurn` on
-it until nobody can act or the battle ends. Castle towers and the catapult act here too.
+The naive fix, running the engine on a second thread and pausing it between decisions, trades a
+clean call stack for cross-thread synchronization inside a codebase that never expected it. The
+approach taken instead leaves the engine's own control flow untouched and inserts a hook where the
+engine already asks an external party what to do.
 
-**Unit-turn loop — `Arena::UnitTurn`** (`battle_arena.cpp:460`). For the chosen unit, it loops
-until the unit's turn is over, and on each iteration takes exactly one of four branches:
+## The idea in one sentence
 
-1. **Pending UI actions** (auto-combat toggles etc.) — already happened, handled first.
-2. **Standing / dead / immovable** — turn ends.
-3. **Bad morale** — the engine emits an automatic `MORALE` command.
-4. **A full-fledged action** — the unit will really decide something.
+The engine keeps the call stack and calls into us at the one branch of `Arena::UnitTurn` where it
+would otherwise consult the built-in AI or the human interface, and we block there until an action
+arrives.
 
-Only branch 4 is a *decision*. Branches 1–3 are bookkeeping, and an agent that intercepted them
-would be changing the game's rules rather than playing it.
+## Intuition
 
-## The critical ordering inside branch 4
+The polarity is the inversion an ML engineer meets in training frameworks. Writing a bare training
+loop, you call `model.forward()`. Handing the loop to a framework, the framework calls your
+`on_batch_end` callback instead, and your code lives inside its stack rather than above it.
 
-After the actions are chosen, `UnitTurn` does three things **in this order**:
+Gymnasium's contract is the first shape: you call `env.step(a)` and the environment returns.
+fheroes2 is the second: the engine drives, and our hook is the callback. The adapter that restores
+a normal `step()` for Python runs the engine in a separate process, parks it inside the hook while
+the chosen action travels over stdio, and lets it continue. PySC2 and the Battle for Wesnoth
+environment use the same trampoline.
 
-```
-1. update the PCG32 stream from the chosen command sequence   (battle_arena.cpp:517)
-2. apply each command                                          (ApplyAction, :522)
-3. remove dead units, maybe append a good-morale re-decision
-```
+Two consequences fall straight out of that. An episode cannot be rewound or forked mid-flight,
+because the state lives in a live C++ call stack rather than in a snapshot. Vectorization is
+process-level, not thread-level.
 
-Step 1 is why *observation must happen before it*: once the command stream has perturbed the RNG,
-you are no longer looking at the state the decision was made in. Our
-`DecisionController::observeChosenActions` hook is called immediately after the actions are
-chosen and immediately before step 1 — that placement is the whole design.
+## How it works
 
-## The hook contract
+Two loops nest.
 
-`Battle::DecisionController` (`battle_decision_controller.h`) has three methods:
+`Arena::Turns()` (`battle_arena.cpp:552`) advances one round. It increments the turn counter,
+calls `NewTurn()` on both forces, then repeatedly selects the next eligible unit and calls
+`UnitTurn` on it until nobody can act or the battle ends. Castle towers and the catapult also act
+here.
 
-| Method | When | Rule |
+`Arena::UnitTurn` (`battle_arena.cpp:460`) loops until the chosen unit's turn is over, taking
+exactly one of four branches per iteration: pending interface actions, a unit that is standing,
+dead, or immovable, a bad-morale automatic action, or a full-fledged action. Only the fourth is a
+decision. The first three are bookkeeping, and a hook that intercepted them would be changing the
+rules rather than playing the game.
+
+The ordering inside the fourth branch is the load-bearing detail. Once the actions are chosen,
+`UnitTurn` updates the combat generator's stream from the command sequence
+(`battle_arena.cpp:517`), then applies each command, then removes dead units and may append a
+good-morale re-decision. Observation has to happen before the stream update, because afterward the
+random state no longer matches the state the decision was made in. Our observer hook is called
+immediately after the actions are chosen and immediately before that update.
+
+The interface carries three methods.
+
+| Method | When it fires | Contract |
 |---|---|---|
-| `handlesDecision` | Branch 4 only | Return true to take over this decision |
-| `chooseActions` | If it claimed the decision | Must append ≥1 valid action |
-| `observeChosenActions` | **Every** branch-4 decision | Read-only; runs before the RNG stream update |
+| `handlesDecision` | fourth branch only | return true to take over this decision |
+| `chooseActions` | when it claimed the decision | must append at least one valid action |
+| `observeChosenActions` | every fourth-branch decision | read-only, before the stream update |
 
-A null controller — the default for every existing caller — leaves the engine bit-identical,
-which is exactly what the golden digests verify.
+A null controller, the default for every existing caller, leaves the engine bit-identical, which
+is what the golden digests verify.
 
-**Decision identity.** Every branch-4 decision increments `Arena::GetEngineDecisionIndex()`.
-Good morale can hand the *same unit* a second decision in the same turn; it gets its own index,
-because for learning purposes it is a genuinely separate choice made in a different state.
+Every fourth-branch decision increments `Arena::GetEngineDecisionIndex()`. Good morale can hand
+the same unit a second decision within one turn, and it receives its own index, because for
+learning purposes it is a separate choice made in a different state.
 
-## Why it matters here
+## Comparison with alternatives
 
-This structure is why the environment is **worker-blocking** rather than step-driven: Python
-cannot call "step" — the engine calls *us*, deep inside its own call stack, and we block there
-until an action arrives. It is also why parallelism means multiple *processes*: the arena is a
-file-static singleton (`battle_arena.cpp:73`) that asserts it is the only live one.
+| Approach | Engine change | Step granularity | Cost | When preferred |
+|---|---|---|---|---|
+| Blocking hook in `UnitTurn` (ours) | one optional parameter | exact decision | one process per episode | An engine whose loop already consults an external decider |
+| Call `Turns()` per step | none | whole round | coarse, unusable for control | Never for per-unit control |
+| Second thread, pause and resume | none in the loop, heavy elsewhere | exact decision | cross-thread synchronization in code that never expected it | When the engine cannot be recompiled |
+| Refactor the loop into a coroutine | large, invasive | exact decision | high risk of behavior change | A greenfield engine, or one already written around a generator |
+| Replay from a command log | none | replay only | no live control | Debugging and strict replay |
 
-## What this does *not* say
+The blocking hook wins here because the engine already had the seam. Branch four exists precisely
+so the loop can ask somebody what to do, so we answer instead of the built-in AI without
+restructuring anything.
 
-Nothing here covers spell casting, siege machinery, or retreat/surrender — all outside the
-`creature_field_v1` profile. The hook deliberately never sees them.
+## When to use it
 
-## See also
-- [[determinism-seeds-and-digests]] — what the command stream does to the RNG.
+Use the hook for any decision the engine treats as full-fledged. Never intercept automatic morale,
+pending interface actions, towers, or the catapult, and never use it for spells or siege
+machinery, which sit outside the `creature_field_v1` scenario profile.
+
+## Key terms
+
+- Round: one pass in which every eligible unit acts once, advanced by `Arena::Turns()`.
+- Decision: one full-fledged unit choice, the fourth branch of `UnitTurn`, and the step boundary.
+- Engine decision index: monotonic counter over full-fledged decisions, including morale re-decisions.
+- Null controller: the absent hook, which preserves the engine's original behavior exactly.
+
+## Why it came up here
+
+This structure explains two properties that would otherwise look arbitrary. The environment is a
+blocking worker rather than a library call, and parallelism means multiple processes, because the
+arena is a file-static singleton (`battle_arena.cpp:73`) whose constructor asserts that it is the
+only live one.
+
+## What this does not say
+
+Nothing here covers spell casting, siege machinery, or retreat and surrender. The hook never sees
+them by design.
+
+## Go deeper
+
+- [[determinism-seeds-and-digests]] — what the command stream does to the random generator.
 - [[legal-actions-and-masking]] — what a decision may legally contain.
+- `docs/agent/decisions/0002-action-space.md` — the action interface the hook carries.

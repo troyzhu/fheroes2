@@ -1,65 +1,65 @@
 ---
-title: "Reference vault — fheroes2 agent environment"
-tags: [reference, index, moc]
-updated: 2026-07-29
+title: Reference vault — index
+type: moc
+updated: 2026-07-30
+related_concepts: ["[[../concepts/legal-actions-and-masking]]", "[[../concepts/observation-design]]"]
+tags: [reference, index, moc, agent-env]
 ---
 
-# Reference vault — index
+> **What this note is.** The scannable catalogue of every work behind the two verified literature
+> runs. Read [[summary]] first for what the corpus establishes; come here to find a specific
+> source, its quality, and where it is used. Provenance and vault mechanics are at the bottom.
 
-Consolidated references behind the two adversarially verified research runs
-([[../research_rl_approaches|RL approaches]], 2026-07-27, 23 sources · 
-[[../research_minimap_observations|minimap/hybrid observations]], 2026-07-29, 20 sources) and
-the four ADRs in `../decisions/`. One note per work in `notes/`; local copies in `files/`
-(43 files, ~59 MB — see `manifest.tsv` for URL, status, size, and scraped title of every file;
-re-fetch with `./fetch_references.sh`).
+Reading order for someone new to the corpus: [[ref-vcmi-gym]] for the closest prior art, then
+[[ref-gym-microrts]] for the masking evidence and single-machine feasibility, then [[ref-sc2le]]
+for observation design.
 
-> Obsidian: open `docs/agent/` (or the repo root) as a vault; wikilinks below resolve to
-> `notes/`. Each note's frontmatter carries `urls`, `local` file paths, `tags`, and which
-> research run(s) cited it.
+## The corpus
 
-## Direct prior art (study first)
+| Source | Type | Year | Quality | What it establishes | Feeds |
+|---|---|---|---|---|---|
+| [[ref-vcmi-gym]] | project | 2023–26 | primary | Heroes III battle RL shipped as an in-game AI; padded-entity plus per-hex encoding; flat masked action space; CleanRL-style stack | ADR 0002, ADR 0003 |
+| [[ref-gym-microrts]] | paper | 2021 | primary | Masking ablations (0% unmasked to 82–91% fully masked); factorized heads; state of the art in ~60 h on one 16 GB machine | ADR 0002, hardware plan |
+| [[ref-invalid-action-masking]] | paper | 2022 | primary | Masking is a valid policy gradient; the $-10^8$ implementation; penalties collapse as the illegal space grows | ADR 0002 |
+| [[ref-sc2le]] | paper | 2017 | primary | Feature layers as synthetic semantic rasterizations, never RGB; structured tensors alongside planes | ADR 0004 |
+| [[ref-alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
+| [[ref-griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |
+| [[ref-microrts-py]] | codebase | 2021–25 | primary | `CategoricalMasked` reference implementation; `partial_obs` flag; TrueSkill league evaluation | ADR 0001, evaluation |
+| [[ref-nle]] | project | 2020 | primary | Symbolic multi-component observations; CNN over embedded per-cell glyphs at small board scale | ADR 0004 |
+| [[ref-stratega]] | project | 2020 | primary | Forward-model-centric agent API for planning methods | planning option |
+| [[ref-arlinbfw]] | codebase | 2019 | primary | Headless C++ game engine driven out-of-process over a text channel | worker architecture |
+| [[ref-entity-based-rl]] | project | 2022–23 | mixed | Entity-list APIs and ragged-batch transformers | upgrade path |
+| [[ref-openai-five]] | paper | 2019 | primary | Structured arrays over pixels at scale | pixel-cost rationale |
+| [[ref-asymmetric-actor-critic]] | paper-group | 2017–22 | primary | Privileged-critic and recurrent POMDP baselines | ADR 0001 (option only) |
+| [[ref-misc-pipeline-sources]] | collection | mixed | mixed | Sample Factory, Lux AI winner, board-game scaling laws, NetHack follow-up, FootsiesGym | background |
 
-- [[ref-vcmi-gym]] — HoMM3 battle RL → shipped MMAI combat AI in VCMI 1.7.0. *The* template.
-- [[ref-arlinbfw]] — Battle for Wesnoth: headless C++ engine + text protocol, existence proof.
-- [[ref-stratega]] — forward-model-centric strategy-games framework (planning door).
+Quality reads as the source class, not as our endorsement. Two entries carry caveats that matter
+at the point of use: [[ref-entity-based-rl]] and [[ref-openai-five]] contributed claims that never
+reached a verified claim set, so cite those sources directly rather than citing us.
 
-## Observation design
-
-- [[ref-sc2le]] — feature layers, the canonical semantic minimap; why not RGB.
-- [[ref-pysc2]] — one game state, multiple toggleable observers (feature/RGB/raw).
-- [[ref-griddly]] — VECTOR vs pixel observers: performance parity at ~14× throughput.
-- [[ref-nle]] — symbolic multi-component observations; 9×9-crop CNN practice at small scale.
-- [[ref-entity-based-rl]] — entity-list APIs and transformers (upgrade path; partly unverified).
-- [[ref-openai-five]] — structured-arrays-over-pixels at scale (unverified rationale).
-
-## Action space and training
-
-- [[ref-invalid-action-masking]] — masking is a valid policy gradient; implementation canon.
-- [[ref-gym-microrts]] — masking ablations (0.0 → 0.91), factorized heads, 60 h/16 GB SOTA.
-- [[ref-microrts-py]] — CategoricalMasked code, partial_obs flag, TrueSkill league.
-- [[ref-alphastar]] — entity transformer + semantic minimap + scatter connections; BC → 87 %.
-
-## Partial observability
-
-- [[ref-asymmetric-actor-critic]] — privileged-critic and POMDP baselines (verified gap: kept
-  as option, no surviving performance claims).
-
-## Peripheral / fetched-only
-
-- [[ref-misc-pipeline-sources]] — Sample Factory, Lux AI winner, board-game scaling laws,
-  NetHack-is-hard-to-hack, FootsiesGym, cyber-defence entity RL.
-
-## How these map to our decisions
+## How the corpus maps to our decisions
 
 | Decision | Anchored by |
 |---|---|
-| [[../decisions/0001-observation-profiles\|ADR 0001]] full/observable profiles | [[ref-microrts-py]], [[ref-asymmetric-actor-critic]], engine `WAR_INFO` fact |
-| [[../decisions/0002-action-space\|ADR 0002]] fixed space + mask | [[ref-invalid-action-masking]], [[ref-gym-microrts]], [[ref-vcmi-gym]], [[ref-alphastar]] |
-| [[../decisions/0003-config-management\|ADR 0003]] YAML configs | [[ref-vcmi-gym]] (PBT/W&B practice) |
-| [[../decisions/0004-spatial-observation-modality\|ADR 0004]] planes, no pixels | [[ref-sc2le]], [[ref-pysc2]], [[ref-griddly]], [[ref-alphastar]], [[ref-nle]] |
+| ADR 0001, observability profiles | [[ref-microrts-py]], [[ref-asymmetric-actor-critic]], plus the engine's own `WAR_INFO` behavior |
+| ADR 0002, fixed action space with mask | [[ref-invalid-action-masking]], [[ref-gym-microrts]], [[ref-vcmi-gym]], [[ref-alphastar]] |
+| ADR 0003, versioned configuration | [[ref-vcmi-gym]] |
+| ADR 0004, semantic planes and no pixels | [[ref-sc2le]], [[ref-griddly]], [[ref-alphastar]], [[ref-nle]] |
+
+## Provenance
+
+Two runs of the same pipeline produced this corpus: literature on environment and agent design
+(2026-07-27, 23 sources) and coarse-spatial observation design (2026-07-29, 20 sources). Counting
+the overlap, that is roughly 35 distinct works, 43 fetched source files, and 15 per-work notes.
+
+Local copies live in `files/`, with `manifest.tsv` recording the URL, fetch status, byte size, and
+title of every file. `fetch_references.sh` re-fetches them reproducibly. One repository ships no
+README upstream, which the manifest records as a failed fetch rather than hiding.
+
+Opening `docs/agent/` or the repository root as an Obsidian vault resolves every wikilink here.
 
 ## Related
 
-- [[summary]] — the consolidated analysis across the whole corpus (read this before the raw notes).
-- [[../concepts/index|Concept primers]] — the teaching layer these findings feed into.
+- [[summary]] — what the corpus establishes, with confidence markers.
+- [[../concepts/index|Concept primers]] — the teaching layer these findings feed.
 - [[../START_HERE|START_HERE]] — the system as it stands.

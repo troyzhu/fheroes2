@@ -1,132 +1,166 @@
 ---
-title: "Project log — fheroes2 agent environment"
+title: Project log — fheroes2 agent environment
 type: log
-tags: [log, agent-env]
 updated: 2026-07-30
+related_concepts: ["[[concepts/determinism-seeds-and-digests]]"]
+tags: [log, agent-env]
 ---
 
-> **What this is.** The dated record of what was done, in what order, with the evidence each step
-> produced. It is deliberately *separate* from [[START_HERE]], which explains the system as it
-> stands now. Read this when you need history — "why is it like this?", "when did that number
-> change?", "what did we already try?". Newest entries at the bottom.
+> **What this note is.** The dated record of what was done, in what order, and what evidence each
+> step produced. It is separate from [[START_HERE]], which describes the system as it stands.
+> Read this for history: why something is the way it is, when a number changed, what was already
+> tried. Newest entries at the bottom.
+>
+> Hardware is always named in full ("Apple M2") so it never reads as a milestone number.
 
-## 2026-07-26 — Phase 0 (M3 MacBook)
+## 2026-07-26 — Phase 0 on the Apple M3 MacBook
 
-Spec v0.3 written and source-cross-checked. Headless battle spike built
-(`agent_play/spike/`), 7/7 automated experiments passing from a clean clone.
+Specification v0.3 written and cross-checked against the source. Headless battle spike built under
+`agent_play/spike/`, with 7 of 7 automated experiments passing from a clean clone.
 
-Four findings overturned the spec (detail in [[START_HERE#What we learned that changed the plan]]):
-headless battles need **no game assets**; the world seed needs **no engine change**; a second
-entry point needs **no CMake refactor**; the repo has **two build systems**.
+Four findings overturned the specification, detailed in
+[[START_HERE#What we learned that changed the plan]]: headless battles need no game assets, the
+world seed needs no engine change, a second entry point needs no CMake refactor, and the repository
+has two build systems.
 
-Measured (indicative only): ~5,000 episodes/s, 12.9 MB peak RSS, 2,000 sequential arenas in one
-process. Report: `local_source_audit.md`.
+Indicative measurements only: about 5,000 episodes/s, 12.9 MB peak resident memory, and 2,000
+sequential arenas in one process. The report is `local_source_audit.md`.
 
-## 2026-07-27 — Target-machine verification (Mac mini M2) and Milestone 1
+## 2026-07-27 — Target-machine verification (Apple M2 Mac mini) and Milestone 1
 
-**Phase 0 reproduced on the target hardware.** 7/7 in both the `-O3` and the
-`FHEROES2_WITH_DEBUG` (`-O0 -g`) builds. Map seed `2227197244` and spike digest
-`2cfd42cb104aa5e7` identical to the M3 baseline **and** identical between build types — battle
-resolution is stable across optimization levels.
+Phase 0 reproduced on the target hardware, 7 of 7 in both the `-O3` and the `FHEROES2_WITH_DEBUG`
+(`-O0 -g`) builds. Map seed `2227197244` and spike digest `2cfd42cb104aa5e7` matched the Apple M3
+baseline and matched between build types, so battle resolution is stable across optimization
+levels.
 
-*Correction recorded:* the `src/dist` Makefile never defines `-DNDEBUG`, so its "Release" build
-already had `assert()` live. Every Phase 0 run on both machines had been exercising the
-`ApplyAction` asserts; the runbook's earlier "Release compiles out the asserts" rationale holds
-only for CMake Release builds.
+A correction surfaced along the way. The `src/dist` Makefile never defines `NDEBUG`, so its
+"Release" build already had `assert()` live, and every Phase 0 run on both machines had been
+exercising the `ApplyAction` assertions. The runbook's earlier claim that Release compiles the
+assertions out holds only for CMake Release builds.
 
-*Portability fix:* `build_spike.sh` broke on a repo path containing spaces
-(`/Volumes/External Drive/…`); flag lists are now bash arrays.
+A portability fix followed: `build_spike.sh` broke on a repository path containing spaces, since
+the clone lives under `/Volumes/External Drive/`, so flag lists became bash arrays.
 
-**Benchmark written** — `benchmark_m2.md` (Mode A only): ~4,566 eps/s tiny-melee (M2 ≈ 9 % slower
-than M3), 12 MB RSS, 10 ms process startup, scaling linear to 4 workers then flat (+17 % from 4→8).
-Recommended default: **4 workers**.
+Benchmark written as `benchmark_m2.md`, Mode A only. About 4,600 episodes/s on the tiny-melee
+fixture (the Apple M2 runs roughly 9% slower than the Apple M3), 12 MB resident memory, 10 ms
+process startup, scaling linearly to four workers and then flattening, gaining only 17% from four
+to eight. Recommended default: four workers.
 
-**CMake regression** — configures and builds to 100 %; both CMake and Makefile binaries launch to
-the main menu against a local `devdata/` root. Discovered: a `FHEROES2_DATA` root also needs the
-repo's own `files/data/resurrection.h2d`, or startup throws ~9 s in.
+CMake regression configured and built to completion, and both the CMake and Makefile binaries
+launched to the main menu against a local `devdata/` root. Discovered in passing: a
+`FHEROES2_DATA` root also needs the repository's own `files/data/resurrection.h2d`, or startup
+throws about nine seconds in.
 
-**Sanitizers** — full `FHEROES2_WITH_ASAN=1` build (implies UBSan), spike relinked with matching
-flags. 1,900 episodes across five compositions: **zero reports**, all deterministic (~700 eps/s,
-207 MB RSS under instrumentation).
+Sanitizers ran clean. A full `FHEROES2_WITH_ASAN=1` build, which implies UBSan, with the spike
+relinked using matching flags, produced zero reports across 1,900 episodes and five compositions,
+all deterministic, at about 700 episodes/s and 207 MB resident memory under instrumentation.
 
-**Milestone 1 complete** (`verify_m1.sh` 4/4). Shared `Battle::computeBattleSeed` extracted to
-`battle_seed.{h,cpp}`; agent library under `src/fheroes2/agent/` (scenario fixtures + validation,
-SHA-256 `agent_terminal_v1` digest, headless AI-vs-AI runner); worker entry point in
-`src/agent_worker/`. Ten identical runs per fixture; two fresh processes byte-identical.
-`m1_tiny_melee` reproduces the historical map/combat seeds (`2227197244` / `1356111745`).
+Milestone 1 completed, `verify_m1.sh` passing 4 of 4. `Battle::computeBattleSeed` was extracted to
+`battle_seed.{h,cpp}`; the agent library under `src/fheroes2/agent/` gained scenario fixtures and
+validation, the SHA-256 `agent_terminal_v1` digest, and the headless runner; the worker entry point
+landed in `src/agent_worker/`. Ten identical runs per fixture, and two fresh processes produced
+byte-identical output. The `m1_tiny_melee` fixture reproduces the historical map and combat seeds,
+`2227197244` and `1356111745`.
 
-**RL literature consolidated** — `research_rl_approaches.md` (23 sources, 25 claims verified by
-3-vote adversarial verification, 23 confirmed). Produced **ADR 0001** (observation profiles) and
-**ADR 0002** (fixed canonical action space + mask), the latter amending spec §10.4 after finding
-that no verified codebase consumes variable-length candidate lists.
+Literature consolidated into `research_rl_approaches.md` from 23 sources, with 25 claims put
+through three-vote adversarial verification and 23 confirmed. It produced ADR 0001 on observability
+profiles and ADR 0002 on the fixed canonical action space with a mask, the latter amending
+specification §10.4 after the sweep found that no verified codebase consumes variable-length
+candidate lists.
 
 ## 2026-07-28 — Milestone 2
 
-**Decision hook and passive teacher logging** (`verify_m2.sh` 8/8).
+The decision hook and passive teacher logging landed, `verify_m2.sh` passing 8 of 8.
 
-`Battle::DecisionController` added as an optional constructor parameter to `Arena`, dispatched in
-the full-fledged branch of `UnitTurn`, with the observer firing *before* the command stream
-updates the combat RNG. Automatic bad-morale and pending-UI actions are never intercepted.
-`GetEngineDecisionIndex()` counts full-fledged decisions (good-morale re-decisions count
-separately).
+`Battle::DecisionController` became an optional constructor parameter on `Arena`, dispatched in the
+full-fledged branch of `UnitTurn`, with the observer firing before the command stream updates the
+combat generator. Automatic bad-morale and pending-interface actions are never intercepted.
+`GetEngineDecisionIndex()` counts full-fledged decisions, and a good-morale re-decision counts
+separately.
 
-Agent side: `snapshotCommand` (copy-decode via `GetNextValue`), `PassiveTeacherRecorder`,
-SHA-256 `agent_decisions_v0` decision-stream digest, JSONL `TrajectoryWriter`
-(`agent_passive_v0` — no wall-clock fields, so files are byte-identical across processes), worker
-`--trajectory-dir`.
+On the agent side: `snapshotCommand` decoding a copy through `GetNextValue`, the
+`PassiveTeacherRecorder`, the SHA-256 `agent_decisions_v0` decision-stream digest, the JSONL
+`TrajectoryWriter` emitting the `agent_passive_v0` schema with no wall-clock fields so files stay
+byte-identical across processes, and the worker's `--trajectory-dir` flag.
 
-**Inertness evidence:** spike digest and all five golden fixture digests unchanged, *including*
+Inertness evidence: the spike digest and all five golden fixture digests were unchanged, including
 with the recorder actively attached.
 
-**Documentation:** `implementation_report.md` (review inventory) and **ADR 0003** (versioned YAML
-configs; every artifact embeds its resolved config + hash + commit). The Battle Only UI item was
-downgraded to optional QA / accepted risk — it is a normal-game regression checkbox, not a
-training prerequisite.
+Documentation gained `implementation_report.md` as a review inventory, and ADR 0003 on versioned
+configuration, under which every artifact embeds its resolved configuration, that configuration's
+hash, and the commit. The Battle Only interface check was downgraded to optional quality assurance
+at accepted risk, since it is a normal-game regression checkbox rather than a training
+prerequisite.
 
 ## 2026-07-29 — Minimap research, reference vault, Milestone 3
 
-**Coarse-minimap question researched** — `research_minimap_observations.md` (20 sources, 24/25
-claims verified). Produced **ADR 0004**: a semantic `planes_v1` modality joins the schema; true
-pixel rendering is rejected for the training environment. Key evidence: SC2's feature layers were
-never RGB; Griddly's vector observer matches pixel observers on performance at ~14× throughput.
+The coarse-minimap question was researched into `research_minimap_observations.md`, from 20 sources
+with 24 of 25 claims verified. It produced ADR 0004: a semantic `planes_v1` modality joins the
+schema, and rendered pixels are rejected for the training environment. The decisive evidence was
+that SC2's feature layers were never RGB, and that Griddly's vector observer matches its pixel
+observers on task performance at roughly 14 times the throughput.
 
-**Reference vault built** — `references/` with 43 local source copies (~59 MB), 15 Obsidian
-notes, index, and consolidated summary; reproducible via `fetch_references.sh`.
+The reference vault was built under `references/`, holding 43 local source files at about 59 MB,
+15 per-work notes, an index, and a consolidated synthesis, all reproducible through
+`fetch_references.sh`.
 
-**Milestone 3 complete** (`verify_m3.sh` 8/8) — *the project's top risk closed*.
+Milestone 3 completed, `verify_m3.sh` passing 8 of 8, which closed the project's top risk.
 
-Command legality lifted **verbatim** out of `battle_action.cpp` (the three anonymous-namespace
-helpers plus the `checkParameters` lambdas of `ApplyAction{Move,Attack,Skip}`) into
-`battle_action_validation.{h,cpp}`; the engine now executes through the lifted functions. The
-attack gate became `resolveAttackCommand()`, returning the resolved target/direction the lambda
-used to discard.
+Command legality was lifted verbatim out of `battle_action.cpp`, covering the three
+anonymous-namespace helpers and the `checkParameters` lambdas of `ApplyAction{Move,Attack,Skip}`,
+into `battle_action_validation.{h,cpp}`, and the engine now executes through the lifted functions.
+The attack gate became `resolveAttackCommand()`, which returns the resolved target and direction
+that the lambda previously computed and discarded.
 
-Machine-generated 71-monster capability audit → `simple_v1` allowlist
-(`python/fheroes2_agent/data/monster_capabilities_v1.json`); scenario validation enforces it.
-Canonical `Discrete(793)` action space with mask and candidates from **one** enumeration.
-Built-in teacher matching: **100 % coverage, 116/116 decisions**, min candidates ≥ 5.
+A machine-generated 71-monster capability audit produced the `simple_v1` allowlist at
+`python/fheroes2_agent/data/monster_capabilities_v1.json`, and scenario validation now enforces it.
+The canonical 793-slot action space emits its mask and candidates from one enumeration. Built-in
+teacher matching reached 100% coverage over 116 of 116 decisions, with a minimum of 5 candidates
+per decision.
 
-Golden digests unchanged with enumeration running at every decision — proving the candidate
-generator consumes no randomness.
+Golden digests were unchanged with enumeration running at every decision, which proves the
+candidate generator consumes no randomness.
 
 ## 2026-07-30 — Documentation restructure
 
-Split the reference-style content out of the entry point: [[START_HERE]] became a teaching
-document (notation, concepts, architecture, current state), this log took the chronology, and
-`concepts/` gained six primers ([[determinism-seeds-and-digests]], [[battle-turn-dispatch]],
-[[legal-actions-and-masking]], [[observation-design]], [[command-encoding-and-snapshots]],
-[[teacher-coverage-and-behavior-cloning]]). `references/summary.md` restructured the same way.
+Reference-style content was split out of the entry point. [[START_HERE]] became a teaching
+document carrying an MDP on-ramp, notation, architecture, and current state; this log took the
+chronology; and `concepts/` gained six primers: [[determinism-seeds-and-digests]],
+[[battle-turn-dispatch]], [[legal-actions-and-masking]], [[observation-design]],
+[[command-encoding-and-snapshots]], and [[teacher-coverage-and-behavior-cloning]].
 
----
+The rewrite was driven by two instruments rather than taste. The project's `WRITING_STYLE`
+contract supplies a deterministic lint, which the first draft breached on every file for em-dash
+density and on nine files for bold density. An independent critical review supplied 25 prioritized
+defects, of which the load-bearing ones were a contradictory masking constant, a missing MDP
+on-ramp, an overloaded use of the word "profile" across three distinct axes, and a
+bullet-grouped bibliography where a scannable table belonged.
+
+Lint counts after the rewrite, across all eleven documents:
+
+| check | worst file | threshold | breach |
+|---|---|---|---|
+| em-dash per 1,000 characters | 0.90 | 1 | none |
+| bold per 1,000 words | 2.89 | 6 | none |
+| label-colon bullets | 0 | 2 | none |
+| banned constructions | 3 | 0 | exempt, all three are the `play-harness` branch name matching the hype-verb regex |
+| question headings | 0 | 0 | none |
+| exclamation marks | 0 | 0 | none |
+| paragraphs over 160 words | 0 | 0 | none |
+
+The primers also moved onto the tutorial template, gaining a motivation section, an intuition
+drawn from machine learning, and a grounded comparison against the alternatives that were
+rejected. A primer taught in isolation, with no comparison, counts as incomplete under that
+contract.
 
 ## Running verification history
 
-Every gate, every time it was run at HEAD, has passed. Current expected output:
+Every gate has passed on every run at HEAD. Current expected output:
 
 | Gate | Expected |
 |---|---|
-| `agent_play/spike/verify_phase0.sh` | `7 passed, 0 failed` · seed `2227197244` · digest `2cfd42cb104aa5e7` |
-| `agent_play/verify_m1.sh` | `4 passed, 0 failed` · `deterministic=yes` |
+| `agent_play/spike/verify_phase0.sh` | `7 passed, 0 failed`, seed `2227197244`, digest `2cfd42cb104aa5e7` |
+| `agent_play/verify_m1.sh` | `4 passed, 0 failed`, `deterministic=yes` |
 | `agent_play/verify_m2.sh` | `8 passed, 0 failed` |
-| `agent_play/verify_m3.sh` | `8 passed, 0 failed` · `teacher_coverage=complete` |
-| `cmake --build build/cmake-regression` | builds to 100 % |
+| `agent_play/verify_m3.sh` | `8 passed, 0 failed`, `teacher_coverage=complete` |
+| `cmake --build build/cmake-regression` | builds to completion |
