@@ -6,8 +6,10 @@ projects live on their own branches; the branch you are on determines which appl
 ## Branch `agent-env` — headless battle environment for training
 
 **Read `docs/agent/START_HERE.md` first, in full, before doing anything else.** It is the single
-entry point: project goal, current status, findings that overturned the original plan, build and
-verification commands, ordered next steps, and the decisions not to relitigate.
+entry point, written to teach: project goal and scope, a notation/terms table, the architecture,
+the five ideas the design rests on (each with a primer in `docs/agent/concepts/`), current state,
+build and verification commands, and the decisions not to relitigate. Dated history lives
+separately in `docs/agent/log.md`.
 
 Quick orientation: Phase 0 and Milestone 1 (deterministic runner foundation) are complete and
 verified on both the M3 MacBook and the target Mac mini M2. Engine changes are minimal by design:

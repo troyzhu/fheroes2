@@ -58,4 +58,8 @@ re-fetch with `./fetch_references.sh`).
 | [[../decisions/0003-config-management\|ADR 0003]] YAML configs | [[ref-vcmi-gym]] (PBT/W&B practice) |
 | [[../decisions/0004-spatial-observation-modality\|ADR 0004]] planes, no pixels | [[ref-sc2le]], [[ref-pysc2]], [[ref-griddly]], [[ref-alphastar]], [[ref-nle]] |
 
-See [[summary]] for the consolidated analysis across the whole corpus.
+## Related
+
+- [[summary]] — the consolidated analysis across the whole corpus (read this before the raw notes).
+- [[../concepts/index|Concept primers]] — the teaching layer these findings feed into.
+- [[../START_HERE|START_HERE]] — the system as it stands.
