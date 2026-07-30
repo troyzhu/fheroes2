@@ -2,7 +2,7 @@
 title: Training design
 type: design
 updated: 2026-07-30
-related_concepts: ["[[decisions/0005-training-and-reward]]", "[[rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]"]
+related_concepts: ["[[notation]]", "[[decisions/0005-training-and-reward]]", "[[rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]"]
 tags: [agent-env, training, design]
 ---
 
@@ -28,17 +28,20 @@ The teacher is the engine's own `AI::BattlePlanner`, described in [[implementati
 
 ## Notation
 
+These follow the contract in [[notation]], which fixes the symbols against the standard treatment and lists what this project adds.
+
 | Symbol | Meaning |
 |---|---|
 | $o$ | Observation, the serialized battle state the policy receives |
 | $a \in \{0, \ldots, 792\}$ | Canonical action index |
 | $m(o) \in \{0,1\}^{793}$ | Legality mask for the state behind $o$ |
-| $\ell_\theta(o) \in \mathbb{R}^{793}$ | Network logits |
-| $\pi_\theta(a \mid o)$ | Masked policy, $\operatorname{softmax}$ over $\ell_\theta$ with illegal entries set to $-10^8$ |
+| $\ell(o, \theta) \in \mathbb{R}^{793}$ | Network logits, the book's action preferences $h(s, a, \theta)$ gathered into a vector |
+| $\pi(a \mid o, \theta)$ | Masked policy, $\operatorname{softmax}$ over $\ell(o, \theta)$ with illegal entries set to $-10^8$ |
+| $v(o, w)$ | Critic, sharing a trunk with the actor, so $\theta$ and $w$ overlap |
 | $\pi^{*}$ | The teacher policy |
 | $\mathcal{D}$ | Dataset of observation and action pairs |
-| $\hat A_t$ | Advantage estimate at step $t$ |
-| $r_t(\theta)$ | Probability ratio $\pi_\theta(a_t \mid o_t) / \pi_{\theta_{\text{old}}}(a_t \mid o_t)$ |
+| $\hat A_t$ | Advantage estimate at step $t$, targeting the advantage function $\delta_\pi$ |
+| $\rho_t(\theta)$ | Importance ratio $\pi(a_t \mid o_t, \theta) \,/\, \pi(a_t \mid o_t, \theta_{\text{old}})$, written $r_t(\theta)$ in the PPO paper |
 | $T$ | Episode length in decisions, 5 to 40 here |
 | $\varepsilon$ | Per-decision error rate of a fitted policy |
 
@@ -83,13 +86,13 @@ Behavior cloning treats imitation as supervised classification. Each teacher dec
 
 Maximum likelihood over teacher actions, which for a categorical policy is cross-entropy:
 
-$$\mathcal{L}_{\text{BC}}(\theta) = -\frac{1}{|\mathcal{D}|} \sum_{(o, a^{*}) \in \mathcal{D}} \log \pi_\theta(a^{*} \mid o)$$
+$$\mathcal{L}_{\text{BC}}(\theta) = -\frac{1}{|\mathcal{D}|} \sum_{(o, a^{*}) \in \mathcal{D}} \ln \pi(a^{*} \mid o, \theta)$$
 
-The detail that matters is that $\pi_\theta$ is the masked policy, not a raw softmax over 793 outputs. The mask is applied before the log, so the normalization runs over the legal set alone and the loss never asks the network to suppress actions that were already impossible. Training against an unmasked softmax would spend most of the gradient signal teaching legality that the environment already supplies, and would produce a network whose probabilities are wrong the moment masking is switched on at evaluation.
+The detail that matters is that $\pi(a \mid o, \theta)$ is the masked policy, not a raw softmax over 793 outputs. The mask is applied before the log, so the normalization runs over the legal set alone and the loss never asks the network to suppress actions that were already impossible. Training against an unmasked softmax would spend most of the gradient signal teaching legality that the environment already supplies, and would produce a network whose probabilities are wrong the moment masking is switched on at evaluation.
 
 > [!derivation]- Why masked cross-entropy is the right likelihood, and what it implies about the ceiling
 > The teacher's action is always legal, so $m_{a^{*}}(o) = 1$ and the masked likelihood is well defined. Writing $\mathcal{A}(o)$ for the legal set,
-> $$\pi_\theta(a^{*} \mid o) = \frac{\exp \ell_{a^{*}}}{\sum_{a' \in \mathcal{A}(o)} \exp \ell_{a'}}$$
+> $$\pi(a^{*} \mid o, \theta) = \frac{\exp \ell_{a^{*}}}{\sum_{a' \in \mathcal{A}(o)} \exp \ell_{a'}}$$
 > so minimizing $\mathcal{L}_{\text{BC}}$ is maximum likelihood over a categorical distribution whose support is exactly the legal set. The minimum of $\mathcal{L}_{\text{BC}}$ is the conditional entropy $H(a^{*} \mid o)$ of the teacher's own policy given the observation. Two consequences follow. If the teacher is deterministic given full state but our observation drops something it conditions on, that entropy is strictly positive and the loss cannot reach zero however large the network. Residual loss should therefore not be read as underfitting without first checking what the teacher sees and the student does not, which for `full_v1` fields such as `engine_strength` is a real gap.
 
 ### Training algorithm and starting hyperparameters
@@ -154,15 +157,15 @@ DAgger requires querying the teacher at arbitrary states the student produced. W
 
 PPO maximizes a clipped surrogate that keeps each update near the policy that collected the data:
 
-$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta)\, \hat A_t, \ \operatorname{clip}\big(r_t(\theta),\, 1-\epsilon,\, 1+\epsilon\big)\, \hat A_t \right) \right]$$
+$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( \rho_t(\theta)\, \hat A_t, \ \operatorname{clip}\big(\rho_t(\theta),\, 1-\epsilon,\, 1+\epsilon\big)\, \hat A_t \right) \right]$$
 
 with the full loss adding a value term and an entropy bonus:
 
-$$L(\theta) = -L^{\text{CLIP}}(\theta) + c_v\, \hat{\mathbb{E}}_t\big[(V_\theta(o_t) - \hat G_t)^2\big] - c_e\, \hat{\mathbb{E}}_t\big[H(\pi_\theta(\cdot \mid o_t))\big]$$
+$$L(\theta, w) = -L^{\text{CLIP}}(\theta) + c_v\, \hat{\mathbb{E}}_t\big[(v(o_t, w) - \hat G_t)^2\big] - c_e\, \hat{\mathbb{E}}_t\big[H(\pi(\cdot \mid o_t, \theta))\big]$$
 
 Advantages come from generalized advantage estimation, which trades bias against variance through $\lambda$ and is derived in [[rl-methods#GAE]].
 
-Two integration details decide whether this works. The mask must be applied when sampling and again when recomputing log-probabilities during the update, or $r_t \neq 1$ at $\theta = \theta_{\text{old}}$ and the clipping window is centered on the wrong point. And the entropy bonus must be computed over the legal set only, since entropy over 793 outputs where 760 are masked is dominated by the mask rather than by the policy's actual indecision.
+Two integration details decide whether this works. The mask must be applied when sampling and again when recomputing log-probabilities during the update, or $\rho_t \neq 1$ at $\theta = \theta_{\text{old}}$ and the clipping window is centered on the wrong point. And the entropy bonus must be computed over the legal set only, since entropy over 793 outputs where 760 are masked is dominated by the mask rather than by the policy's actual indecision.
 
 ### Starting hyperparameters
 

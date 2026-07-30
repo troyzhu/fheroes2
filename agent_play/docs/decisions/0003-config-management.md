@@ -19,7 +19,7 @@ The project is about to accumulate many configuration axes: scenario suites, obs
 
    Reproducibility rule (the load-bearing part): every produced artifact, trajectory header, benchmark report, checkpoint metadata, W&B run, embeds `{resolved_config, sha256(canonical_config), git_commit, schema_versions}`. Canonicalization follows §11.3 (sorted keys, no insignificant whitespace). An artifact whose config hash cannot be recomputed is treated as corrupted.
 5. Tooling stance: plain YAML + pydantic now; no Hydra initially (composition magic vs traceability). Revisit only if sweep orchestration outgrows PBT/W&B, and record the change here.
-6. Discoverability for future sessions: `configs/README.md` lists every axis with its schema location; this ADR is the pointer of record from `START_HERE.md`.
+6. Discoverability for future sessions: `configs/README.md` lists every axis with its schema location; this ADR is the pointer of record from [[../overview]].
 
 ## Consequences
 

@@ -2,7 +2,7 @@
 title: Concept primers, index
 type: moc
 updated: 2026-07-30
-related_concepts: ["[[../README]]", "[[../rl-and-the-battle-domain]]"]
+related_concepts: ["[[../overview]]", "[[../rl-and-the-battle-domain]]"]
 tags: [concept, index, moc, agent-env]
 ---
 
@@ -24,7 +24,8 @@ Each follows the same shape: motivation, the idea in one sentence, an intuition 
 ## Related
 
 - [[../rl-and-the-battle-domain]], the conceptual entry point these primers build on.
-- [[../README|START_HERE]], the system as it stands, with the notation table.
+- [[../overview]], the system as it stands.
+- [[../notation]], the symbol contract used throughout.
 - [[inventory]], what is actually built and how it was verified.
 - [[../research/findings|Literature synthesis]], the evidence behind these ideas.
 - `../decisions/`, the ADRs these concepts justify.

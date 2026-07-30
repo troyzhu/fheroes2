@@ -1,6 +1,6 @@
 # fheroes2 Agent Local Source Audit
 
-> New here? Read `agent_play/docs/START_HERE.md` first, this document is the detailed evidence behind it, not the entry point.
+> New here? Read `agent_play/docs/overview.md` first. This document is the detailed evidence behind it, not the entry point.
 
 Fills the template in Appendix D of `agent_play/fheroes2_agent_system_spec_v0.3.md`. This is the Phase 0 report the spec makes mandatory before broader implementation.
 

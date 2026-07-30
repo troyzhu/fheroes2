@@ -53,5 +53,5 @@ Opening `agent_play/docs/` or the repository root as an Obsidian vault resolves 
 - [[findings]], what the corpus establishes, with confidence markers.
 - [[../archive/research-runs/2026-07-27-rl-approaches]] and [[../archive/research-runs/2026-07-29-spatial-observations]], the claim-by-claim reports with verification votes.
 - [[prior-art]], an orientation to the open-source codebases behind it.
-- [[../implementation/README|Concept primers]] — the teaching layer these findings feed.
-- [[../README|START_HERE]] — the system as it stands.
+- [[../implementation/README|Concept primers]], the teaching layer these findings feed.
+- [[../overview]], the system as it stands.

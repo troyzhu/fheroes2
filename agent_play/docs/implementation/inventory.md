@@ -4,7 +4,7 @@
 
 ## How to review this branch in ~20 minutes
 
-1. Read this file, then skim `START_HERE.md` §2 (status) and §6 (runbook state).
+1. Read this file, then skim [[../overview]] for the current status and the runbook.
 2. Run the verification suite (expected outputs listed in the matrix below):
 
    ```bash

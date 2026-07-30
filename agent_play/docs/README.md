@@ -15,8 +15,9 @@ This tree lives under `agent_play/` rather than under the repository's `docs/` d
 
 | If you want to | Read, in order |
 |---|---|
-| Understand the problem, with no background in reinforcement learning or in this game | [[rl-and-the-battle-domain]], then [[README]] |
-| Build it and see the current state | [[README]] |
+| Understand the problem, with no background in reinforcement learning or in this game | [[rl-and-the-battle-domain]], then [[overview]] |
+| Build it and see the current state | [[overview]] |
+| Look up a symbol, or see what this tree assumes from a standard RL text and what it adds | [[notation]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] to look up a source |
 | Understand what is implemented and how | [[implementation/inventory]] for what exists, then [[implementation/README]] for how each mechanism works |
 | Understand why an interface is the way it is | [[decisions/README]] |
@@ -29,11 +30,12 @@ This tree lives under `agent_play/` rather than under the repository's `docs/` d
 
 ```
 agent_play/docs/
-├── INDEX.md                     this file
-├── README.md                    orientation, notation, scope, build, current state
+├── README.md                    this file, a routing index
+├── overview.md                  orientation, scope, build, current state
+├── notation.md                  the symbol contract, and what this tree adds to a standard RL text
 ├── rl-and-the-battle-domain.md  RL vocabulary, the battle domain, comparison to other games
-├── roadmap.md                   scope: battles now, wider battles and the adventure map later
-├── training-design.md           how a policy is fitted: architecture, losses, hyperparameters, alternatives
+├── roadmap.md                   scope, battles now, wider battles and the adventure map later
+├── training-design.md           how a policy is fitted, architecture, losses, hyperparameters, alternatives
 ├── rl-methods.md                every RL technique the docs name, derived, with verdicts
 ├── research/                    the literature and what it establishes
 ├── implementation/              how the built mechanisms work

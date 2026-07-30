@@ -67,7 +67,7 @@ Truncation against termination. When an episode ends because a round limit was r
 
 The discount. $\gamma$ belongs to the objective alongside the reward and is deferred with it. Short episodes make a value near 1 defensible.
 
-The initial-state distribution. A win rate is a statement about the scenario and army generator as much as about the policy. That generator is currently five fixed fixtures used as regression anchors, which is not a training distribution. Defining it is a prerequisite for any reported result meaning anything, and it is presently the largest undocumented modeling choice in the project.
+The initial-state distribution $d_0$. A win rate is a statement about the scenario and army generator as much as about the policy. That generator is currently five fixed fixtures used as regression anchors, which is not a training distribution. Defining it is a prerequisite for any reported result meaning anything, and it is presently the largest undocumented modeling choice in the project.
 
 ## Consequences
 

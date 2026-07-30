@@ -50,8 +50,8 @@ Stated as a Markov decision process, which [[rl-and-the-battle-domain]] develops
 | State $s$ | The battle position: which stacks stand where, with what counts, hit points, and shots remaining. |
 | Observation $o$ | A serialization of $s$: padded entity records, optionally an `11 × 9 × C` plane tensor, filtered by an observability profile. |
 | Action $a$ | What the active stack does. One slot of a fixed 793-wide discrete space, with a per-state legality mask. |
-| Transition $P(s' \mid s, a)$ | The fheroes2 engine. Stochastic through damage, morale, and luck rolls, but seeded, so a fixed seed makes an episode reproducible. |
-| Reward $R$ | Deliberately undefined in Phase 1a. The terminal outcome (winner, surviving force) is recorded; the objective is chosen later. |
+| Transition $p(s' \mid s, a)$ | The fheroes2 engine. Stochastic through damage, morale, and luck rolls, but seeded, so a fixed seed makes an episode reproducible. |
+| Reward $p(r \mid s, a)$ | Deliberately undefined in Phase 1a. The terminal outcome (winner, surviving force) is recorded; the objective is chosen later. |
 | Episode | One battle, from arena construction to a terminal state or round truncation. |
 | Policy $\pi(a \mid s)$ | Not in this repository. The environment ships without a learner by design. |
 
@@ -228,18 +228,20 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 
 | Path | What it is | Read when |
 |---|---|---|
-| `agent_play/docs/START_HERE.md` | this file, the system as it stands | first |
-| `agent_play/docs/concepts/` | eight concept primers, starting with RL vocabulary and the game comparison | first, if the vocabulary is new |
-| `agent_play/docs/log.md` | dated project history and evidence | when you need why or when |
+| `agent_play/docs/README.md` | routing index for this tree | to find anything |
+| `agent_play/docs/overview.md` | this file, the system as it stands | first |
+| `agent_play/docs/notation.md` | the symbol contract, and what this tree adds to a standard RL text | before any of the mathematical documents |
+| `agent_play/docs/rl-and-the-battle-domain.md` | RL vocabulary, the battle domain, comparison with other environments | first, if the vocabulary is new |
+| `agent_play/docs/rl-methods.md` | every RL technique the docs name, derived, with verdicts | to look one up |
+| `agent_play/docs/training-design.md` | architecture, losses, hyperparameters, and the alternatives at each choice | before training anything |
+| `agent_play/docs/roadmap.md` | scope, battles now, wider battles and the adventure-map agent later | to see what is deliberately not built yet |
 | `agent_play/docs/decisions/` | accepted ADRs amending the specification | before implementing the area they touch |
-| `agent_play/docs/implementation_report.md` | review inventory: commits, engine surface, verification matrices | to review what exists |
-| `agent_play/docs/references/` | reference vault: index, synthesis, repository orientation, per-work notes, 43 local source files | to consult or extend the evidence base |
-| `agent_play/docs/references/repos.md` | what each open-source codebase contains and where to look inside it | before studying vcmi-gym, MicroRTS-Py, PySC2, or ARLinBfW |
-| `agent_play/docs/references/report-rl-approaches.md` | verified literature consolidation on environment and agent design | before design work |
-| `agent_play/docs/references/report-spatial-observations.md` | verified research on spatial and hybrid observations | before observation serialization |
-| `agent_play/docs/local_source_audit.md` | Phase 0 report, assumption table, file and line evidence | before touching battle code |
-| `agent_play/docs/benchmark_m2.md` | Apple M2 target-hardware performance, Mode A | before sizing workers or models |
+| `agent_play/docs/implementation/` | what exists, plus a primer per built mechanism | to review or extend the code |
+| `agent_play/docs/research/` | consolidated findings, prior art, and a note per source | to consult or extend the evidence base |
+| `agent_play/docs/archive/` | dated history, benchmarks, raw research runs, fetched sources | when you need why or when, never as a reading path |
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` | the full design document | when implementing a milestone |
+| `agent_play/lint_docs.sh` | the documentation gate, style contract plus wikilink resolution | before claiming a doc change is done |
+| `agent_play/verify_m*.sh` | the milestone verification gates | after touching engine or agent code |
 | `agent_play/spike/README.md` | Phase 0 spike usage and limits | before running it |
 
 The specification is large. Sections 0.1, 4, 9, 10, 13, and 22 carry the weight. Where an ADR and the specification disagree, the ADR wins, having been written later and with verified evidence.

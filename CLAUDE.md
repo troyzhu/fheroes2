@@ -10,11 +10,28 @@ under `agent_play/`, not under `docs/`, because `docs/` is the source of the pro
 website (`.github/workflows/pages.yml` builds Jekyll from it) and this material is internal.
 
 The tree separates reading material from records. `README.md` routes; `overview.md` carries
-orientation, notation, scope, build and current state; `rl-and-the-battle-domain.md` teaches the
-reinforcement-learning vocabulary and the battle domain from scratch; `research/` holds the
-literature; `implementation/` holds one primer per built mechanism; `decisions/` holds the accepted
-records; and `archive/` holds dated logs, benchmarks, and raw research runs, which are provenance
-rather than a reading path.
+orientation, scope, build and current state; `notation.md` fixes the mathematical symbols;
+`rl-and-the-battle-domain.md` teaches the reinforcement-learning vocabulary and the battle domain
+from scratch; `research/` holds the literature; `implementation/` holds one primer per built
+mechanism; `decisions/` holds the accepted records; and `archive/` holds dated logs, benchmarks,
+and raw research runs, which are provenance rather than a reading path.
+
+**Notation is not a free choice.** All mathematics follows Shiyu Zhao,
+*Mathematical Foundations of Reinforcement Learning*, because the repository owner's existing study
+notes follow that text and this material is meant to extend them rather than run a parallel
+vocabulary. `agent_play/docs/notation.md` is the contract: what is inherited, what this project adds
+and why the book does not need it, the deliberate departures, and a coverage map saying which
+chapters are assumed so they are never re-derived here. Read it before editing any document that
+carries equations. Concretely that means `v_\pi(s)` and `q_\pi(s,a)` rather than `V^\pi`/`Q^\pi`,
+`\pi(a \mid s, \theta)` rather than `\pi_\theta`, `p(s' \mid s,a)` and `p(r \mid s,a)` for the model,
+`d_0` for the initial-state distribution, `\delta_\pi` for the advantage function, `\ln` rather than
+`\log`, and `\rho_t(\theta)` for the PPO ratio, since `r` is a reward.
+
+**Run `./agent_play/lint_docs.sh` before claiming any documentation change is done.** It enforces
+the writing contract at `~/.claude/plugins/marketplaces/troyzhu/docs/WRITING_STYLE.md` (em-dash and
+bold budgets, banned constructions, no question headings, paragraphs under 160 words, and no
+hard-wrapped prose, since this vault is one paragraph per line) and resolves every wikilink, which
+is what catches the silent breakage that a file rename causes.
 
 Scope note: everything built so far is the **battle** environment. `agent_play/docs/roadmap.md`
 records the wider goal, including the adventure-map agent covering movement, recruitment, and town
@@ -34,7 +51,8 @@ that both build systems compile into the normal executable without behavior chan
 ```bash
 make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh \
   && ./agent_play/spike/verify_phase0.sh && ./agent_play/verify_m1.sh \
-  && ./agent_play/verify_m2.sh && ./agent_play/verify_m3.sh
+  && ./agent_play/verify_m2.sh && ./agent_play/verify_m3.sh \
+  && ./agent_play/lint_docs.sh
 ```
 
 ## Branch `play-harness` — Claude plays the game through the real UI
