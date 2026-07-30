@@ -28,9 +28,13 @@ tags: [agent-env, primer, rl, entry-point]
 
 ## Part 1 — the vocabulary
 
-Every RL game environment is described with the same handful of objects, and every design decision in this project is a choice about one of them. Documentation for game environments usually assumes either the RL vocabulary or the game and rarely bridges the two, which makes design choices look arbitrary. Whether an environment blocks or is called, whether an action is one integer or five, and whether a value is hidden from the agent all sound like implementation trivia until they are stated as choices about the state, the action space, and the observation function.
+Reinforcement learning studies an agent that repeatedly looks at a situation, picks an action, and receives a number scoring how that turned out. Nobody supplies the right answer. The agent learns by acting and watching what the number does, which is what separates it from supervised learning, where every training example arrives with its correct label attached.
 
-Writing the formalism down makes choices comparable. Once StarCraft, microRTS, NetHack, and a Heroes battle are all written as the same tuple, the differences become measurable rather than anecdotal, and a decision taken in one can be argued for or against in another.
+A turn-based battle fits that loop directly, and the sections below name each part of it. The names are worth learning because the rest of this documentation uses them constantly. The observability profiles are a choice about the observation function, the fixed action space and its legality mask are a choice about the action set and its legal subset, and the deliberately undefined reward is a choice to leave one part of the loop empty until the environment underneath it is trustworthy.
+
+Naming the parts also makes environments comparable. Once StarCraft, microRTS, NetHack, and a Heroes battle are written as the same tuple, their differences are measurable rather than anecdotal, and an argument settled in one can be carried into another.
+
+One property is assumed throughout and is easiest to state now. A problem is Markov when the current state carries everything needed to predict what comes next, so the history that produced that state adds nothing. The assumption is what allows a policy to look only at the present. Much of the observation design in this project exists either to keep it true or to be explicit about where it fails.
 
 ## Notation
 
@@ -40,13 +44,13 @@ Writing the formalism down makes choices comparable. Once StarCraft, microRTS, N
 | $a \in \mathcal{A}$ | Action: one choice by the acting player. |
 | $\mathcal{A}(s) \subseteq \mathcal{A}$ | The legal actions in state $s$. Usually a small subset. |
 | $P(s' \mid s, a)$ | Transition function: how the world evolves. Deterministic when it puts all mass on one $s'$. |
-| $R(s, a, s')$ | Reward: the scalar the agent maximizes. |
-| $\gamma \in [0, 1]$ | Discount factor, trading immediate against future reward. |
+| $R(s, a, s')$ | Reward, the scalar arriving on one transition. The quantity a policy maximizes is the expected return $J(\pi)$, not $R$ itself. |
+| $\gamma \in [0, 1)$ | Discount factor, trading immediate against future reward. A value of 1 is admissible only for episodic tasks that are guaranteed to terminate, which battles are. |
 | $\tau$ | Trajectory, the sequence $s_0, a_0, r_1, s_1, \ldots$ of one episode. |
-| $G_t = \sum_{k \ge 0} \gamma^k r_{t+k+1}$ | Return: the discounted sum of future reward from step $t$. |
+| $G_t = \sum_{k \ge 0} \gamma^k r_{t+k+1}$ | Return, the discounted sum of future reward from step $t$. Episodes here are finite, so the sum runs to termination. |
 | $o = O(s)$ | Observation: what the agent actually receives, which may hide part of $s$. |
-| $\pi(a \mid s)$ | Policy: the distribution over actions the agent follows. |
-| $V^\pi(s)$, $Q^\pi(s,a)$ | Value functions: expected return from a state, or from a state-action pair. |
+| $\pi(a \mid s)$ | Policy, the distribution over actions the agent follows. When the agent sees an observation rather than the state, it is $\pi(a \mid o)$, or $\pi(a \mid h)$ over the history. |
+| $V^\pi(s) = \mathbb{E}_\pi[G_t \mid s_t = s]$, $Q^\pi(s,a)$ | Value functions, the expected return under $\pi$ from a state, or from a state and action. |
 | $m \in \{0,1\}^{\lvert \mathcal{A} \rvert}$ | Legality mask, with $m_i = 1$ exactly when action $i$ lies in $\mathcal{A}(s)$. |
 | $\rho_0$ | Initial-state distribution. Here it is the scenario and army generator, and it defines what a reported win rate means. |
 | $\Omega$ | The observation space, the set $o$ is drawn from. |
@@ -194,12 +198,18 @@ Every design record in this project cites one of the six objects from Part 1. Th
 - Trajectory: the recorded sequence of states, actions, and rewards in an episode.
 - Return: discounted cumulative reward, the quantity a policy maximizes.
 - Rollout: running the current policy to collect trajectories.
-- On-policy: the learner keeps the collecting policy close to the policy being updated, so an importance-sampling correction stays low variance.
-
-PPO is on-policy in this sense. It reuses each batch for several epochs under a clipped ratio rather than for a single gradient step.
+- On-policy: the learner keeps the collecting policy close to the policy being updated, so an importance-sampling correction stays low variance. PPO is on-policy in this sense, since it reuses each batch for several epochs under a clipped ratio rather than for a single gradient step.
 - Off-policy: learning from data generated by a different or older policy.
 - Distribution shift: the mismatch between the states a teacher visited and those the student visits.
 - Sparse reward: a signal that arrives only at the end of an episode.
+- Policy gradient: adjusting the policy's parameters in the direction that raises expected return, estimated from sampled trajectories.
+- PPO: proximal policy optimization, the policy-gradient method used in most of the work cited here. It reuses each batch of experience for several passes while clipping how far the policy may move.
+- Logits: the raw scores a network emits per action, before they are turned into probabilities.
+- Softmax: the function turning logits into probabilities, by exponentiating and normalizing. Setting a logit very negative therefore drives its probability to zero.
+- Actor and critic: the actor is the policy that chooses actions; the critic estimates value and is used to reduce the variance of the actor's updates. The critic exists only during training.
+- Behavior cloning: supervised learning of a policy from recorded expert decisions, treating the expert's action as the label.
+- Gymnasium: the common Python interface for RL environments, where the learner calls `step(action)` and receives an observation and reward.
+- Monte Carlo tree search: a planning method that looks ahead by simulating many possible continuations, rather than learning a reflex.
 - Stack: a group of identical creatures acting as a single unit, the atom of a Heroes battle.
 - Round: one pass in which every eligible stack acts once, ordered by speed.
 - Retaliation: the defender's automatic counter-attack after a melee strike.
