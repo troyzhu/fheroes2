@@ -6,15 +6,13 @@ goal: "A deterministic, headless, structured battle environment for fheroes2 tha
 branch: agent-env
 date_started: 2026-07-26
 updated: 2026-07-30
-related_concepts: ["[[determinism-seeds-and-digests]]", "[[battle-turn-dispatch]]", "[[legal-actions-and-masking]]", "[[observation-design]]", "[[command-encoding-and-snapshots]]", "[[teacher-coverage-and-behavior-cloning]]"]
+related_concepts: ["[[rl-for-games]]", "[[fheroes2-battles-vs-other-games]]", "[[determinism-seeds-and-digests]]", "[[battle-turn-dispatch]]", "[[legal-actions-and-masking]]", "[[observation-design]]", "[[command-encoding-and-snapshots]]", "[[teacher-coverage-and-behavior-cloning]]"]
 tags: [agent-env, rl-environment, fheroes2, entry-point]
 ---
 
-> **What this note is.** The entry point for the agent environment: what it is, the terms it uses,
-> how the pieces fit, what state it is in, and how to build and verify it. It describes the system
-> as it stands. Dated history lives in [[log]], and the ideas behind the design are one click away
-> in `concepts/`. Assumes familiarity with MDPs and policy gradients; assumes no fheroes2 or C++
-> knowledge.
+> **What this note is.** The entry point for the agent environment: what it is, the terms it uses, how the pieces fit, what state it is in, and how to build and verify it. It describes the system as it stands, and dated history lives in [[log]].
+>
+> **New to the project?** Read [[rl-for-games]] first for the vocabulary (state, action, reward, transition, policy, observability), then [[fheroes2-battles-vs-other-games]] for what a Heroes battle is and how it differs from StarCraft, microRTS, and NetHack. This note assumes both. The full reading order is in [[concepts/index|the concept index]].
 
 ## Table of contents
 - [[#Prerequisites — the environment as an MDP]]
@@ -32,7 +30,7 @@ tags: [agent-env, rl-environment, fheroes2, entry-point]
 
 ## Prerequisites — the environment as an MDP
 
-The whole system in vocabulary you already own.
+The whole system in the vocabulary of [[rl-for-games]]. If any row reads as unfamiliar, that primer defines it from scratch, and [[fheroes2-battles-vs-other-games]] explains the game itself.
 
 | MDP element | Here |
 |---|---|
@@ -44,22 +42,13 @@ The whole system in vocabulary you already own.
 | Episode | One battle, from arena construction to a terminal state or round truncation. |
 | Policy $\pi(a \mid s)$ | Not in this repository. The environment ships without a learner by design. |
 
-Two structural facts distinguish this from a Gymnasium environment you would write yourself, and
-both follow from the engine rather than from taste.
+Two structural facts distinguish this from a Gymnasium environment you would write yourself, and both follow from the engine rather than from taste.
 
-Control is inverted. Nothing calls `env.step(a)`, because `Arena::Turns()` advances a whole round
-rather than one decision. The engine owns the call stack and calls into our hook at each decision
-point, so the worker blocks there until an action arrives. A Python-side adapter re-presents a
-normal `step()` on top of that, the same trampoline PySC2 uses.
+Control is inverted. Nothing calls `env.step(a)`, because `Arena::Turns()` advances a whole round rather than one decision. The engine owns the call stack and calls into our hook at each decision point, so the worker blocks there until an action arrives. A Python-side adapter re-presents a normal `step()` on top of that, the same trampoline PySC2 uses.
 
-Only one episode runs per process at a time. The engine's arena is a file-static singleton whose
-constructor asserts it is the only live one, so vectorization means multiple processes.
+Only one episode runs per process at a time. The engine's arena is a file-static singleton whose constructor asserts it is the only live one, so vectorization means multiple processes.
 
-Determinism here is conditional, exactly like `env.reset(seed=k)`. Seed in, episode out. The
-distribution a policy trains on is over world seeds and army compositions; the five committed
-fixtures pin regression anchors, not the training set. Within an episode the dynamics remain
-stochastic from the policy's point of view, since damage, morale, and luck are drawn from a
-combat-seeded generator that never appears in the observation.
+Determinism here is conditional, exactly like `env.reset(seed=k)`. Seed in, episode out. The distribution a policy trains on is over world seeds and army compositions; the five committed fixtures pin regression anchors, not the training set. Within an episode the dynamics remain stochastic from the policy's point of view, since damage, morale, and luck are drawn from a combat-seeded generator that never appears in the observation.
 
 ## Notation and key terms
 
@@ -90,18 +79,13 @@ combat-seeded generator that never appears in the observation.
 | Worker | `fheroes2_agent_worker`, the entry point outside both build systems' source globs. |
 | episodes/s | Throughput unit for the environment alone, measured with no protocol layer attached. |
 
-Board constants: 11 by 9 gives 99 cells, six hex directions, and an action space of
-$1 + 99 + 99 + 594 = 793$ slots.
+Board constants: 11 by 9 gives 99 cells, six hex directions, and an action space of $1 + 99 + 99 + 594 = 793$ slots.
 
 ## What this project is
 
-Build a deterministic, headless, structured environment for fheroes2 battles so a policy can be
-trained on them. The environment reads true engine state and selects from engine-generated legal
-actions, never pixels and never synthetic input.
+Build a deterministic, headless, structured environment for fheroes2 battles so a policy can be trained on them. The environment reads true engine state and selects from engine-generated legal actions, never pixels and never synthetic input.
 
-The first deliverable is deliberately narrow. Phase 1a aims at a trustworthy substrate, so the
-environment itself contains no learner, no language model, no screenshot parsing, and no interface
-automation.
+The first deliverable is deliberately narrow. Phase 1a aims at a trustworthy substrate, so the environment itself contains no learner, no language model, no screenshot parsing, and no interface automation.
 
 | In scope (`creature_field_v1` with `simple_v1`) | Deferred to Phase 1b | Excluded from this branch |
 |---|---|---|
@@ -111,8 +95,7 @@ automation.
 | MOVE, ATTACK, SKIP | Spell casting | Screenshots, mouse, keyboard |
 | Both sides engine-driven and hook-interceptable | Retreat and surrender as actions | Rendered pixels, which live on the `play-harness` branch |
 
-That last row names a separate project in this repository, where Claude plays through the real
-interface using frame dumps and an input pipe. The two efforts stay independent.
+That last row names a separate project in this repository, where Claude plays through the real interface using frame dumps and an input pipe. The two efforts stay independent.
 
 ## Architecture at a glance
 
@@ -135,58 +118,33 @@ interface using frame dumps and an input pipe. The two efforts stay independent.
         src/agent_worker/  ──►  [Milestone 4: JSONL protocol]  ──►  Python
 ```
 
-Three properties hold it together. Engine behavior is unchanged, since every engine edit is either
-a verbatim lift or an optional hook that is inert when unused, and each was accepted only on
-unchanged digests. Legality has one implementation, so a mask cannot disagree with what the engine
-accepts. Everything is hashed, so drift is loud.
+Three properties hold it together. Engine behavior is unchanged, since every engine edit is either a verbatim lift or an optional hook that is inert when unused, and each was accepted only on unchanged digests. Legality has one implementation, so a mask cannot disagree with what the engine accepts. Everything is hashed, so drift is loud.
 
 ## The five ideas the design rests on
 
 Each idea has a primer; read the one covering whatever you are about to touch.
 
-**Determinism.** A battle is a pure function of world seed and army composition. We pin the world
-seed by reseeding the thread-local generator, derive the combat seed through one shared helper, and
-hash the outcome. Digest equality is how every engine change on this branch was proven safe. See
-[[determinism-seeds-and-digests]].
+**Determinism.** A battle is a pure function of world seed and army composition. We pin the world seed by reseeding the thread-local generator, derive the combat seed through one shared helper, and hash the outcome. Digest equality is how every engine change on this branch was proven safe. See [[determinism-seeds-and-digests]].
 
-**Turn dispatch.** `Turns()` advances a whole round, so an RL step cannot be a call into the
-engine. The engine calls us, at exactly one branch of `UnitTurn`, and the observer must run before
-the command stream perturbs the random generator. See [[battle-turn-dispatch]].
+**Turn dispatch.** `Turns()` advances a whole round, so an RL step cannot be a call into the engine. The engine calls us, at exactly one branch of `UnitTurn`, and the observer must run before the command stream perturbs the random generator. See [[battle-turn-dispatch]].
 
-**Legal actions and masking.** A fixed 793-slot space plus a per-state boolean mask, which remains
-a correct policy gradient and is empirically the difference between a 0% and an 82–91% win rate in
-controlled ablations elsewhere. One enumeration yields both the mask and the candidate list. See
-[[legal-actions-and-masking]].
+**Legal actions and masking.** A fixed 793-slot space plus a per-state boolean mask, which remains a correct policy gradient and is empirically the difference between a 0% and an 82–91% win rate in controlled ablations elsewhere. One enumeration yields both the mask and the candidate list. See [[legal-actions-and-masking]].
 
-**Observation design.** Structured state only: padded entity records plus an optional semantic
-plane tensor, filtered by an observability profile. Pixels are excluded, costing roughly 14 times
-more with no measured benefit and undoing the asset-free core. See [[observation-design]].
+**Observation design.** Structured state only: padded entity records plus an optional semantic plane tensor, filtered by an observability profile. Pixels are excluded, costing roughly 14 times more with no measured benefit and undoing the asset-free core. See [[observation-design]].
 
-**Teacher coverage.** The engine's own AI plays and we record it. The fraction of its decisions our
-action space can express is the sharpest completeness test available, and the same recordings are
-the behavior-cloning dataset. No human play is involved. See
-[[teacher-coverage-and-behavior-cloning]].
+**Teacher coverage.** The engine's own AI plays and we record it. The fraction of its decisions our action space can express is the sharpest completeness test available, and the same recordings are the behavior-cloning dataset. No human play is involved. See [[teacher-coverage-and-behavior-cloning]].
 
 ## What we learned that changed the plan
 
 Four Phase 0 findings overturned the original specification. Do not re-derive them.
 
-Headless battles need no game assets at all: no display, audio, AGG, h2d, or HoMM2 data. Monster
-stats are hardcoded (`monster_info.cpp:384`) and obstacle setup uses ICN identifiers as plain enum
-tags (`battle_board.cpp:573`), so battle resolution never touches an asset. This was the
-specification's top risk, and closing it is why pixels stay out.
+Headless battles need no game assets at all: no display, audio, AGG, h2d, or HoMM2 data. Monster stats are hardcoded (`monster_info.cpp:384`) and obstacle setup uses ICN identifiers as plain enum tags (`battle_board.cpp:573`), so battle resolution never touches an asset. This was the specification's top risk, and closing it is why pixels stay out.
 
-The world seed needs no engine change, because `Rand::CurrentThreadRandomDevice()` (`rand.cpp:85`)
-returns a mutable reference to a `thread_local PCG32`. The proposed `World` API overload became a
-deferred cleanup rather than a prerequisite.
+The world seed needs no engine change, because `Rand::CurrentThreadRandomDevice()` (`rand.cpp:85`) returns a mutable reference to a `thread_local PCG32`. The proposed `World` API overload became a deferred cleanup rather than a prerequisite.
 
-A second entry point needs no CMake refactor. Linking a new `main` against the game objects minus
-`fheroes2.o` worked on the first attempt with no undefined symbols, so the non-entry object set is
-already library-shaped.
+A second entry point needs no CMake refactor. Linking a new `main` against the game objects minus `fheroes2.o` worked on the first attempt with no undefined symbols, so the non-entry object set is already library-shaped.
 
-This repository has two build systems, CMake and a plain Makefile under `src/dist`, and the
-Makefile path is the one in regular use. Whether the agent target supports both is still open, and
-Milestone 4 settles it.
+This repository has two build systems, CMake and a plain Makefile under `src/dist`, and the Makefile path is the one in regular use. Whether the agent target supports both is still open, and Milestone 4 settles it.
 
 Full evidence, with a 25-row assumption table, is in `local_source_audit.md`.
 
@@ -202,14 +160,9 @@ Full evidence, with a 25-row assumption table, is in `local_source_audit.md`.
 | Milestones 5 and 6, Python environment, hardening, benchmark | not started | — |
 | Optional QA, one Battle Only battle through the interface | accepted risk, owner's call | normal-game regression only, not a training prerequisite |
 
-Measured throughput is about 4,600 episodes/s on the Apple M2 target machine for the tiny-melee
-fixture with no protocol layer attached, at 12 MB resident memory, scaling linearly to four worker
-processes. The learner, not the environment, will be the bottleneck.
+Measured throughput is about 4,600 episodes/s on the Apple M2 target machine for the tiny-melee fixture with no protocol layer attached, at 12 MB resident memory, scaling linearly to four worker processes. The learner, not the environment, will be the bottleneck.
 
-The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are
-limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook
-(`DecisionController`), and the additive `src/fheroes2/agent/` library. Enumerate them with
-`git diff master --stat -- src/`.
+The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook (`DecisionController`), and the additive `src/fheroes2/agent/` library. Enumerate them with `git diff master --stat -- src/`.
 
 Milestone 4 in concrete terms:
 
@@ -223,8 +176,7 @@ Milestone 4 in concrete terms:
 | Failure handling | On malformed input, emit an error frame and stay alive; on stdin end, skip safely and unwind | §5.4 |
 | `ENABLE_AGENT` target | A CMake target for the worker, settling the two-build-system question | §6.2 |
 
-Exit criterion: scripted stdin and stdout tests control both sides without a single invalid
-command.
+Exit criterion: scripted stdin and stdout tests control both sides without a single invalid command.
 
 ## Build and verify
 
@@ -247,10 +199,7 @@ make -C src/dist -j"$(sysctl -n hw.ncpu)"
 ./agent_play/verify_m3.sh              # 8 passed, legal actions and full teacher coverage
 ```
 
-Two numbers carry the determinism claim: map seed `2227197244` and spike digest
-`2cfd42cb104aa5e7`. Both are machine-independent and have reproduced across three working trees,
-two machines, and both optimization levels. A mismatch is a real finding, so stop and investigate
-before building on top of it.
+Two numbers carry the determinism claim: map seed `2227197244` and spike digest `2cfd42cb104aa5e7`. Both are machine-independent and have reproduced across three working trees, two machines, and both optimization levels. A mismatch is a real finding, so stop and investigate before building on top of it.
 
 Useful extras:
 
@@ -267,11 +216,12 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 | Path | What it is | Read when |
 |---|---|---|
 | `docs/agent/START_HERE.md` | this file, the system as it stands | first |
-| `docs/agent/concepts/` | six concept primers | when a term or mechanism is unfamiliar |
+| `docs/agent/concepts/` | eight concept primers, starting with RL vocabulary and the game comparison | first, if the vocabulary is new |
 | `docs/agent/log.md` | dated project history and evidence | when you need why or when |
 | `docs/agent/decisions/` | accepted ADRs amending the specification | before implementing the area they touch |
 | `docs/agent/implementation_report.md` | review inventory: commits, engine surface, verification matrices | to review what exists |
-| `docs/agent/references/` | reference vault: index, synthesis, per-work notes, 43 local source files | to consult or extend the evidence base |
+| `docs/agent/references/` | reference vault: index, synthesis, repository orientation, per-work notes, 43 local source files | to consult or extend the evidence base |
+| `docs/agent/references/repos.md` | what each open-source codebase contains and where to look inside it | before studying vcmi-gym, MicroRTS-Py, PySC2, or ARLinBfW |
 | `docs/agent/research_rl_approaches.md` | verified literature consolidation on environment and agent design | before design work |
 | `docs/agent/research_minimap_observations.md` | verified research on spatial and hybrid observations | before observation serialization |
 | `docs/agent/local_source_audit.md` | Phase 0 report, assumption table, file and line evidence | before touching battle code |
@@ -279,66 +229,46 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` | the full design document | when implementing a milestone |
 | `agent_play/spike/README.md` | Phase 0 spike usage and limits | before running it |
 
-The specification is large. Sections 0.1, 4, 9, 10, 13, and 22 carry the weight. Where an ADR and
-the specification disagree, the ADR wins, having been written later and with verified evidence.
+The specification is large. Sections 0.1, 4, 9, 10, 13, and 22 carry the weight. Where an ADR and the specification disagree, the ADR wins, having been written later and with verified evidence.
 
 ## Decisions not to relitigate
 
-Agent work lives on `agent-env`, branched from `master` rather than from `play-harness`. Both trees
-produce the identical battle digest, which proves the interface patch inert, but the baseline stays
-clean regardless.
+Agent work lives on `agent-env`, branched from `master` rather than from `play-harness`. Both trees produce the identical battle digest, which proves the interface patch inert, but the baseline stays clean regardless.
 
-The baseline is the current `master` lineage rather than the `1.1.17` tag the specification pinned.
-The tag is 42 commits behind and every specification-critical battle file is byte-identical.
+The baseline is the current `master` lineage rather than the `1.1.17` tag the specification pinned. The tag is 42 commits behind and every specification-critical battle file is byte-identical.
 
-The world seed is pinned by reseeding (specification §7.2, option 1); the narrow `World` overload
-remains a deferred cleanup. The spike's FNV digest stays as a historical baseline while the
-environment uses SHA-256, and the two are intentionally not comparable.
+The world seed is pinned by reseeding (specification §7.2, option 1); the narrow `World` overload remains a deferred cleanup. The spike's FNV digest stays as a historical baseline while the environment uses SHA-256, and the two are intentionally not comparable.
 
-Legality is extracted, never re-derived. The tactical AI and the human interface already carry
-their own near-duplicates of those rules, and a third copy is forbidden.
+Legality is extracted, never re-derived. The tactical AI and the human interface already carry their own near-duplicates of those rules, and a third copy is forbidden.
 
 Rendered pixels are permanently out of the training environment (ADR 0004).
 
 ## Gotchas that will bite
 
-One arena per process. `battle_arena.cpp:73` holds a file-static pointer and the constructor asserts
-it is null, so each arena must be destroyed before the next, and parallelism means processes.
+One arena per process. `battle_arena.cpp:73` holds a file-static pointer and the constructor asserts it is null, so each arena must be destroyed before the next, and parallelism means processes.
 
-Input `Army` objects are not synchronized after a battle, so terminal state must be read from the
-`Force` objects before the arena is destroyed.
+Input `Army` objects are not synchronized after a battle, so terminal state must be read from the `Force` objects before the arena is destroyed.
 
-`Battle::Command` stores parameters in reverse and its accessor pops, so decode a copy rather than
-the live command. See [[command-encoding-and-snapshots]].
+`Battle::Command` stores parameters in reverse and its accessor pops, so decode a copy rather than the live command. See [[command-encoding-and-snapshots]].
 
-The Makefile build never defines `NDEBUG`, so `assert()` is live even at `-O3`. A CMake `Release`
-build does define it, which makes benchmark numbers from the two build systems non-comparable.
+The Makefile build never defines `NDEBUG`, so `assert()` is live even at `-O3`. A CMake `Release` build does define it, which makes benchmark numbers from the two build systems non-comparable.
 
-Run `make -C src/dist clean` after every upstream sync, because the `-MD` depfiles hard-code header
-paths and a rename breaks incremental builds with `No rule to make target`.
+Run `make -C src/dist clean` after every upstream sync, because the `-MD` depfiles hard-code header paths and a rename breaks incremental builds with `No rule to make target`.
 
-A `FHEROES2_DATA` root needs the repository's own `files/data/resurrection.h2d` in addition to the
-GOG extraction, or startup throws about nine seconds in (`h2d.cpp:110`).
+A `FHEROES2_DATA` root needs the repository's own `files/data/resurrection.h2d` in addition to the GOG extraction, or startup throws about nine seconds in (`h2d.cpp:110`).
 
-Repository paths may contain spaces, since this clone lives under `/Volumes/External Drive/`. Build
-scripts must pass flag lists as bash arrays, and because macOS ships bash 3.2, an empty array under
-`set -u` needs the `${arr[@]+"${arr[@]}"}` form.
+Repository paths may contain spaces, since this clone lives under `/Volumes/External Drive/`. Build scripts must pass flag lists as bash arrays, and because macOS ships bash 3.2, an empty array under `set -u` needs the `${arr[@]+"${arr[@]}"}` form.
 
 If the Makefile build fails in the `.pot` step, put Homebrew's `gettext` ahead of pyenv on `PATH`.
 
 ## Remaining risks, in order
 
-The historical top risk, legal-action generation, is closed: validators extracted, full teacher
-coverage, no live-arena probing. What remains:
+The historical top risk, legal-action generation, is closed: validators extracted, full teacher coverage, no live-arena probing. What remains:
 
-The protocol and JSON surface arriving in Milestone 4, where a strict parser boundary and a
-vendored dependency enter the tree, and where stdout discipline and invalid-input handling decide
-whether the worker stays healthy.
+The protocol and JSON surface arriving in Milestone 4, where a strict parser boundary and a vendored dependency enter the tree, and where stdout discipline and invalid-input handling decide whether the worker stays healthy.
 
-The transition from behavior cloning to reinforcement learning, for which no verified small-scale
-precedent exists (`research_rl_approaches.md`, open question 2).
+The transition from behavior cloning to reinforcement learning, for which no verified small-scale precedent exists (`research_rl_approaches.md`, open question 2).
 
 Learner throughput on Apple silicon, unmeasured anywhere in the literature at relevant model sizes.
 
-The Phase 1b expansion covering wide units, flyers, and special targeting, which requires
-re-auditing the `simple_v1` assumptions before the allowlist widens.
+The Phase 1b expansion covering wide units, flyers, and special targeting, which requires re-auditing the `simple_v1` assumptions before the allowlist widens.

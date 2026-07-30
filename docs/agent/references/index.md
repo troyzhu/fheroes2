@@ -6,13 +6,9 @@ related_concepts: ["[[../concepts/legal-actions-and-masking]]", "[[../concepts/o
 tags: [reference, index, moc, agent-env]
 ---
 
-> **What this note is.** The scannable catalogue of every work behind the two verified literature
-> runs. Read [[summary]] first for what the corpus establishes; come here to find a specific
-> source, its quality, and where it is used. Provenance and vault mechanics are at the bottom.
+> **What this note is.** The scannable catalogue of every work behind the two verified literature runs. Read [[summary]] first for what the corpus establishes; come here to find a specific source, its quality, and where it is used. Provenance and vault mechanics are at the bottom.
 
-Reading order for someone new to the corpus: [[ref-vcmi-gym]] for the closest prior art, then
-[[ref-gym-microrts]] for the masking evidence and single-machine feasibility, then [[ref-sc2le]]
-for observation design.
+For what each codebase actually contains and where to look inside it, read [[repos|the repository orientation]] first. Reading order for someone new to the corpus: [[ref-vcmi-gym]] for the closest prior art, then [[ref-gym-microrts]] for the masking evidence and single-machine feasibility, then [[ref-sc2le]] for observation design.
 
 ## The corpus
 
@@ -33,9 +29,7 @@ for observation design.
 | [[ref-asymmetric-actor-critic]] | paper-group | 2017–22 | primary | Privileged-critic and recurrent POMDP baselines | ADR 0001 (option only) |
 | [[ref-misc-pipeline-sources]] | collection | mixed | mixed | Sample Factory, Lux AI winner, board-game scaling laws, NetHack follow-up, FootsiesGym | background |
 
-Quality reads as the source class, not as our endorsement. Two entries carry caveats that matter
-at the point of use: [[ref-entity-based-rl]] and [[ref-openai-five]] contributed claims that never
-reached a verified claim set, so cite those sources directly rather than citing us.
+Quality reads as the source class, not as our endorsement. Two entries carry caveats that matter at the point of use: [[ref-entity-based-rl]] and [[ref-openai-five]] contributed claims that never reached a verified claim set, so cite those sources directly rather than citing us.
 
 ## How the corpus maps to our decisions
 
@@ -48,18 +42,15 @@ reached a verified claim set, so cite those sources directly rather than citing 
 
 ## Provenance
 
-Two runs of the same pipeline produced this corpus: literature on environment and agent design
-(2026-07-27, 23 sources) and coarse-spatial observation design (2026-07-29, 20 sources). Counting
-the overlap, that is roughly 35 distinct works, 43 fetched source files, and 15 per-work notes.
+Two runs of the same pipeline produced this corpus: literature on environment and agent design (2026-07-27, 23 sources) and coarse-spatial observation design (2026-07-29, 20 sources). Counting the overlap, that is roughly 35 distinct works, 43 fetched source files, and 15 per-work notes.
 
-Local copies live in `files/`, with `manifest.tsv` recording the URL, fetch status, byte size, and
-title of every file. `fetch_references.sh` re-fetches them reproducibly. One repository ships no
-README upstream, which the manifest records as a failed fetch rather than hiding.
+Local copies live in `files/`, with `manifest.tsv` recording the URL, fetch status, byte size, and title of every file. `fetch_references.sh` re-fetches them reproducibly. One repository ships no README upstream, which the manifest records as a failed fetch rather than hiding.
 
 Opening `docs/agent/` or the repository root as an Obsidian vault resolves every wikilink here.
 
 ## Related
 
-- [[summary]] — what the corpus establishes, with confidence markers.
+- [[summary]], what the corpus establishes, with confidence markers.
+- [[repos]], an orientation to the open-source codebases behind it.
 - [[../concepts/index|Concept primers]] — the teaching layer these findings feed.
 - [[../START_HERE|START_HERE]] — the system as it stands.

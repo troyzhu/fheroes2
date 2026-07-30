@@ -15,68 +15,39 @@ updated: 2026-07-30
 
 # Teacher coverage and behavior cloning — a primer
 
-The engine's own tactical AI plays every battle we run, and recording it serves two purposes at
-once. Checking that each of its decisions maps onto a legal action in our canonical space measures
-whether that space is complete, and the same recordings become the dataset for behavior cloning.
+The engine's own tactical AI plays every battle we run, and recording it serves two purposes at once. Checking that each of its decisions maps onto a legal action in our canonical space measures whether that space is complete, and the same recordings become the dataset for behavior cloning.
 
 ## Motivation
 
-An action space can be incomplete in a way that ordinary testing never reveals. If the enumerator
-silently omits a legal move, nothing crashes: episodes run, gates pass, and the policy simply never
-learns a move it was never offered. The defect surfaces much later as a capability ceiling that
-looks like a training problem.
+An action space can be incomplete in a way that ordinary testing never reveals. If the enumerator silently omits a legal move, nothing crashes: episodes run, gates pass, and the policy simply never learns a move it was never offered. The defect surfaces much later as a capability ceiling that looks like a training problem.
 
-Exhaustively proving completeness is impractical, because it would mean deriving the legal set
-independently of the engine, which is the duplication the whole design avoids. What is available
-instead is a competent player whose choices can be checked against our set.
+Exhaustively proving completeness is impractical, because it would mean deriving the legal set independently of the engine, which is the duplication the whole design avoids. What is available instead is a competent player whose choices can be checked against our set.
 
 ## The idea in one sentence
 
-Record what the built-in AI does at every decision and measure the fraction of its choices our
-action space can express.
+Record what the built-in AI does at every decision and measure the fraction of its choices our action space can express.
 
 ## Intuition
 
-This is recall over a candidate set, the metric a retrieval system reports as recall@k. A retriever
-is useless if the gold document never appears among the candidates, however good the reranker is.
-Here the built-in AI's move is the gold label and our enumeration is the candidate set, so coverage
-asks whether the right answer was on the menu at all.
+This is recall over a candidate set, the metric a retrieval system reports as recall@k. A retriever is useless if the gold document never appears among the candidates, however good the reranker is. Here the built-in AI's move is the gold label and our enumeration is the candidate set, so coverage asks whether the right answer was on the menu at all.
 
-The choice of teacher matters for the same reason. A random player would exercise few interesting
-actions, so its coverage would prove little, while a competent one probes the parts of the space
-that competent play actually uses.
+The choice of teacher matters for the same reason. A random player would exercise few interesting actions, so its coverage would prove little, while a competent one probes the parts of the space that competent play actually uses.
 
 ## How it works
 
-The teacher is `AI::BattlePlanner`, the game's own tactical AI, which already plays both sides of
-every headless battle. The passive recorder observes its choices through the decision hook without
-influencing them.
+The teacher is `AI::BattlePlanner`, the game's own tactical AI, which already plays both sides of every headless battle. The passive recorder observes its choices through the decision hook without influencing them.
 
-At each full-fledged decision, computed at the same pre-application state, we take the legal
-candidate set our enumerator produces and the canonical index of the action the teacher actually
-chose. Coverage is then
+At each full-fledged decision, computed at the same pre-application state, we take the legal candidate set our enumerator produces and the canonical index of the action the teacher actually chose. Coverage is then
 
 $$\text{coverage} = \frac{\left|\{\, d : a^{\text{teacher}}_d \in \mathcal{A}^{\text{legal}}_d \,\}\right|}{\left|\{\, d \,\}\right|}$$
 
-over decisions $d$. A value below 1 means one of three things: the enumeration missed a legal
-action, the canonical indexing cannot express it, or the creature lies outside the `simple_v1`
-allowlist and the scenario should have been rejected. All three are worth knowing before training
-rather than after.
+over decisions $d$. A value below 1 means one of three things: the enumeration missed a legal action, the canonical indexing cannot express it, or the creature lies outside the `simple_v1` allowlist and the scenario should have been rejected. All three are worth knowing before training rather than after.
 
-The current measurement is 116 of 116 decisions across all five fixtures, with a minimum candidate
-count of 5 per decision.
+The current measurement is 116 of 116 decisions across all five fixtures, with a minimum candidate count of 5 per decision.
 
-**From coverage to cloning.** The same recordings are the imitation dataset, and the staging the
-evidence supports runs in four steps. Collect passive teacher trajectories, which Milestone 2
-completed. Behavior-clone $\pi(a \mid s)$ from those decisions, the step AlphaStar's purely
-supervised stage carried to an 87% win rate against the game's Elite bot before any reinforcement
-learning. Correct the distribution shift with a DAgger-style pass, rolling out the student and
-asking the teacher what it would have done in the states the student actually visits. Then
-reinforce with masked PPO against a mixture of scripted opponents, since single-opponent training
-produces agents that lose to simple rushes.
+**From coverage to cloning.** The same recordings are the imitation dataset, and the staging the evidence supports runs in four steps. Collect passive teacher trajectories, which Milestone 2 completed. Behavior-clone $\pi(a \mid s)$ from those decisions, the step AlphaStar's purely supervised stage carried to an 87% win rate against the game's Elite bot before any reinforcement learning. Correct the distribution shift with a DAgger-style pass, rolling out the student and asking the teacher what it would have done in the states the student actually visits. Then reinforce with masked PPO against a mixture of scripted opponents, since single-opponent training produces agents that lose to simple rushes.
 
-The third and fourth steps carry a documented evidence gap at this scale, because no verified
-small-scale transition recipe exists.
+The third and fourth steps carry a documented evidence gap at this scale, because no verified small-scale transition recipe exists.
 
 ## Comparison with alternatives
 
@@ -88,13 +59,11 @@ small-scale transition recipe exists.
 | Independent legality derivation | genuine completeness | high, and duplicates battle rules | its own bugs | Never here, by design |
 | Human play traces | expresses human strategy | needs a human | small samples | Late-stage evaluation |
 
-Coverage is preferred because it is continuous and free. It re-measures on every gate run, so a
-refactor that quietly drops an action type fails immediately.
+Coverage is preferred because it is continuous and free. It re-measures on every gate run, so a refactor that quietly drops an action type fails immediately.
 
 ## When to use it
 
-Measure coverage on every verification run and treat any value below 100% as a defect in the
-enumerator or the scenario filter, not as a tolerance to accept.
+Measure coverage on every verification run and treat any value below 100% as a defect in the enumerator or the scenario filter, not as a tolerance to accept.
 
 ## Key terms
 
@@ -105,20 +74,13 @@ enumerator or the scenario filter, not as a tolerance to accept.
 
 ## Why it came up here
 
-Coverage is Milestone 3's exit criterion because it converts a belief about enumeration into a
-measured number, and because it keeps measuring afterward.
+Coverage is Milestone 3's exit criterion because it converts a belief about enumeration into a measured number, and because it keeps measuring afterward.
 
-Calibration for what follows comes from the one shipped comparable system: its first working model
-reached roughly 75% against the weak scripted bot and 45% against the strong one, and a much later
-iteration averaged about 65% against the strong bot. Parity with the engine's AI is a
-multi-iteration goal.
+Calibration for what follows comes from the one shipped comparable system: its first working model reached roughly 75% against the weak scripted bot and 45% against the strong one, and a much later iteration averaged about 65% against the strong bot. Parity with the engine's AI is a multi-iteration goal.
 
 ## What this does not say
 
-Full coverage proves our space contains everything the teacher does, not everything legal in
-principle. A move no AI ever plays could still be missing, and that residual is bounded by the
-capability audit, which excludes creatures whose action space we do not model, rather than by
-coverage itself.
+Full coverage proves our space contains everything the teacher does, not everything legal in principle. A move no AI ever plays could still be missing, and that residual is bounded by the capability audit, which excludes creatures whose action space we do not model, rather than by coverage itself.
 
 ## Go deeper
 
