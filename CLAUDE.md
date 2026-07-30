@@ -19,7 +19,9 @@ rather than a reading path.
 Scope note: everything built so far is the **battle** environment. `agent_play/docs/roadmap.md`
 records the wider goal, including the adventure-map agent covering movement, recruitment, and town
 management, and the research owed before any of it is designed. `decisions/0005-training-and-reward.md`
-covers how a policy will be trained and what it will be rewarded for.
+records how a policy will be trained and what it will be rewarded for, and
+`agent_play/docs/training-design.md` carries the mechanics behind it: network architecture,
+losses, hyperparameter tables, and the alternatives weighed at each choice.
 
 Quick orientation: Phase 0 and Milestones 1 through 3 are complete and verified on the target
 Apple M2 Mac mini. Engine changes are deliberately small: two verbatim lifts

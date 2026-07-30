@@ -11,12 +11,15 @@ tags: [adr, training, reward, agent-env]
 
 - Status: algorithm choice accepted; reward design deliberately open, with the decision criteria fixed here
 - Context: [[../research/findings]], [[../implementation/teacher-coverage-and-behavior-cloning]], user question 2026-07-30
+- Mechanics: [[../training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
 
 ## Context
 
 Milestones 1 through 3 built an environment and said almost nothing about what would train on it. That was intentional while the substrate was unproven, but it left two questions unanswered that a reader is entitled to ask, and this record answers the first and scopes the second.
 
 The environment ships with no reward function at all. Phase 1a records the terminal outcome and the surviving force and stops there. That is a real design choice rather than an omission, and the reasoning is that a reward encodes what you want the agent to do, which is a modeling decision that should not be frozen while the thing underneath it is still being verified. The cost of deferring is nothing, since the recorded terminal state is sufficient to define most candidate rewards after the fact.
+
+Where this record names a technique without teaching it, [[../training-design]] teaches it. That document gives the network architecture, the cross-entropy objective cloning minimizes and why it is masked, the DAgger iteration written out with its mixing schedule and aggregation step, the PPO surrogate with its masking integration, starting hyperparameter tables for both stages, and a compared-alternatives table at every choice point.
 
 ## Decision, part one: the training algorithm
 
