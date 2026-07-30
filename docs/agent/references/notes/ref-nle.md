@@ -25,6 +25,6 @@ Verified claims anchored here (3-0, two merged claims):
 - The baseline agent embeds per-cell glyph IDs into learned vectors, runs CNNs over the embedding planes including a dedicated 9×9 egocentric-crop CNN (a board patch comparable to our 11×9), encodes stats with an MLP, and fuses by concatenation + MLP into an LSTM, the hybrid coarse-spatial + vector architecture over a synthetic, non-rendered raster.
 - Caveat: practice evidence, not a controlled CNN-vs-MLP-vs-transformer ablation. A tempting NLE-vs-ALE throughput figure (14.4K vs 0.90K steps/s) was refuted 0-3, do not cite it.
 
-Where we use it: [[../research_minimap_observations]] §3; supports CNN heads over `planes_v1` in [[../decisions/0004-spatial-observation-modality]].
+Where we use it: [[report-spatial-observations]] §3; supports CNN heads over `planes_v1` in [[../decisions/0004-spatial-observation-modality]].
 
 Related: [[ref-griddly]], [[ref-alphastar]]

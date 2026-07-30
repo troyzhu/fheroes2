@@ -1,7 +1,7 @@
 # ADR 0002 — Fixed canonical action space with legal mask, candidates derived from one enumeration
 
 - Status: accepted 2026-07-27 (implementation lands with Milestone 3)
-- Context: spec §10 (legal-action generation), `research_rl_approaches.md` §3
+- Context: spec §10 (legal-action generation), [[references/report-rl-approaches]] §3
 
 ## Context
 

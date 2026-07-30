@@ -87,4 +87,4 @@ It does not settle whether a convolutional network over planes beats an entity t
 
 - [[legal-actions-and-masking]] — the action side of the same interface.
 - [[determinism-seeds-and-digests]] — why the digest ignores profiles.
-- `docs/agent/research_minimap_observations.md` — the verified evidence behind the pixel decision.
+- `docs/agent/references/report-spatial-observations.md` — the verified evidence behind the pixel decision.

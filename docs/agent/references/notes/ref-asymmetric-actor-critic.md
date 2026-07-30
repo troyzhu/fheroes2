@@ -22,6 +22,6 @@ The literature behind our `full_v1`-as-oracle option:
 
 Verification status, important: these were fetched and are on-topic, but no claim about asymmetric/oracle-critic setups survived to verification in either run (an explicitly marked gap). They justify *keeping the full-state profile available* (near-zero cost), not any performance expectation. Creature-only HoMM2 battles are near-fully observable anyway (hidden info ≈ RNG, not fog), so POMDP machinery may simply be unnecessary until hero/fog scope.
 
-Where we use it: [[../decisions/0001-observation-profiles]] context; open question 1 of [[../research_rl_approaches]].
+Where we use it: [[../decisions/0001-observation-profiles]] context; open question 1 of [[report-rl-approaches]].
 
 Related: [[ref-microrts-py]] (partial_obs flag), [[ref-alphastar]] (LSTM core)

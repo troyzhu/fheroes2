@@ -1,7 +1,7 @@
 # ADR 0001 — Dual observation profiles: `full_v1` and `observable_v1`
 
 - Status: accepted 2026-07-27
-- Context: spec §12 (observation schema), `research_rl_approaches.md` §2, user requirement 2026-07-27 ("the more realistic agent mode should have a partially observable state")
+- Context: spec §12 (observation schema), [[references/report-rl-approaches]] §2, user requirement 2026-07-27 ("the more realistic agent mode should have a partially observable state")
 
 ## Context
 

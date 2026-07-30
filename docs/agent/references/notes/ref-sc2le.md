@@ -22,6 +22,6 @@ Verified claims anchored here (all 3-0):
 - Structured non-spatial tensors accompany the planes because "agents aren't expected to learn to read text and numbers from pixels, especially at low resolution", the API itself institutionalizes the hybrid planes+vector pattern.
 - (gap) The promised raw-RGB-vs-feature-layer comparison was never published in verifiable form.
 
-Where we use it: [[../research_minimap_observations]]; design template for [[../decisions/0004-spatial-observation-modality]] (`planes_v1`).
+Where we use it: [[report-spatial-observations]]; design template for [[../decisions/0004-spatial-observation-modality]] (`planes_v1`).
 
 Related: [[ref-pysc2]], [[ref-alphastar]], [[ref-griddly]]

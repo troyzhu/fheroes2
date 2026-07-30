@@ -26,6 +26,6 @@ Verified claims anchored here (votes from the research pipeline):
 - Observation design lesson: attributes that can't be represented were removed from the dynamics (morale/luck/terrain) to preserve the Markov property; v12+ moved to a 165-node/7-edge-type GENConv graph (3-0).
 - Eval: ~75 % vs StupidAI / ~45 % vs BattleAI initially; v12 GNN ~65 % vs BattleAI; ~5 days / 2.5 M battles / $45 GPU per model (self-reported; 2-1 on the eval details).
 
-Where we use it: [[../research_rl_approaches]] (template for schemas, masking, stack), [[../decisions/0002-action-space]] (fixed space + mask), calibration that beating the strong scripted AI is a multi-iteration goal.
+Where we use it: [[report-rl-approaches]] (template for schemas, masking, stack), [[../decisions/0002-action-space]] (fixed space + mask), calibration that beating the strong scripted AI is a multi-iteration goal.
 
 Related: [[ref-gym-microrts]], [[ref-invalid-action-masking]], [[ref-alphastar]]

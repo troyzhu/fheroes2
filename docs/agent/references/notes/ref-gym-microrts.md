@@ -24,6 +24,6 @@ Verified claims anchored here (all 3-0):
 - Observation: per-cell one-hot feature planes (h, w, 27), no entity list, the "semantic minimap" in degenerate form.
 - Eval protocol: 4 seeds, best-seed 100 games/bot under step cap + opponent-diverse training mix (18 CoacAI + 2×3 weaker bots); single-opponent agents lose to simple rushes.
 
-Where we use it: masking requirement + eval design in [[../research_rl_approaches]], hardware feasibility for the M2 mini, [[../decisions/0002-action-space]].
+Where we use it: masking requirement + eval design in [[report-rl-approaches]], hardware feasibility for the M2 mini, [[../decisions/0002-action-space]].
 
 Related: [[ref-microrts-py]], [[ref-invalid-action-masking]], [[ref-vcmi-gym]]

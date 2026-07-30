@@ -20,6 +20,6 @@ General n-player strategy-games framework (turn-based as of the AIIDE-20 paper, 
 
 Verified claims (3-0, two merged): the YAML-driven framework description and the forward-model-centric agent interface, both code-confirmed (`Agent.h`).
 
-Where we use it: the reminder that our deterministic ~4,600 eps/s battle core is a first-class planning asset, keep a copyable-state/forward-model door open for MCTS/MuZero-style methods after the process-parallel worker phase ([[../research_rl_approaches]] §4).
+Where we use it: the reminder that our deterministic ~4,600 eps/s battle core is a first-class planning asset, keep a copyable-state/forward-model door open for MCTS/MuZero-style methods after the process-parallel worker phase ([[report-rl-approaches]] §4).
 
 Related: [[ref-vcmi-gym]], [[ref-misc-pipeline-sources]] (Scaling Scaling Laws with Board Games)

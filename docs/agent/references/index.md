@@ -51,6 +51,7 @@ Opening `docs/agent/` or the repository root as an Obsidian vault resolves every
 ## Related
 
 - [[summary]], what the corpus establishes, with confidence markers.
+- [[report-rl-approaches]] and [[report-spatial-observations]], the claim-by-claim reports with verification votes.
 - [[repos]], an orientation to the open-source codebases behind it.
 - [[../concepts/index|Concept primers]] — the teaching layer these findings feed.
 - [[../START_HERE|START_HERE]] — the system as it stands.

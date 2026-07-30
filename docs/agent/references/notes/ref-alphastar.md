@@ -29,6 +29,6 @@ Verified claims anchored here:
 - Three modalities (entity/spatial/scalar) concatenated into one LSTM core, spatial and structured coexist (3-0).
 - Ablation caveat (2-1, medium): Fig 3f/h ablated these components but open text quotes no component-level effect sizes (paywall); cite the fact of the ablation, not magnitudes.
 
-Where we use it: BC-first validation ([[../research_rl_approaches]] §4), pointer-head compatibility in [[../decisions/0002-action-space]], hybrid fusion pattern in [[../decisions/0004-spatial-observation-modality]].
+Where we use it: BC-first validation ([[report-rl-approaches]] §4), pointer-head compatibility in [[../decisions/0002-action-space]], hybrid fusion pattern in [[../decisions/0004-spatial-observation-modality]].
 
 Related: [[ref-sc2le]], [[ref-pysc2]], [[ref-entity-based-rl]]

@@ -65,7 +65,7 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | Coverage audit (recorder + worker `--audit-coverage`, `--capability-audit`) | Per-decision candidate counts and teacher matching; COVERAGE reporting in the determinism verdict | §10.6 | `verify_m3.sh` |
 | `agent_play/verify_m3.sh` | M3 gate: 8 checks, unit tests, determinism+coverage verdict, golden digests under enumeration, 100 % coverage, min-candidates, cross-process byte-identity, audit sanity | §20-M3 | self |
 | `agent_play/spike/bench_m2.sh` + `docs/agent/benchmark_m2.md` | Mode A benchmark deliverable on target hardware | §19 | reproducible via script |
-| `docs/agent/research_rl_approaches.md` | Adversarially verified literature consolidation (23 sources) | — | citations + verification votes inline |
+| `docs/agent/references/report-rl-approaches.md` | Adversarially verified literature consolidation (23 sources) | — | citations + verification votes inline |
 | `docs/agent/decisions/000{1,2,3}-*.md` | Accepted ADRs: observation profiles; action space; config management | amend §10, §12 | — |
 
 ## Verification matrix (all green as of `85c30a11f` on the M2 mini)

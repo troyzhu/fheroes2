@@ -34,7 +34,7 @@ Sanitizers ran clean. A full `FHEROES2_WITH_ASAN=1` build, which implies UBSan, 
 
 Milestone 1 completed, `verify_m1.sh` passing 4 of 4. `Battle::computeBattleSeed` was extracted to `battle_seed.{h,cpp}`; the agent library under `src/fheroes2/agent/` gained scenario fixtures and validation, the SHA-256 `agent_terminal_v1` digest, and the headless runner; the worker entry point landed in `src/agent_worker/`. Ten identical runs per fixture, and two fresh processes produced byte-identical output. The `m1_tiny_melee` fixture reproduces the historical map and combat seeds, `2227197244` and `1356111745`.
 
-Literature consolidated into `research_rl_approaches.md` from 23 sources, with 25 claims put through three-vote adversarial verification and 23 confirmed. It produced ADR 0001 on observability profiles and ADR 0002 on the fixed canonical action space with a mask, the latter amending specification §10.4 after the sweep found that no verified codebase consumes variable-length candidate lists.
+Literature consolidated into [[references/report-rl-approaches]] from 23 sources, with 25 claims put through three-vote adversarial verification and 23 confirmed. It produced ADR 0001 on observability profiles and ADR 0002 on the fixed canonical action space with a mask, the latter amending specification §10.4 after the sweep found that no verified codebase consumes variable-length candidate lists.
 
 ## 2026-07-28 — Milestone 2
 
@@ -50,7 +50,7 @@ Documentation gained `implementation_report.md` as a review inventory, and ADR 0
 
 ## 2026-07-29 — Minimap research, reference vault, Milestone 3
 
-The coarse-minimap question was researched into `research_minimap_observations.md`, from 20 sources with 24 of 25 claims verified. It produced ADR 0004: a semantic `planes_v1` modality joins the schema, and rendered pixels are rejected for the training environment. The decisive evidence was that SC2's feature layers were never RGB, and that Griddly's vector observer matches its pixel observers on task performance at roughly 14 times the throughput.
+The coarse-minimap question was researched into [[references/report-spatial-observations]], from 20 sources with 24 of 25 claims verified. It produced ADR 0004: a semantic `planes_v1` modality joins the schema, and rendered pixels are rejected for the training environment. The decisive evidence was that SC2's feature layers were never RGB, and that Griddly's vector observer matches its pixel observers on task performance at roughly 14 times the throughput.
 
 The reference vault was built under `references/`, holding 43 local source files at about 59 MB, 15 per-work notes, an index, and a consolidated synthesis, all reproducible through `fetch_references.sh`.
 
@@ -97,3 +97,15 @@ Every gate has passed on every run at HEAD. Current expected output:
 | `agent_play/verify_m2.sh` | `8 passed, 0 failed` |
 | `agent_play/verify_m3.sh` | `8 passed, 0 failed`, `teacher_coverage=complete` |
 | `cmake --build build/cmake-regression` | builds to completion |
+
+## 2026-07-30 — Navigation restructure
+
+A third review round found the structure cumbersome to navigate for its two real purposes, understanding the research and understanding the implementation, and found the two new foundation primers buried under `concepts/` when they are entry-point material rather than reference.
+
+The two were merged into one promoted document, `rl-and-the-battle-domain.md`, sitting beside START_HERE at the top level. It runs in three parts: the vocabulary of RL game environments, the Heroes battle domain restated in that vocabulary with a comparison against seven other environments, and what the comparison implies for the design.
+
+START_HERE gained a "Where to start" table as its first section, routing by intent across six paths, and absorbed the MDP framing into a "The problem in one page" section rather than deferring it.
+
+Both literature reports moved into `references/` as `report-rl-approaches.md` and `report-spatial-observations.md`, so the top level now holds orientation and status only, `concepts/` holds the six implementation deep dives, `decisions/` holds the ADRs, and `references/` holds every piece of literature.
+
+`references/summary.md` gained inline links to the per-work notes, the ADRs, the concept primers, and the two reports, since it previously named sources without linking any of them.

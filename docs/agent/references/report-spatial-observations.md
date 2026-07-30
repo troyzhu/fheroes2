@@ -1,6 +1,6 @@
 # Coarse-minimap / hybrid observations — verified literature consolidation
 
-> Produced 2026-07-29 by the same adversarial research pipeline as `research_rl_approaches.md`: 5 search angles → 20 sources fetched → 96 claims extracted → top 25 verified (3 votes each) → 24 confirmed, 1 refuted, 0 unverified. Question: should the fheroes2 battle agent get a coarse, pixel-like minimap view in addition to structured state, and if so, how? The design decision extracted from this report is `decisions/0004-spatial-observation-modality.md`.
+> Produced 2026-07-29 by the same adversarial research pipeline as [[references/report-rl-approaches]]: 5 search angles → 20 sources fetched → 96 claims extracted → top 25 verified (3 votes each) → 24 confirmed, 1 refuted, 0 unverified. Question: should the fheroes2 battle agent get a coarse, pixel-like minimap view in addition to structured state, and if so, how? The design decision extracted from this report is `decisions/0004-spatial-observation-modality.md`.
 
 ## The one-paragraph answer
 

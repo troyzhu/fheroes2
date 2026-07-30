@@ -6,18 +6,29 @@ goal: "A deterministic, headless, structured battle environment for fheroes2 tha
 branch: agent-env
 date_started: 2026-07-26
 updated: 2026-07-30
-related_concepts: ["[[rl-for-games]]", "[[fheroes2-battles-vs-other-games]]", "[[determinism-seeds-and-digests]]", "[[battle-turn-dispatch]]", "[[legal-actions-and-masking]]", "[[observation-design]]", "[[command-encoding-and-snapshots]]", "[[teacher-coverage-and-behavior-cloning]]"]
+related_concepts: ["[[rl-and-the-battle-domain]]", "[[concepts/legal-actions-and-masking]]", "[[concepts/observation-design]]"]
 tags: [agent-env, rl-environment, fheroes2, entry-point]
 ---
 
-> **What this note is.** The entry point for the agent environment: what it is, the terms it uses, how the pieces fit, what state it is in, and how to build and verify it. It describes the system as it stands, and dated history lives in [[log]].
->
-> **New to the project?** Read [[rl-for-games]] first for the vocabulary (state, action, reward, transition, policy, observability), then [[fheroes2-battles-vs-other-games]] for what a Heroes battle is and how it differs from StarCraft, microRTS, and NetHack. This note assumes both. The full reading order is in [[concepts/index|the concept index]].
+> **What this note is.** The front door. It says what the project is, gives the terms and the shape of the system, states where it stands, and tells you how to build and verify it. Two companions carry the depth: [[rl-and-the-battle-domain]] explains reinforcement learning and the Heroes battle domain from scratch, and [[log]] holds the dated history.
+
+## Where to start
+
+Pick the row that matches why you are here.
+
+| If you want to | Read, in order |
+|---|---|
+| Understand the problem, with no RL or fheroes2 background | [[rl-and-the-battle-domain]], then this note |
+| Get it building and see the current state | This note, sections [[#Build and verify]] and [[#Where the project stands]] |
+| Understand the research and the evidence | [[references/summary]], then [[references/repos]] for the codebases, then [[references/index]] for a specific source |
+| Understand what is implemented and how | [[implementation_report]] for the inventory, then [[concepts/index]] for how each mechanism works |
+| Understand why a decision was taken | `decisions/`, four accepted records amending the specification |
+| Reconstruct history | [[log]] |
 
 ## Table of contents
-- [[#Prerequisites — the environment as an MDP]]
+- [[#The problem in one page]]
 - [[#Notation and key terms]]
-- [[#What this project is]]
+- [[#Scope]]
 - [[#Architecture at a glance]]
 - [[#The five ideas the design rests on]]
 - [[#What we learned that changed the plan]]
@@ -28,9 +39,11 @@ tags: [agent-env, rl-environment, fheroes2, entry-point]
 - [[#Gotchas that will bite]]
 - [[#Remaining risks, in order]]
 
-## Prerequisites — the environment as an MDP
+## The problem in one page
 
-The whole system in the vocabulary of [[rl-for-games]]. If any row reads as unfamiliar, that primer defines it from scratch, and [[fheroes2-battles-vs-other-games]] explains the game itself.
+Build a deterministic, headless, structured environment for fheroes2 battles so a policy can be trained on them. The environment reads true engine state and selects from engine-generated legal actions, never pixels and never synthetic input.
+
+Stated as a Markov decision process, which [[rl-and-the-battle-domain]] develops from first principles:
 
 | MDP element | Here |
 |---|---|
@@ -81,11 +94,9 @@ Determinism here is conditional, exactly like `env.reset(seed=k)`. Seed in, epis
 
 Board constants: 11 by 9 gives 99 cells, six hex directions, and an action space of $1 + 99 + 99 + 594 = 793$ slots.
 
-## What this project is
+## Scope
 
-Build a deterministic, headless, structured environment for fheroes2 battles so a policy can be trained on them. The environment reads true engine state and selects from engine-generated legal actions, never pixels and never synthetic input.
-
-The first deliverable is deliberately narrow. Phase 1a aims at a trustworthy substrate, so the environment itself contains no learner, no language model, no screenshot parsing, and no interface automation.
+Phase 1a aims at a trustworthy substrate, so the environment itself contains no learner, no language model, no screenshot parsing, and no interface automation.
 
 | In scope (`creature_field_v1` with `simple_v1`) | Deferred to Phase 1b | Excluded from this branch |
 |---|---|---|
@@ -124,15 +135,15 @@ Three properties hold it together. Engine behavior is unchanged, since every eng
 
 Each idea has a primer; read the one covering whatever you are about to touch.
 
-**Determinism.** A battle is a pure function of world seed and army composition. We pin the world seed by reseeding the thread-local generator, derive the combat seed through one shared helper, and hash the outcome. Digest equality is how every engine change on this branch was proven safe. See [[determinism-seeds-and-digests]].
+**Determinism.** A battle is a pure function of world seed and army composition. We pin the world seed by reseeding the thread-local generator, derive the combat seed through one shared helper, and hash the outcome. Digest equality is how every engine change on this branch was proven safe. See [[concepts/determinism-seeds-and-digests]].
 
-**Turn dispatch.** `Turns()` advances a whole round, so an RL step cannot be a call into the engine. The engine calls us, at exactly one branch of `UnitTurn`, and the observer must run before the command stream perturbs the random generator. See [[battle-turn-dispatch]].
+**Turn dispatch.** `Turns()` advances a whole round, so an RL step cannot be a call into the engine. The engine calls us, at exactly one branch of `UnitTurn`, and the observer must run before the command stream perturbs the random generator. See [[concepts/battle-turn-dispatch]].
 
-**Legal actions and masking.** A fixed 793-slot space plus a per-state boolean mask, which remains a correct policy gradient and is empirically the difference between a 0% and an 82–91% win rate in controlled ablations elsewhere. One enumeration yields both the mask and the candidate list. See [[legal-actions-and-masking]].
+**Legal actions and masking.** A fixed 793-slot space plus a per-state boolean mask, which remains a correct policy gradient and is empirically the difference between a 0% and an 82–91% win rate in controlled ablations elsewhere. One enumeration yields both the mask and the candidate list. See [[concepts/legal-actions-and-masking]].
 
-**Observation design.** Structured state only: padded entity records plus an optional semantic plane tensor, filtered by an observability profile. Pixels are excluded, costing roughly 14 times more with no measured benefit and undoing the asset-free core. See [[observation-design]].
+**Observation design.** Structured state only: padded entity records plus an optional semantic plane tensor, filtered by an observability profile. Pixels are excluded, costing roughly 14 times more with no measured benefit and undoing the asset-free core. See [[concepts/observation-design]].
 
-**Teacher coverage.** The engine's own AI plays and we record it. The fraction of its decisions our action space can express is the sharpest completeness test available, and the same recordings are the behavior-cloning dataset. No human play is involved. See [[teacher-coverage-and-behavior-cloning]].
+**Teacher coverage.** The engine's own AI plays and we record it. The fraction of its decisions our action space can express is the sharpest completeness test available, and the same recordings are the behavior-cloning dataset. No human play is involved. See [[concepts/teacher-coverage-and-behavior-cloning]].
 
 ## What we learned that changed the plan
 
@@ -222,8 +233,8 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 | `docs/agent/implementation_report.md` | review inventory: commits, engine surface, verification matrices | to review what exists |
 | `docs/agent/references/` | reference vault: index, synthesis, repository orientation, per-work notes, 43 local source files | to consult or extend the evidence base |
 | `docs/agent/references/repos.md` | what each open-source codebase contains and where to look inside it | before studying vcmi-gym, MicroRTS-Py, PySC2, or ARLinBfW |
-| `docs/agent/research_rl_approaches.md` | verified literature consolidation on environment and agent design | before design work |
-| `docs/agent/research_minimap_observations.md` | verified research on spatial and hybrid observations | before observation serialization |
+| `docs/agent/references/report-rl-approaches.md` | verified literature consolidation on environment and agent design | before design work |
+| `docs/agent/references/report-spatial-observations.md` | verified research on spatial and hybrid observations | before observation serialization |
 | `docs/agent/local_source_audit.md` | Phase 0 report, assumption table, file and line evidence | before touching battle code |
 | `docs/agent/benchmark_m2.md` | Apple M2 target-hardware performance, Mode A | before sizing workers or models |
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` | the full design document | when implementing a milestone |
@@ -249,7 +260,7 @@ One arena per process. `battle_arena.cpp:73` holds a file-static pointer and the
 
 Input `Army` objects are not synchronized after a battle, so terminal state must be read from the `Force` objects before the arena is destroyed.
 
-`Battle::Command` stores parameters in reverse and its accessor pops, so decode a copy rather than the live command. See [[command-encoding-and-snapshots]].
+`Battle::Command` stores parameters in reverse and its accessor pops, so decode a copy rather than the live command. See [[concepts/command-encoding-and-snapshots]].
 
 The Makefile build never defines `NDEBUG`, so `assert()` is live even at `-O3`. A CMake `Release` build does define it, which makes benchmark numbers from the two build systems non-comparable.
 
@@ -267,7 +278,7 @@ The historical top risk, legal-action generation, is closed: validators extracte
 
 The protocol and JSON surface arriving in Milestone 4, where a strict parser boundary and a vendored dependency enter the tree, and where stdout discipline and invalid-input handling decide whether the worker stays healthy.
 
-The transition from behavior cloning to reinforcement learning, for which no verified small-scale precedent exists (`research_rl_approaches.md`, open question 2).
+The transition from behavior cloning to reinforcement learning, for which no verified small-scale precedent exists ([[references/report-rl-approaches]], open question 2).
 
 Learner throughput on Apple silicon, unmeasured anywhere in the literature at relevant model sizes.
 

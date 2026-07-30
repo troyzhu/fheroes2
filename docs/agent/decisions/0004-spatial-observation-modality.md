@@ -1,7 +1,7 @@
 # ADR 0004 — Semantic spatial-plane observation modality; true pixel rendering rejected
 
 - Status: accepted 2026-07-29 (plane layout specified with Milestone 3/4 observation serialization; emitter lands there)
-- Context: user proposal 2026-07-29 (coarse "minimap" view for the agent); `research_minimap_observations.md`; extends ADR 0001 (observation profiles)
+- Context: user proposal 2026-07-29 (coarse "minimap" view for the agent); [[references/report-spatial-observations]]; extends ADR 0001 (observation profiles)
 
 ## Context
 

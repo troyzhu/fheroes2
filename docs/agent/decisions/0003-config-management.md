@@ -1,7 +1,7 @@
 # ADR 0003 — Versioned config files govern every tunable; artifacts embed their resolved config
 
 - Status: accepted 2026-07-27 (binding from Milestone 4 onward; C++ scenario JSON per spec §11)
-- Context: user requirement 2026-07-27; spec §11 (scenario schema), §15 (trajectory metadata), §16.4 (determinism metadata); `research_rl_approaches.md` §4
+- Context: user requirement 2026-07-27; spec §11 (scenario schema), §15 (trajectory metadata), §16.4 (determinism metadata); [[references/report-rl-approaches]] §4
 
 ## Context
 
