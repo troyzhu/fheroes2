@@ -20,6 +20,7 @@
 
 #include "agent_scenario.h"
 
+#include "agent_capabilities.h"
 #include "army.h"
 #include "ground.h"
 #include "monster.h"
@@ -45,9 +46,16 @@ namespace
 
             ++liveSlots;
 
-            if ( !Monster( stack.monsterId ).isValid() ) {
+            const fheroes2::agent::MonsterCapability capability = fheroes2::agent::auditMonster( stack.monsterId );
+            if ( !capability.isValid ) {
                 return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " has invalid monster id "
                        + std::to_string( stack.monsterId );
+            }
+            // Profile gate (spec 11.1): only creatures whose action space simple_v1 fully
+            // covers may appear on either side.
+            if ( !capability.simpleV1Supported ) {
+                return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " monster " + capability.name
+                       + " is not supported by simple_v1 (" + capability.reason + ")";
             }
             if ( stack.count > scenarioMaxStackCount ) {
                 return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " count " + std::to_string( stack.count )

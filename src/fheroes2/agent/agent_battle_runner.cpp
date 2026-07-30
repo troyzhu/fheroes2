@@ -20,10 +20,13 @@
 
 #include "agent_battle_runner.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <optional>
 #include <utility>
 
+#include "agent_action_space.h"
 #include "agent_command_snapshot.h"
 #include "agent_digest.h"
 #include "agent_trajectory.h"
@@ -82,10 +85,34 @@ namespace
                 record.actions.push_back( fheroes2::agent::snapshotCommand( command ) );
             }
 
+            if ( auditCoverage ) {
+                // Enumerate at the exact pre-application state the teacher decided in. The
+                // enumeration consumes no combat randomness, so recorded outcomes stay
+                // byte-identical with and without the audit (verified by the golden digests).
+                const fheroes2::agent::ActionSet set = fheroes2::agent::enumerateSimpleV1Actions( currentUnit );
+
+                // The mask and the candidate list are two views of one enumeration.
+                assert( static_cast<size_t>( std::count( set.legalMask.begin(), set.legalMask.end(), 1 ) ) == set.candidates.size() );
+
+                fheroes2::agent::DecisionCoverage cov;
+                cov.candidateCount = static_cast<uint32_t>( set.candidates.size() );
+
+                const std::optional<uint32_t> teacherIndex = fheroes2::agent::resolveTeacherActionIndex( currentUnit, record.actions );
+                cov.teacherResolved = teacherIndex.has_value();
+                if ( teacherIndex ) {
+                    cov.teacherCanonicalIndex = *teacherIndex;
+                    cov.teacherMatched = ( *teacherIndex < set.legalMask.size() && set.legalMask[*teacherIndex] != 0 );
+                }
+
+                coverage.push_back( cov );
+            }
+
             decisions.push_back( std::move( record ) );
         }
 
+        bool auditCoverage{ false };
         std::vector<DecisionRecord> decisions;
+        std::vector<fheroes2::agent::DecisionCoverage> coverage;
     };
 
     void fillArmy( Army & army, const PlayerColor color, const fheroes2::agent::SideSpec & side )
@@ -176,6 +203,9 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     assert( validateScenario( scenario ).empty() );
 
     PassiveTeacherRecorder recorder;
+    if ( recording != nullptr ) {
+        recorder.auditCoverage = recording->auditTeacherCoverage;
+    }
 
     EpisodeOutcome outcome;
     outcome.effectiveWorldSeed = scenario.worldSeed;
@@ -246,6 +276,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
 
     if ( recording != nullptr ) {
         recording->decisions = std::move( recorder.decisions );
+        recording->coverage = std::move( recorder.coverage );
         recording->decisionDigest = computeDecisionDigest( recording->decisions );
     }
 

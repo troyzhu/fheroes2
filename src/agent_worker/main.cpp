@@ -36,6 +36,7 @@
 #include <vector>
 
 #include "agent_battle_runner.h"
+#include "agent_capabilities.h"
 #include "agent_scenario.h"
 #include "agent_trajectory.h"
 #include "logging.h"
@@ -45,6 +46,8 @@ int main( int argc, char ** argv )
     int runs = 10;
     std::string onlyFixture;
     std::string trajectoryDir;
+    std::string capabilityAuditPath;
+    bool auditCoverage = false;
     bool quiet = false;
 
     for ( int i = 1; i < argc; ++i ) {
@@ -71,12 +74,19 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--trajectory-dir" ) == 0 ) {
             trajectoryDir = next( "--trajectory-dir" );
         }
+        else if ( std::strcmp( argv[i], "--capability-audit" ) == 0 ) {
+            capabilityAuditPath = next( "--capability-audit" );
+        }
+        else if ( std::strcmp( argv[i], "--audit-coverage" ) == 0 ) {
+            auditCoverage = true;
+        }
         else if ( std::strcmp( argv[i], "--quiet" ) == 0 ) {
             quiet = true;
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--fixture ID] [--trajectory-dir DIR] [--list] [--quiet]\n"
+                          "usage: fheroes2_agent_worker [--runs N] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
             return 2;
@@ -89,6 +99,16 @@ int main( int argc, char ** argv )
     }
 
     Logging::InitLog();
+
+    if ( !capabilityAuditPath.empty() ) {
+        // Standalone mode: write the machine-generated monster capability audit and exit.
+        if ( !fheroes2::agent::writeCapabilityAudit( capabilityAuditPath ) ) {
+            std::fprintf( stderr, "cannot write capability audit: %s\n", capabilityAuditPath.c_str() );
+            return 2;
+        }
+        std::printf( "CAPABILITY_AUDIT path=%s monsters=%zu\n", capabilityAuditPath.c_str(), fheroes2::agent::auditAllMonsters().size() );
+        return 0;
+    }
 
     std::vector<fheroes2::agent::Scenario> scenarios;
     for ( const auto & scenario : fheroes2::agent::milestone1Fixtures() ) {
@@ -114,13 +134,39 @@ int main( int argc, char ** argv )
     std::map<std::string, std::set<std::string>> digestsPerScenario;
     std::map<std::string, std::set<std::string>> decisionDigestsPerScenario;
 
+    struct CoverageTotals
+    {
+        size_t decisions = 0;
+        size_t resolved = 0;
+        size_t matched = 0;
+        uint32_t minCandidates = UINT32_MAX;
+    };
+    std::map<std::string, CoverageTotals> coveragePerScenario;
+
     for ( const auto & scenario : scenarios ) {
         for ( int run = 0; run < runs; ++run ) {
             // Passive teacher recording is always on: it must never change the outcome (that
             // invariance is exactly what the golden state digests verify), and it yields the
             // decision-stream digest reported below.
             fheroes2::agent::EpisodeRecording recording;
+            recording.auditTeacherCoverage = auditCoverage;
             const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, &recording );
+
+            if ( auditCoverage ) {
+                CoverageTotals & totals = coveragePerScenario[scenario.scenarioId];
+                for ( const fheroes2::agent::DecisionCoverage & cov : recording.coverage ) {
+                    ++totals.decisions;
+                    if ( cov.teacherResolved ) {
+                        ++totals.resolved;
+                    }
+                    if ( cov.teacherMatched ) {
+                        ++totals.matched;
+                    }
+                    if ( cov.candidateCount < totals.minCandidates ) {
+                        totals.minCandidates = cov.candidateCount;
+                    }
+                }
+            }
 
             digestsPerScenario[scenario.scenarioId].insert( outcome.stateDigest );
             decisionDigestsPerScenario[scenario.scenarioId].insert( recording.decisionDigest );
@@ -165,7 +211,21 @@ int main( int argc, char ** argv )
         }
     }
 
-    std::printf( "VERDICT fixtures=%zu runs_each=%d deterministic=%s\n", scenarios.size(), runs, deterministic ? "yes" : "no" );
+    bool coverageComplete = true;
+    if ( auditCoverage ) {
+        for ( const auto & scenario : scenarios ) {
+            const CoverageTotals & totals = coveragePerScenario[scenario.scenarioId];
+            const double coverage = ( totals.decisions == 0 ) ? 0.0 : ( 100.0 * static_cast<double>( totals.matched ) / static_cast<double>( totals.decisions ) );
+            std::printf( "COVERAGE fixture=%s decisions=%zu resolved=%zu matched=%zu coverage=%.1f%% min_candidates=%u\n", scenario.scenarioId.c_str(),
+                         totals.decisions, totals.resolved, totals.matched, coverage, ( totals.decisions == 0 ) ? 0 : totals.minCandidates );
+            if ( totals.decisions == 0 || totals.matched != totals.decisions ) {
+                coverageComplete = false;
+            }
+        }
+    }
 
-    return deterministic ? EXIT_SUCCESS : EXIT_FAILURE;
+    std::printf( "VERDICT fixtures=%zu runs_each=%d deterministic=%s%s\n", scenarios.size(), runs, deterministic ? "yes" : "no",
+                 auditCoverage ? ( coverageComplete ? " teacher_coverage=complete" : " teacher_coverage=INCOMPLETE" ) : "" );
+
+    return ( deterministic && ( !auditCoverage || coverageComplete ) ) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

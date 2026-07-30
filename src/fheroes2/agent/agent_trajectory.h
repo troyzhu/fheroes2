@@ -42,10 +42,26 @@ namespace fheroes2::agent
         std::vector<CommandSnapshot> actions;
     };
 
+    // Per-decision simple_v1 coverage data (Milestone 3): how many legal candidates existed
+    // and whether the teacher's chosen action mapped onto the canonical action space.
+    struct DecisionCoverage
+    {
+        uint32_t candidateCount{ 0 };
+        bool teacherResolved{ false };
+        bool teacherMatched{ false };
+        uint32_t teacherCanonicalIndex{ 0 };
+    };
+
     // Filled by runEpisode() when a recording is requested.
     struct EpisodeRecording
     {
+        // Input: when true, runEpisode() additionally enumerates the simple_v1 action set at
+        // every full-fledged decision and records teacher coverage against it.
+        bool auditTeacherCoverage{ false };
+
         std::vector<DecisionRecord> decisions;
+        // Parallel to `decisions` when auditTeacherCoverage was set.
+        std::vector<DecisionCoverage> coverage;
         // SHA-256 over the canonical byte serialization of every decision
         // ("agent_decisions_v0"): replay-equality of the chosen-command stream.
         std::string decisionDigest;
