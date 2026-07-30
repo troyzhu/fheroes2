@@ -8,7 +8,7 @@ tags: [agent-env, training, design]
 
 # Training design
 
-This document says how a battle policy is actually fitted: what the network consumes and emits, what loss each stage minimizes, which algorithm optimizes it, which hyperparameters it starts from, and what the alternatives were at each choice. [[decisions/0005-training-and-reward]] records the decisions; this is the reasoning and the mechanics behind them. Nothing here is implemented yet, so every number is a starting point to be measured rather than a tuned result.
+Techniques named here are defined in [[rl-methods]], which derives the chain from the policy gradient to PPO and surveys every alternative. This document says how a battle policy is actually fitted: what the network consumes and emits, what loss each stage minimizes, which algorithm optimizes it, which hyperparameters it starts from, and what the alternatives were at each choice. [[decisions/0005-training-and-reward]] records the decisions; this is the reasoning and the mechanics behind them. Nothing here is implemented yet, so every number is a starting point to be measured rather than a tuned result.
 
 ## Table of contents
 - [[#The learning problem]]
@@ -160,7 +160,7 @@ with the full loss adding a value term and an entropy bonus:
 
 $$L(\theta) = -L^{\text{CLIP}}(\theta) + c_v\, \hat{\mathbb{E}}_t\big[(V_\theta(o_t) - \hat G_t)^2\big] - c_e\, \hat{\mathbb{E}}_t\big[H(\pi_\theta(\cdot \mid o_t))\big]$$
 
-Advantages come from generalized advantage estimation, which trades bias against variance through $\lambda$.
+Advantages come from generalized advantage estimation, which trades bias against variance through $\lambda$ and is derived in [[rl-methods#GAE]].
 
 Two integration details decide whether this works. The mask must be applied when sampling and again when recomputing log-probabilities during the update, or $r_t \neq 1$ at $\theta = \theta_{\text{old}}$ and the clipping window is centered on the wrong point. And the entropy bonus must be computed over the legal set only, since entropy over 793 outputs where 760 are masked is dominated by the mask rather than by the policy's actual indecision.
 

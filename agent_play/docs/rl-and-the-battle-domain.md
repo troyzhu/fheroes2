@@ -222,6 +222,7 @@ Part 1 is vocabulary rather than method, so it does not recommend an algorithm a
 
 ## Go deeper
 
+- [[rl-methods]] — every technique named here, derived, from the policy gradient through PPO and the alternatives.
 - [[README]] — the system as it stands, the build, and the current state.
 - [[implementation/README|Concept primers]] — how each implemented mechanism works.
 - [[research/findings|Literature synthesis]] — what the evidence establishes.

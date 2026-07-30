@@ -11,6 +11,7 @@ tags: [adr, training, reward, agent-env]
 
 - Status: algorithm choice accepted; reward design deliberately open, with the decision criteria fixed here
 - Context: [[../research/findings]], [[../implementation/teacher-coverage-and-behavior-cloning]], user question 2026-07-30
+- Techniques: [[../rl-methods]] defines every method named below, with its equation and our verdict.
 - Mechanics: [[../training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
 
 ## Context
