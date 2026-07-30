@@ -3,7 +3,7 @@
 > **Status:** v0.3 — source-cross-checked **and Phase 0 runtime-validated**  
 > **Original draft:** 2026-07-25  
 > **Source audit revision:** 2026-07-25  
-> **Runtime validation revision:** 2026-07-26 — see §0.1 and `docs/agent/local_source_audit.md`  
+> **Runtime validation revision:** 2026-07-26 — see §0.1 and `agent_play/docs/archive/benchmarks/2026-07-26-source-audit-apple-m3.md`  
 > **Primary target:** Apple Silicon Mac mini M2; assume 16 GB unified memory until the local machine is measured  
 > **Validation machine:** Apple M3, 8 cores, 16 GB, macOS 26.5.2 — **not the target Mac mini.** Source-level and determinism findings transfer; all *measurements* must be re-taken on the mini.  
 > **Pinned engine baseline:** see §0.1 — the `1.1.17` pin is superseded by the current master lineage  
@@ -25,7 +25,7 @@ Throughout this document:
 - **LOCAL-VERIFY** means source inspection is insufficient; the local agent must build or run the engine.
 - **DEFERRED** means deliberately outside the first mergeable implementation.
 
-The local agent may refine this specification when runtime evidence contradicts it. Any meaningful change should be recorded in `docs/agent/decisions/` rather than silently broadening or changing scope.
+The local agent may refine this specification when runtime evidence contradicts it. Any meaningful change should be recorded in `agent_play/docs/decisions/` rather than silently broadening or changing scope.
 
 The first mergeable result must not contain an LLM, RL training loop, whole-map agent, screenshot parser, or GUI automation. It must first create a trustworthy environment substrate.
 
@@ -34,7 +34,7 @@ The first mergeable result must not contain an LLM, RL training loop, whole-map 
 ## 0.1 Validation results (v0.3)
 
 Phase 0 was executed. A headless creature-only battle was built and run against this repository.
-Full report: **`docs/agent/local_source_audit.md`**. Artifacts: `agent_play/spike/`.
+Full report: **`agent_play/docs/archive/benchmarks/2026-07-26-source-audit-apple-m3.md`**. Artifacts: `agent_play/spike/`.
 
 **Phase 0 verdict: GO.** The two highest-ranked risks in §23 are materially reduced.
 
@@ -151,7 +151,7 @@ showing changes, re-audit that file before trusting §3.
 Create:
 
 ```text
-docs/agent/local_source_audit.md
+agent_play/docs/local_source_audit.md
 ```
 
 Record:
@@ -2089,7 +2089,7 @@ Record:
 Create:
 
 ```text
-docs/agent/benchmark_m2.md
+agent_play/docs/benchmark_m2.md
 ```
 
 Include exact hardware/software, commands, scenario digests, raw summary tables, and a recommendation for default worker count.
@@ -2107,7 +2107,7 @@ Deliver:
 - Battle Only run;
 - deterministic headless AI-v-AI smoke;
 - 100 sequential arena stress;
-- `docs/agent/local_source_audit.md`.
+- `agent_play/docs/archive/benchmarks/2026-07-26-source-audit-apple-m3.md`.
 
 Exit only when the initialization and asset path are known.
 
@@ -2366,7 +2366,7 @@ Use release `1.1.17` and verify that `git rev-parse HEAD` equals:
 2685c2188b541660f1ce261b554c3e92f79b1775
 ```
 
-Read this specification fully before editing. Do not implement it blindly: begin with **Phase 0**, build the normal game, run Battle Only, and produce `docs/agent/local_source_audit.md`.
+Read this specification fully before editing. Do not implement it blindly: begin with **Phase 0**, build the normal game, run Battle Only, and produce `agent_play/docs/archive/benchmarks/2026-07-26-source-audit-apple-m3.md`.
 
 The first deliverable is a deterministic, headless, creature-only field-battle environment. It must use true engine state and legal engine commands. It must not contain an LLM, RL algorithm, adventure-map control, screenshot parsing, or GUI automation.
 
@@ -2406,9 +2406,9 @@ simple_v1 candidate generator
 built-in AI passive demonstrations and candidate matching
 deterministic semantic replay
 tests and stress runs
-docs/agent/local_source_audit.md
-docs/agent/implementation_report.md
-docs/agent/benchmark_m2.md
+agent_play/docs/local_source_audit.md
+agent_play/docs/implementation_report.md
+agent_play/docs/benchmark_m2.md
 ADRs for deviations
 ```
 

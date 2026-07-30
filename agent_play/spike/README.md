@@ -1,12 +1,12 @@
 # Phase 0 spike — headless battle smoke test
 
-> New here? Read **`docs/agent/START_HERE.md`** first.
+> New here? Read **`agent_play/docs/README.md`** first.
 
 Throwaway diagnostic that answers the Phase 0 questions in
 `agent_play/fheroes2_agent_system_spec_v0.3.md` §2.4. **Not** the eventual agent worker:
 there is no decision hook, no candidate generation, no protocol, and no Python here.
 
-Findings are written up in `docs/agent/local_source_audit.md`.
+Findings are written up in `agent_play/docs/archive/benchmarks/2026-07-26-source-audit-apple-m3.md`.
 
 ## Build
 
@@ -74,4 +74,4 @@ Protocol-ish output goes to stdout; the config banner goes to stderr.
 - The digest is an FNV-style fold, not SHA-256. Sufficient to detect divergence between runs; the
   real environment needs the canonical digest defined in spec §12.5.
 - ~~Measured on an Apple M3, not the target Mac mini M2.~~ Resolved 2026-07-27: reproduced on the
-  M2 with identical seed and digest; see `docs/agent/benchmark_m2.md`.
+  M2 with identical seed and digest; see `agent_play/docs/archive/benchmarks/2026-07-27-apple-m2.md`.

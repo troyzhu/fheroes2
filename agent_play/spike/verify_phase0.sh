@@ -83,7 +83,7 @@ report "ranged (Archer) path" "$?" "Archer 20 beats Peasant 60"
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 echo
-echo "  Not covered here (must be done manually -- see docs/agent/local_source_audit.md):"
+echo "  Not covered here (must be done manually -- see agent_play/docs/archive/benchmarks/2026-07-26-source-audit-apple-m3.md):"
 echo "    - Debug build assertion run (FHEROES2_WITH_DEBUG)"
 echo "    - sanitizers (ASan/UBSan)"
 echo "    - CMake normal-game regression"

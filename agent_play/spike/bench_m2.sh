@@ -1,6 +1,6 @@
 #!/bin/bash
 # Mode A benchmark (spec §19.1-A: pure engine baseline, built-in AI vs built-in AI,
-# no per-decision JSON, single worker) for docs/agent/benchmark_m2.md.
+# no per-decision JSON, single worker) for agent_play/docs/archive/benchmarks/2026-07-27-apple-m2.md.
 #
 # Modes B and C require the protocol layer / Python client (Milestones 4-5) and are
 # therefore NOT covered here. Workloads are limited to what the Phase 0 spike can

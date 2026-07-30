@@ -5,20 +5,27 @@ projects live on their own branches; the branch you are on determines which appl
 
 ## Branch `agent-env` — headless battle environment for training
 
-**Read `docs/agent/START_HERE.md` first, in full, before doing anything else.** It is the single
-entry point, written to teach: project goal and scope, a notation/terms table, the architecture,
-the five ideas the design rests on (each with a primer in `docs/agent/concepts/`), current state,
-build and verification commands, and the decisions not to relitigate. Dated history lives
-separately in `docs/agent/log.md`.
+**Read `agent_play/docs/README.md` first, then follow its routing table.** The documentation lives
+under `agent_play/`, not under `docs/`, because `docs/` is the source of the project's published
+website (`.github/workflows/pages.yml` builds Jekyll from it) and this material is internal.
 
-Quick orientation: Phase 0 and Milestone 1 (deterministic runner foundation) are complete and
-verified on both the M3 MacBook and the target Mac mini M2. Engine changes are minimal by design:
-the shared `Battle::computeBattleSeed` helper (`src/fheroes2/battle/battle_seed.{h,cpp}`) plus the
-entry-point-free agent library under `src/fheroes2/agent/` that both build systems compile into
-the normal executable without behavior change. Verify everything with:
+The tree separates reading material from records. `README.md` routes; `overview.md` carries
+orientation, notation, scope, build and current state; `rl-and-the-battle-domain.md` teaches the
+reinforcement-learning vocabulary and the battle domain from scratch; `research/` holds the
+literature; `implementation/` holds one primer per built mechanism; `decisions/` holds the accepted
+records; and `archive/` holds dated logs, benchmarks, and raw research runs, which are provenance
+rather than a reading path.
+
+Quick orientation: Phase 0 and Milestones 1 through 3 are complete and verified on the target
+Apple M2 Mac mini. Engine changes are deliberately small: two verbatim lifts
+(`battle_seed.{h,cpp}`, `battle_action_validation.{h,cpp}`), one optional hook
+(`battle_decision_controller.h`), and the entry-point-free library under `src/fheroes2/agent/`
+that both build systems compile into the normal executable without behavior change. Verify with:
 
 ```bash
-make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh && ./agent_play/spike/verify_phase0.sh && ./agent_play/verify_m1.sh
+make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh \
+  && ./agent_play/spike/verify_phase0.sh && ./agent_play/verify_m1.sh \
+  && ./agent_play/verify_m2.sh && ./agent_play/verify_m3.sh
 ```
 
 ## Branch `play-harness` — Claude plays the game through the real UI
