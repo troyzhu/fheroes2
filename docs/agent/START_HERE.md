@@ -58,6 +58,10 @@ next.**
   indices, typed `CommandSnapshot` decoding, passive teacher recording with a SHA-256
   decision-stream digest, JSONL trajectory writer (`agent_passive_v0`), worker
   `--trajectory-dir` — `./agent_play/verify_m2.sh` passes 8/8
+- ✅ Coarse-minimap question researched and decided (2026-07-29):
+  `research_minimap_observations.md` (24/25 claims verified) + **ADR 0004** — a semantic
+  spatial-plane modality (`planes_v1`, SC2-feature-layer style, derived from the same state as
+  the entity list) joins the schema at Milestone 3/4; true pixel rendering rejected for the env
 - ❌ Milestone 3 onward (`simple_v1` legal actions — the top-risk milestone): **not started**
 
 Branch: **`agent-env`**, branched from `master`, pushed to `origin` (the `troyzhu` fork).
@@ -104,8 +108,9 @@ Full evidence and a 25-row assumption table: `local_source_audit.md`.
 | `agent_play/spike/README.md` | how to drive the spike, its limitations | before running it |
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` (rest) | the full 2600-line design: protocol, schemas, milestones | when implementing a milestone |
 | `docs/agent/research_rl_approaches.md` | verified RL literature consolidation; per-topic recommendations and design deltas | before Milestone 2/3 design work |
+| `docs/agent/research_minimap_observations.md` | verified research on coarse-minimap/hybrid observations (feature layers, multi-observer APIs, costs) | before observation-schema implementation |
 | `docs/agent/implementation_report.md` | review-oriented inventory: commits, engine surface, component/verification matrices, deviations | to review what exists |
-| `docs/agent/decisions/` | accepted ADRs that amend the spec (0001 observation profiles, 0002 action space, 0003 config management) | before implementing the area they touch |
+| `docs/agent/decisions/` | accepted ADRs that amend the spec (0001 observation profiles, 0002 action space, 0003 config management, 0004 spatial-plane modality) | before implementing the area they touch |
 
 The spec is large. §0.1 (validation), §4 (scope), §9 (decision hook), §10 (legal actions) and §22
 (definition of done) are the sections that matter for Milestone 1–3.
@@ -180,8 +185,9 @@ because it would mean determinism does not hold on the target hardware.
    arena), generate the monster capability audit (§4.2), implement candidate generation with the
    **fixed canonical action indexing + legal mask of ADR 0002**, deterministic ordering (§10.4),
    and built-in teacher matching (§10.6). Observation serialization along the way must follow
-   ADR 0001's `full_v1`/`observable_v1` profiles. Exit: every supported fixture state has valid
-   candidates and 100 % teacher-action coverage.
+   ADR 0001's `full_v1`/`observable_v1` profiles and include the `planes_v1` semantic spatial
+   modality of ADR 0004 (derived tensor, same state source, no rendering). Exit: every supported
+   fixture state has valid candidates and 100 % teacher-action coverage.
 
 ---
 
