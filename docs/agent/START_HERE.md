@@ -110,6 +110,7 @@ Full evidence and a 25-row assumption table: `local_source_audit.md`.
 | `docs/agent/research_rl_approaches.md` | verified RL literature consolidation; per-topic recommendations and design deltas | before Milestone 2/3 design work |
 | `docs/agent/research_minimap_observations.md` | verified research on coarse-minimap/hybrid observations (feature layers, multi-observer APIs, costs) | before observation-schema implementation |
 | `docs/agent/implementation_report.md` | review-oriented inventory: commits, engine surface, component/verification matrices, deviations | to review what exists |
+| `docs/agent/references/` | Obsidian-ready reference vault: `index.md`, per-work `notes/`, consolidated `summary.md`, 43 local copies in `files/` + `manifest.tsv`, reproducible `fetch_references.sh` | to consult or extend the evidence base |
 | `docs/agent/decisions/` | accepted ADRs that amend the spec (0001 observation profiles, 0002 action space, 0003 config management, 0004 spatial-plane modality) | before implementing the area they touch |
 
 The spec is large. §0.1 (validation), §4 (scope), §9 (decision hook), §10 (legal actions) and §22

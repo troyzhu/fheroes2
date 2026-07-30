@@ -1,0 +1,1006 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="readthedocs-addons-api-version" content="1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maskable PPO &mdash; Stable Baselines3 - Contrib 2.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/baselines_theme.css?v=23ee7d75" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=182a64a0"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <script src="../_static/js/versions.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Recurrent PPO" href="ppo_recurrent.html" />
+    <link rel="prev" title="CrossQ" href="crossq.html" /> 
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="sb3-contrib" /><meta name="readthedocs-version-slug" content="master" /><meta name="readthedocs-resolver-filename" content="/modules/ppo_mask.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Stable Baselines3 - Contrib
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="switch-menus">
+                <div class="version-switch"></div>
+                <div class="language-switch"></div>
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/algos.html">RL Algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">RL Algorithms</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ars.html">ARS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crossq.html">CrossQ</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Maskable PPO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#can-i-use">Can I use?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#results">Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#x4">4x4</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#no-masking">No masking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#with-masking">With masking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#combined">Combined</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#x10">10x10</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">No masking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">With masking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Combined</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-replicate-the-results">How to replicate the results?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO"><code class="docutils literal notranslate"><span class="pre">MaskablePPO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.collect_rollouts"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.collect_rollouts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.dump_logs"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.dump_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.get_env"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.get_env()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.get_parameters"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.get_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.get_vec_normalize_env"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.get_vec_normalize_env()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.learn"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.learn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.load"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.logger"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.predict"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.save"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.set_env"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.set_env()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.set_logger"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.set_logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.set_parameters"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.set_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.set_random_seed"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.set_random_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sb3_contrib.ppo_mask.MaskablePPO.train"><code class="docutils literal notranslate"><span class="pre">MaskablePPO.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#maskableppo-policies">MaskablePPO Policies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sb3_contrib.ppo_mask.MlpPolicy"><code class="docutils literal notranslate"><span class="pre">MlpPolicy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sb3_contrib.ppo_mask.CnnPolicy"><code class="docutils literal notranslate"><span class="pre">CnnPolicy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sb3_contrib.ppo_mask.MultiInputPolicy"><code class="docutils literal notranslate"><span class="pre">MultiInputPolicy</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ppo_recurrent.html">Recurrent PPO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qrdqn.html">QR-DQN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tqc.html">TQC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trpo.html">TRPO</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Common</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../common/torch_layers.html">Torch Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common/wrappers.html">Gym Wrappers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Misc</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../misc/changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stable Baselines3 - Contrib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Maskable PPO</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/modules/ppo_mask.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="maskable-ppo">
+<span id="module-sb3_contrib.ppo_mask"></span><span id="ppo-mask"></span><h1>Maskable PPO<a class="headerlink" href="#maskable-ppo" title="Link to this heading"></a></h1>
+<p>Implementation of <a class="reference external" href="https://arxiv.org/abs/2006.14171">invalid action masking</a> for the Proximal Policy Optimization (PPO)
+algorithm. Other than adding support for action masking, the behavior is the same as in SB3’s core PPO algorithm.</p>
+<p class="rubric">Available Policies</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sb3_contrib.ppo_mask.MlpPolicy" title="sb3_contrib.ppo_mask.MlpPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MlpPolicy</span></code></a></p></td>
+<td><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskableActorCriticPolicy</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sb3_contrib.ppo_mask.CnnPolicy" title="sb3_contrib.ppo_mask.CnnPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CnnPolicy</span></code></a></p></td>
+<td><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskableActorCriticCnnPolicy</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sb3_contrib.ppo_mask.MultiInputPolicy" title="sb3_contrib.ppo_mask.MultiInputPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiInputPolicy</span></code></a></p></td>
+<td><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskableMultiInputActorCriticPolicy</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Paper: <a class="reference external" href="https://arxiv.org/abs/2006.14171">https://arxiv.org/abs/2006.14171</a></p></li>
+<li><p>Blog post: <a class="reference external" href="https://costa.sh/blog-a-closer-look-at-invalid-action-masking-in-policy-gradient-algorithms.html">https://costa.sh/blog-a-closer-look-at-invalid-action-masking-in-policy-gradient-algorithms.html</a></p></li>
+<li><p>Additional Blog post: <a class="reference external" href="https://boring-guy.sh/posts/masking-rl/">https://boring-guy.sh/posts/masking-rl/</a></p></li>
+</ul>
+</section>
+<section id="can-i-use">
+<h2>Can I use?<a class="headerlink" href="#can-i-use" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Recurrent policies: ❌</p></li>
+<li><p>Multi processing: ✔️</p></li>
+<li><p>Gym spaces:</p></li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Space</p></th>
+<th class="head"><p>Action</p></th>
+<th class="head"><p>Observation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Discrete</p></td>
+<td><p>✔️</p></td>
+<td><p>✔️</p></td>
+</tr>
+<tr class="row-odd"><td><p>Box</p></td>
+<td><p>❌</p></td>
+<td><p>✔️</p></td>
+</tr>
+<tr class="row-even"><td><p>MultiDiscrete</p></td>
+<td><p>✔️</p></td>
+<td><p>✔️</p></td>
+</tr>
+<tr class="row-odd"><td><p>MultiBinary</p></td>
+<td><p>✔️</p></td>
+<td><p>✔️</p></td>
+</tr>
+<tr class="row-even"><td><p>Dict</p></td>
+<td><p>❌</p></td>
+<td><p>✔️</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You must use <code class="docutils literal notranslate"><span class="pre">MaskableEvalCallback</span></code> from <code class="docutils literal notranslate"><span class="pre">sb3_contrib.common.maskable.callbacks</span></code> instead of the base <code class="docutils literal notranslate"><span class="pre">EvalCallback</span></code> to properly evaluate a model with action masks.
+Similarly, you must use <code class="docutils literal notranslate"><span class="pre">evaluate_policy</span></code> from <code class="docutils literal notranslate"><span class="pre">sb3_contrib.common.maskable.evaluation</span></code> instead of the SB3 one.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In order to use <code class="docutils literal notranslate"><span class="pre">SubprocVecEnv</span></code> with <code class="docutils literal notranslate"><span class="pre">MaskablePPO</span></code>, you must implement the <code class="docutils literal notranslate"><span class="pre">action_masks</span></code> inside the environment (<code class="docutils literal notranslate"><span class="pre">ActionMasker</span></code> cannot be used).
+You can have a look at the <a class="reference external" href="https://github.com/Stable-Baselines-Team/stable-baselines3-contrib/blob/master/sb3_contrib/common/envs/invalid_actions_env.py">built-in environments with invalid action masks</a> to have a working example.</p>
+</div>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>Train a PPO agent on <code class="docutils literal notranslate"><span class="pre">InvalidActionEnvDiscrete</span></code>. <code class="docutils literal notranslate"><span class="pre">InvalidActionEnvDiscrete</span></code> has a <code class="docutils literal notranslate"><span class="pre">action_masks</span></code> method that
+returns the invalid action mask (<code class="docutils literal notranslate"><span class="pre">True</span></code> if the action is valid, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskablePPO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.common.envs</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidActionEnvDiscrete</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.common.maskable.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate_policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.common.maskable.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_action_masks</span>
+<span class="c1"># This is a drop-in replacement for EvalCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.common.maskable.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskableEvalCallback</span>
+
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">InvalidActionEnvDiscrete</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">n_invalid_actions</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MaskablePPO</span><span class="p">(</span><span class="s2">&quot;MlpPolicy&quot;</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="mi">5_000</span><span class="p">)</span>
+
+<span class="n">evaluate_policy</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">n_eval_episodes</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">reward_threshold</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;ppo_mask&quot;</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">model</span> <span class="c1"># remove to demonstrate saving and loading</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">MaskablePPO</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;ppo_mask&quot;</span><span class="p">)</span>
+
+<span class="n">obs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="c1"># Retrieve current action mask</span>
+    <span class="n">action_masks</span> <span class="o">=</span> <span class="n">get_action_masks</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">action</span><span class="p">,</span> <span class="n">_states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">action_masks</span><span class="o">=</span><span class="n">action_masks</span><span class="p">)</span>
+    <span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the environment implements the invalid action mask but using a different name, you can use the <code class="docutils literal notranslate"><span class="pre">ActionMasker</span></code>
+to specify the name (see <a class="reference external" href="https://github.com/Stable-Baselines-Team/stable-baselines3-contrib/pull/25">PR #25</a>):</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are using a custom environment and you want to debug it with <code class="docutils literal notranslate"><span class="pre">check_env</span></code>,
+it will execute the method <code class="docutils literal notranslate"><span class="pre">step</span></code> passing a random action to it (using <code class="docutils literal notranslate"><span class="pre">action_space.sample()</span></code>),
+without taking into account the invalid actions mask (see <a class="reference external" href="https://github.com/Stable-Baselines-Team/stable-baselines3-contrib/issues/145">issue #145</a>).</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.common.maskable.policies</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskableActorCriticPolicy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.common.wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionMasker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sb3_contrib.ppo_mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskablePPO</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mask_fn</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="c1"># Do whatever you&#39;d like in this function to return the action mask</span>
+    <span class="c1"># for the current env. In this example, we assume the env has a</span>
+    <span class="c1"># helpful method we can rely on.</span>
+    <span class="k">return</span> <span class="n">env</span><span class="o">.</span><span class="n">valid_action_mask</span><span class="p">()</span>
+
+
+<span class="n">env</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># Initialize env</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">ActionMasker</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">mask_fn</span><span class="p">)</span>  <span class="c1"># Wrap to enable masking</span>
+
+<span class="c1"># MaskablePPO behaves the same as SB3&#39;s PPO unless the env is wrapped</span>
+<span class="c1"># with ActionMasker. If the wrapper is detected, the masks are automatically</span>
+<span class="c1"># retrieved and used when learning. Note that MaskablePPO does not accept</span>
+<span class="c1"># a new action_mask_fn kwarg, as it did in an earlier draft.</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MaskablePPO</span><span class="p">(</span><span class="n">MaskableActorCriticPolicy</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">learn</span><span class="p">()</span>
+
+<span class="c1"># Note that use of masks is manual and optional outside of learning,</span>
+<span class="c1"># so masking can be &quot;removed&quot; at testing time</span>
+<span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">action_masks</span><span class="o">=</span><span class="n">valid_action_array</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
+<p>Results are shown for two MicroRTS benchmarks: MicrortsMining4x4F9-v0 (600K steps) and MicrortsMining10x10F9-v0
+(1.5M steps). For each, models were trained with and without masking, using 3 seeds.</p>
+<section id="x4">
+<h3>4x4<a class="headerlink" href="#x4" title="Link to this heading"></a></h3>
+<section id="no-masking">
+<h4>No masking<a class="headerlink" href="#no-masking" title="Link to this heading"></a></h4>
+<img alt="../_images/4x4_no_mask.png" src="../_images/4x4_no_mask.png" />
+</section>
+<section id="with-masking">
+<h4>With masking<a class="headerlink" href="#with-masking" title="Link to this heading"></a></h4>
+<img alt="../_images/4x4_mask.png" src="../_images/4x4_mask.png" />
+</section>
+<section id="combined">
+<h4>Combined<a class="headerlink" href="#combined" title="Link to this heading"></a></h4>
+<img alt="../_images/4x4_combined.png" src="../_images/4x4_combined.png" />
+</section>
+</section>
+<section id="x10">
+<h3>10x10<a class="headerlink" href="#x10" title="Link to this heading"></a></h3>
+<section id="id1">
+<h4>No masking<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<img alt="../_images/10x10_no_mask.png" src="../_images/10x10_no_mask.png" />
+</section>
+<section id="id2">
+<h4>With masking<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<img alt="../_images/10x10_mask.png" src="../_images/10x10_mask.png" />
+</section>
+<section id="id3">
+<h4>Combined<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<img alt="../_images/10x10_combined.png" src="../_images/10x10_combined.png" />
+<p>More information may be found in the
+<a class="reference external" href="https://github.com/Stable-Baselines-Team/stable-baselines3-contrib/pull/25">associated PR</a>.</p>
+</section>
+</section>
+<section id="how-to-replicate-the-results">
+<h3>How to replicate the results?<a class="headerlink" href="#how-to-replicate-the-results" title="Link to this heading"></a></h3>
+<p>Clone the repo for the experiment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:kronion/microrts-ppo-comparison.git
+<span class="nb">cd</span><span class="w"> </span>microrts-ppo-comparison
+</pre></div>
+</div>
+<p>Install dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install MicroRTS:</span>
+rm<span class="w"> </span>-fR<span class="w"> </span>~/microrts<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mkdir<span class="w"> </span>~/microrts<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w"> </span>wget<span class="w"> </span>-O<span class="w"> </span>~/microrts/microrts.zip<span class="w"> </span>http://microrts.s3.amazonaws.com/microrts/artifacts/202004222224.microrts.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w"> </span>unzip<span class="w"> </span>~/microrts/microrts.zip<span class="w"> </span>-d<span class="w"> </span>~/microrts/
+
+<span class="c1"># You may want to make a venv before installing packages</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>Train several times with various seeds, with and without masking:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># python sb/train_ppo.py [output dir] [MicroRTS map size] [--mask] [--seed int]</span>
+
+<span class="c1"># 4x4 unmasked</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">4</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">42</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">4</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">43</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">4</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">44</span>
+
+<span class="c1"># 4x4 masked</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">4</span><span class="w"> </span>--mask<span class="w"> </span>--seed<span class="w"> </span><span class="m">42</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">4</span><span class="w"> </span>--mask<span class="w"> </span>--seed<span class="w"> </span><span class="m">43</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">4</span><span class="w"> </span>--mask<span class="w"> </span>--seed<span class="w"> </span><span class="m">44</span>
+
+<span class="c1"># 10x10 unmasked</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">10</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">42</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">10</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">43</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">10</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">44</span>
+
+<span class="c1"># 10x10 masked</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">10</span><span class="w"> </span>--mask<span class="w"> </span>--seed<span class="w"> </span><span class="m">42</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">10</span><span class="w"> </span>--mask<span class="w"> </span>--seed<span class="w"> </span><span class="m">43</span>
+python<span class="w"> </span>sb3/train_ppo.py<span class="w"> </span>zoo<span class="w"> </span><span class="m">10</span><span class="w"> </span>--mask<span class="w"> </span>--seed<span class="w"> </span><span class="m">44</span>
+</pre></div>
+</div>
+<p>View the tensorboard log output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># For 4x4 environment</span>
+<span class="w"> </span>tensorboard<span class="w"> </span>--logdir<span class="w"> </span>zoo/4x4/runs
+
+<span class="w"> </span><span class="c1"># For 10x10 environment</span>
+<span class="w"> </span>tensorboard<span class="w"> </span>--logdir<span class="w"> </span>zoo/10x10/runs
+</pre></div>
+</div>
+</section>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sb3_contrib.ppo_mask.</span></span><span class="sig-name descname"><span class="pre">MaskablePPO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gae_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_range_vf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_advantage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ent_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vf_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_grad_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rollout_buffer_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rollout_buffer_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_kl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats_window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensorboard_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_init_setup_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/ppo_mask/ppo_mask.html#MaskablePPO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO" title="Link to this definition"></a></dt>
+<dd><p>Proximal Policy Optimization algorithm (PPO) (clip version) with Invalid Action Masking.</p>
+<p>Based on the original Stable Baselines 3 implementation.</p>
+<p>Introduction to PPO: <a class="reference external" href="https://spinningup.openai.com/en/latest/algorithms/ppo.html">https://spinningup.openai.com/en/latest/algorithms/ppo.html</a>
+Background on Invalid Action Masking: <a class="reference external" href="https://arxiv.org/abs/2006.14171">https://arxiv.org/abs/2006.14171</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> (<em>MaskableActorCriticPolicy</em>) – The policy model to use (MlpPolicy, CnnPolicy, …)</p></li>
+<li><p><strong>env</strong> (<em>Env</em><em> | </em><em>VecEnv</em><em> | </em><em>str</em>) – The environment to learn from (if registered in Gym, can be str)</p></li>
+<li><p><strong>learning_rate</strong> (<em>float</em><em> | </em><em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The learning rate, it can be a function
+of the current progress remaining (from 1 to 0)</p></li>
+<li><p><strong>n_steps</strong> (<em>int</em>) – The number of steps to run for each environment per update
+(i.e. batch size is n_steps * n_env where n_env is number of environment copies running in parallel)</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em> | </em><em>None</em>) – Minibatch size</p></li>
+<li><p><strong>n_epochs</strong> (<em>int</em>) – Number of epoch when optimizing the surrogate loss</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – Discount factor</p></li>
+<li><p><strong>gae_lambda</strong> (<em>float</em>) – Factor for trade-off of bias vs variance for Generalized Advantage Estimator</p></li>
+<li><p><strong>clip_range</strong> (<em>float</em><em> | </em><em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – Clipping parameter, it can be a function of the current progress
+remaining (from 1 to 0).</p></li>
+<li><p><strong>clip_range_vf</strong> (<em>None</em><em> | </em><em>float</em><em> | </em><em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – Clipping parameter for the value function,
+it can be a function of the current progress remaining (from 1 to 0).
+This is a parameter specific to the OpenAI implementation. If None is passed (default),
+no clipping will be done on the value function.
+IMPORTANT: this clipping depends on the reward scaling.</p></li>
+<li><p><strong>normalize_advantage</strong> (<em>bool</em>) – Whether to normalize or not the advantage</p></li>
+<li><p><strong>ent_coef</strong> (<em>float</em>) – Entropy coefficient for the loss calculation</p></li>
+<li><p><strong>vf_coef</strong> (<em>float</em>) – Value function coefficient for the loss calculation</p></li>
+<li><p><strong>max_grad_norm</strong> (<em>float</em>) – The maximum value for the gradient clipping</p></li>
+<li><p><strong>target_kl</strong> (<em>float</em><em> | </em><em>None</em>) – Limit the KL divergence between updates,
+because the clipping is not enough to prevent large update
+see issue #213 (cf <a class="reference external" href="https://github.com/hill-a/stable-baselines/issues/213">https://github.com/hill-a/stable-baselines/issues/213</a>)
+By default, there is no limit on the kl div.</p></li>
+<li><p><strong>stats_window_size</strong> (<em>int</em>) – Window size for the rollout logging, specifying the number of episodes to average
+the reported success rate, mean episode length, and mean reward over</p></li>
+<li><p><strong>tensorboard_log</strong> (<em>str</em><em> | </em><em>None</em>) – the log location for tensorboard (if None, no logging)</p></li>
+<li><p><strong>policy_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – additional arguments to be passed to the policy on creation. See <a class="reference internal" href="#ppo-mask-policies"><span class="std std-ref">MaskablePPO Policies</span></a></p></li>
+<li><p><strong>verbose</strong> (<em>int</em>) – the verbosity level: 0 no output, 1 info, 2 debug</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em> | </em><em>None</em>) – Seed for the pseudo random generators</p></li>
+<li><p><strong>device</strong> (<em>device</em><em> | </em><em>str</em>) – Device (cpu, cuda, …) on which the code should be run.
+Setting it to auto, the code will be run on the GPU if possible.</p></li>
+<li><p><strong>_init_setup_model</strong> (<em>bool</em>) – Whether or not to build the network at the creation of the instance</p></li>
+<li><p><strong>rollout_buffer_class</strong> (<em>type</em><em>[</em><em>RolloutBuffer</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>rollout_buffer_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.collect_rollouts">
+<span class="sig-name descname"><span class="pre">collect_rollouts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rollout_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rollout_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_masking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/ppo_mask/ppo_mask.html#MaskablePPO.collect_rollouts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.collect_rollouts" title="Link to this definition"></a></dt>
+<dd><p>Collect experiences using the current policy and fill a <code class="docutils literal notranslate"><span class="pre">RolloutBuffer</span></code>.
+The term rollout here refers to the model-free notion and should not
+be used with the concept of rollout used in model-based RL or planning.</p>
+<p>This method is largely identical to the implementation found in the parent class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> (<em>VecEnv</em>) – The training environment</p></li>
+<li><p><strong>callback</strong> (<em>BaseCallback</em>) – Callback that will be called at each step
+(and at the beginning and end of the rollout)</p></li>
+<li><p><strong>rollout_buffer</strong> (<em>RolloutBuffer</em>) – Buffer to fill with rollouts</p></li>
+<li><p><strong>n_steps</strong> – Number of experiences to collect per environment</p></li>
+<li><p><strong>use_masking</strong> (<em>bool</em>) – Whether or not to use invalid action masks during training</p></li>
+<li><p><strong>n_rollout_steps</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if function returned with at least <cite>n_rollout_steps</cite>
+collected, False if callback terminated rollout prematurely.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.dump_logs">
+<span class="sig-name descname"><span class="pre">dump_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.dump_logs" title="Link to this definition"></a></dt>
+<dd><p>Write log.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iteration</strong> (<em>int</em>) – Current logging iteration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.get_env">
+<span class="sig-name descname"><span class="pre">get_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.get_env" title="Link to this definition"></a></dt>
+<dd><p>Returns the current environment (can be None if not defined).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current environment</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>VecEnv</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.get_parameters">
+<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.get_parameters" title="Link to this definition"></a></dt>
+<dd><p>Return the parameters of the agent. This includes parameters from different networks, e.g.
+critics (value functions) and policies (pi functions).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping of from names of the objects to PyTorch state-dicts.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.get_vec_normalize_env">
+<span class="sig-name descname"><span class="pre">get_vec_normalize_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.get_vec_normalize_env" title="Link to this definition"></a></dt>
+<dd><p>Return the <code class="docutils literal notranslate"><span class="pre">VecNormalize</span></code> wrapper of the training env
+if it exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The <code class="docutils literal notranslate"><span class="pre">VecNormalize</span></code> env.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>VecNormalize</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.learn">
+<span class="sig-name descname"><span class="pre">learn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_timesteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tb_log_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaskablePPO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_num_timesteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_masking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_bar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/ppo_mask/ppo_mask.html#MaskablePPO.learn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.learn" title="Link to this definition"></a></dt>
+<dd><p>Return a trained model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_timesteps</strong> (<em>int</em>) – The total number of samples (env steps) to train on
+Note: it is a lower bound, see <a class="reference external" href="https://github.com/DLR-RM/stable-baselines3/issues/1150">issue #1150</a></p></li>
+<li><p><strong>callback</strong> (<em>None</em><em> | </em><em>Callable</em><em> | </em><em>list</em><em>[</em><em>BaseCallback</em><em>] </em><em>| </em><em>BaseCallback</em>) – callback(s) called at every step with state of the algorithm.</p></li>
+<li><p><strong>log_interval</strong> (<em>int</em>) – for on-policy algos (e.g., PPO, A2C, …) this is the number of
+training iterations (i.e., log_interval * n_steps * n_envs timesteps) before logging;
+for off-policy algos (e.g., TD3, SAC, …) this is the number of episodes before
+logging.</p></li>
+<li><p><strong>tb_log_name</strong> (<em>str</em>) – the name of the run for TensorBoard logging</p></li>
+<li><p><strong>reset_num_timesteps</strong> (<em>bool</em>) – whether or not to reset the current timestep number (used in logging)</p></li>
+<li><p><strong>progress_bar</strong> (<em>bool</em>) – Display a progress bar using tqdm and rich.</p></li>
+<li><p><strong>self</strong> (<em>SelfMaskablePPO</em>)</p></li>
+<li><p><strong>use_masking</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the trained model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>SelfMaskablePPO</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_system_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.load" title="Link to this definition"></a></dt>
+<dd><p>Load the model from a zip-file.
+Warning: <code class="docutils literal notranslate"><span class="pre">load</span></code> re-creates the model from scratch, it does not update it in-place!
+For an in-place load use <code class="docutils literal notranslate"><span class="pre">set_parameters</span></code> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em><em> | </em><em>Path</em><em> | </em><em>BufferedIOBase</em>) – path to the file (or a file-like) where to
+load the agent from</p></li>
+<li><p><strong>env</strong> (<em>Env</em><em> | </em><em>VecEnv</em><em> | </em><em>None</em>) – the new environment to run the loaded model on
+(can be None if you only need prediction from a trained model) has priority over any saved environment</p></li>
+<li><p><strong>device</strong> (<em>device</em><em> | </em><em>str</em>) – Device on which the code should run.</p></li>
+<li><p><strong>custom_objects</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Dictionary of objects to replace
+upon loading. If a variable is present in this dictionary as a
+key, it will not be deserialized and the corresponding item
+will be used instead. Similar to custom_objects in
+<code class="docutils literal notranslate"><span class="pre">keras.models.load_model</span></code>. Useful when you have an object in
+file that can not be deserialized.</p></li>
+<li><p><strong>print_system_info</strong> (<em>bool</em>) – Whether to print system info from the saved model
+and the current system info (useful to debug loading issues)</p></li>
+<li><p><strong>force_reset</strong> (<em>bool</em>) – Force call to <code class="docutils literal notranslate"><span class="pre">reset()</span></code> before training
+to avoid unexpected behavior.
+See <a class="reference external" href="https://github.com/DLR-RM/stable-baselines3/issues/597">https://github.com/DLR-RM/stable-baselines3/issues/597</a></p></li>
+<li><p><strong>kwargs</strong> – extra arguments to change the model when loading</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new model instance with loaded parameters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>SelfBaseAlgorithm</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.logger">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Logger</span></em><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.logger" title="Link to this definition"></a></dt>
+<dd><p>Getter for the logger object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">episode_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deterministic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/ppo_mask/ppo_mask.html#MaskablePPO.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.predict" title="Link to this definition"></a></dt>
+<dd><p>Get the policy action from an observation (and optional hidden state).
+Includes sugar-coating to handle different observations (e.g. normalizing images).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation</strong> (<em>ndarray</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>ndarray</em><em>]</em>) – the input observation</p></li>
+<li><p><strong>state</strong> (<em>tuple</em><em>[</em><em>ndarray</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>) – The last hidden states (can be None, used in recurrent policies)</p></li>
+<li><p><strong>episode_start</strong> (<em>ndarray</em><em> | </em><em>None</em>) – The last masks (can be None, used in recurrent policies)
+this correspond to beginning of episodes,
+where the hidden states of the RNN must be reset.</p></li>
+<li><p><strong>deterministic</strong> (<em>bool</em>) – Whether or not to return deterministic actions.</p></li>
+<li><p><strong>action_masks</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the model’s action and the next hidden state
+(used in recurrent policies)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[<em>ndarray</em>, tuple[<em>ndarray</em>, …] | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.save" title="Link to this definition"></a></dt>
+<dd><p>Save all the attributes of the object and the model parameters in a zip-file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em><em> | </em><em>Path</em><em> | </em><em>BufferedIOBase</em>) – path to the file where the rl agent should be saved</p></li>
+<li><p><strong>exclude</strong> (<em>Iterable</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – name of parameters that should be excluded in addition to the default ones</p></li>
+<li><p><strong>include</strong> (<em>Iterable</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – name of parameters that might be excluded but should be included anyway</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.set_env">
+<span class="sig-name descname"><span class="pre">set_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.set_env" title="Link to this definition"></a></dt>
+<dd><p>Checks the validity of the environment, and if it is coherent, set it as the current environment.
+Furthermore wrap any non vectorized env into a vectorized
+checked parameters:
+- observation_space
+- action_space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> (<em>Env</em><em> | </em><em>VecEnv</em>) – The environment for learning a policy</p></li>
+<li><p><strong>force_reset</strong> (<em>bool</em>) – Force call to <code class="docutils literal notranslate"><span class="pre">reset()</span></code> before training
+to avoid unexpected behavior.
+See issue <a class="reference external" href="https://github.com/DLR-RM/stable-baselines3/issues/597">https://github.com/DLR-RM/stable-baselines3/issues/597</a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.set_logger">
+<span class="sig-name descname"><span class="pre">set_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.set_logger" title="Link to this definition"></a></dt>
+<dd><p>Setter for for logger object.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When passing a custom logger object,
+this will overwrite <code class="docutils literal notranslate"><span class="pre">tensorboard_log</span></code> and <code class="docutils literal notranslate"><span class="pre">verbose</span></code> settings
+passed to the constructor.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>logger</strong> (<em>Logger</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_path_or_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exact_match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.set_parameters" title="Link to this definition"></a></dt>
+<dd><p>Load parameters from a given zip-file or a nested dictionary containing parameters for
+different modules (see <code class="docutils literal notranslate"><span class="pre">get_parameters</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>load_path_or_iter</strong> – Location of the saved data (path or file-like, see <code class="docutils literal notranslate"><span class="pre">save</span></code>), or a nested
+dictionary containing nn.Module parameters used by the policy. The dictionary maps
+object names to a state-dictionary returned by <code class="docutils literal notranslate"><span class="pre">torch.nn.Module.state_dict()</span></code>.</p></li>
+<li><p><strong>exact_match</strong> (<em>bool</em>) – If True, the given parameters should include parameters for each
+module and each of their parameters, otherwise raises an Exception. If set to False, this
+can be used to update only specific parameters.</p></li>
+<li><p><strong>device</strong> (<em>device</em><em> | </em><em>str</em>) – Device on which the code should run.</p></li>
+<li><p><strong>load_path_or_dict</strong> (<em>str</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Tensor</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.set_random_seed">
+<span class="sig-name descname"><span class="pre">set_random_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.set_random_seed" title="Link to this definition"></a></dt>
+<dd><p>Set the seed of the pseudo-random generators
+(python, numpy, pytorch, gym, action_space)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>int</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MaskablePPO.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/ppo_mask/ppo_mask.html#MaskablePPO.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sb3_contrib.ppo_mask.MaskablePPO.train" title="Link to this definition"></a></dt>
+<dd><p>Update policy using the currently gathered rollout buffer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="maskableppo-policies">
+<span id="ppo-mask-policies"></span><h2>MaskablePPO Policies<a class="headerlink" href="#maskableppo-policies" title="Link to this heading"></a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MlpPolicy">
+<span class="sig-prename descclassname"><span class="pre">sb3_contrib.ppo_mask.</span></span><span class="sig-name descname"><span class="pre">MlpPolicy</span></span><a class="headerlink" href="#sb3_contrib.ppo_mask.MlpPolicy" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskableActorCriticPolicy</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sb3_contrib.common.maskable.policies.</span></span><span class="sig-name descname"><span class="pre">MaskableActorCriticPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_schedule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_arch=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_fn=&lt;class</span> <span class="pre">'torch.nn.modules.activation.Tanh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ortho_init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor_class=&lt;class</span> <span class="pre">'stable_baselines3.common.torch_layers.FlattenExtractor'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor_kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share_features_extractor=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_images=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_class=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_kwargs=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Policy class for actor-critic algorithms (has both policy and value prediction).
+Used by A2C, PPO and the likes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation_space</strong> (<em>Space</em>) – Observation space</p></li>
+<li><p><strong>action_space</strong> (<em>Space</em>) – Action space</p></li>
+<li><p><strong>lr_schedule</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – Learning rate schedule (could be constant)</p></li>
+<li><p><strong>net_arch</strong> (<em>list</em><em>[</em><em>int</em><em>] </em><em>| </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The specification of the policy and value networks.</p></li>
+<li><p><strong>activation_fn</strong> (<em>type</em><em>[</em><em>Module</em><em>]</em>) – Activation function</p></li>
+<li><p><strong>ortho_init</strong> (<em>bool</em>) – Whether to use or not orthogonal initialization</p></li>
+<li><p><strong>features_extractor_class</strong> (<em>type</em><em>[</em><em>BaseFeaturesExtractor</em><em>]</em>) – Features extractor to use.</p></li>
+<li><p><strong>features_extractor_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Keyword arguments
+to pass to the features extractor.</p></li>
+<li><p><strong>share_features_extractor</strong> (<em>bool</em>) – If True, the features extractor is shared between the policy and value networks.</p></li>
+<li><p><strong>normalize_images</strong> (<em>bool</em>) – Whether to normalize images or not,
+dividing by 255.0 (True by default)</p></li>
+<li><p><strong>optimizer_class</strong> (<em>type</em><em>[</em><em>Optimizer</em><em>]</em>) – The optimizer to use,
+<code class="docutils literal notranslate"><span class="pre">th.optim.Adam</span></code> by default</p></li>
+<li><p><strong>optimizer_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Additional keyword arguments,
+excluding the learning rate, to pass to the optimizer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">evaluate_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy.evaluate_actions"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Evaluate actions according to the current policy,
+given the observations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>Tensor</em>) – Observation</p></li>
+<li><p><strong>actions</strong> (<em>Tensor</em>) – Actions</p></li>
+<li><p><strong>action_masks</strong> (<em>Tensor</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>estimated value, log likelihood of taking those actions
+and entropy of the action distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[<em>Tensor</em>, <em>Tensor</em>, <em>Tensor</em> | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy.extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Preprocess the observation if needed and extract features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>Tensor</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Tensor</em><em>]</em>) – Observation</p></li>
+<li><p><strong>features_extractor</strong> (<em>BaseFeaturesExtractor</em><em> | </em><em>None</em>) – The features extractor to use. If None, then <code class="docutils literal notranslate"><span class="pre">self.features_extractor</span></code> is used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extracted features. If features extractor is not shared, returns a tuple with the
+features for the actor and the features for the critic.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tensor</em> | tuple[<em>Tensor</em>, <em>Tensor</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deterministic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Forward pass in all the networks (actor and critic)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>Tensor</em>) – Observation</p></li>
+<li><p><strong>deterministic</strong> (<em>bool</em>) – Whether to sample or use deterministic actions</p></li>
+<li><p><strong>action_masks</strong> (<em>ndarray</em><em> | </em><em>None</em>) – Action masks to apply to the action distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>action, value and log probability of the action</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[<em>Tensor</em>, <em>Tensor</em>, <em>Tensor</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy.get_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Get the current policy distribution given the observations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>Tensor</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Tensor</em><em>]</em>) – Observation</p></li>
+<li><p><strong>action_masks</strong> (<em>ndarray</em><em> | </em><em>None</em>) – Actions’ mask</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the action distribution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>MaskableDistribution</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">episode_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deterministic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Get the policy action from an observation (and optional hidden state).
+Includes sugar-coating to handle different observations (e.g. normalizing images).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation</strong> (<em>ndarray</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>ndarray</em><em>]</em>) – the input observation</p></li>
+<li><p><strong>state</strong> (<em>tuple</em><em>[</em><em>ndarray</em><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>) – The last states (can be None, used in recurrent policies)</p></li>
+<li><p><strong>episode_start</strong> (<em>ndarray</em><em> | </em><em>None</em>) – The last masks (can be None, used in recurrent policies)</p></li>
+<li><p><strong>deterministic</strong> (<em>bool</em>) – Whether or not to return deterministic actions.</p></li>
+<li><p><strong>action_masks</strong> (<em>ndarray</em><em> | </em><em>None</em>) – Action masks to apply to the action distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the model’s action and the next state
+(used in recurrent policies)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[<em>ndarray</em>, tuple[<em>ndarray</em>, …] | None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">predict_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticPolicy.predict_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Get the estimated values according to the current policy given the observations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obs</strong> (<em>Tensor</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Tensor</em><em>]</em>) – Observation</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the estimated values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tensor</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.CnnPolicy">
+<span class="sig-prename descclassname"><span class="pre">sb3_contrib.ppo_mask.</span></span><span class="sig-name descname"><span class="pre">CnnPolicy</span></span><a class="headerlink" href="#sb3_contrib.ppo_mask.CnnPolicy" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskableActorCriticCnnPolicy</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sb3_contrib.common.maskable.policies.</span></span><span class="sig-name descname"><span class="pre">MaskableActorCriticCnnPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_schedule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_arch=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_fn=&lt;class</span> <span class="pre">'torch.nn.modules.activation.Tanh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ortho_init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor_class=&lt;class</span> <span class="pre">'stable_baselines3.common.torch_layers.NatureCNN'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor_kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share_features_extractor=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_images=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_class=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_kwargs=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableActorCriticCnnPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>CNN policy class for actor-critic algorithms (has both policy and value prediction).
+Used by A2C, PPO and the likes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation_space</strong> (<em>Space</em>) – Observation space</p></li>
+<li><p><strong>action_space</strong> (<em>Space</em>) – Action space</p></li>
+<li><p><strong>lr_schedule</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – Learning rate schedule (could be constant)</p></li>
+<li><p><strong>net_arch</strong> (<em>list</em><em>[</em><em>int</em><em>] </em><em>| </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The specification of the policy and value networks.</p></li>
+<li><p><strong>activation_fn</strong> (<em>type</em><em>[</em><em>Module</em><em>]</em>) – Activation function</p></li>
+<li><p><strong>ortho_init</strong> (<em>bool</em>) – Whether to use or not orthogonal initialization</p></li>
+<li><p><strong>features_extractor_class</strong> (<em>type</em><em>[</em><em>BaseFeaturesExtractor</em><em>]</em>) – Features extractor to use.</p></li>
+<li><p><strong>features_extractor_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Keyword arguments
+to pass to the features extractor.</p></li>
+<li><p><strong>share_features_extractor</strong> (<em>bool</em>) – If True, the features extractor is shared between the policy and value networks.</p></li>
+<li><p><strong>normalize_images</strong> (<em>bool</em>) – Whether to normalize images or not,
+dividing by 255.0 (True by default)</p></li>
+<li><p><strong>optimizer_class</strong> (<em>type</em><em>[</em><em>Optimizer</em><em>]</em>) – The optimizer to use,
+<code class="docutils literal notranslate"><span class="pre">th.optim.Adam</span></code> by default</p></li>
+<li><p><strong>optimizer_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Additional keyword arguments,
+excluding the learning rate, to pass to the optimizer</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sb3_contrib.ppo_mask.MultiInputPolicy">
+<span class="sig-prename descclassname"><span class="pre">sb3_contrib.ppo_mask.</span></span><span class="sig-name descname"><span class="pre">MultiInputPolicy</span></span><a class="headerlink" href="#sb3_contrib.ppo_mask.MultiInputPolicy" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskableMultiInputActorCriticPolicy</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sb3_contrib.common.maskable.policies.</span></span><span class="sig-name descname"><span class="pre">MaskableMultiInputActorCriticPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_schedule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_arch=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_fn=&lt;class</span> <span class="pre">'torch.nn.modules.activation.Tanh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ortho_init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor_class=&lt;class</span> <span class="pre">'stable_baselines3.common.torch_layers.CombinedExtractor'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_extractor_kwargs=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share_features_extractor=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_images=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_class=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_kwargs=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sb3_contrib/common/maskable/policies.html#MaskableMultiInputActorCriticPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>MultiInputActorClass policy class for actor-critic algorithms (has both policy and value prediction).
+Used by A2C, PPO and the likes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation_space</strong> (<em>Dict</em>) – Observation space (Tuple)</p></li>
+<li><p><strong>action_space</strong> (<em>Space</em>) – Action space</p></li>
+<li><p><strong>lr_schedule</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – Learning rate schedule (could be constant)</p></li>
+<li><p><strong>net_arch</strong> (<em>list</em><em>[</em><em>int</em><em>] </em><em>| </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The specification of the policy and value networks.</p></li>
+<li><p><strong>activation_fn</strong> (<em>type</em><em>[</em><em>Module</em><em>]</em>) – Activation function</p></li>
+<li><p><strong>ortho_init</strong> (<em>bool</em>) – Whether to use or not orthogonal initialization</p></li>
+<li><p><strong>features_extractor_class</strong> (<em>type</em><em>[</em><em>BaseFeaturesExtractor</em><em>]</em>) – Uses the CombinedExtractor</p></li>
+<li><p><strong>features_extractor_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Keyword arguments
+to pass to the feature extractor.</p></li>
+<li><p><strong>share_features_extractor</strong> (<em>bool</em>) – If True, the features extractor is shared between the policy and value networks.</p></li>
+<li><p><strong>normalize_images</strong> (<em>bool</em>) – Whether to normalize images or not,
+dividing by 255.0 (True by default)</p></li>
+<li><p><strong>optimizer_class</strong> (<em>type</em><em>[</em><em>Optimizer</em><em>]</em>) – The optimizer to use,
+<code class="docutils literal notranslate"><span class="pre">th.optim.Adam</span></code> by default</p></li>
+<li><p><strong>optimizer_kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Additional keyword arguments,
+excluding the learning rate, to pass to the optimizer</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="crossq.html" class="btn btn-neutral float-left" title="CrossQ" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ppo_recurrent.html" class="btn btn-neutral float-right" title="Recurrent PPO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2026, Stable Baselines3.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

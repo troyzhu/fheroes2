@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reinforcement Learning with RLLib &mdash; Griddly 1.6.7 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" type="text/css" />
+    <link rel="canonical" href="https://griddly.readthedocs.io/en/latest/rllib/intro/index.html" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
+        <script src="../../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
+        
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Single Agent Games" href="../single-agent/index.html" />
+    <link rel="prev" title="Robot Tag 4v4" href="../../games/Robot_Tag_4v4/index.html" /> 
+
+<!-- RTD Extra Head -->
+
+
+
+<script type="application/json" id="READTHEDOCS_DATA">{"ad_free": false, "api_host": "https://readthedocs.org", "build_date": "2023-03-16T11:30:24Z", "builder": "sphinx", "canonical_url": null, "commit": "63c45656", "docroot": "/docs/", "features": {"docsearch_disabled": false}, "global_analytics_code": "UA-17997319-1", "language": "en", "page": "rllib/intro/index", "programming_language": "cpp", "project": "griddly", "proxied_api_host": "/_", "source_suffix": ".rst", "subprojects": {}, "theme": "sphinx_rtd_theme", "user_analytics_code": "UA-220539420-1", "version": "latest"}</script>
+
+<!--
+Using this variable directly instead of using `JSON.parse` is deprecated.
+The READTHEDOCS_DATA global variable will be removed in the future.
+-->
+<script type="text/javascript">
+READTHEDOCS_DATA = JSON.parse(document.getElementById('READTHEDOCS_DATA').innerHTML);
+</script>
+
+
+
+<!-- end RTD <extrahead> -->
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="griddly" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/rllib/intro/index.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Griddly
+          </a>
+              <div class="version">
+                latest
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/community.html">Community</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/halloffame.html">Hall of Fame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/artwork.html">Artwork</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/gym/index.html">OpenAI Gym Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/gdy/index.html">Griddly Description YAML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/action%20spaces/index.html">Action Spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/observation%20spaces/index.html">Observation Spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/visualization/index.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started/procedural%20content%20generation/index.html">Procedural Content Generation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Games</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../games/index.html">Single-Player</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/index.html#rts">RTS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/index.html#multi-agent">Multi-Agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reinforcement learning</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reinforcement Learning with RLLib</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#examples-setup">Examples Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-parameters">Environment Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#level-randomization">Level Randomization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#agents">Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simple-convolutional-agent">Simple Convolutional agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#simpleconvagent">SimpleConvAgent</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#global-average-pooling">Global Average Pooling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gapagent">GAPAgent</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#recording-videos">Recording Videos</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#uploading-videos-to-wandb">Uploading Videos to WandB</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#recording-environment-actions">Recording Environment Actions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#uploading-environment-events-to-wandb">Uploading Environment Events to WandB</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../single-agent/index.html">Single Agent Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multi-agent/index.html">Multi Agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/GDY/index.html">GDY Tutorial - Making Sokoban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/GDY%20Schema/index.html">GDY Schema Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Proximity%20Triggers/index.html">Proximity Triggers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Custom%20Shaders/index.html">Custom Shaders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Projectiles/index.html">Projectiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Stochasticity/index.html">Stochasticity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Level%20Design/index.html">Level Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/AStarSearch/index.html">A* Search</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/GDY/index.html">Griddy Description YAML</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Griddly</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Reinforcement Learning with RLLib</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/Bam4d/Griddly/blob/master/docs/rllib/intro/index.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="reinforcement-learning-with-rllib">
+<span id="doc-rllib-intro"></span><h1>Reinforcement Learning with RLLib<a class="headerlink" href="#reinforcement-learning-with-rllib" title="Permalink to this headline"></a></h1>
+<p>Griddly provides support for reinforcement learning using the <a class="reference external" href="https://docs.ray.io/en/latest/rllib.html">RLLib</a> reinforcement learning library.</p>
+<p>While RLLib doesn’t support OpenAI Gym registered environments, it does provide a similar interface which is supported by Griddly’s <code class="docutils literal notranslate"><span class="pre">RLLibEnv</span></code> environment.</p>
+<p>Griddly provides two classes, <code class="docutils literal notranslate"><span class="pre">RLLibEnv</span></code> and <code class="docutils literal notranslate"><span class="pre">RLLibMultiAgentWrapper</span></code> which abstract away all the tedious parts of wrapping environments for RL and leaves you to concentrate on training algorithms, designing networks and game mechanics.</p>
+<p>Examples for <a class="reference internal" href="../single-agent/index.html#doc-rllib-single-agent"><span class="std std-ref">single-agent</span></a> and <a class="reference internal" href="../multi-agent/index.html#doc-rllib-multi-agent"><span class="std std-ref">multi-agent</span></a> training are provided.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>All examples and networks are implemented using PyTorch. Some examples may be modified to work with Tensorflow, but we do not provide explicit support for Tensorflow.</p>
+</div>
+<section id="examples-setup">
+<h2>Examples Setup<a class="headerlink" href="#examples-setup" title="Permalink to this headline"></a></h2>
+<p>Griddly installs most of the dependencies for you automatically when it is installed, however you will need to install RLLlib and Pytorch to run the provided examples.</p>
+<p>You can install RLLib and pytorch using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ray<span class="o">[</span>rllib<span class="o">]==</span><span class="m">2</span>.1.0
+</pre></div>
+</div>
+</section>
+<section id="environment-parameters">
+<h2>Environment Parameters<a class="headerlink" href="#environment-parameters" title="Permalink to this headline"></a></h2>
+<p>Parameters for the environments, such as the <a class="reference internal" href="../../getting-started/gdy/index.html#doc-getting-started-gdy"><span class="std std-ref">GDY</span></a> file for the game and <a class="reference internal" href="../../getting-started/observation%20spaces/index.html#doc-observation-spaces"><span class="std std-ref">Observer options</span></a> can be sent to the environment using the <code class="docutils literal notranslate"><span class="pre">env_config</span></code> dictionary.</p>
+<p>Most of the parameters here are the same as the parameters that can be given to the <code class="docutils literal notranslate"><span class="pre">gym.make()</span></code> command when creating a <a class="reference internal" href="../../getting-started/gym/index.html#doc-getting-started-gym-advanced"><span class="std std-ref">Griddly environment for OpenAI Gym</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;env_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s1">&#39;yaml_file&#39;</span><span class="p">:</span> <span class="s1">&#39;Single-Player/GVGAI/clusters_partially_observable.yaml&#39;</span><span class="p">,</span>
+
+    <span class="s1">&#39;global_observer_type&#39;</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">ObserverType</span><span class="o">.</span><span class="n">SPRITE_2D</span><span class="p">,</span>
+    <span class="s1">&#39;record_video_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;frequency&#39;</span><span class="p">:</span> <span class="mi">100000</span>
+    <span class="p">},</span>
+
+    <span class="s1">&#39;random_level_on_reset&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;max_steps&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>The above example will also record a video of the environment (rendered using the <code class="docutils literal notranslate"><span class="pre">SPRITE_2D</span></code> renderer) for one episode every 100000 steps.
+Finally the max_steps of the environment will be override to be 1000 steps before the environment is reset automatically.</p>
+</section>
+<section id="level-randomization">
+<h2>Level Randomization<a class="headerlink" href="#level-randomization" title="Permalink to this headline"></a></h2>
+<p>Partially observable games have a fixed observations space regardless of the size of the levels. Additionally several games have levels of fixed size.</p>
+<p>With these games, the level can be randomized at the end of every episode using the <code class="docutils literal notranslate"><span class="pre">random_level_on_reset</span></code> option in the <code class="docutils literal notranslate"><span class="pre">env_config</span></code> section of RLLib’s config.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;env_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+
+    <span class="s1">&#39;random_level_on_reset&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>If this is set to true then the agent will be placed in one of the random levels described in the GDY file each time the episode restarts.</p>
+</section>
+<section id="agents">
+<h2>Agents<a class="headerlink" href="#agents" title="Permalink to this headline"></a></h2>
+<p>We provide a few custom agent models that can be used with any Griddly environment.</p>
+<section id="simple-convolutional-agent">
+<span id="simple-conv-agent"></span><h3>Simple Convolutional agent<a class="headerlink" href="#simple-convolutional-agent" title="Permalink to this headline"></a></h3>
+<p>The simple convolutional agent stacks three convolutional layers that preserve the size of the input. After these layers the representation is flattened and linear layers are then used for the actor and critic heads.</p>
+<p>To use <code class="docutils literal notranslate"><span class="pre">SimpleConvAgent</span></code>, register the custom model with RLLib and then use it in your training <code class="docutils literal notranslate"><span class="pre">config</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ModelCatalog</span><span class="o">.</span><span class="n">register_custom_model</span><span class="p">(</span><span class="s1">&#39;SimpleConv&#39;</span><span class="p">,</span> <span class="n">SimpleConvAgent</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;custom_model&#39;</span><span class="p">:</span> <span class="s1">&#39;SimpleConv&#39;</span>
+        <span class="s1">&#39;custom_model_config&#39;</span><span class="p">:</span> <span class="o">.....</span>
+    <span class="p">}</span>
+
+    <span class="o">...</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="simpleconvagent">
+<h4>SimpleConvAgent<a class="headerlink" href="#simpleconvagent" title="Permalink to this headline"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SimpleConvAgent</span><span class="p">(</span><span class="n">TorchModelV2</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Simple Convolution agent that calculates the required linear output layer</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_space</span><span class="p">,</span> <span class="n">action_space</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">obs_space</span><span class="p">,</span> <span class="n">action_space</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_objects</span> <span class="o">=</span> <span class="n">obs_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_actions</span> <span class="o">=</span> <span class="n">num_outputs</span>
+
+        <span class="n">linear_flatten</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">obs_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mi">64</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_objects</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(),</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">linear_flatten</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">512</span><span class="p">)),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actor_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_actions</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_critic_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">seq_lens</span><span class="p">):</span>
+        <span class="n">obs_transformed</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">network_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">obs_transformed</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_critic_head</span><span class="p">(</span><span class="n">network_output</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_head</span><span class="p">(</span><span class="n">network_output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">value_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="global-average-pooling">
+<span id="gap-agent"></span><h3>Global Average Pooling<a class="headerlink" href="#global-average-pooling" title="Permalink to this headline"></a></h3>
+<p>Griddly environments’ observation spaces can differ between games, levels and visualization options. In order to handle this in a generic way using neural networks, we provide a Global Average Pooling agent <cite>GAPAgent</cite>, which can be used with any 2D environment with no additional configuration.</p>
+<p>All you need to do is register the custom model with RLLib and then use it in your training <code class="docutils literal notranslate"><span class="pre">config</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ModelCatalog</span><span class="o">.</span><span class="n">register_custom_model</span><span class="p">(</span><span class="s1">&#39;GAP&#39;</span><span class="p">,</span> <span class="n">GAPAgent</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;custom_model&#39;</span><span class="p">:</span> <span class="s1">&#39;GAP&#39;</span>
+        <span class="s1">&#39;custom_model_config&#39;</span><span class="p">:</span> <span class="o">.....</span>
+    <span class="p">}</span>
+
+    <span class="o">...</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="gapagent">
+<h4>GAPAgent<a class="headerlink" href="#gapagent" title="Permalink to this headline"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">GAPAgent</span><span class="p">(</span><span class="n">TorchModelV2</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Global Average Pooling Agent</span>
+<span class="sd">This is the same agent used in https://arxiv.org/abs/2011.06363.</span>
+
+<span class="sd">Global average pooling is a simple way to allow training grid-world environments regardless o the size of the grid.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_space</span><span class="p">,</span> <span class="n">action_space</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">obs_space</span><span class="p">,</span> <span class="n">action_space</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span> <span class="n">model_config</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_num_objects</span> <span class="o">=</span> <span class="n">obs_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_num_actions</span> <span class="o">=</span> <span class="n">num_outputs</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_objects</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+        <span class="n">GlobalAvePool</span><span class="p">(</span><span class="mi">2048</span><span class="p">),</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2048</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">512</span><span class="p">)),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_actor_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_actions</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_critic_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="n">layer_init</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">seq_lens</span><span class="p">):</span>
+    <span class="n">obs_transformed</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">network_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">obs_transformed</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_critic_head</span><span class="p">(</span><span class="n">network_output</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_head</span><span class="p">(</span><span class="n">network_output</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">state</span>
+
+<span class="k">def</span> <span class="nf">value_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>You can read more about agents that use Global Average Pooling here: <a class="reference external" href="https://arxiv.org/abs/2005.11247">https://arxiv.org/abs/2005.11247</a></p>
+</div>
+</section>
+</section>
+</section>
+<section id="recording-videos">
+<h2>Recording Videos<a class="headerlink" href="#recording-videos" title="Permalink to this headline"></a></h2>
+<p>Griddly can automatically record videos during training by placing the <code class="docutils literal notranslate"><span class="pre">record_video_config</span></code> dictionary into the standard RLLib <code class="docutils literal notranslate"><span class="pre">env_config</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;env_config&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;record_video_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;frequency&#39;</span><span class="p">:</span> <span class="mi">20000</span>
+        <span class="s1">&#39;directory&#39;</span><span class="p">:</span> <span class="s1">&#39;/home/griddlyuser/my_experiment_videos&#39;</span>
+        <span class="s1">&#39;include_global&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;include_agents&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>the <code class="docutils literal notranslate"><span class="pre">directory</span></code> value must be an absolute path, as the working directory of workers is controlled by Ray.</p>
+</div>
+<p>Videos can be recorded from the perspective of the agent and the perspective of the global observer. <code class="docutils literal notranslate"><span class="pre">include_global</span></code> and <code class="docutils literal notranslate"><span class="pre">include_agents</span></code> will set which videos are recorded.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For more information on how to configure observers see <a class="reference internal" href="../../getting-started/observation%20spaces/index.html#doc-observation-spaces"><span class="std std-ref">Observation Spaces</span></a></p>
+</div>
+<p>The triggering of videos is configured using the <code class="docutils literal notranslate"><span class="pre">frequency</span></code> variable. The <code class="docutils literal notranslate"><span class="pre">frequency</span></code> variable refers to the number of steps in each environment that pass before the recording is triggered.</p>
+<p>Once triggered, the next episode is recorded in full. Videos of episodes are recorded on the first environment in every worker in RLLib.</p>
+<section id="uploading-videos-to-wandb">
+<h3>Uploading Videos to WandB<a class="headerlink" href="#uploading-videos-to-wandb" title="Permalink to this headline"></a></h3>
+<p>To automatically upload videos to WandB, the <code class="docutils literal notranslate"><span class="pre">VideoCallback</span></code> can be set in the RLLib config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="o">...</span><span class="p">,</span>
+
+    <span class="s1">&#39;callbacks&#39;</span><span class="p">:</span> <span class="n">VideoCallback</span><span class="p">,</span>
+
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="recording-environment-actions">
+<h2>Recording Environment Actions<a class="headerlink" href="#recording-environment-actions" title="Permalink to this headline"></a></h2>
+<figure class="align-center" id="id1">
+<img alt="../../_images/agent_info_example.png" src="../../_images/agent_info_example.png" />
+<figcaption>
+<p><span class="caption-text">An example of logged events for each agent in an environment during training. Can help to diagnose problems with reward shaping and track exploration.</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>Griddly’s RLLib integration hooks into the <a class="reference internal" href="../../getting-started/observation%20spaces/index.html#event-history"><span class="std std-ref">Event History</span></a> and records all the frequency of the actions that are being taken by agents during training.
+This event history can then be picked up in the agent’s <code class="docutils literal notranslate"><span class="pre">info</span></code> in RLLib’s callback methods, e,g <code class="docutils literal notranslate"><span class="pre">on_episode_step</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;env_config&#39;</span><span class="p">:</span>
+     <span class="s1">&#39;record_actions&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="uploading-environment-events-to-wandb">
+<h3>Uploading Environment Events to WandB<a class="headerlink" href="#uploading-environment-events-to-wandb" title="Permalink to this headline"></a></h3>
+<p>To automatically upload action events to WandB, the <code class="docutils literal notranslate"><span class="pre">ActionTrackerCallback</span></code> can be set in the RLLib config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="o">...</span><span class="p">,</span>
+
+    <span class="s1">&#39;callbacks&#39;</span><span class="p">:</span> <span class="n">ActionTrackerCallback</span><span class="p">,</span>
+
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../games/Robot_Tag_4v4/index.html" class="btn btn-neutral float-left" title="Robot Tag 4v4" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../single-agent/index.html" class="btn btn-neutral float-right" title="Single Agent Games" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Chris Bamford.
+      <span class="commit">Revision <code>63c45656</code>.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+  
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

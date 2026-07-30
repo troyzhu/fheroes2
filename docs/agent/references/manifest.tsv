@@ -1,0 +1,45 @@
+file	status	bytes	title_or_note	url
+arxiv-1708.04782.pdf	OK	2070901	StarCraft II: A New Challenge for Reinforcement Learning	https://arxiv.org/abs/1708.04782
+arxiv-2105.13807.pdf	OK	1685475	Gym-$μ$RTS: Toward Affordable Full Game Real-time Strategy Games Research with Deep Reinforcement Learning	https://arxiv.org/abs/2105.13807
+arxiv-2006.14171.pdf	OK	1010251	A Closer Look at Invalid Action Masking in Policy Gradient Algorithms	https://arxiv.org/abs/2006.14171
+arxiv-2011.06363.pdf	OK	385429	Griddly: A platform for AI research in games	https://arxiv.org/abs/2011.06363
+arxiv-2006.13760.pdf	OK	4745588	The NetHack Learning Environment	https://arxiv.org/abs/2006.13760
+arxiv-1912.06680.pdf	OK	8811456	Dota 2 with Large Scale Deep Reinforcement Learning	https://arxiv.org/abs/1912.06680
+arxiv-2206.02855.pdf	OK	362186	Efficient entity-based reinforcement learning	https://arxiv.org/abs/2206.02855
+arxiv-2105.11674.pdf	OK	1050966	Unbiased Asymmetric Reinforcement Learning under Partial Observability	https://arxiv.org/abs/2105.11674
+arxiv-1710.06542.pdf	OK	4752351	Asymmetric Actor Critic for Image-Based Robot Learning	https://arxiv.org/abs/1710.06542
+arxiv-2110.05038.pdf	OK	12623506	Recurrent Model-Free RL Can Be a Strong Baseline for Many POMDPs	https://arxiv.org/abs/2110.05038
+arxiv-2308.03526.pdf	OK	1002417	AlphaStar Unplugged: Large-Scale Offline Reinforcement Learning	https://arxiv.org/abs/2308.03526
+arxiv-2104.06890.pdf	OK	1901271	An Introduction of mini-AlphaStar	https://arxiv.org/abs/2104.06890
+arxiv-2009.05643.pdf	OK	465878	The Design Of &#34;Stratega&#34;: A General Strategy Games Framework	https://arxiv.org/abs/2009.05643
+arxiv-1811.06447.pdf	OK	1157999	Adversarial Resilience Learning - Towards Systemic Vulnerability Analysis for Large and Complex Systems	https://arxiv.org/abs/1811.06447
+arxiv-2410.17647.pdf	OK	932799	Entity-based Reinforcement Learning for Autonomous Cyber Defence	https://arxiv.org/abs/2410.17647
+arxiv-2104.03113.pdf	OK	465709	Scaling Scaling Laws with Board Games	https://arxiv.org/abs/2104.03113
+arxiv-2305.19240.pdf	OK	7169379	NetHack is Hard to Hack	https://arxiv.org/abs/2305.19240
+arxiv-2607.06514.pdf	OK	1926018	FootsiesGym: A Fighting Game Benchmark for Two-Player Zero-Sum Imperfect-Information Games	https://arxiv.org/abs/2607.06514
+pysc2-environment.md	OK	25470	-	https://raw.githubusercontent.com/google-deepmind/pysc2/master/docs/environment.md
+pysc2-README.md	OK	8665	-	https://raw.githubusercontent.com/google-deepmind/pysc2/master/README.md
+alphastar-detailed-architecture.txt	OK	26608	-	https://raw.githubusercontent.com/chengyu2/learning_alpha_star/master/detailed-architecture.txt
+vcmi-gym-README.md	OK	4930	-	https://raw.githubusercontent.com/smanolloff/vcmi-gym/main/README.md
+microrts-py-README.md	OK	14379	-	https://raw.githubusercontent.com/Farama-Foundation/MicroRTS-Py/master/README.md
+entity-gym-README.md	OK	1974	-	https://raw.githubusercontent.com/entity-neural-network/entity-gym/main/README.md
+rogue-net-README.md	OK	716	-	https://raw.githubusercontent.com/entity-neural-network/rogue-net/main/README.md
+nle-README.md	OK	12766	-	https://raw.githubusercontent.com/heiner/nle/main/README.md
+griddly-README.md	OK	9916	-	https://raw.githubusercontent.com/Bam4d/Griddly/develop/README.md
+arlinbfw-README.md	OK	6535	-	https://raw.githubusercontent.com/DStelter94/ARLinBfW/master/README.md
+sample-factory-README.md	OK	11518	-	https://raw.githubusercontent.com/alex-petrenko/sample-factory/master/README.md
+lux-ai-2021-winner-README.md	OK	20750	-	https://raw.githubusercontent.com/IsaiahPressman/Kaggle_Lux_AI_2021/main/README.md
+mmai-README.md	OK	2377	-	https://raw.githubusercontent.com/vcmi-mods/mmai/vcmi-1.7/README.md
+invalid-action-masking-README.md	FAILED	0	-	https://raw.githubusercontent.com/vwxyzjn/invalid-action-masking/master/README.md
+vcmi-gym-blog.html	OK	146245	-	https://smanolloff.github.io/projects/vcmi-gym/
+stratega-page.html	OK	39788	-	https://gaigresearch.github.io/2020/06/15/dockhorn2020stratega/
+sb3-maskable-ppo.html	OK	95410	-	https://sb3-contrib.readthedocs.io/en/master/modules/ppo_mask.html
+ppo-implementation-details.html	OK	174806	-	https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+entity-based-rl-blog.html	OK	244844	-	https://clemenswinter.com/2023/04/14/entity-based-reinforcement-learning/
+alphastar-deepmind-blog.html	OK	153576	-	https://deepmind.google/blog/alphastar-grandmaster-level-in-starcraft-ii-using-multi-agent-reinforcement-learning/
+alphastar-nature-landing.html	OK	415260	-	https://www.nature.com/articles/s41586-019-1724-z
+griddly-observation-spaces.html	OK	38008	-	https://griddly.readthedocs.io/en/latest/getting-started/observation%20spaces/index.html
+griddly-rllib-intro.html	OK	44595	-	https://griddly.readthedocs.io/en/latest/rllib/intro/index.html
+minihack-observation-spaces.html	OK	31837	-	https://minihack.readthedocs.io/en/latest/getting-started/observation_spaces.html
+nle-revisited-blog.html	OK	41567	-	https://iclr-blogposts.github.io/2026/blog/2026/revisiting-the-nle/
+alphastar-unformatted.pdf	OK	2140290	-	https://storage.googleapis.com/deepmind-media/research/alphastar/AlphaStar_unformatted.pdf

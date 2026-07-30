@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>STRATEGA: A General Strategy Games Framework</title>
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="/favicon.ico?" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico?" type="image/x-icon">
+    <!--<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">-->
+    <link rel="stylesheet" href="https://at.alicdn.com/t/font_8v3czwksspqlg14i.css">
+    <link rel="stylesheet" href="/css/main.css ">
+    <link rel="canonical" href="https://GAIGResearch.github.io/2020/06/15/dockhorn2020stratega/">
+    <link rel="alternate" type="application/rss+xml" title="GAIG" href="https://GAIGResearch.github.io/feed.xml ">
+	
+	<script src="https://kit.fontawesome.com/3a5605ae4b.js"></script>
+
+
+
+
+
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">GAIG</a>
+        <small>Game AI Research Group @ QMUL</small>
+        <button id="headerMenu" class="menu"><i class="fas fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fas fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/about/">
+                        
+                            <i class="fas fa-heart"></i>About
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/members/">
+                        
+                            <i class="fas fa-users"></i>Members
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/projects/">
+                        
+                            <i class="fas fa-project-diagram"></i>Projects
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <h1>STRATEGA: A General Strategy Games Framework</h1>
+        <div class="label">
+
+            <div class="label-card">
+				
+                <i class="fas fa-calendar"></i>2020
+				
+            </div>
+
+            <div class="label-card">
+                
+			
+					<!-- Find names of all group members -->
+					
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						  <!-- ignore externals -->
+							
+						
+					
+						
+					
+						
+					 
+					<!-- Compute author string, with highlighted authors from the group -->
+					
+					
+					
+						
+					<!-- Look for all authors in the split author list. Authors MUST be divided by ' and '. -->
+					
+						
+						
+						
+						<!-- First try to find the exact spelling from the author list in the list of group members -->
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+						
+						<!-- If unsuccessful, try to look for each name in each member and allow one name from the member's profile to be mising -->
+						 
+							
+							  <!-- Increase this if a bigger difference in name should be allowed -->
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+						
+					
+						
+						
+						
+						<!-- First try to find the exact spelling from the author list in the list of group members -->
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+						
+						<!-- If unsuccessful, try to look for each name in each member and allow one name from the member's profile to be mising -->
+						 
+							
+							  <!-- Increase this if a bigger difference in name should be allowed -->
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+						
+					
+						
+						
+						
+						<!-- First try to find the exact spelling from the author list in the list of group members -->
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+						
+						<!-- If unsuccessful, try to look for each name in each member and allow one name from the member's profile to be mising -->
+						 
+							
+							  <!-- Increase this if a bigger difference in name should be allowed -->
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									  <!-- size bigger than 2 to ignore initials -->
+										
+									
+								
+									  <!-- size bigger than 2 to ignore initials -->
+										
+									
+								
+								
+								 <!-- This author is a member of the group -->
+									
+									
+									
+						
+					
+						
+						
+						
+						<!-- First try to find the exact spelling from the author list in the list of group members -->
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+							
+							
+						
+						
+						<!-- If unsuccessful, try to look for each name in each member and allow one name from the member's profile to be mising -->
+						 
+							
+							  <!-- Increase this if a bigger difference in name should be allowed -->
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									
+								
+									
+								
+									
+								
+								
+								
+							
+								  <!-- Found keeps track of how many names we've found to match this member -->
+								<!-- Ignore special characters -->
+								  
+								
+									  <!-- size bigger than 2 to ignore initials -->
+										
+									
+								
+									  <!-- size bigger than 2 to ignore initials -->
+										
+									
+								
+									  <!-- size bigger than 2 to ignore initials -->
+										
+									
+								
+								
+								 <!-- This author is a member of the group -->
+									
+									
+									
+						
+					
+						
+					<!-- Highlight all authors that are members of the group. Link to their profile page in the website -->
+					
+					
+					
+						  <!-- This is how the author appears in the author list -->
+						  <!-- This is the author's member page -->
+						  <!-- Decompose string to insert html for the author -->
+						
+						
+					
+						  <!-- This is how the author appears in the author list -->
+						  <!-- This is the author's member page -->
+						  <!-- Decompose string to insert html for the author -->
+						
+						
+					
+					<!-- end compute author string -->
+				
+				<i class="fas fa-user"></i>Dockhorn, Alexander and Grueso, Jorge Hurtado and <a href='/members/Dominik-Jeurissen' target='_blank'>Jeurissen, Dominik</a> and <a href='/members/Diego-Perez-Liebana' target='_blank'>Liebana, Diego Perez</a></a>
+				
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fas fa-th-list"></i>
+  
+    
+        <a href="/category/#Publications" title="Category: Publications" rel="category">Publications</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+
+            </div>
+
+            <div class="label-card">
+            
+<!-- <span class="point">•</span> -->
+<span class="pageTag">
+  <i class="fas fa-tags"></i>
+  
+    
+        <!--a href="/tag/#pubs-2020" title="Tag: pubs-2020" rel="tag">pubs-2020</a-->
+        <a href="/tag/#pubs-2020" title="Tag: pubs-2020" rel="tag">pubs-2020</a>&nbsp;
+    
+        <!--a href="/tag/#aiide" title="Tag: aiide" rel="tag">aiide</a-->
+        <a href="/tag/#aiide" title="Tag: aiide" rel="tag">aiide</a>&nbsp;
+    
+        <!--a href="/tag/#strategy-games" title="Tag: strategy-games" rel="tag">strategy-games</a-->
+        <a href="/tag/#strategy-games" title="Tag: strategy-games" rel="tag">strategy-games</a>&nbsp;
+    
+        <!--a href="/tag/#general-video-game-playing" title="Tag: general-video-game-playing" rel="tag">general-video-game-playing</a-->
+        <a href="/tag/#general-video-game-playing" title="Tag: general-video-game-playing" rel="tag">general-video-game-playing</a>&nbsp;
+    
+        <!--a href="/tag/#rhea" title="Tag: rhea" rel="tag">rhea</a-->
+        <a href="/tag/#rhea" title="Tag: rhea" rel="tag">rhea</a>&nbsp;
+    
+        <!--a href="/tag/#mcts" title="Tag: mcts" rel="tag">mcts</a-->
+        <a href="/tag/#mcts" title="Tag: mcts" rel="tag">mcts</a>
+    
+  
+
+</span>
+
+            </div>
+
+        </div>
+        <hr>
+
+        
+        
+
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        
+
+        </article>
+		
+		
+			
+				<h2>Abstract</h2>
+				
+				Strategy games are complex environments often used in AIresearch to evaluate new algorithms. Despite the commonalities of most strategy games, often research is focused on one game only, which may lead to bias or overfitting to a particular environment. In this paper, we motivate and present STRATEGA - a general strategy games framework for playing n-player turn-based and real-time strategy games. The platform currently implements turn-based games, which can be configured via YAML-files. It exposes an API with access to a forward model to facilitate research on statistical forward planning agents. The framework and agents can log information during games for analysing and debugging algorithms. We also present some sample rule-based agents, as well as search-based agents like Monte Carlo Tree Search and Rolling Horizon Evolution, and quantitatively analyse their performance to demonstrate the use of the framework. Results, although purely illustrative, show the known problems that traditional search-based agents have when dealing with high branching factors in these games.
+			
+			
+			<hr>
+			
+			<!-- Arxiv link -->
+			
+			<!-- Link to pdf if on website -->
+			
+			
+			
+			<!-- GitHub repo link -->
+			<i class="fab fa-github"></i> Github: <a href="https://github.com/GAIGResearch/stratega" target="_blank">https://github.com/GAIGResearch/stratega</a>&nbsp; <br/>
+			
+				
+			
+			
+			
+			
+			<!-- Link to presentation pdf if on website -->
+			
+			<!-- Link to presentation ppt if on website -->
+			
+			<!-- Youtube link -->
+			
+			
+			<h2><i class="fas fa-quote-right"></i> Cite this work</h2>
+			
+			
+			
+			<code style="display:block">
+			@inproceedings&#123;dockhorn2020stratega,<br/>
+			<span style="margin:10px;">author= &#123;Dockhorn, Alexander and Grueso, Jorge Hurtado and Jeurissen, Dominik and Liebana, Diego Perez&#125;,</span><br/>
+			<span style="margin:10px;">title= &#123;&#123;STRATEGA: A General Strategy Games Framework&#125;&#125;,</span><br/>
+			<span style="margin:10px;">year= &#123;2020&#125;,</span><br/>
+			
+			 <span style="margin:10px;">booktitle= &#123;&#123;AIIDE-20 Workshop on Artificial Intelligence for Strategy Games&#125;&#125;,</span><br/> 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			 <span style="margin:10px;">abstract= &#123;Strategy games are complex environments often used in AIresearch to evaluate new algorithms. Despite the commonalities of most strategy games, often research is focused on one game only, which may lead to bias or overfitting to a particular environment. In this paper, we motivate and present STRATEGA - a general strategy games framework for playing n-player turn-based and real-time strategy games. The platform currently implements turn-based games, which can be configured via YAML-files. It exposes an API with access to a forward model to facilitate research on statistical forward planning agents. The framework and agents can log information during games for analysing and debugging algorithms. We also present some sample rule-based agents, as well as search-based agents like Monte Carlo Tree Search and Rolling Horizon Evolution, and quantitatively analyse their performance to demonstrate the use of the framework. Results, although purely illustrative, show the known problems that traditional search-based agents have when dealing with high branching factors in these games.&#125;,</span><br/> 
+			}
+			</code>
+			
+			
+		
+		
+        <hr>
+
+        
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+            
+            
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+        
+			<a href="/2020/06/15/dockhorn2020local/"><strong>< Previous</strong></a>
+        
+    </div>
+    <div class="nex">
+        
+			<a href="/2020/06/15/gaina2020onlinerhea/"><strong>Next ></strong> </a>
+        
+    </div>
+</div>
+
+
+        <h2 id="comments">Comments</h2>
+        
+
+
+
+
+
+    </div>
+    <button class="anchor"><i class="fas fa-anchor"></i></button>
+    <div class="right">
+        <div class="wrap">
+
+            <!-- Content -->
+            <div class="side content">
+                <div>
+                    Content
+                </div>
+                <ul id="content-side" class="content-ul">
+                    
+                    <li><a href="#comments">Comments</a></li>
+                </ul>
+            </div>
+            <!-- <div class="side">bbbb</div> -->
+        </div>
+    </div>
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+            
+        </p>
+        <p class="contact">
+            Contact us at: 
+            <a href="https://github.com/GAIGResearch" title="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/GameAI_QMUL" title="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://youtube.com/channel/UCr58-7eDABnsOc0_c13-ILQ" title="Youtube"><i class="fab fa-youtube" aria-hidden="true"></i></a>     
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a> & <a href="https://pages.github.com/">Github Pages</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <div class="back-to-top">
+    <a href="#top" data-scroll>
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/smooth-scroll.min.js " charset="utf-8"></script>
+    <script type="text/javascript">
+      smoothScroll.init({
+        speed: 500, // Integer. How fast to complete the scroll in milliseconds
+        easing: 'easeInOutCubic', // Easing pattern to use
+        offset: 20, // Integer. How far to offset the scrolling anchor location in pixels
+      });
+    </script>
+    <!-- <script src=" /js/scroll.min.js " charset="utf-8"></script> -->
+  </body>
+
+</html>

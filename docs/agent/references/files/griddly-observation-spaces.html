@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Observation Spaces &mdash; Griddly 1.6.7 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" type="text/css" />
+    <link rel="canonical" href="https://griddly.readthedocs.io/en/latest/getting-started/observation spaces/index.html" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script src="../../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
+        <script src="../../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
+        
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Visualization" href="../visualization/index.html" />
+    <link rel="prev" title="Action Spaces" href="../action%20spaces/index.html" /> 
+
+<!-- RTD Extra Head -->
+
+
+
+<script type="application/json" id="READTHEDOCS_DATA">{"ad_free": false, "api_host": "https://readthedocs.org", "build_date": "2023-03-16T11:30:17Z", "builder": "sphinx", "canonical_url": null, "commit": "63c45656", "docroot": "/docs/", "features": {"docsearch_disabled": false}, "global_analytics_code": "UA-17997319-1", "language": "en", "page": "getting-started/observation spaces/index", "programming_language": "cpp", "project": "griddly", "proxied_api_host": "/_", "source_suffix": ".rst", "subprojects": {}, "theme": "sphinx_rtd_theme", "user_analytics_code": "UA-220539420-1", "version": "latest"}</script>
+
+<!--
+Using this variable directly instead of using `JSON.parse` is deprecated.
+The READTHEDOCS_DATA global variable will be removed in the future.
+-->
+<script type="text/javascript">
+READTHEDOCS_DATA = JSON.parse(document.getElementById('READTHEDOCS_DATA').innerHTML);
+</script>
+
+
+
+<!-- end RTD <extrahead> -->
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="griddly" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/getting-started/observation%20spaces/index.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Griddly
+          </a>
+              <div class="version">
+                latest
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/community.html">Community</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/halloffame.html">Hall of Fame</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/artwork.html">Artwork</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gym/index.html">OpenAI Gym Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gdy/index.html">Griddly Description YAML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../action%20spaces/index.html">Action Spaces</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Observation Spaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-an-observer">What is an <strong>Observer</strong>?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#single-agent-observations">Single Agent Observations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multi-agent-observations">Multi-Agent Observations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pixels">Pixels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vector">Vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#semantic-state">Semantic State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#event-history">Event History</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization/index.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../procedural%20content%20generation/index.html">Procedural Content Generation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Games</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../games/index.html">Single-Player</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/index.html#rts">RTS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../games/index.html#multi-agent">Multi-Agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reinforcement learning</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../rllib/intro/index.html">Reinforcement Learning with RLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rllib/single-agent/index.html">Single Agent Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rllib/multi-agent/index.html">Multi Agent</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/GDY/index.html">GDY Tutorial - Making Sokoban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/GDY%20Schema/index.html">GDY Schema Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Proximity%20Triggers/index.html">Proximity Triggers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Custom%20Shaders/index.html">Custom Shaders</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Projectiles/index.html">Projectiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Stochasticity/index.html">Stochasticity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/Level%20Design/index.html">Level Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/AStarSearch/index.html">A* Search</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/GDY/index.html">Griddy Description YAML</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Griddly</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Observation Spaces</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/Bam4d/Griddly/blob/master/docs/getting-started/observation spaces/index.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="observation-spaces">
+<span id="doc-observation-spaces"></span><h1>Observation Spaces<a class="headerlink" href="#observation-spaces" title="Permalink to this headline"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<p>Observation spaces in Griddly are highly configurable. In addition to providing pixel-based and vector-based states of environments, Griddly also provides methods of accessing semantic information about the game state itself, such as state data and event history. For pixel and vector-based representations Griddly provides different <strong>observers</strong>.</p>
+<section id="what-is-an-observer">
+<h3>What is an <strong>Observer</strong>?<a class="headerlink" href="#what-is-an-observer" title="Permalink to this headline"></a></h3>
+<p>An <strong>observer</strong> in Griddly converts the state of an environment to something that is consumable by a machine learning algorithm. It effectively <cite>creates</cite> the observations. In Griddly there are many different options for creating observations. This page will outline how all of these methods can be used.</p>
+<p>Every environment in Griddly has at least two configurable observers; the <strong>player</strong> observer(s) and the <strong>global</strong> observer.</p>
+<figure class="align-center" id="id2">
+<img alt="../../_images/GriddlyPO.png" src="../../_images/GriddlyPO.png" />
+<figcaption>
+<p><span class="caption-text">The “Spider Nest” environment with an isometric player observer (inset) and isometric global observer configured.</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>The <strong>player</strong> observer(s) are what the agent in the environment <cite>sees</cite>. The agent might be able to see only a small area around itself (this is known as egocentric partial observability), or it might be able to see the entire environment.</p>
+<p>The <strong>global</strong> observer always gives a view of the entire environment regardless of the number of players and and size of the environment.</p>
+<p>Both observers have a standard OpenAI Gym observation space which can be accessed with <code class="docutils literal notranslate"><span class="pre">env.observation_space</span></code> describing the player observation space and <code class="docutils literal notranslate"><span class="pre">env.global_observation_space</span></code> describing the global observation space.</p>
+</section>
+<section id="single-agent-observations">
+<h3>Single Agent Observations<a class="headerlink" href="#single-agent-observations" title="Permalink to this headline"></a></h3>
+<p>The observations for environments where a single avatar is being controlled are returned in the following way:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+<span class="c1"># obs = np.array([ ... ]) # Player observation</span>
+
+<span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
+
+<span class="c1"># obs = np.array([ ... ]) # Player observation</span>
+</pre></div>
+</div>
+</section>
+<section id="multi-agent-observations">
+<h3>Multi-Agent Observations<a class="headerlink" href="#multi-agent-observations" title="Permalink to this headline"></a></h3>
+<p>When there are multiple agents in an environment the <code class="docutils literal notranslate"><span class="pre">env.reset(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">env.step(...)</span></code> functions will return the observations of all the of agents as an array of <code class="docutils literal notranslate"><span class="pre">np.array</span></code> objects. Each observation in the array will be consistent with the shape of <code class="docutils literal notranslate"><span class="pre">env.observation_shape</span></code>.</p>
+<p>As an example in an environment with 2 players, the result of <code class="docutils literal notranslate"><span class="pre">env.reset(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">env.step(...)</span></code> will be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+<span class="c1">#  obs = [</span>
+<span class="c1">#    np.array([ ... ]), # Player 1 observation</span>
+<span class="c1">#    np.array([ ... ]) # Player 2 observation</span>
+<span class="c1"># ]</span>
+
+<span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">([</span> <span class="o">...</span> <span class="p">])</span>
+
+<span class="c1">#  obs = [</span>
+<span class="c1">#    np.array([ ... ]), # Player 1 observation</span>
+<span class="c1">#    np.array([ ... ]) # Player 2 observation</span>
+<span class="c1"># ]</span>
+</pre></div>
+</div>
+<p>The global observer can also be returned in the <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> function by setting the <code class="docutils literal notranslate"><span class="pre">global_observations</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">True</span></code>. In this case a dictionary is returned with the <code class="docutils literal notranslate"><span class="pre">global</span></code> and <code class="docutils literal notranslate"><span class="pre">player</span></code> keys for both observation types.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">global_observations</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1">#  obs = {</span>
+<span class="c1">#      &#39;global&#39;: np.array([ ... ]), # Global observation</span>
+<span class="c1">#      &#39;player&#39;: [</span>
+<span class="c1">#        np.array([ ... ]), # Player 1 observation</span>
+<span class="c1">#        np.array([ ... ]) # Player 2 observation</span>
+<span class="c1">#     ]</span>
+<span class="c1"># }</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pixels">
+<h2>Pixels<a class="headerlink" href="#pixels" title="Permalink to this headline"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For pixel-based observers, each object must define how it should be rendered with an <a class="reference internal" href="../../reference/GDY/Objects/items/Observers/index.html#properties-objects-items-properties-observers"><span class="std std-ref">Observer Configuration</span></a></p>
+</div>
+<p>The observer type can be chosen when creating the environment with <code class="docutils literal notranslate"><span class="pre">gym.make()</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+  <span class="s1">&#39;GDY-MyEnvironmentName-v0&#39;</span><span class="p">,</span>
+  <span class="n">player_observer_type</span><span class="o">=</span><span class="n">XXX</span><span class="p">,</span>
+  <span class="n">global_observer_type</span><span class="o">=</span><span class="n">YYY</span>
+  <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The options for both the <code class="docutils literal notranslate"><span class="pre">player_observer_type</span></code> and <code class="docutils literal notranslate"><span class="pre">global_observer_type</span></code> are given below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">gd.ObserverType.BLOCK_2D</dt>
+<dd class="field-odd"><p>Renders sprites defined by the GDY object <cite>Block2D</cite> descriptions.</p>
+</dd>
+</dl>
+<img alt="../../_images/Spiders-level-Block2D-22.png" src="../../_images/Spiders-level-Block2D-22.png" />
+<dl class="field-list simple">
+<dt class="field-odd">gd.ObserverType.SPRITE_2D</dt>
+<dd class="field-odd"><p>Renders sprites defined by the GDY object <cite>Sprite2D</cite> descriptions.</p>
+</dd>
+</dl>
+<img alt="../../_images/Spiders-level-Sprite2D-22.png" src="../../_images/Spiders-level-Sprite2D-22.png" />
+<dl class="field-list simple">
+<dt class="field-odd">gd.ObserverType.ISOMETRIC</dt>
+<dd class="field-odd"><p>Renders sprites defined by the GDY object <cite>Isometric</cite> descriptions.</p>
+</dd>
+</dl>
+<img alt="../../_images/Spiders-level-Isometric-22.png" src="../../_images/Spiders-level-Isometric-22.png" />
+</section>
+<section id="vector">
+<span id="vector-observer"></span><h2>Vector<a class="headerlink" href="#vector" title="Permalink to this headline"></a></h2>
+<p>Vector observers will return a tensor of shape [<em>objects, player ids, object_rotation, variables</em>, <em>width</em>, <em>height</em>] where each value is either 0 or 1 denoting that there is an object of that type in a particular location.</p>
+<p>The data contained in the cell can be configured using the vector options in the <a class="reference internal" href="../../reference/GDY/Environment/Observers/Vector/index.html#properties-environment-properties-observers-properties-vector"><span class="std std-ref">GDY observer configuration</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Objects</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<p>Each cell always contains a multi-label representation of whether an object is present (1) in that cell or not (0).</p>
+<p>The order of the object index in each [x,y] location can be retrieved by calling <code class="docutils literal notranslate"><span class="pre">env.game.get_object_names()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">IncludePlayerId</dt>
+<dd class="field-odd"><p>If this option is set, each cell of the observation tensor also contains a one-hot representation of which player an object belongs to.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In multi-agent scenarios, every agent sees themselves as player 1.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">IncludeRotation</dt>
+<dd class="field-odd"><p>This option appends a one-hot to the cell representing the rotation of the object at that position.</p>
+</dd>
+<dt class="field-even">IncludeVariables</dt>
+<dd class="field-even"><p>If set, the local variables of each object are provided. The order of the variables can be retrieved by calling <code class="docutils literal notranslate"><span class="pre">env.game.get_object_variable_names()</span></code></p>
+</dd>
+</dl>
+<p>As an example, in an 5x5 environment that has three types of object: <cite>avatar</cite>, <cite>wall</cite> and <cite>goal</cite> and no other options are set:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obs_shape</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span>
+
+<span class="c1"># obs_shape == (3,5,5)</span>
+
+<span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
+
+<span class="c1"># obs = [</span>
+  <span class="p">[</span> <span class="c1"># avatar in these locations</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="p">],</span>
+  <span class="p">[</span> <span class="c1"># wall in these locations</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="p">],</span>
+  <span class="p">[</span> <span class="c1"># goal in these locations</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="semantic-state">
+<h2>Semantic State<a class="headerlink" href="#semantic-state" title="Permalink to this headline"></a></h2>
+<p>A breakdown of the entire environment including internal variable values that the objects may have can be recovered using <code class="docutils literal notranslate"><span class="pre">env.get_state()</span></code>.</p>
+<dl class="field-list">
+<dt class="field-odd">env.get_state()</dt>
+<dd class="field-odd"><p>This function will return data in the following format:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;GameTicks&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">  </span><span class="s1">&#39;GlobalVariables&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="s1">&#39;Objects&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="s1">&#39;Name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;avatar&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;Location&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">],</span>
+<span class="w">      </span><span class="s1">&#39;Orientation&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;NONE&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;PlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;Variables&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s1">&#39;_y&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;_playerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;_x&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="s1">&#39;Name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;goal&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;Location&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">3</span><span class="p">],</span>
+<span class="w">      </span><span class="s1">&#39;Orientation&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;NONE&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;PlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;Variables&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s1">&#39;_y&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;_playerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;_x&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+
+<span class="w">      </span><span class="p">...</span>
+
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="event-history">
+<span id="id1"></span><h2>Event History<a class="headerlink" href="#event-history" title="Permalink to this headline"></a></h2>
+<p>Event history in Griddly contains all the information about actions that have been made by the player, any internal actions that have been executed by any game mechanics, or any delayed actions that have been performed.</p>
+<p>Event history is gathered during <code class="docutils literal notranslate"><span class="pre">env.step()</span></code> and returned in the <code class="docutils literal notranslate"><span class="pre">info['History']</span></code> variable, but it must be enabled first.</p>
+<p>To enable event history, <code class="docutils literal notranslate"><span class="pre">env.enable_history(True)</span></code> can be called after <code class="docutils literal notranslate"><span class="pre">gym.make()</span></code></p>
+<p>The format of event history looks like this:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;PlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;ActionName&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;move&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;Tick&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;Reward&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;Delay&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;SourceObjectName&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;avatar&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;DestinationObjectName&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;_empty&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;SourceObjectPlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;DestinationObjectPlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;SourceLocation&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">],</span>
+<span class="w">    </span><span class="s1">&#39;DestinationLocation&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;PlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;ActionName&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;move&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;Tick&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;Reward&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;Delay&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;SourceObjectName&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ball&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;DestinationObjectName&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;_empty&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;SourceObjectPlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;DestinationObjectPlayerId&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;SourceLocation&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">],</span>
+<span class="w">    </span><span class="s1">&#39;DestinationLocation&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../action%20spaces/index.html" class="btn btn-neutral float-left" title="Action Spaces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../visualization/index.html" class="btn btn-neutral float-right" title="Visualization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Chris Bamford.
+      <span class="commit">Revision <code>63c45656</code>.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+  
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

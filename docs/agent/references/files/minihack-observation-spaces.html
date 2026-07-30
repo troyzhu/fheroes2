@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Observation Spaces &mdash; MiniHack  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Action Spaces" href="action_spaces.html" />
+    <link rel="prev" title="Trying out MiniHack" href="trying_out.html" /> 
+<script async type="text/javascript" src="/_/static/javascript/readthedocs-addons.js"></script><meta name="readthedocs-project-slug" content="minihack" /><meta name="readthedocs-version-slug" content="latest" /><meta name="readthedocs-resolver-filename" content="/getting-started/observation_spaces.html" /><meta name="readthedocs-http-status" content="200" /></head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> MiniHack
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#extending-minihack">Extending MiniHack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#docker">Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="trying_out.html">Trying out MiniHack</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="trying_out.html#playing-as-a-human">Playing as a human</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Observation Spaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-the-observation-space">Specifying the Observation Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="action_spaces.html">Action Spaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="action_spaces.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="action_spaces.html#specifying-the-action-space">Specifying the Action Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="action_spaces.html#possible-actions">Possible Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="des_files.html">Description files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="des_files.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="des_files.html#types-of-des-files">Types of des-files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="des_files.html#adding-entities-to-des-files">Adding Entities to des-files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="des_files.html#sources-of-randomness-in-des-files">Sources of Randomness in des-files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="des_files.html#random-terrain-placement">Random Terrain Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="des_files.html#further-information">Further Information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interface.html">Creating New Environments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interface.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interface.html#level-generator">Level Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interface.html#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interface.html#example-1">Example 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface.html#example-2">Example 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reward.html">Reward Function</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reward.html#default-configuration">Default Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reward.html#reward-manager">Reward Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="level_editor.html">Level Editor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="level_editor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="level_editor.html#accessing-the-level-editor">Accessing the Level Editor</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../envs/index.html">MiniHack Environment Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../envs/index.html#navigation-tasks">Navigation Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/room.html">Room</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/room.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/room.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/room.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/corridor.html">Corridor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/corridor.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/corridor.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/corridor.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/keyroom.html">KeyRoom</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/keyroom.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/keyroom.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/keyroom.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/mazewalk.html">MazeWalk</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/mazewalk.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/mazewalk.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/mazewalk.html#all-environments">All environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/river.html">River</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/river.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/river.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/river.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/hidenseek.html">HideNSeek</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/hidenseek.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/hidenseek.html#source">Source</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/battle.html">CorridorBattle</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/battle.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/battle.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/battle.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/memento.html">Memento</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/memento.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/memento.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/memento.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/navigation/explore.html">MazeExplore</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/explore.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/explore.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/navigation/explore.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../envs/index.html#skill-acquisition-tasks">Skill Acquisition Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../envs/skills/simple_skills.html">Simple Tasks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/simple_skills.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/simple_skills.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/simple_skills.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/skills/lava_cross.html">Lava Crossing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/lava_cross.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/lava_cross.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/lava_cross.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/skills/wod.html">Wand of Death</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/wod.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/wod.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/wod.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/skills/quest.html">Quest</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/quest.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/quest.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/skills/quest.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../envs/index.html#ported-tasks">Ported tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../envs/ported/minigrid.html">MiniGrid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/ported/minigrid.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/ported/minigrid.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/ported/minigrid.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../envs/ported/boxoban.html">Boxoban</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../envs/ported/boxoban.html#reward">Reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/ported/boxoban.html#source">Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../envs/ported/boxoban.html#all-environments">All Environments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/contributing.html">Submitting New Environments</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/des_file_tutorial.html"><em>des-file</em> format: A tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/des_file_tutorial.html#What-is-a-des-file?">What is a des-file?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/des_file_tutorial.html#The-Two-Types-of-des-files:-MAZE-and-ROOM">The Two Types of des-files: MAZE and ROOM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/des_file_tutorial.html#MAZE-type-levels">MAZE-type levels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/des_file_tutorial.html#ROOM-type-levels">ROOM-type levels</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/des_file_tutorial.html#Adding-complexity:-Monsters,-Objects-&amp;-Traps">Adding complexity: Monsters, Objects &amp; Traps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/des_file_tutorial.html#Landscaping-Terrain:-selections-and-coordinates">Landscaping Terrain: selections and coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/des_file_tutorial.html#Controlling-Randomness">Controlling Randomness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/des_file_tutorial.html#Wrapping-up">Wrapping up</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Agents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../agents/torchbeast.html">TorchBeast</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../agents/torchbeast.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../agents/torchbeast.html#running-experiments">Running Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../agents/torchbeast.html#replicating-the-results-of-the-paper">Replicating the Results of the Paper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../agents/torchbeast.html#evaluate-and-watch">Evaluate and Watch</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../agents/rllib.html">RLlib</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../agents/rllib.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../agents/rllib.html#running-experiments">Running Experiments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../agents/ued.html">Unsupervised Environment Design</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/minihack.html">minihack package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/minihack.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/minihack.base.html">minihack.base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/minihack.level_generator.html">minihack.level_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/minihack.navigation.html">minihack.navigation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/minihack.reward_manager.html">minihack.reward_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/minihack.skills.html">minihack.skills module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/minihack.wiki.html">minihack.wiki module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/nethack.html">NetHack</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../about/nethack.html#nethack-learning-environment">NetHack Learning Environment</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MiniHack</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Observation Spaces</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/getting-started/observation_spaces.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section class="tex2jax_ignore mathjax_ignore" id="observation-spaces">
+<h1>Observation Spaces<a class="headerlink" href="#observation-spaces" title="Permalink to this headline"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<p>MiniHack supports several forms of observations, including global or agent-centred viewpoints (or both) of the grid. The table bellow illustrateds three forms of agent-centred observations of the grid of the map in MiniHack.</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-align:center head"><p>Pixel Observations</p></th>
+<th class="text-align:center head"><p>Symbolic Observations</p></th>
+<th class="text-align:center head"><p>Textual Observations</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:center"><p><img alt="" src="../_images/obs_pixel.png" /></p></td>
+<td class="text-align:center"><p><img alt="" src="../_images/obs_symbol.png" /></p></td>
+<td class="text-align:center"><p><img alt="" src="../_images/obs_text.png" /></p></td>
+</tr>
+</tbody>
+</table>
+<p>In addition, observations can include player statistics, in-game text messages, and inventory information.</p>
+<p><img alt="" src="../_images/obs_additional.png" /></p>
+</section>
+<section id="specifying-the-observation-space">
+<h2>Specifying the Observation Space<a class="headerlink" href="#specifying-the-observation-space" title="Permalink to this headline"></a></h2>
+<p>MiniHack has a dictionary-structured observation space. Most keys are inherited from NLE, while some are added in MiniHack. To make sure that the desired observations are returned by the environment, the corresponding options should be passed during the initialisation. The <code class="docutils literal notranslate"><span class="pre">observation_keys</span></code> parameter can be used to specify the observation space in any MiniHack environment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+   <span class="s2">&quot;MiniHack-River-v0&quot;</span><span class="p">,</span>
+   <span class="n">observation_keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;glyphs&quot;</span><span class="p">,</span> <span class="s2">&quot;chars&quot;</span><span class="p">,</span> <span class="s2">&quot;colors&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that using different observation keys can make environments significantly easier or harder.</p>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline"></a></h2>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-align:center head"><p>Name</p></th>
+<th class="text-align:center head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">glyphs</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(21\times79\)</span> matrix of glyphs (ids of entities) on the map. Each glyph represents an entirely unique entity, so these are integers between 0 and 5991. In the standard terminal-based view of NetHack, these glyphs are represented by characters, with colours and other possible visual features.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">chars</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(21\times79\)</span> matrix of the characters representing the map.</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">colors</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(21\times79\)</span> matrix of the colours of each of the characters on the map (some characters represent different objects or monsters depending on their colour).</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">specials</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(21\times79\)</span> matrix of special extra information about the view of that cell on the map, for example, if the foreground and background colour should be reversed.</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">screen_descriptions</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(21\times79\times80\)</span> tensor of utf-8 encodings of textual descriptions of each cell present in the map. NetHack provides these textual descriptions (which can be accessed by the user by using the describe action on a specific tile).</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">pixel</span></code></p></td>
+<td class="text-align:center"><p>a representation of the current screen in image form, where each cell is represented by a <span class="math notranslate nohighlight">\(16\times16\times3\)</span> image, meaning the entire observation is so <span class="math notranslate nohighlight">\(336\times1264\times3\)</span> (with 3 channels for RGB).</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">blstats</span></code></p></td>
+<td class="text-align:center"><p>a representation of the status line at the bottom of the screen, containing information about the player character’s position, health, attributes and other statuses. It comes in the form of a dimension <span class="math notranslate nohighlight">\(25\)</span> vector.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">message</span></code></p></td>
+<td class="text-align:center"><p>the utf-8 encoding of the on-screen message displayed at the top of the screen. It’s a <span class="math notranslate nohighlight">\(256\)</span>-dimensional vector.</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">inv_glyphs</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(55\)</span>-dimensional vector representing the glyphs present in the current inventory view.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">inv_letters</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(55\)</span>-dimensional vector representing the letters present in the current inventory view.</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">inv_oclasses</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(55\)</span>-dimensional vector representing the class of objects present in the current inventory view.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">inv_strs</span></code></p></td>
+<td class="text-align:center"><p>a <span class="math notranslate nohighlight">\(55\times80\)</span> matrix containing utf-8 encodings of textual descriptions of objects present in the current inventory view.</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">tty_chars</span></code></p></td>
+<td class="text-align:center"><p>the character representation of the entire screen, including the message and map, of size <span class="math notranslate nohighlight">\(24\times80\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">tty_colors</span></code></p></td>
+<td class="text-align:center"><p>the color representation of the entire screen, including the message and map, of size <span class="math notranslate nohighlight">\(24\times80\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:center"><p><code class="docutils literal notranslate"><span class="pre">tty_cursor</span></code></p></td>
+<td class="text-align:center"><p>the location of the cursor on the screen, a 2-dimensional vector of (x,y) coordinates.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">glyphs</span></code>, <code class="docutils literal notranslate"><span class="pre">chars</span></code>, <code class="docutils literal notranslate"><span class="pre">colors</span></code>, <code class="docutils literal notranslate"><span class="pre">specials</span></code>, <code class="docutils literal notranslate"><span class="pre">pixel</span></code>, <code class="docutils literal notranslate"><span class="pre">screen_descriptions</span></code>, <code class="docutils literal notranslate"><span class="pre">tty_chars</span></code>, and <code class="docutils literal notranslate"><span class="pre">tty_colors</span></code> a cropped observation centered the agent can be used by passing the observation name suffixed with <code class="docutils literal notranslate"><span class="pre">_crop</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">chars_crop</span></code>). This is a NxN matrix centered on the agent’s current location containing the information normally present in the full view. The size of the crop can easily be configured using the <code class="docutils literal notranslate"><span class="pre">obs_crop_h</span></code> and <code class="docutils literal notranslate"><span class="pre">obs_crop_w</span></code> parameters of the environment (9 by default). Cropped observations can facilitate the learning, as the egocentric input makes representation learning easier.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="trying_out.html" class="btn btn-neutral float-left" title="Trying out MiniHack" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="action_spaces.html" class="btn btn-neutral float-right" title="Action Spaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, MiniHack Team @ Facebook AI Research, UCL, and Oxford.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
