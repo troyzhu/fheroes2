@@ -38,31 +38,31 @@ One property is assumed throughout and is easiest to state now. A problem is Mar
 
 ## Notation
 
-Symbols follow Shiyu Zhao, *Mathematical Foundations of Reinforcement Learning*, so that this documentation continues from standard notes on that text rather than running a second vocabulary alongside them. [[notation]] carries the full contract, including the symbols this project has to add for partial observability and masking, and the two places where a clash with the PPO literature forced a departure.
+Symbols match the owner's existing RL wiki, so that this documentation extends those notes rather than running a second vocabulary alongside them. [[notation]] carries the full contract, including which wiki note already defines each concept and which symbols this project has to add for masking and partial observability.
 
 | Symbol | Meaning |
 |---|---|
 | $s \in \mathcal{S}$ | State, everything the simulator needs to continue the game. |
 | $a \in \mathcal{A}$ | Action, one choice by the acting player. |
 | $\mathcal{A}(s) \subseteq \mathcal{A}$ | The legal actions in state $s$, usually a small subset. |
-| $p(s' \mid s, a)$ | Transition model, how the world evolves. Deterministic when it puts all its mass on one $s'$. |
-| $p(r \mid s, a)$ | Reward model, the distribution of the scalar arriving on one transition. What a policy maximizes is the expected return $J(\theta)$, not any single reward. |
-| $\gamma \in [0, 1]$ | Discount rate, trading immediate against future reward. The book restricts it to $(0, 1)$ for its infinite-horizon arguments; $\gamma = 1$ is admissible here only because battles are guaranteed to terminate. |
+| $P(s' \mid s, a)$ | Transition function, how the world evolves. Deterministic when it puts all its mass on one $s'$. |
+| $R(s, a, s')$ | Reward, the scalar arriving on one transition. What a policy maximizes is the expected return $J(\theta)$, not $R$ itself. |
+| $\gamma \in [0, 1]$ | Discount factor, trading immediate against future reward. Most treatments restrict it to $[0, 1)$ so infinite-horizon returns converge; $\gamma = 1$ is admissible here only because battles are guaranteed to terminate. |
 | $\tau$ | Trajectory, the sequence $s_0, a_0, r_1, s_1, \ldots$ of one episode. |
-| $G_t \doteq R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots$ | Return, the discounted sum of future reward from step $t$. Episodes here are finite, so the sum runs to termination. |
+| $G_t = \sum_{k \ge 0} \gamma^k r_{t+k+1}$ | Return, the discounted sum of future reward from step $t$. Episodes here are finite, so the sum runs to termination. |
 | $o = O(s)$ | Observation, what the agent actually receives, which may hide part of $s$. |
 | $\pi(a \mid s)$ | Policy, the distribution over actions the agent follows. When the agent sees an observation rather than the state it is $\pi(a \mid o)$, or $\pi(a \mid h)$ over the history. |
-| $\pi(a \mid s, \theta)$ | The same policy once parameterized, written with a comma rather than as $\pi_\theta$, following the book. |
-| $v_\pi(s) \doteq \mathbb{E}[G_t \mid S_t = s]$, $q_\pi(s, a)$ | Value functions, the expected return under $\pi$ from a state, or from a state and action. |
-| $\delta_\pi(s, a) \doteq q_\pi(s, a) - v_\pi(s)$ | Advantage, how much better an action is than what the policy does on average at that state. |
+| $\pi_\theta(a \mid s)$ | The same policy once parameterized by $\theta$. |
+| $V^\pi(s) = \mathbb{E}_\pi[G_t \mid s_t = s]$, $Q^\pi(s, a)$ | Value functions, the expected return under $\pi$ from a state, or from a state and action. |
+| $A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$ | Advantage, how much better an action is than what the policy does on average at that state. |
 | $m \in \{0,1\}^{\lvert \mathcal{A} \rvert}$ | Legality mask, with $m_i = 1$ exactly when action $i$ lies in $\mathcal{A}(s)$. |
-| $d_0$ | Initial-state distribution. Here it is the scenario and army generator, and it decides what a reported win rate means. |
+| $\rho_0$ | Initial-state distribution. Here it is the scenario and army generator, and it decides what a reported win rate means. |
 | $\Omega$ | The observation space, the set $o$ is drawn from. |
-| $J(\theta) = \mathbb{E}_{S \sim d_0}\big[v_\pi(S)\big]$ | The objective a policy maximizes, the book's $\bar v_\pi^{\,0}$. |
+| $J(\theta) = \mathbb{E}_{s_0 \sim \rho_0}\big[V^\pi(s_0)\big]$ | The objective a policy maximizes. |
 
-An environment is the tuple $(\mathcal{S}, \mathcal{A}, p(s' \mid s, a), p(r \mid s, a), d_0)$, extended to a partially observed problem by an observation space $\Omega$ and an observation function $O$, which in general is stochastic and written $O(o \mid s, a)$. The discount $\gamma$ belongs to the agent's objective rather than to the environment, alongside the reward model.
+An environment is the tuple $(\mathcal{S}, \mathcal{A}, P, R, \rho_0)$, extended to a partially observed problem by an observation space $\Omega$ and an observation function $O$, which in general is stochastic and written $O(o \mid s, a)$. The discount $\gamma$ belongs to the agent's objective rather than to the environment, alongside $R$.
 
-Almost every environment design decision is a decision about one of those objects. $d_0$ is the one most often left implicit.
+Almost every environment design decision is a decision about one of those objects. $\rho_0$ is the one most often left implicit.
 
 ## The environment: four objects
 
@@ -70,9 +70,9 @@ State is everything the simulator needs to continue. In a battle that is which u
 
 Action is one choice by the acting player, and the shape of $\mathcal{A}$ is the single most consequential design decision in a game environment, because it decides what the policy's output layer looks like. The shapes that recur are these. A flat discrete space enumerates every action as one integer, which is simple and works up to roughly $10^4$ entries. A factorized space splits an action into independent components, each with its own softmax, which is how a space of $10^7$ joint actions becomes a few hundred logits. A parameterized space picks a discrete type and then continuous parameters. A pointer space selects among a variable-length set of candidates by attention, which is the general answer when the candidate set is genuinely unbounded.
 
-Transition is how the world evolves. Games are usually stochastic through damage rolls, critical hits, or hidden shuffles. Stochasticity is not the same as unpredictability from bad engineering. A seeded generator leaves $p(s' \mid s, a)$ unchanged and makes the sampler reproducible, which is what makes replay and regression testing possible. See [[implementation/determinism-seeds-and-digests]].
+Transition is how the world evolves. Games are usually stochastic through damage rolls, critical hits, or hidden shuffles. Stochasticity is not the same as unpredictability from bad engineering. A seeded generator leaves $P$ unchanged and makes the sampler reproducible, which is what makes replay and regression testing possible. See [[implementation/determinism-seeds-and-digests]].
 
-Reward is the per-transition scalar. What a policy maximizes is the expected return $J(\theta)$, not any single reward. Game environments typically offer a sparse terminal signal, meaning win or lose at the end, which is unbiased but hard to learn from, or a shaped signal such as damage dealt minus damage taken, which learns faster and risks teaching the wrong objective. The choice is a modeling decision and does not have to be made when the environment is built.
+Reward is the per-transition scalar. What a policy maximizes is the expected return $J(\theta)$, not $R$ itself. Game environments typically offer a sparse terminal signal, meaning win or lose at the end, which is unbiased but hard to learn from, or a shaped signal such as damage dealt minus damage taken, which learns faster and risks teaching the wrong objective. The choice is a modeling decision and does not have to be made when the environment is built.
 
 ## The policy and what it may see
 
@@ -85,7 +85,7 @@ A useful consequence is the asymmetric actor-critic pattern. Because the critic 
 Legality is the second property. Almost every game restricts which actions are available in a state, and the standard mechanism is masking. The illegal entries of the policy's output are set to a large negative constant before the softmax, so they receive no probability and no gradient.
  Masking is not a heuristic, and the reason is narrower than it first appears. Replacing a logit with a large negative constant is not a differentiable function of that logit; it discards it.
 
-What licenses the method is that the mask depends on $s$ alone and never on the policy parameters, so the masked softmax is itself a well-formed parameterized policy $\pi^{\text{mask}}(a \mid s, \theta)$ over $\mathcal{A}(s)$. The usual estimator is then an unbiased gradient of $J(\theta)$ for that masked policy class, which is the objective over legal play. The policy class being optimized has changed, so a policy trained with a mask is undefined behavior if the mask is removed at deployment. The alternative of penalizing illegal actions with negative reward is well documented to collapse as the illegal fraction grows. See [[implementation/legal-actions-and-masking]].
+What licenses the method is that the mask depends on $s$ alone and never on the policy parameters, so the masked softmax is itself a well-formed parameterized policy $\pi^{\text{mask}}_\theta$ over $\mathcal{A}(s)$. The usual estimator is then an unbiased gradient of $J(\theta)$ for that masked policy class, which is the objective over legal play. The policy class being optimized has changed, so a policy trained with a mask is undefined behavior if the mask is removed at deployment. The alternative of penalizing illegal actions with negative reward is well documented to collapse as the illegal fraction grows. See [[implementation/legal-actions-and-masking]].
 
 ## The axes along which game environments differ
 
@@ -123,8 +123,8 @@ Phase 1a narrows this. No heroes, so no spells and no leadership bonuses. No cas
 | State $s$ | Position, count, hit points, remaining shots, and status of every stack, plus whose turn it is and the combat generator's position. |
 | Action $a$ | What the active stack does: move to a cell, attack a specific enemy from a specific direction, shoot, or skip. |
 | Legal set $\mathcal{A}(s)$ | Typically 5 to 30 actions, out of a fixed space of 793. |
-| Transition $p(s' \mid s, a)$ | The engine, stochastic through damage rolls, morale, and luck, but exactly reproducible under a fixed combat seed. |
-| Reward $p(r \mid s, a)$ | Deliberately undefined in Phase 1a. The terminal outcome and surviving force are recorded so an objective can be chosen later. |
+| Transition $P$ | The engine, stochastic through damage rolls, morale, and luck, but exactly reproducible under a fixed combat seed. |
+| Reward $R$ | Deliberately undefined in Phase 1a. The terminal outcome and surviving force are recorded so an objective can be chosen later. |
 | Observation $o$ | Structured records, either the true state or the player-obtainable subset, never pixels. |
 | Episode | One battle: roughly 5 to 40 decisions in the fixtures measured so far. |
 | Players | Two, opposed, ordered by a speed queue rather than strictly alternating. Fixing an opponent policy induces a single-agent MDP whose transition absorbs that opponent; the induced problem is non-stationary as soon as the opponent changes, which is the regime self-play creates. Because the queue can give one side several consecutive decisions, the induced problem is a semi-MDP, and the discount between a player's own successive decisions is $\gamma^k$ for a random $k$. |
@@ -186,7 +186,7 @@ Self-play and league training generate their own curriculum for two-player games
 
 ## Evaluation
 
-Game agents are compared by win rate against a fixed pool of opponents under a fixed seed set, and by rating systems such as Elo or TrueSkill when many agents must be ordered. A win rate is a statement about $d_0$ and the opponent pool, so both belong in the report. Ratings additionally assume a transitive ordering of strength, which is exactly what cyclic self-play strategies violate, so where cycles are the concern the pairwise win-rate matrix has to be reported alongside the scalar. The seeded fixed pool answers whether a change helped; the rating league answers how a checkpoint compares to everything built so far. Reporting either without the seed set and the opponent list makes the number unreproducible.
+Game agents are compared by win rate against a fixed pool of opponents under a fixed seed set, and by rating systems such as Elo or TrueSkill when many agents must be ordered. A win rate is a statement about $\rho_0$ and the opponent pool, so both belong in the report. Ratings additionally assume a transitive ordering of strength, which is exactly what cyclic self-play strategies violate, so where cycles are the concern the pairwise win-rate matrix has to be reported alongside the scalar. The seeded fixed pool answers whether a change helped; the rating league answers how a checkpoint compares to everything built so far. Reporting either without the seed set and the opponent list makes the number unreproducible.
 
 Three environment properties matter independently of the agent. Determinism under a seed, so trajectories replay and regressions are detectable. Speed, so the learner rather than the simulator is the bottleneck. Engine-sourced legality, so the mask cannot disagree with what the simulator will accept. An environment missing any of the three can still train an agent, but debugging it becomes guesswork.
 
@@ -194,7 +194,7 @@ Three environment properties matter independently of the agent. Determinism unde
 
 The comparison explains why our decisions diverge from the environments we borrow evidence from. We use a flat masked action space rather than microRTS's factorized one because 793 entries do not need factoring. We keep both an entity list and an optional plane tensor rather than committing, because at this scale neither is expensive and no published ablation settles which wins on an 11 by 9 board. We ship an observability profile despite full observability today, because the seam is free now and expensive to retrofit when hero mana and fog arrive. And we invest in seed and digest discipline more heavily than comparable projects do, because a fast deterministic engine makes that discipline cheap and it is the only affordable proof that engine edits changed nothing.
 
-Every design record in this project cites one of the six objects from Part 1. The observability profiles are a choice about $O$ ([[decisions/0001-observation-profiles|ADR 0001]]), the canonical action space and mask are a choice about $\mathcal{A}$ and $\mathcal{A}(s)$ ([[decisions/0002-action-space|ADR 0002]]), the seed discipline is a choice about reproducing $p(s' \mid s, a)$, and the deliberate absence of a reward in Phase 1a is a choice to defer $p(r \mid s, a)$ until the substrate is trustworthy.
+Every design record in this project cites one of the six objects from Part 1. The observability profiles are a choice about $O$ ([[decisions/0001-observation-profiles|ADR 0001]]), the canonical action space and mask are a choice about $\mathcal{A}$ and $\mathcal{A}(s)$ ([[decisions/0002-action-space|ADR 0002]]), the seed discipline is a choice about reproducing $P$, and the deliberate absence of a reward in Phase 1a is a choice to defer $R$ until the substrate is trustworthy.
 
 ## Key terms
 

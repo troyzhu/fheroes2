@@ -24,9 +24,9 @@ Part 1 derives the chain from the objective to PPO, because those pieces build o
 
 ### The objective
 
-A policy $\pi(a \mid s, \theta)$ is scored by the expected return from a start distribution that does not depend on it. That metric is the book's $\bar v_\pi^{\,0}$, and [[notation]] says why it rather than either stationary-distribution metric is the right one for an episodic task.
+A policy $\pi_\theta$ is scored by the expected return from the initial-state distribution. Battles terminate, so this is the episodic objective rather than an average-reward one, and the start distribution does not depend on the policy.
 
-$$J(\theta) = \mathbb{E}_{S_0 \sim d_0}\big[v_\pi(S_0)\big] = \mathbb{E}_{S_0 \sim d_0,\ \tau \sim \pi(\theta)}\!\left[\sum_{t=0}^{T-1} \gamma^{t} R_{t+1}\right]$$
+$$J(\theta) = \mathbb{E}_{s_0 \sim \rho_0}\big[V^\pi(s_0)\big] = \mathbb{E}_{s_0 \sim \rho_0,\ \tau \sim \pi_\theta}\!\left[\sum_{t=0}^{T-1} \gamma^{t} r_{t+1}\right]$$
 
 Everything in Part 1 is machinery for estimating $\nabla_\theta J$ from sampled play, because that gradient cannot be computed directly. The environment's dynamics appear in the expectation and are unknown to the learner.
 
@@ -34,59 +34,59 @@ Everything in Part 1 is machinery for estimating $\nabla_\theta J$ from sampled 
 
 The policy gradient theorem says the gradient can be written as an expectation over trajectories the current policy already generates, which is what makes it estimable by sampling.
 
-$$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi(\theta)}\!\left[\sum_{t} \nabla_\theta \ln \pi(a_t \mid s_t, \theta)\, G_t\right]$$
+$$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\!\left[\sum_{t} \nabla_\theta \log \pi_\theta(a_t \mid s_t)\, G_t\right]$$
 
 REINFORCE is the estimator obtained by replacing the expectation with sampled episodes. Its meaning is direct. Increase the log-probability of actions that preceded high return, decrease it for actions that preceded low return, in proportion.
 
-The book states the same theorem over a state distribution rather than over trajectories, as $\nabla_\theta J(\theta) = \mathbb{E}_{S \sim \eta,\, A \sim \pi(S, \theta)}\big[\nabla_\theta \ln \pi(A \mid S, \theta)\, q_\pi(S, A)\big]$ in its (9.9). The trajectory form above is that expression with $G_t$ substituted for $q_\pi(S_t, A_t)$, which is legitimate because $G_t$ is an unbiased sample of it, and with the sum over $\eta$ absorbed into sampling whole episodes.
+The state-distribution form of the same theorem, $\nabla_\theta J(\theta) = \mathbb{E}_{s \sim d^\pi,\, a \sim \pi_\theta}\big[\nabla_\theta \log \pi_\theta(a \mid s)\, Q^\pi(s, a)\big]$, is the one your `policy-gradient-theorem` note states. The trajectory form above is that expression with $G_t$ substituted for $Q^\pi(s_t, a_t)$, which is legitimate because $G_t$ is an unbiased sample of it, and with the sum over $d^\pi$ absorbed into sampling whole episodes.
 
 > [!derivation]- Where the log comes from, and why the dynamics vanish
 > The trajectory probability factorizes into terms the policy controls and terms it does not.
-> $$p(\tau \mid \theta) = d_0(s_0) \prod_t \pi(a_t \mid s_t, \theta)\, p(s_{t+1} \mid s_t, a_t)$$
-> Differentiating $J = \int p(\tau \mid \theta)\, G(\tau)\, \mathrm{d}\tau$ needs $\nabla_\theta p(\tau \mid \theta)$, and the identity $\nabla_\theta p = p \nabla_\theta \ln p$ turns it back into an expectation. Here $G(\tau)$ is the return of a whole trajectory, written with $G$ rather than $R$ because $R$ is reserved for a single step's reward.
-> $$\nabla_\theta J = \int p(\tau \mid \theta)\, \nabla_\theta \ln p(\tau \mid \theta)\, G(\tau)\, \mathrm{d}\tau = \mathbb{E}\!\left[\nabla_\theta \ln p(\tau \mid \theta)\, G(\tau)\right]$$
-> Taking the log of the factorization turns the product into a sum, and every term that does not depend on $\theta$, meaning $d_0$ and every transition factor $p(s_{t+1} \mid s_t, a_t)$, differentiates to zero.
-> $$\nabla_\theta \ln p(\tau \mid \theta) = \sum_t \nabla_\theta \ln \pi(a_t \mid s_t, \theta)$$
+> $$p_\theta(\tau) = \rho_0(s_0) \prod_t \pi_\theta(a_t \mid s_t)\, P(s_{t+1} \mid s_t, a_t)$$
+> Differentiating $J = \int p_\theta(\tau)\, G(\tau)\, d\tau$ needs $\nabla_\theta p_\theta(\tau)$, and the identity $\nabla_\theta p = p \nabla_\theta \log p$ turns it back into an expectation. Here $G(\tau)$ is the return of a whole trajectory, written $G$ rather than $R$ because $R$ is the per-step reward function.
+> $$\nabla_\theta J = \int p_\theta(\tau)\, \nabla_\theta \log p_\theta(\tau)\, G(\tau)\, \mathrm{d}\tau = \mathbb{E}\!\left[\nabla_\theta \log p_\theta(\tau)\, G(\tau)\right]$$
+> Taking the log of the factorization turns the product into a sum, and every term that does not depend on $\theta$, meaning $\rho_0$ and every transition factor $P(s_{t+1} \mid s_t, a_t)$, differentiates to zero.
+> $$\nabla_\theta \log p_\theta(\tau) = \sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t)$$
 > That is why a model of the environment is not required. This same argument is what licenses action masking, since a mask that depends on the state alone is another factor independent of $\theta$.
 
 ### Baselines, and why variance is the real enemy
 
 REINFORCE is unbiased and nearly unusable on its own, because its variance is enormous. Subtracting any function of the state leaves it unbiased while reducing that variance.
 
-$$\nabla_\theta J = \mathbb{E}\!\left[\sum_t \nabla_\theta \ln \pi(a_t \mid s_t, \theta)\,\big(G_t - b(s_t)\big)\right]$$
+$$\nabla_\theta J = \mathbb{E}\!\left[\sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t)\,\big(G_t - b(s_t)\big)\right]$$
 
 > [!derivation]- Why subtracting a state-dependent baseline changes nothing in expectation
 > The cross term vanishes because probabilities sum to one.
-> $$\mathbb{E}_{a \sim \pi}\!\left[\nabla_\theta \ln \pi(a \mid s, \theta)\, b(s)\right] = b(s) \sum_a \pi(a \mid s, \theta)\, \frac{\nabla_\theta \pi(a \mid s, \theta)}{\pi(a \mid s, \theta)} = b(s)\, \nabla_\theta \sum_a \pi(a \mid s, \theta) = b(s)\, \nabla_\theta 1 = 0$$
+> $$\mathbb{E}_{a \sim \pi}\!\left[\nabla_\theta \log \pi_\theta(a \mid s)\, b(s)\right] = b(s) \sum_a \pi_\theta(a \mid s)\, \frac{\nabla_\theta \pi_\theta(a \mid s)}{\pi_\theta(a \mid s)} = b(s)\, \nabla_\theta \sum_a \pi_\theta(a \mid s) = b(s)\, \nabla_\theta 1 = 0$$
 > The condition is that $b$ must not depend on the action. A baseline that peeks at $a$ introduces bias, which is exactly the trap in the asymmetric-critic case discussed in Part 3.
 
-The baseline used in practice is the state value $v_\pi(s) \doteq \mathbb{E}[G_t \mid S_t = s]$, the expected return from a state. Using it produces the advantage.
+The baseline used in practice is the state value $V^\pi(s) = \mathbb{E}_\pi[G_t \mid s_t = s]$, the expected return from a state. Using it produces the advantage.
 
-$$\delta_\pi(s, a) \doteq q_\pi(s, a) - v_\pi(s)$$
+$$A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$$
 
-Two notes on this. The state value is not quite the variance-minimizing baseline, which the book derives in its Box 10.1 as $q_\pi$ weighted by $\lVert \nabla_\theta \ln \pi \rVert^2$. The state value wins on practicality instead, because a critic is being learned anyway and the optimal baseline would need a second estimator. The advantage is then written $\delta_\pi$ rather than $A^\pi$ because the temporal-difference error two sections below is a sampled estimate of exactly this quantity, and reusing the letter keeps that link visible.
+One caveat, since it is easy to overstate. The state value is not the variance-minimizing baseline, which is $Q^\pi$ weighted by $\lVert \nabla_\theta \log \pi_\theta \rVert^2$. It wins on practicality instead, because a critic is being learned anyway and the true optimum would need a second estimator. Your `advantage-function` note makes the same point with the word approximately.
 
 The advantage answers the question the gradient actually needs. Not "was this outcome good" but "was this action better or worse than what this policy usually does here". An action followed by a return of 10 in a state worth 12 should be discouraged, and raw return cannot express that.
 
 ### Actor-critic
 
-Learning $v_\pi$ alongside $\pi$ gives actor-critic. The actor is the policy, updated by the gradient above. The critic is an approximator $v(s, w)$ whose only job is to reduce the actor's variance, and it is discarded at deployment, which is what makes privileged critics possible at all.
+Learning $V^\pi$ alongside $\pi$ gives actor-critic. The actor is the policy, updated by the gradient above. The critic is an approximator $v(s, w)$ whose only job is to reduce the actor's variance, and it is discarded at deployment, which is what makes privileged critics possible at all.
 
 ### Bootstrapping, and the truncation bug
 
-Estimating $v_\pi$ from complete episodes is Monte Carlo, unbiased and high variance. Estimating it from one step plus the current estimate of the next state is temporal-difference learning, biased and much lower variance.
+Estimating $V^\pi$ from complete episodes is Monte Carlo, unbiased and high variance. Estimating it from one step plus the current estimate of the next state is temporal-difference learning, biased and much lower variance.
 
-$$v(s_t, w) \leftarrow r_{t+1} + \gamma\, v(s_{t+1}, w)$$
+$$V_\phi(s_t) \leftarrow r_{t+1} + \gamma\, V_\phi(s_{t+1})$$
 
 That substitution of an estimate into its own target is bootstrapping. It creates a distinction the environment must respect, and it is the most common environment-side bug in reinforcement learning.
 
-When an episode ends because the task genuinely finished, there is no future, so the target is $r_{t+1}$ alone. When an episode ends because a step limit was reached, the future still exists and was merely cut off, so the target must bootstrap $r_{t+1} + \gamma\, v(s_T, w)$. Treating a truncation as a termination tells the learner that the world ends at the limit, which biases every value estimate downward. This is why [[decisions/0005-training-and-reward]] requires the protocol to report which case occurred, rather than only that the episode is over.
+When an episode ends because the task genuinely finished, there is no future, so the target is $r_{t+1}$ alone. When an episode ends because a step limit was reached, the future still exists and was merely cut off, so the target must bootstrap $r_{t+1} + \gamma\, V_\phi(s_T)$. Treating a truncation as a termination tells the learner that the world ends at the limit, which biases every value estimate downward. This is why [[decisions/0005-training-and-reward]] requires the protocol to report which case occurred, rather than only that the episode is over.
 
 ### GAE
 
-Generalized advantage estimation interpolates between the two extremes with a single knob. The starting point is the one-step temporal-difference residual, which is the advantage estimate the book uses in its Algorithm 10.2 and the reason a single critic network suffices there.
+Generalized advantage estimation interpolates between the two extremes with a single knob. The starting point is the one-step temporal-difference residual, which is on its own the cheapest advantage estimate and the reason a single critic network suffices for A2C.
 
-$$\delta_t = r_{t+1} + \gamma\, v(s_{t+1}, w) - v(s_t, w)$$
+$$\delta_t = r_{t+1} + \gamma\, V_\phi(s_{t+1}) - V_\phi(s_t)$$
 
 Generalized advantage estimation replaces that single residual with an exponentially weighted sum over the residuals that follow it.
 
@@ -96,8 +96,8 @@ At $\lambda = 0$ it is the single residual, low variance and biased by whatever 
 
 > [!derivation]- Why $\lambda = 1$ recovers Monte Carlo
 > Expanding the sum and cancelling adjacent value terms telescopes it.
-> $$\sum_{l \ge 0} \gamma^{l} \delta_{t+l} = \sum_{l \ge 0} \gamma^{l}\big(r_{t+l+1} + \gamma\, v(s_{t+l+1}, w) - v(s_{t+l}, w)\big) = G_t - v(s_t, w)$$
-> Every intermediate value term appears once positively and once negatively, so only $-v(s_t, w)$ survives, which is the empirical advantage.
+> $$\sum_{l \ge 0} \gamma^{l} \delta_{t+l} = \sum_{l \ge 0} \gamma^{l}\big(r_{t+l+1} + \gamma\, V_\phi(s_{t+l+1}) - V_\phi(s_{t+l})\big) = G_t - V_\phi(s_t)$$
+> Every intermediate value term appears once positively and once negatively, so only $-V_\phi(s_t)$ survives, which is the empirical advantage.
 
 ### Why the step must be constrained
 
@@ -105,13 +105,13 @@ A policy-gradient step that is too large is not merely inefficient, it is destru
 
 Trust-region policy optimization enforces this with an explicit constraint on the KL divergence between old and new policy. It works and is heavy, requiring second-order machinery.
 
-PPO achieves a similar effect with a first-order trick. Define the importance ratio between new and old policy, written $\rho_t(\theta)$ here because $r$ already means a reward. The PPO paper writes the same quantity $r_t(\theta)$.
+PPO achieves a similar effect with a first-order trick. Define the importance ratio between new and old policy. It is written $r_t(\theta)$ here, following the PPO paper and your `ppo-clip` note, so the letter $r$ is overloaded against the per-step reward. Context disambiguates, since the ratio always carries a $(\theta)$.
 
-$$\rho_t(\theta) = \frac{\pi(a_t \mid o_t, \theta)}{\pi(a_t \mid o_t, \theta_{\text{old}})}$$
+$$r_t(\theta) = \frac{\pi_\theta(a_t \mid o_t)}{\pi_{\theta_{\text{old}}}(a_t \mid o_t)}$$
 
 and optimize the clipped surrogate.
 
-$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t\!\left[\min\Big(\rho_t(\theta)\,\hat A_t,\ \operatorname{clip}\big(\rho_t(\theta), 1-\epsilon, 1+\epsilon\big)\,\hat A_t\Big)\right]$$
+$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t\!\left[\min\Big(r_t(\theta)\,\hat A_t,\ \operatorname{clip}\big(r_t(\theta), 1-\epsilon, 1+\epsilon\big)\,\hat A_t\Big)\right]$$
 
 The clip removes the incentive to move the ratio beyond $1 \pm \epsilon$. The $\min$ makes the objective pessimistic, so an update that would overshoot gains nothing while an update that would make things worse is still penalized in full. The policy can drift no further than the data support without the optimizer noticing it has stopped improving.
 
@@ -125,7 +125,7 @@ Added to the loss with a small coefficient, entropy $H(\pi(\cdot \mid o))$ rewar
 
 ### Value-based methods
 
-Rather than parameterizing the policy, learn an action-value approximator $q(s, a, w)$ and act greedily. DQN made this work with deep networks through a replay buffer and a slowly updated target network, both of which exist to stabilize a bootstrapped target that would otherwise chase itself. QR-DQN extends it to learn a distribution over returns rather than a mean, which is more informative under heavy randomness.
+Rather than parameterizing the policy, learn $Q_\phi(s, a)$ and act greedily. DQN made this work with deep networks through a replay buffer and a slowly updated target network, both of which exist to stabilize a bootstrapped target that would otherwise chase itself. QR-DQN extends it to learn a distribution over returns rather than a mean, which is more informative under heavy randomness.
 
 The appeal is sample efficiency, since a replay buffer reuses old data indefinitely. The drawback here is that value-based methods compose awkwardly with an imitation warm start, because a cloned policy is not an action-value function, and that large discrete action spaces make the greedy maximization and the target computation more expensive. The one shipped comparable system implemented both families and reported the policy-gradient variants as its production path.
 

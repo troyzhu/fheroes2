@@ -48,7 +48,7 @@ Today the two differ only by fields tagged `oracle`, chiefly `engine_strength`. 
 
 ## The rule underneath both axes: keep it an MDP
 
-An attribute that influences the transition distribution and is not observed makes the observation process non-Markov. That is not fatal, since partially observed problems are well posed and routinely trained, but it carries costs worth choosing rather than inheriting. The best memoryless policy may have to be stochastic and may still be strictly suboptimal, observation-conditioned value estimates are biased as estimates of $v_\pi(s)$, and temporal-difference targets inherit that bias. Prefer exposure so the costs are opt-in.
+An attribute that influences the transition distribution and is not observed makes the observation process non-Markov. That is not fatal, since partially observed problems are well posed and routinely trained, but it carries costs worth choosing rather than inheriting. The best memoryless policy may have to be stochastic and may still be strictly suboptimal, observation-conditioned value estimates are biased as estimates of $V^\pi(s)$, and temporal-difference targets inherit that bias. Prefer exposure so the costs are opt-in.
 
 The reference project met this and chose removal, deleting morale, luck, and terrain effects from the game. We chose exposure instead, so those mechanics stay live and their fields appear in both profiles.
 

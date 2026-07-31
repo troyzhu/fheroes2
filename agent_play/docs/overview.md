@@ -50,8 +50,8 @@ Stated as a Markov decision process, which [[rl-and-the-battle-domain]] develops
 | State $s$ | The battle position: which stacks stand where, with what counts, hit points, and shots remaining. |
 | Observation $o$ | A serialization of $s$: padded entity records, optionally an `11 × 9 × C` plane tensor, filtered by an observability profile. |
 | Action $a$ | What the active stack does. One slot of a fixed 793-wide discrete space, with a per-state legality mask. |
-| Transition $p(s' \mid s, a)$ | The fheroes2 engine. Stochastic through damage, morale, and luck rolls, but seeded, so a fixed seed makes an episode reproducible. |
-| Reward $p(r \mid s, a)$ | Deliberately undefined in Phase 1a. The terminal outcome (winner, surviving force) is recorded; the objective is chosen later. |
+| Transition $P(s' \mid s, a)$ | The fheroes2 engine. Stochastic through damage, morale, and luck rolls, but seeded, so a fixed seed makes an episode reproducible. |
+| Reward $R$ | Deliberately undefined in Phase 1a. The terminal outcome (winner, surviving force) is recorded; the objective is chosen later. |
 | Episode | One battle, from arena construction to a terminal state or round truncation. |
 | Policy $\pi(a \mid s)$ | Not in this repository. The environment ships without a learner by design. |
 
@@ -230,7 +230,7 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 |---|---|---|
 | `agent_play/docs/README.md` | routing index for this tree | to find anything |
 | `agent_play/docs/overview.md` | this file, the system as it stands | first |
-| `agent_play/docs/notation.md` | the symbol contract, and what this tree adds to a standard RL text | before any of the mathematical documents |
+| `agent_play/docs/notation.md` | the symbol contract, and what is recap of the RL wiki vs new here | before any of the mathematical documents |
 | `agent_play/docs/rl-and-the-battle-domain.md` | RL vocabulary, the battle domain, comparison with other environments | first, if the vocabulary is new |
 | `agent_play/docs/rl-methods.md` | every RL technique the docs name, derived, with verdicts | to look one up |
 | `agent_play/docs/training-design.md` | architecture, losses, hyperparameters, and the alternatives at each choice | before training anything |

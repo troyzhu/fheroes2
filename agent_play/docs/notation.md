@@ -1,124 +1,129 @@
 ---
-title: Notation, and how this tree extends the standard treatment
+title: Notation, and how this tree extends the RL wiki
 type: reference
 updated: 2026-07-30
 related_concepts: ["[[rl-and-the-battle-domain]]", "[[rl-methods]]", "[[training-design]]"]
 tags: [agent-env, rl, notation, reference, entry-point]
 ---
 
-# Notation, and how this tree extends the standard treatment
+# Notation, and how this tree extends the RL wiki
 
-This page fixes the symbols used everywhere else in this documentation, and fixes them against an external source rather than inventing a house style. That source is Shiyu Zhao, *Mathematical Foundations of Reinforcement Learning* ([book PDF](https://github.com/MathFoundationRL/Book-Mathematical-Foundation-of-Reinforcement-Learning/blob/main/Book-all-in-one.pdf)), referred to below as the book. The intent is that this material reads as a continuation of notes already taken on that text, not as a second vocabulary that has to be held alongside the first.
+This page fixes the symbols used everywhere else in this documentation, and fixes them against an external source rather than inventing a house style. That source is the repository owner's personal reinforcement-learning wiki, an Obsidian vault under Dropbox at `Papers/wiki`, which carries roughly six thousand concept notes and already defines nearly every technique this project uses. Note names below are given in code font, as `concepts/policy-gradient-theorem` and similar. They are deliberately not wikilinks, because that vault is a separate Obsidian vault and a link across the boundary would not resolve.
 
-Three commitments follow. Anything the book defines is used here with the book's meaning and is not redefined. Anything this project needs that the book does not cover is introduced explicitly, together with the reason it is absent there. And the few genuine departures are listed in [[#Section 4, departures and collisions]] with their justification, so no departure is silent.
+Three commitments follow. Symbols match the wiki, so nothing has to be mentally translated when moving between the two. Concepts the wiki already covers are named and pointed at rather than re-derived, which is what [[#Section 3, coverage against the wiki]] is for. And the handful of things the wiki does not cover are called out explicitly, because those are the parts of this tree that carry new material rather than recap.
 
 Readers who want the domain rather than the symbols should start at [[rl-and-the-battle-domain]] and treat this page as a lookup.
 
-## Section 1, symbols inherited from the book
+## Section 1, the shared symbols
 
-These carry the book's meaning. The last column points at where the book introduces them, so an unfamiliar symbol can be chased to its original treatment rather than to a paraphrase here.
+These carry the same meaning here as in the wiki. The last column names the note that defines the concept, so an unfamiliar symbol can be chased to a full treatment instead of a one-line gloss.
 
-| Symbol | Meaning | Book |
+| Symbol | Meaning | Defined in the wiki at |
 |---|---|---|
-| $\mathcal{S}$ | State space | Ch. 2 |
-| $\mathcal{A}(s)$ | Actions available at $s$, abbreviated $\mathcal{A}$ where the dependence is not at issue | Ch. 2 |
-| $\mathcal{R}$ | Reward set | Ch. 2 |
-| $S_t, A_t, R_{t+1}$ | Random variables: state and action at step $t$, and the reward that arrives after acting | §2.3 |
-| $s, a, r, s'$ | Realizations of those variables | Ch. 2 |
-| $p(s' \mid s, a)$ | State transition model | §2.4 |
-| $p(r \mid s, a)$ | Reward model | §2.4 |
-| $\pi(a \mid s)$ | Policy | §2.4 |
-| $\pi(a \mid s, \theta)$ | Policy parameterized by $\theta$, written with a comma rather than as $\pi_\theta$ | §9.3 |
-| $\gamma$ | Discount rate | §2.3 |
-| $G_t \doteq R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots$ | Discounted return from step $t$ | §2.3 |
-| $v_\pi(s) \doteq \mathbb{E}[G_t \mid S_t = s]$ | State value | §2.3 |
-| $q_\pi(s, a)$ | Action value | Ch. 2 |
-| $\delta_\pi(s, a) \doteq q_\pi(s, a) - v_\pi(s)$ | Advantage function | §10.2 |
-| $\delta_t = r_{t+1} + \gamma v(s_{t+1}, w) - v(s_t, w)$ | Temporal-difference error, the sampled stand-in for the advantage | §10.2 |
-| $J(\theta)$ | The metric being maximized | §9.2 |
-| $\bar v_\pi^{\,0} = \mathbb{E}_{S \sim d_0}[v_\pi(S)]$ | Average state value under a start distribution that does not depend on $\pi$ | §9.2 |
-| $d_0$ | Initial-state distribution | §9.2 |
-| $d_\pi(s)$ | Stationary state distribution under $\pi$ | §9.2 |
-| $\eta(s)$ | The state distribution appearing in the policy gradient theorem | §9.3 |
-| $b(s)$ | Baseline subtracted from the action value | §10.2 |
-| $w$ | Parameters of a value approximator, as in $v(s, w)$ | §10.2 |
-| $\alpha_\theta,\ \alpha_w$ | Actor and critic step sizes | §10.2 |
-| $h(s, a, \theta)$ | Action preference feeding a softmax policy | §9.3 |
-| $\ln$ | Natural logarithm, the book's spelling, used here in place of $\log$ | §9.3 |
-| $\doteq$ | Equality by definition | throughout |
+| $\mathcal{S}$, $\mathcal{A}$, $\mathcal{A}(s)$ | State space, action space, and the legal actions at $s$ | `concepts/markov-decision-process` |
+| $P(s' \mid s, a)$ | Transition function | `concepts/markov-decision-process` |
+| $R(s, a, s')$ | Reward on one transition | `concepts/markov-decision-process` |
+| $\gamma$ | Discount factor | `concepts/markov-decision-process` |
+| $\tau$ | Trajectory, one episode of $s_0, a_0, r_1, s_1, \ldots$ | `concepts/policy-gradient-theorem` |
+| $G_t = \sum_{k \ge 0} \gamma^k r_{t+k+1}$ | Discounted return from step $t$ | `concepts/returns-rl` |
+| $\pi(a \mid s)$, $\pi_\theta(a \mid s)$ | Policy, and the same policy parameterized by $\theta$ | `concepts/policy-gradient` |
+| $V^\pi(s)$ | State value | `concepts/value-function` |
+| $Q^\pi(s, a)$ | Action value | `concepts/q-function` |
+| $A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$ | Advantage | `concepts/advantage-function` |
+| $V_\phi$ | Learned critic, parameters $\phi$ distinct from the actor's $\theta$ | `concepts/actor-critic` |
+| $b(s)$ | Baseline | `concepts/policy-gradient-theorem` |
+| $d^\pi(s)$ | State distribution induced by $\pi$ | `concepts/policy-gradient-theorem` |
+| $J(\theta)$ | The objective being maximized | `concepts/policy-gradient-theorem` |
+| $\delta_t = r_{t+1} + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$ | Temporal-difference residual | `concepts/temporal-difference` |
+| $\hat A_t = \sum_l (\gamma\lambda)^l \delta_{t+l}$, and $\lambda$ | Generalized advantage estimate and its trace parameter | `concepts/generalized-advantage-estimation` |
+| $r_t(\theta) = \pi_\theta(a_t \mid s_t) / \pi_{\theta_{\text{old}}}(a_t \mid s_t)$ | Probability ratio | `concepts/ppo-clip` |
+| $\epsilon$ | PPO clipping half-width | `concepts/ppo-clip` |
+| $\log$ | Logarithm, spelled this way throughout | wiki convention |
 
-## Section 2, what this project maximizes, in the book's terms
+## Section 2, symbols this project adds
 
-The book gives three metrics in §9.2 and this project uses one of them. A battle terminates, an episode is one battle drawn from a scenario and army generator, and that generator does not depend on the policy. The metric is therefore $\bar v_\pi^{\,0}$, the average state value taken over a fixed start distribution, with $d_0$ standing for the generator. The stationary-distribution metrics $\bar v_\pi$ and $\bar r_\pi$ belong to the continuing setting and are not what is optimized here.
+The wiki is written for reinforcement learning in general and for language models in particular. Each addition below exists because this project is a game environment rather than either of those.
 
-Writing the objective as $J(\theta) = \bar v_\pi^{\,0} = \mathbb{E}_{S \sim d_0}[v_\pi(S)]$ makes a consequence visible that is easy to lose. A reported win rate is a statement about $d_0$ every bit as much as about $\theta$, so a scenario generator is part of the objective rather than part of the test harness. [[decisions/0005-training-and-reward]] records that the generator is currently five fixed fixtures used as regression anchors, which is not yet a training distribution, and treats defining it as a prerequisite for any reported number meaning anything.
-
-## Section 3, symbols this project adds
-
-The book works throughout with a fully observed, single-agent problem in which every action is available and the horizon is infinite. Each addition below exists because one of those assumptions fails here. The last column names the assumption that breaks.
-
-| Symbol | Meaning | Absent from the book because |
+| Symbol | Meaning | Why the wiki has no equivalent |
 |---|---|---|
-| $o \in \Omega$ | Observation, what the agent actually receives | its agent sees $s$ |
+| $o \in \Omega$ | Observation, what the agent actually receives | the wiki's standard setting is fully observed |
 | $O(o \mid s)$ | Observation function, in general stochastic | same |
-| $\pi(a \mid o, \theta)$ | Observation-conditioned policy, the object actually trained here | same |
-| $m(o) \in \{0,1\}^{793}$ | Legality mask, with $m_i = 1$ exactly when action $i$ is legal | its $\mathcal{A}(s)$ is a set; here it has to become a tensor |
-| $\ell(o, \theta) \in \mathbb{R}^{793}$ | Network logits before masking, the book's $h(s, a, \theta)$ gathered into a vector | it keeps preferences scalar and per-action |
-| $\hat A_t$ | Sampled advantage estimator, here generalized advantage estimation | it estimates $\delta_\pi$ by the one-step residual only |
-| $\lambda$ | Trace parameter trading bias against variance in $\hat A_t$ | generalized advantage estimation is not covered |
-| $\rho_t(\theta)$ | Importance ratio $\pi(a_t \mid o_t, \theta) \,/\, \pi(a_t \mid o_t, \theta_{\text{old}})$ | it writes importance weights as $p_0(x)/p_1(x)$ with no per-step symbol |
-| $\epsilon$ | Clipping half-width in the PPO surrogate | PPO is not covered |
-| $\Phi(s)$ | Potential function in potential-based shaping | reward design is not covered |
-| $\pi^{*}$ | The teacher policy, here `AI::BattlePlanner` | imitation is not covered |
+| $\pi_\theta(a \mid o)$ | Observation-conditioned policy, the object actually trained here | same |
+| $m(o) \in \{0,1\}^{793}$ | Legality mask, with $m_i = 1$ exactly when action $i$ is legal | the wiki has no action-masking note at all |
+| $\ell_\theta(o) \in \mathbb{R}^{793}$ | Policy-head logits before masking | same |
+| $\rho_0$ | Initial-state distribution, here the scenario and army generator | episodic start distributions do not arise in the wiki's bandit framing of language-model RL |
+| $\Phi(s)$ | Potential function in potential-based shaping | `concepts/reward-shaping` discusses it without fixing a symbol |
+| $\pi^{*}$ | The teacher policy, here `AI::BattlePlanner` | `concepts/behavior-cloning` leaves the demonstrator unnamed |
 | $\mathcal{D}$ | Dataset of observation and action pairs | same |
-| $\varepsilon$ | Per-decision error rate of a fitted policy | same |
-| $\tau$ | Trajectory, the sequence $s_0, a_0, r_1, s_1, \ldots$ | it reasons state by state rather than over trajectories |
-| $T$ | Episode length in decisions, 5 to 40 here | it works in the infinite-horizon setting |
-| $c_v,\ c_e$ | Value and entropy coefficients in a combined loss | a combined actor-critic loss is not formed |
+| $\varepsilon$ | Per-decision error rate of a fitted policy, used in the DAgger bound | same |
+| $T$ | Episode length in decisions, 5 to 40 here | horizon rarely appears explicitly in the wiki |
+| $c_v$, $c_e$ | Value and entropy coefficients in the combined PPO loss | the wiki gives the losses separately |
 
-## Section 4, departures and collisions
+## Section 3, coverage against the wiki
 
-Four places where a careless reading across sources goes wrong.
+What is recap and what is new. Rows naming a wiki note are assumed known, and this tree links back rather than re-deriving them; where it does restate one, that is for a reader of this repository who does not have the wiki, and the wiki note remains the fuller treatment. Rows marked absent carry material the wiki does not have, and they are where this tree is worth reading on its own account.
 
-The letter $r$ is a reward, always. The PPO literature writes the importance ratio as $r_t(\theta)$, which collides with that. This documentation writes the ratio $\rho_t(\theta)$ instead, so a reader arriving from Schulman et al. (2017) should read our $\rho_t(\theta)$ as their $r_t(\theta)$. The letter $\rho$ is free for this because the initial-state distribution is $d_0$ here rather than $\rho_0$, which is itself a change from earlier revisions of these documents and was made to match the book.
-
-The letter $\delta$ carries two meanings and the book intends both. It is the exact advantage function $\delta_\pi(s, a)$, and it is the temporal-difference error $\delta_t$, which is a sampled stand-in for the first. That identification is worth keeping rather than smoothing away, since it is the reason a single critic network suffices for A2C. Where an advantage is estimated across several steps rather than one, this documentation writes $\hat A_t$, following the source that defines generalized advantage estimation, and states that its target is $\delta_\pi$.
-
-The discount range is relaxed. The book states $\gamma \in (0, 1)$, which is what its infinite-horizon convergence arguments need. Battles here terminate within 5 to 40 decisions, so $\gamma = 1$ is admissible and this documentation uses $\gamma \in [0, 1]$. The relaxation is safe only because termination is guaranteed, and it would not carry over to the adventure-map problem scoped in [[roadmap]].
-
-Sampled quantities keep lowercase letters. The book distinguishes $\delta_\pi(S, A)$ over random variables from $\delta_t(s_t, a_t)$ over samples, as in its (10.7) against (10.8). The same convention holds here, so an expression in capitals is a statement about the expectation and an expression in lowercase is what an implementation computes on a batch.
-
-## Section 5, coverage map
-
-Which material is assumed from the book and which is added here. Rows carrying a chapter are treated as known and are not re-derived; a claim of that kind in this tree links back rather than restating. Rows marked absent are the delta, and they are the pages worth reading.
-
-| Topic | Book | Here |
+| Topic | Your wiki | Here |
 |---|---|---|
-| MDP objects, returns, state and action values | Ch. 1 to 2 | [[rl-and-the-battle-domain]] instantiates each one for a battle |
-| Bellman equation, optimality, value and policy iteration | Ch. 2 to 4 | assumed, and not used, since this project is model-free |
-| Monte Carlo and temporal-difference estimation | Ch. 5, 7 | [[rl-methods]] uses the bias-variance contrast when motivating GAE |
-| Stochastic approximation | Ch. 6 | assumed |
-| Value function approximation, DQN | Ch. 8 | [[rl-methods]] weighs DQN variants and records why they are not the first path here |
-| Policy gradient theorem, REINFORCE, softmax policies | Ch. 9 | [[rl-methods]] restates the theorem and derives the baseline result in trajectory form |
-| Actor-critic, A2C, importance sampling, off-policy actor-critic | Ch. 10 | the point where [[rl-methods]] picks up and continues to PPO |
-| Trust regions and the PPO clipped surrogate | absent | [[rl-methods]], applied in [[training-design]] |
-| Generalized advantage estimation | absent | [[rl-methods]] |
-| Legal-action masking | absent | [[implementation/legal-actions-and-masking]] |
-| Partial observability, belief states, recurrence | absent | [[rl-methods]], [[implementation/observation-design]] |
-| Imitation, behavior cloning, DAgger | absent | [[training-design]] |
-| Potential-based reward shaping | absent | [[rl-methods]], decided in [[decisions/0005-training-and-reward]] |
-| Self-play, opponent mixtures, rating and evaluation | absent | [[rl-and-the-battle-domain]], [[rl-methods]] |
-| Environment engineering, determinism, action encoding | absent | [[implementation/README]] |
+| MDP objects, returns, value and action values | `markov-decision-process`, `value-function`, `q-function`, `returns-rl` | [[rl-and-the-battle-domain]] instantiates each one for a battle |
+| Bellman equation, value and policy iteration | `bellman-equation`, `value-iteration`, `policy-iteration` | assumed and not used, since this project is model-free |
+| Monte Carlo and temporal-difference estimation | `monte-carlo-rl`, `temporal-difference` | [[rl-methods]] uses the bias-variance contrast when motivating GAE |
+| Policy gradient theorem, REINFORCE, baselines | `policy-gradient-theorem`, `reinforce-algorithm` | [[rl-methods]] gives the trajectory form and the baseline derivation |
+| Actor-critic, advantage | `actor-critic`, `advantage-function` | recap only |
+| GAE | `generalized-advantage-estimation` | recap, plus the $\lambda$ choice for a 5 to 40 step horizon |
+| Trust regions, TRPO, PPO clipping | `trust-region-methods`, `trpo`, `ppo-clip` | recap, plus what masking does to the ratio, which is new |
+| Importance sampling, off-policy correction | `importance-sampling-rl`, `off-policy-correction` | recap |
+| Value-based methods, DQN, QR-DQN | `dqn`, `qr-dqn`, `distributional-rl` | [[rl-methods]] records why they are not the first path for this problem |
+| Distributed actor-critic, IMPALA, V-trace | `impala`, `v-trace` | recap, with a note that this environment is too fast to need them yet |
+| Planning, MCTS, AlphaZero, MuZero | `monte-carlo-tree-search`, `alphazero`, `muzero` | [[rl-methods]] records why the door is kept open but not walked through |
+| Imitation, behavior cloning, DAgger | `behavior-cloning`, `imitation-learning`, `dagger` | [[training-design]] gives the architecture, the masked loss, the mixing schedule, and the hyperparameters for this teacher |
+| Reward shaping, potential-based shaping | `reward-shaping`, `sparse-reward`, `reward-hacking` | [[rl-methods]] derives the invariance; [[decisions/0005-training-and-reward]] chooses |
+| Entropy regularization | `entropy-regularization` | recap, plus that it must be computed over the legal set only |
+| Partial observability | `pomdp-detail`, `recurrent-policy` | [[implementation/observation-design]] applies it to two concrete profiles |
+| Self-play, opponent pools, multi-agent | `self-play-rl`, `multi-agent-rl` | recap, plus the speed-queue semi-MDP wrinkle |
+| Offline RL, inverse RL, exploration, curricula | `offline-rl`, `inverse-reinforcement-learning`, `exploration-in-rl`, `curriculum-learning` | surveyed and set aside in [[rl-methods]] Part 2 |
+| Legal-action masking | absent | [[implementation/legal-actions-and-masking]], the main new RL content in this tree |
+| Elo and TrueSkill for ranking agents | absent | [[rl-and-the-battle-domain]] Part 3, and [[research/findings]] on protocol |
+| Asymmetric actor-critic, privileged critics | absent | [[implementation/observation-design]], including the bias result |
+| Truncation against termination bootstrapping | absent | [[rl-methods]], and it constrains the Milestone 4 protocol |
+| Frame stacking and memoryless-policy limits | absent | [[rl-methods]] Part 3 |
+| Game-environment engineering | absent | all of [[implementation/README]], which is the bulk of this repository |
+| The fheroes2 battle domain | absent | [[rl-and-the-battle-domain]] Part 2 |
 
-## Section 6, a reading order from the book
+Two adjacent wiki notes are worth reading beside this tree even though they are not about notation. `reading-notes/mathematics-of-games` and `reading-notes/case-study-llm-and-games` are the closest existing material to this project's subject.
 
-Someone who has worked through the book to Chapter 10 already holds most of Part 1 of [[rl-methods]]. The efficient path is to read [[rl-and-the-battle-domain]] for the domain and the six MDP objects as this project instantiates them, then jump into [[rl-methods]] at trust regions, which is the first thing the book does not cover, and read forward from there. Parts 2 to 5 of that page are a landscape and can be read in any order.
+## Section 4, cautions
 
-Someone who has not read the book can still read this tree straight through. Nothing here depends on holding a proof from the book in mind, and the pieces that matter are restated at the point of use.
+Three places where a careless reading goes wrong.
+
+The letter $r$ is overloaded and stays that way. It is a reward in $r_{t+1}$ and the probability ratio in $r_t(\theta)$. Both the PPO paper and `concepts/ppo-clip` write it this way, so changing it here would create a mismatch worse than the ambiguity it removed. The ratio always carries an explicit $(\theta)$, which is enough to disambiguate in practice.
+
+The discount range is relaxed. Most treatments require $\gamma \in [0, 1)$ so that infinite-horizon returns converge. Battles here terminate within 5 to 40 decisions, so $\gamma = 1$ is admissible and this documentation uses $\gamma \in [0, 1]$. The relaxation is safe only because termination is guaranteed, and it would not carry over to the adventure-map problem scoped in [[roadmap]].
+
+Actor and critic parameters are named separately but are not independent. The critic is $V_\phi$ and the actor is $\pi_\theta$, following the wiki, yet the architecture in [[training-design]] shares a trunk between them, so the two parameter sets overlap. Where a loss is written $L(\theta, \phi)$ it is optimized jointly over the union.
+
+## Section 5, if you are reading Zhao
+
+The book *Mathematical Foundations of Reinforcement Learning* uses a different and internally consistent set of symbols from the ones above. This table translates, so a chapter can be read against this tree without re-deriving anything.
+
+| Here and in the wiki | Zhao |
+|---|---|
+| $V^\pi(s)$, $Q^\pi(s, a)$ | $v_\pi(s)$, $q_\pi(s, a)$ |
+| $A^\pi(s, a)$ | $\delta_\pi(s, a)$, deliberately sharing a letter with the TD error it is estimated by |
+| $\pi_\theta(a \mid s)$ | $\pi(a \mid s, \theta)$ |
+| $P(s' \mid s, a)$, $R(s, a, s')$ | $p(s' \mid s, a)$, $p(r \mid s, a)$ |
+| $\rho_0$ | $d_0$ |
+| $d^\pi(s)$ | $d_\pi(s)$ stationary, $\eta(s)$ in the policy gradient theorem |
+| $J(\theta)$ for an episodic task | $\bar v_\pi^{\,0}$, one of three metrics it distinguishes in §9.2 |
+| $V_\phi(s)$ | $v(s, w)$ |
+| $\log$ | $\ln$ |
+| definitions written with $=$ | $\doteq$ |
+
+Two of the book's choices are worth borrowing as ideas even while keeping the wiki's symbols. Its $\delta_\pi$ makes visible that the temporal-difference error is a sampled estimate of the advantage, which is why one critic network suffices for A2C. And its Box 10.1 derives the actual variance-minimizing baseline, which is $Q^\pi$ weighted by $\lVert \nabla_\theta \log \pi_\theta \rVert^2$ rather than $V^\pi$, a point `concepts/advantage-function` gestures at with the word approximately.
 
 ## Related
 
 - [[rl-and-the-battle-domain]], the vocabulary applied to a battle, and the comparison with other game environments.
-- [[rl-methods]], every technique this documentation names, derived, with a verdict on each.
+- [[rl-methods]], every technique this documentation names, with a verdict on each.
 - [[training-design]], the architecture, losses, and hyperparameters that use these symbols concretely.
 - [[decisions/0005-training-and-reward]], the training and reward decisions, including what is deliberately still open.
