@@ -19,6 +19,7 @@ The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rl
 - [[#The aggregation unit, and an episode-length bias we would otherwise inherit]]
 - [[#Where value-network bias actually comes from]]
 - [[#A reference policy this project does have, and an argument against using it]]
+- [[#The ratio is a one-sample estimate of a divergence you can afford to compute]]
 - [[#Overoptimization, and the measurement it demands]]
 - [[#Evaluation discipline]]
 - [[#What does not transfer]]
@@ -33,6 +34,7 @@ The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rl
 | Aggregation unit, per-decision against per-episode | Yes | Battles vary 5 to 40 decisions, the same length-bias structure as variable completion length |
 | The exact statement of value-network bias | Yes | Decides whether a critic fitted on very little data is safe |
 | A KL leash to a reference policy | Contested, and the book argues both sides | The cloned policy is a genuine reference, but reasoning practice removed the leash to allow exploration |
+| Replacing the clipped ratio with a computed divergence | Yes, and the usual cost objection is absent here | 793 slots with 5 to 30 legal makes the exact divergence nearly free |
 | Overoptimization and the proxy-against-gold measurement | Yes | The shaped-reward risk in [[decisions/0005-training-and-reward]] is the same failure |
 | Evaluation variance, contamination, hillclimbing | Yes | The five fixtures cannot be both regression anchors and the reported evaluation |
 | Truncated importance sampling for async training | Later | Only once actors and learners are separated, which is not the current design |
@@ -116,6 +118,26 @@ The same source argues the other way, and honesty requires reporting it. As reas
 The book also notes a third path that costs nothing. On-policy sampling is itself an implicit regularizer, because updates stay near where the policy already puts probability mass, which is why reinforcement learning forgets less than supervised fine-tuning on distant targets. Stage 3 is on-policy, so some protection is already present without any coefficient.
 
 The resulting recommendation is narrower than the one this page carried before. Do not add a KL leash by default. Instrument the divergence from the cloned checkpoint, watch whether early stage-3 updates degrade win rate against the teacher, and add the penalty only if that degradation appears. If it does, the reward-penalty and loss-term forms are both available and the book treats the choice as minor.
+
+## The ratio is a one-sample estimate of a divergence you can afford to compute
+
+Everything above takes PPO's clip as given. A 2026 result from the group behind Dr. GRPO argues the clip constrains the wrong object, and the argument is worth carrying because the reason it is impractical for language models does not hold here. Full detail in [[research/works/dppo-trust-region]].
+
+The identity at the centre of it is that the total-variation divergence between behavior and current policy at a state is the mean absolute deviation of the ratio from one.
+
+$$D_{\mathrm{TV}}\big(\pi_{\theta_{\text{old}}}(\cdot \mid o) \,\|\, \pi_\theta(\cdot \mid o)\big) = \tfrac{1}{2}\,\mathbb{E}_{a \sim \pi_{\theta_{\text{old}}}}\big[\lvert \rho(\theta) - 1 \rvert\big]$$
+
+PPO's condition $\lvert \rho_t - 1 \rvert \le \varepsilon$ therefore constrains a one-sample estimate of that divergence, taken at whichever action was drawn. In the vocabulary of [[rl-methods#Read this part as Monte Carlo estimation]], PPO thresholds a single realization of a random variable when the trust region wants its mean.
+
+The bias is systematic rather than merely noisy, because the ratio depends on the behavior probability while the divergence depends on moved mass. Their worked example: an action at $10^{-4}$ raised to $10^{-2}$ has ratio 100 and is clipped hard while moving about $10^{-2}$ of mass, and an action at $0.99$ lowered to $0.80$ has ratio $0.808$, sits inside a clip range of $0.2$, and moves $0.19$. Low-probability actions are over-penalized, which suppresses exactly the exploratory ones, and high-probability actions are under-penalized, which permits the destabilizing updates.
+
+Their fix keeps PPO's asymmetric mask but conditions it on a computed divergence over the whole action distribution rather than on the sampled ratio, blocking an update only when it is already moving away from the trust region and the divergence exceeds a threshold. Substituting $\lvert \rho_t - 1 \rvert$ for that divergence recovers PPO, which makes the two directly comparable.
+
+What makes this interesting here is the cost. Their methodology is mostly about approximating the divergence, because summing over a $10^5$-token vocabulary at every position is memory-prohibitive, so they build binary and top-$K$ lower bounds. This project has 793 slots with typically 5 to 30 legal after masking, so the exact divergence over the legal set is a handful of operations. The approximations that occupy most of their paper are unnecessary, and the exact form is available.
+
+The honest caveat is magnitude. The pathology is driven by the dynamic range of behavior probabilities, which spans several orders of magnitude over a vocabulary and will be much narrower over a masked categorical of 5 to 30 actions. The effect should be milder here than they measure. What keeps it worth testing is that the remedy is nearly free at this size, and that the failure it prevents, a destabilizing early update from a confident cloned policy, is the one this project is most exposed to.
+
+One caution against importing their framing wholesale. Their motivating instability is training-inference mismatch, where the sampling engine and the trainer disagree on probabilities from identical parameters. This project runs one process, one code path, and a seeded generator, so that does not arise. The ratio-against-divergence argument stands independently of it.
 
 ## Overoptimization, and the measurement it demands
 

@@ -178,6 +178,12 @@ The clip removes the incentive to move the ratio beyond $1 \pm \varepsilon$. The
 >
 > The two clipped cells are constant in $\theta$, so they contribute no gradient: a good action already pushed far enough up, or a bad one already pushed far enough down, stops contributing. The other two extreme cells stay live, so an action pushed the wrong way still gets full gradient to correct it. The clip is one-sided in effect rather than a symmetric brake.
 
+There is a sharper reading of what the clip is doing, and it matters here. The total-variation divergence between the behavior and current policies at a state satisfies
+
+$$D_{\mathrm{TV}}\big(\pi_{\theta_{\text{old}}}(\cdot \mid o_t) \,\|\, \pi_\theta(\cdot \mid o_t)\big) = \tfrac{1}{2}\,\mathbb{E}_{a_t \sim \pi_{\theta_{\text{old}}}}\big[\lvert \rho_t(\theta) - 1 \rvert\big]$$
+
+so the condition $\lvert \rho_t - 1 \rvert \le \varepsilon$ constrains a one-sample estimate of $2 D_{\mathrm{TV}}$, evaluated at whichever action happened to be drawn. TRPO constrained the divergence itself, and PPO constrains a single draw from the random variable whose mean is that divergence. The substitution introduces a systematic bias, since equal ratios move very unequal amounts of probability mass, and [[rlhf-transfer#The ratio is a one-sample estimate of a divergence you can afford to compute]] works out what it costs and what this project can do about it.
+
 Three consequences bear directly on our design. The ratio must equal 1 at $\theta = \theta_{\text{old}}$, which is why masking has to be applied both when sampling and when recomputing log-probabilities. PPO-clip carries no KL term, so any KL an implementation reports is a diagnostic, typically used for early stopping. And the two KL-shaped quantities that appear around PPO are not the same object and should never be conflated: the trust region is $\pi_\theta$ against $\pi_{\theta_{\text{old}}}$ and is enforced here by the clip, while the leash to a fixed reference policy $\pi_{\text{ref}}$ is a separate regularizer that RLHF adds and that this project does not have, since there is no pretrained reference to stay near.
 
 ### The entropy bonus
