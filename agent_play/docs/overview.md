@@ -233,6 +233,7 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 | `agent_play/docs/notation.md` | the symbol contract, and what is recap of the RL wiki vs new here | before any of the mathematical documents |
 | `agent_play/docs/rl-and-the-battle-domain.md` | RL vocabulary, the battle domain, comparison with other environments | first, if the vocabulary is new |
 | `agent_play/docs/rl-methods.md` | every RL technique the docs name, derived, with verdicts | to look one up |
+| `agent_play/docs/rlhf-transfer.md` | what the language-model RL literature contributes here | before choosing a baseline or an aggregation scheme |
 | `agent_play/docs/training-design.md` | architecture, losses, hyperparameters, and the alternatives at each choice | before training anything |
 | `agent_play/docs/roadmap.md` | scope, battles now, wider battles and the adventure-map agent later | to see what is deliberately not built yet |
 | `agent_play/docs/decisions/` | accepted ADRs amending the specification | before implementing the area they touch |

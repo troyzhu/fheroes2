@@ -14,6 +14,8 @@ Part 1 derives the chain from the objective to PPO, because those pieces build o
 
 ## Table of contents
 - [[#Part 1, from the objective to PPO]]
+  - [[#One shape, many algorithms]], the frame the rest of Part 1 hangs on
+  - [[#Behavior cloning is this same update]], why imitation and PPO are one update
 - [[#Part 2, the alternatives landscape]]
 - [[#Part 3, partial observability]]
 - [[#Part 4, reward shaping]]
@@ -29,6 +31,18 @@ A policy $\pi_\theta$ is scored by the expected return from the initial-state di
 $$J(\theta) = \mathbb{E}_{s_0 \sim \rho_0}\big[V^\pi(s_0)\big] = \mathbb{E}_{s_0 \sim \rho_0,\ \tau \sim \pi_\theta}\!\left[\sum_{t=0}^{T-1} \gamma^{t} r_{t+1}\right]$$
 
 Everything in Part 1 is machinery for estimating $\nabla_\theta J$ from sampled play, because that gradient cannot be computed directly. The environment's dynamics appear in the expectation and are unknown to the learner.
+
+### One shape, many algorithms
+
+Every policy-gradient method in Part 1 is the same update with a different scoring term.
+
+$$\Delta\theta \propto \Psi_t\, \nabla_\theta \log \pi_\theta(a_t \mid s_t)$$
+
+The gradient factor points in the direction that makes $a_t$ more likely. The scalar $\Psi_t$ decides whether to go that way and how hard. Everything that follows differs only in what gets substituted for $\Psi_t$.
+
+$$\Psi_t \in \Big\{\ \underbrace{G_t}_{\text{REINFORCE}},\quad \underbrace{G_t - b(s_t)}_{\text{with baseline}},\quad Q^\pi(s_t, a_t),\quad \underbrace{A^\pi(s_t, a_t)}_{\text{lowest variance}},\quad \underbrace{r_{t+1} + \gamma V(s_{t+1}) - V(s_t)}_{\text{TD residual}}\ \Big\}$$
+
+Keeping this frame in view is what makes the rest of Part 1 a sequence of substitutions rather than a list of unrelated algorithms. It also explains something about the staging in [[decisions/0005-training-and-reward]] that is otherwise easy to miss, and [[#Behavior cloning is this same update]] returns to it.
 
 ### The policy gradient and REINFORCE
 
@@ -66,6 +80,14 @@ $$A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$$
 
 One caveat, since it is easy to overstate. The state value is not the variance-minimizing baseline, which is $Q^\pi$ weighted by $\lVert \nabla_\theta \log \pi_\theta \rVert^2$. It wins on practicality instead, because a critic is being learned anyway and the true optimum would need a second estimator. Your `advantage-function` note makes the same point with the word approximately.
 
+### Behavior cloning is this same update
+
+Supervised imitation is not a different family. Maximizing the log-likelihood of a teacher's action is the update above with $\Psi_t \equiv +1$ and the states drawn from the teacher's distribution rather than the policy's.
+
+$$\nabla_\theta\, \mathbb{E}_{(o, a^{*}) \sim \mathcal{D}}\big[\log \pi_\theta(a^{*} \mid o)\big] \;=\; \text{policy gradient with } \Psi_t \equiv +1,\ \ o \sim \mathcal{D}$$
+
+Two differences hide in that line and they are exactly the two things stage 3 adds. A constant positive $\Psi_t$ can only push probability up, so cloning has no mechanism to push a bad action down. The baseline is what creates a negative signal and therefore any contrast at all. And the states come from a fixed dataset rather than from the policy's own play, which is the covariate shift that DAgger addresses. Seeing cloning and PPO as one update with two knobs changed is the cleanest way to understand why [[training-design]] runs them in sequence on one network.
+
 The advantage answers the question the gradient actually needs. Not "was this outcome good" but "was this action better or worse than what this policy usually does here". An action followed by a return of 10 in a state worth 12 should be discouraged, and raw return cannot express that.
 
 ### Actor-critic
@@ -92,6 +114,10 @@ Generalized advantage estimation replaces that single residual with an exponenti
 
 $$\hat A_t^{\text{GAE}(\gamma, \lambda)} = \sum_{l=0}^{\infty} (\gamma\lambda)^{l}\, \delta_{t+l}$$
 
+Written that way it costs $O(T^2)$ to fill in every $\hat A_t$. Pulling the $l = 0$ term out gives a backward recursion that does the whole episode in one $O(T)$ pass, and this is the form an implementation actually uses.
+
+$$\hat A_t = \delta_t + \gamma\lambda\, \hat A_{t+1}, \qquad \hat A_{T-1} = \delta_{T-1}$$
+
 At $\lambda = 0$ it is the single residual, low variance and biased by whatever the critic gets wrong. At $\lambda = 1$ it telescopes to the Monte Carlo advantage, unbiased and high variance. Values near 0.95 are the usual compromise.
 
 > [!derivation]- Why $\lambda = 1$ recovers Monte Carlo
@@ -105,17 +131,31 @@ A policy-gradient step that is too large is not merely inefficient, it is destru
 
 Trust-region policy optimization enforces this with an explicit constraint on the KL divergence between old and new policy. It works and is heavy, requiring second-order machinery.
 
-PPO achieves a similar effect with a first-order trick. Define the importance ratio between new and old policy. It is written $r_t(\theta)$ here, following the PPO paper and your `ppo-clip` note, so the letter $r$ is overloaded against the per-step reward. Context disambiguates, since the ratio always carries a $(\theta)$.
+PPO achieves a similar effect with a first-order trick. Define the importance ratio between new and old policy. It is written $\rho_t(\theta)$ here, following the PPO paper and your `ppo-clip` note, so the letter $r$ is overloaded against the per-step reward. Context disambiguates, since the ratio always carries a $(\theta)$.
 
-$$r_t(\theta) = \frac{\pi_\theta(a_t \mid o_t)}{\pi_{\theta_{\text{old}}}(a_t \mid o_t)}$$
+$$\rho_t(\theta) = \frac{\pi_\theta(a_t \mid o_t)}{\pi_{\theta_{\text{old}}}(a_t \mid o_t)}$$
 
 and optimize the clipped surrogate.
 
-$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t\!\left[\min\Big(r_t(\theta)\,\hat A_t,\ \operatorname{clip}\big(r_t(\theta), 1-\epsilon, 1+\epsilon\big)\,\hat A_t\Big)\right]$$
+$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t\!\left[\min\Big(\rho_t(\theta)\,\hat A_t,\ \operatorname{clip}\big(\rho_t(\theta), 1-\varepsilon, 1+\varepsilon\big)\,\hat A_t\Big)\right]$$
 
-The clip removes the incentive to move the ratio beyond $1 \pm \epsilon$. The $\min$ makes the objective pessimistic, so an update that would overshoot gains nothing while an update that would make things worse is still penalized in full. The policy can drift no further than the data support without the optimizer noticing it has stopped improving.
+The clip removes the incentive to move the ratio beyond $1 \pm \varepsilon$. The $\min$ makes the objective pessimistic, so an update that would overshoot gains nothing while an update that would make things worse is still penalized in full. The policy can drift no further than the data support without the optimizer noticing it has stopped improving.
 
-Two consequences bear directly on our design. The ratio must equal 1 at $\theta = \theta_{\text{old}}$, which is why masking has to be applied both when sampling and when recomputing log-probabilities. And PPO-clip carries no KL term, so any KL an implementation reports is a diagnostic, typically used for early stopping.
+> [!derivation]- Why the surrogate is a policy gradient at all, and which branch the min selects
+> The unclipped surrogate is $J^{\text{surr}}(\theta) = \mathbb{E}_{\pi_{\theta_{\text{old}}}}[\rho_t(\theta) \hat A_t]$. Using $\nabla_\theta \rho_t = \rho_t \nabla_\theta \log \pi_\theta$ and $\rho_t = 1$ at $\theta = \theta_{\text{old}}$,
+> $$\nabla_\theta J^{\text{surr}}\big|_{\theta = \theta_{\text{old}}} = \mathbb{E}_{\pi_{\theta_{\text{old}}}}\big[\nabla_\theta \log \pi_\theta(a_t \mid o_t)\, \hat A_t\big]\Big|_{\theta_{\text{old}}}$$
+> which is exactly the policy gradient. The first step on the surrogate is therefore a true gradient step, and the clip only starts to bite once $\theta$ has moved and $\rho_t \neq 1$. That identity is the whole reason the ratio has to equal one at the start of an epoch, and it is what masking breaks if applied inconsistently.
+>
+> Which branch the $\min$ picks, and where the gradient vanishes:
+>
+> | | $\rho_t < 1 - \varepsilon$ | $1 - \varepsilon \le \rho_t \le 1 + \varepsilon$ | $\rho_t > 1 + \varepsilon$ |
+> |---|---|---|---|
+> | $\hat A_t > 0$ | $\rho_t \hat A_t$ | $\rho_t \hat A_t$ | $(1+\varepsilon)\hat A_t$, gradient 0 |
+> | $\hat A_t < 0$ | $(1-\varepsilon)\hat A_t$, gradient 0 | $\rho_t \hat A_t$ | $\rho_t \hat A_t$ |
+>
+> The two clipped cells are constant in $\theta$, so they contribute no gradient: a good action already pushed far enough up, or a bad one already pushed far enough down, stops contributing. The other two extreme cells stay live, so an action pushed the wrong way still gets full gradient to correct it. The clip is one-sided in effect rather than a symmetric brake.
+
+Three consequences bear directly on our design. The ratio must equal 1 at $\theta = \theta_{\text{old}}$, which is why masking has to be applied both when sampling and when recomputing log-probabilities. PPO-clip carries no KL term, so any KL an implementation reports is a diagnostic, typically used for early stopping. And the two KL-shaped quantities that appear around PPO are not the same object and should never be conflated: the trust region is $\pi_\theta$ against $\pi_{\theta_{\text{old}}}$ and is enforced here by the clip, while the leash to a fixed reference policy $\pi_{\text{ref}}$ is a separate regularizer that RLHF adds and that this project does not have, since there is no pretrained reference to stay near.
 
 ### The entropy bonus
 

@@ -16,25 +16,25 @@ from scratch; `research/` holds the literature; `implementation/` holds one prim
 mechanism; `decisions/` holds the accepted records; and `archive/` holds dated logs, benchmarks,
 and raw research runs, which are provenance rather than a reading path.
 
-**Notation is not a free choice.** All mathematics matches the repository owner's personal RL wiki,
-an Obsidian vault under Dropbox at `Papers/wiki` (on this machine,
-`/Volumes/External Drive/Dropbox/Papers/wiki`). That vault holds ~6,000 concept notes and already
-defines nearly every technique used here, so this documentation is meant to extend it rather than
-run a parallel vocabulary. Only its core RL notes are in scope; the RLHF, GRPO, and LLM material is
-a different problem. `agent_play/docs/notation.md` is the contract: the shared symbols with the
-wiki note that defines each, the symbols this project adds, a coverage map marking every topic as
-recap or new, and a translation table for anyone reading Zhao's *Mathematical Foundations of RL*,
-which uses different symbols. Read it before editing any document that carries equations.
+**Notation is not a free choice.** `agent_play/docs/notation.md` is the contract, and the tree is
+self-contained: no page depends on a file outside this repository. The symbols match the owner's
+own RL study notes so this material reads as a continuation of them. Concretely: `V^\pi(s)`,
+`Q^\pi(s,a)`, `A^\pi(s,a)`, `\pi_\theta(a \mid s)`, `P(s' \mid s,a)`, `R(s,a,s')`, `\rho_0`,
+`V_\phi` for the critic, `\rho_t(\theta)` for the PPO ratio, `\varepsilon` for the clip half-width,
+`\epsilon` for the DAgger per-decision error rate, `\Psi_t` for the policy-gradient scoring term,
+and `\log` rather than `\ln`.
 
-**That vault is read-only. Never write to it, and never edit, create, or reorganize a file under
-`Papers/wiki`.** Read it to check a symbol or to see whether a concept is already covered, and make
-every change on the fheroes2 side.
+Do NOT "correct" these toward Zhao's `v_\pi`/`q_\pi`/`\delta_\pi`/`\pi(a \mid s,\theta)`/`d_0`/`\ln`.
+That was tried once and fully reverted. The owner cites Zhao for the Bellman-contraction material
+but writes in the Sutton-Barto convention throughout, verified by counting symbols across their
+notes. `notation.md` keeps a Zhao translation table for reading the book alongside.
 
-Concretely the wiki convention is `V^\pi(s)`, `Q^\pi(s,a)`, `A^\pi(s,a)`, `\pi_\theta(a \mid s)`,
-`P(s' \mid s,a)`, `R(s,a,s')`, `\rho_0`, `V_\phi` for the critic, `r_t(\theta)` for the PPO ratio,
-and `\log` rather than `\ln`. Do not "correct" these toward Zhao's `v_\pi`/`q_\pi`/`\delta_\pi`/
-`\pi(a \mid s,\theta)`/`d_0`/`\ln`; that was tried and reverted, because the owner's actual notes
-use the Sutton-Barto convention regardless of which textbook they cite.
+**The owner's notes live at `/Volumes/External Drive/Dropbox/Papers/`, and that tree is READ-ONLY.**
+Never create, edit, move, or reorganize anything under it. The relevant parts are
+`Papers/study/problems/reinforcement-learning/` (74 problem cards, cited in `notation.md` by id as
+`rl-014`), `Papers/study/dive/rlhf-book-lambert/`, and `Papers/wiki/concepts/`. Read them to check
+a convention, then make every change on the fheroes2 side. **The fork is public**, so their notes
+must never be copied in verbatim; write original pages citing card ids as provenance instead.
 
 **Run `./agent_play/lint_docs.sh` before claiming any documentation change is done.** It enforces
 the writing contract at `~/.claude/plugins/marketplaces/troyzhu/docs/WRITING_STYLE.md` (em-dash and

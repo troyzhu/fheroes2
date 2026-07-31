@@ -23,6 +23,7 @@ This tree lives under `agent_play/` rather than under the repository's `docs/` d
 | Understand why an interface is the way it is | [[decisions/README]] |
 | Know how a policy will be trained and what it is rewarded for | [[decisions/0005-training-and-reward]] for the decisions, then [[training-design]] for the architecture, losses, and hyperparameters |
 | Look up any RL technique the docs mention | [[rl-methods]], which defines all of them with their equations and our verdict |
+| See what the language-model RL literature contributes here | [[rlhf-transfer]] |
 | Know what is planned beyond battles, including the navigation agent | [[roadmap]] |
 | Trace a number back to the run that produced it | [[archive/README]] |
 
@@ -37,6 +38,7 @@ agent_play/docs/
 ├── roadmap.md                   scope, battles now, wider battles and the adventure map later
 ├── training-design.md           how a policy is fitted, architecture, losses, hyperparameters, alternatives
 ├── rl-methods.md                every RL technique the docs name, derived, with verdicts
+├── rlhf-transfer.md             what transfers from RLHF to a battle agent, and what does not
 ├── research/                    the literature and what it establishes
 ├── implementation/              how the built mechanisms work
 ├── decisions/                   accepted decision records

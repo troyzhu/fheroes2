@@ -41,9 +41,9 @@ These follow the contract in [[notation]], which matches the owner's RL wiki and
 | $\pi^{*}$ | The teacher policy |
 | $\mathcal{D}$ | Dataset of observation and action pairs |
 | $\hat A_t$ | Advantage estimate at step $t$, targeting $A^\pi$, computed by GAE |
-| $r_t(\theta)$ | Probability ratio $\pi_\theta(a_t \mid o_t) \,/\, \pi_{\theta_{\text{old}}}(a_t \mid o_t)$ |
+| $\rho_t(\theta)$ | Probability ratio $\pi_\theta(a_t \mid o_t) \,/\, \pi_{\theta_{\text{old}}}(a_t \mid o_t)$ |
 | $T$ | Episode length in decisions, 5 to 40 here |
-| $\varepsilon$ | Per-decision error rate of a fitted policy |
+| $\epsilon$ | Per-decision error rate of a fitted policy |
 
 ## The policy network
 
@@ -143,7 +143,7 @@ The mixing coefficient starts near 1 and decays to 0, typically $\beta_i = p^{i}
 
 ### Why it is worth the extra machinery
 
-Cloning error compounds. A policy with per-decision error $\varepsilon$ that makes a mistake early lands in a state unlike anything it trained on, where its error is higher, and the damage accumulates over the episode. The classical result is that plain cloning has regret growing as $O(\varepsilon T^{2})$ in the horizon, while DAgger achieves $O(\varepsilon T)$ (Ross, Gordon and Bagnell, 2011).
+Cloning error compounds. A policy with per-decision error $\epsilon$ that makes a mistake early lands in a state unlike anything it trained on, where its error is higher, and the damage accumulates over the episode. The classical result is that plain cloning has regret growing as $O(\epsilon T^{2})$ in the horizon, while DAgger achieves $O(\epsilon T)$ (Ross, Gordon and Bagnell, 2011).
 
 With $T$ between 5 and 40 here, that quadratic term is far less punishing than in the long-horizon settings where DAgger was developed. The honest expectation is that DAgger helps but is not transformative at battle scope, and that it becomes important at adventure-map scope where $T$ is in the thousands.
 
@@ -157,7 +157,7 @@ DAgger requires querying the teacher at arbitrary states the student produced. W
 
 PPO maximizes a clipped surrogate that keeps each update near the policy that collected the data:
 
-$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta)\, \hat A_t, \ \operatorname{clip}\big(r_t(\theta),\, 1-\epsilon,\, 1+\epsilon\big)\, \hat A_t \right) \right]$$
+$$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( \rho_t(\theta)\, \hat A_t, \ \operatorname{clip}\big(\rho_t(\theta),\, 1-\varepsilon,\, 1+\varepsilon\big)\, \hat A_t \right) \right]$$
 
 with the full loss adding a value term and an entropy bonus:
 
@@ -174,7 +174,7 @@ These are the community defaults, adjusted for a small fast environment. Every o
 | Hyperparameter | Start | Reasoning |
 |---|---|---|
 | Learning rate | $3 \times 10^{-4}$, annealed | PPO's usual value |
-| Clip range $\epsilon$ | 0.2 | Standard; lower it if the policy moves too fast after cloning |
+| Clip range $\varepsilon$ | 0.2 | Standard; lower it if the policy moves too fast after cloning |
 | Discount $\gamma$ | 0.99 | Episodes are short, so near-undiscounted is defensible |
 | GAE $\lambda$ | 0.95 | Standard bias-variance point |
 | Rollout length | 256 decisions per worker | Several episodes per rollout at this episode length |
