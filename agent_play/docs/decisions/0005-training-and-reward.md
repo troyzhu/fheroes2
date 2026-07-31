@@ -13,6 +13,7 @@ tags: [adr, training, reward, agent-env]
 - Context: [[../research/findings]], [[../implementation/teacher-coverage-and-behavior-cloning]], user question 2026-07-30
 - Techniques: [[../rl-methods]] defines every method named below, with its equation and our verdict.
 - Mechanics: [[../training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
+- Transfer: [[../rlhf-transfer]] works out what the language-model reinforcement-learning literature contributes here, and supplies evidence for two things this record left open.
 
 ## Context
 
@@ -57,7 +58,7 @@ Potential-based shaping. Shaping expressed as the difference of a potential func
 The choice is made against these, in order.
 
 1. The objective must survive. Any shaping must be potential-based or demonstrably not change the optimal policy. A proxy that changes what the agent is optimizing for is rejected regardless of how fast it learns.
-2. Terminal-first, shaped only if needed. Start with the margin-weighted terminal reward. Add shaping only if learning demonstrably stalls, and report both.
+2. Terminal-first, shaped only if needed. Start with the margin-weighted terminal reward. Add shaping only if learning demonstrably stalls, and report both. This now has outside support rather than resting on the short horizon alone. A win or loss computed by the engine is a verifiable reward in the sense of [[../rlhf-transfer#The chapter that transfers almost completely]], and the strongest recent results in that regime train on sparse binary outcomes rather than on step-level process rewards. Reporting both means plotting the shaped proxy and the win rate against divergence from the cloned checkpoint, not against training steps.
 3. It must compose with the campaign. A battle reward that does not reflect the surviving army's value in the wider game will teach behavior that is locally optimal and globally wrong. This is the strongest argument for the margin-weighted variant over the pure win-loss signal.
 4. It must be defined over recorded state. Anything the reward needs must already be in the terminal record, or the record changes first.
 
@@ -68,6 +69,10 @@ Truncation against termination. When an episode ends because a round limit was r
 The discount. $\gamma$ belongs to the objective alongside the reward and is deferred with it. Short episodes make a value near 1 defensible.
 
 The initial-state distribution $\rho_0$. A win rate is a statement about the scenario and army generator as much as about the policy. That generator is currently five fixed fixtures used as regression anchors, which is not a training distribution. Defining it is a prerequisite for any reported result meaning anything, and it is presently the largest undocumented modeling choice in the project.
+
+It now has an acceptance criterion, which it did not when this record was written. A generated scenario carries gradient only when the policy neither always wins nor always loses it, and under a group or leave-one-out baseline that is an identity rather than a heuristic, since equal returns across a group make every advantage in it zero. Published practice in the verifiable-reward setting filters training problems to roughly a 20 to 80 percent solve rate for this reason, and [[../rlhf-transfer#Difficulty filtering, and what it settles]] carries the argument. Two things follow. The generator needs a difficulty control whose effect is measured as a win rate over sampled scenarios rather than asserted from army sizes. And the target band moves as the policy improves, which makes this a curriculum rather than a fixed distribution.
+
+A held-out seed set is a separate obligation. The five fixtures are used continuously during development, so a win rate reported on them is a number that development has been optimizing against. Evaluation seeds have to be fixed in advance and excluded from training before any headline number is quoted.
 
 ## Consequences
 

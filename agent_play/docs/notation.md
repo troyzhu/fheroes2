@@ -83,6 +83,9 @@ The study notes already cover most of the machinery, which is why [[rl-methods]]
 | Offline RL | `rl-033` to `rl-035`, `rl-059` | surveyed and set aside |
 | Planning, MCTS, model-based RL | `rl-051`, `rl-052`, `rl-057`, `rl-204` | why the door is kept open but not walked through |
 | Policy-gradient family shape, RLOO, GRPO, loss aggregation | the RLHF math companion, ch. 6a to 6d | [[rlhf-transfer]] works out what applies to battles |
+| Verifiable rewards, difficulty filtering of the training set | beyond where the companion reaches | [[rlhf-transfer]], read from the open-source book; it supplies an acceptance criterion for $\rho_0$ |
+| Overoptimization measured against a KL budget | beyond where the companion reaches | [[rlhf-transfer]], which turns it into a reporting protocol |
+| Evaluation variance, hillclimbing, contamination | beyond where the companion reaches | [[rlhf-transfer]], applied to the fixture set |
 | Legal-action masking | absent | [[implementation/legal-actions-and-masking]], the main new RL content here |
 | Elo and TrueSkill for ranking agents | absent | [[rl-and-the-battle-domain]] Part 3 |
 | Asymmetric actor-critic, privileged critics | absent | [[implementation/observation-design]], including the bias result |

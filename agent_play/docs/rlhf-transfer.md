@@ -8,30 +8,57 @@ tags: [agent-env, rl, rlhf, reference]
 
 # What transfers from RLHF to a battle agent
 
-Most of the reinforcement learning written about today is applied to language models, so most of the recent engineering experience lives there. This project has no language model, no preference data, and no pretrained reference policy, which makes it fair to ask what any of that experience is worth here. The answer is that a specific and useful subset transfers, and the rest actively misleads.
+Most reinforcement learning written about today is applied to language models, so most of the recent engineering experience lives there. This project has no language model, no preference data, and no pretrained reference policy, which makes it fair to ask what any of that experience is worth here. The answer is that a specific and useful subset transfers, one chapter transfers almost completely, and the rest actively misleads.
 
-Sources are Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rlhfbook.com](https://rlhfbook.com), policy-gradient chapter) and the owner's math companion to it. Both use the notation fixed in [[notation]]. Techniques named here are defined in [[rl-methods]].
+The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rlhfbook.com](https://rlhfbook.com)), which is open source, read here in full rather than only where the owner's notes reach. Its Appendix A uses the same symbols this tree does, including $V^\pi$, $Q^\pi$, $A^\pi$, $\pi_\theta$, and $\log$, so nothing below needs translating. Techniques named here are defined in [[rl-methods]]; symbols are fixed in [[notation]].
 
 ## Table of contents
 - [[#The short version]]
+- [[#The chapter that transfers almost completely]]
 - [[#Critic-free baselines, which this project should seriously consider]]
 - [[#The aggregation unit, and an episode-length bias we would otherwise inherit]]
 - [[#Where value-network bias actually comes from]]
-- [[#A reference policy this project does have]]
-- [[#Overoptimization, restated for a shaped battle reward]]
+- [[#A reference policy this project does have, and an argument against using it]]
+- [[#Overoptimization, and the measurement it demands]]
+- [[#Evaluation discipline]]
 - [[#What does not transfer]]
 
 ## The short version
 
 | Idea | Transfers | Why |
 |---|---|---|
-| Group and leave-one-out baselines instead of a critic | Yes, strongly | Battles are cheap and seed-repeatable, so the sampling this needs is nearly free here |
-| Aggregation unit, per-decision against per-episode | Yes | Battles vary 5 to 40 decisions, which is the same length-bias structure as variable completion length |
-| The exact statement of value-network bias | Yes | Decides whether a critic fitted on very little data is safe to use |
-| A KL leash to a reference policy | Yes, after cloning | The cloned policy is a genuine reference even though no pretrained one exists |
-| Reward overoptimization and normalization | Yes | The shaped-reward risk in [[decisions/0005-training-and-reward]] is the same failure |
+| Verifiable rewards, and what follows from them | Almost completely | A win or loss is a verifiable reward in exactly the book's sense |
+| Difficulty filtering of the training distribution | Yes, and it is the sharpest finding here | Answers an open question in [[decisions/0005-training-and-reward]] about the scenario generator |
+| Group and leave-one-out baselines instead of a critic | Yes, strongly | Battles are cheap and seed-repeatable, so the sampling this needs is nearly free |
+| Aggregation unit, per-decision against per-episode | Yes | Battles vary 5 to 40 decisions, the same length-bias structure as variable completion length |
+| The exact statement of value-network bias | Yes | Decides whether a critic fitted on very little data is safe |
+| A KL leash to a reference policy | Contested, and the book argues both sides | The cloned policy is a genuine reference, but reasoning practice removed the leash to allow exploration |
+| Overoptimization and the proxy-against-gold measurement | Yes | The shaped-reward risk in [[decisions/0005-training-and-reward]] is the same failure |
+| Evaluation variance, contamination, hillclimbing | Yes | The five fixtures cannot be both regression anchors and the reported evaluation |
 | Truncated importance sampling for async training | Later | Only once actors and learners are separated, which is not the current design |
 | Token-level structure, DPO, preference data, instruction tuning | No | There is no language model and no human preference signal here |
+
+## The chapter that transfers almost completely
+
+The book's reasoning chapter covers reinforcement learning with verifiable rewards, meaning a reward computed by a deterministic function rather than predicted by a learned model. A unit test passes or it does not. An extracted answer equals 77 or it does not.
+
+A battle is won or it is lost, computed by the engine. This project is therefore already doing verifiable-reward reinforcement learning, and three consequences follow directly.
+
+Overoptimization mostly stops being a concern. The failure in RLHF is that a policy pushed hard against a *learned* reward exploits that model's errors. A verifiable reward has no errors to exploit, and the book reports these domains are robust to overoptimization for exactly that reason. The residual risk here is not the win-loss signal but any *shaped* term added beside it, which is a hand-written reward model and does have errors to exploit.
+
+Sparse binary outcome rewards are the practice, not a compromise. The book records that reasoning models train on correct-or-incorrect at the end rather than on step-level process rewards, with auxiliary terms only for format. That is independent support for the terminal-first criterion already in [[decisions/0005-training-and-reward]], and it is worth more than the usual argument that sparse reward is merely tolerable at short horizons. The strongest recent results in a comparable regime chose it.
+
+The third consequence is large enough to have its own section.
+
+### Difficulty filtering, and what it settles
+
+The book reports that filtering training problems to those the model solves between roughly 20 and 80 percent of the time is essential, because a problem solved every time and a problem never solved both produce no gradient. With a group-relative or leave-one-out baseline this is not a heuristic but an identity: if every rollout in a group earns the same return, the advantage of every member is zero and the batch contributes nothing.
+
+[[decisions/0005-training-and-reward]] calls the initial-state distribution the largest undocumented modeling choice in the project and leaves it open. This gives it a concrete acceptance criterion. A scenario and army generator is suitable when the policy being trained wins somewhere in a middle band, and unsuitable when it wins almost always or almost never, regardless of how realistic the matchups look.
+
+Two things follow for the design. The generator needs a difficulty parameter that can be measured rather than asserted, and the natural measurement is the win rate of the current policy, or the teacher, over a sample of generated scenarios. And the band moves, because a scenario set that is well calibrated for a freshly cloned policy becomes too easy once training works, which makes this a curriculum rather than a fixed distribution. The five committed fixtures are regression anchors and were never a training distribution; this says what the training distribution has to satisfy.
+
+The cost of ignoring it is specific. Sampling armies uniformly would produce many lopsided matchups, most batches would carry near-zero advantage, and the run would look like a learning-rate problem.
 
 ## Critic-free baselines, which this project should seriously consider
 
@@ -41,11 +68,11 @@ REINFORCE leave-one-out draws $K$ episodes from the same starting state and uses
 
 $$b_k = \frac{1}{K-1}\sum_{i \neq k} G^{(i)}, \qquad \hat A_k = G^{(k)} - b_k$$
 
-Excluding the sample itself is what keeps this exactly unbiased, because $b_k$ is then independent of $a_k$ and the baseline term vanishes by the argument in [[rl-methods]]. Group-relative optimization instead uses the full group mean, which includes the sample and leaves an $O(1/K)$ bias, and then divides by the group standard deviation, which is contested and which the Dr. GRPO variant drops.
+Excluding the sample itself is what keeps this exactly unbiased, because $b_k$ is then independent of $a_k$ and the baseline term vanishes by the argument in [[rl-methods]]. Group-relative optimization instead uses the full group mean, which includes the sample and leaves an $O(1/K)$ bias, then divides by the group standard deviation, which is contested and which the Dr. GRPO variant drops.
 
-The reason this matters here is that the objection to it does not apply. In a language model, drawing $K$ completions per prompt is the dominant cost. Here the environment runs at roughly 4,600 episodes per second and a scenario is reproducible from a seed, so drawing $K$ episodes from one starting state is close to free. Against that, the critic has to be fitted on very little data, and [[training-design]] already flags 116 recorded decisions as a regime where a network memorizes.
+The reason this matters here is that the objection to it does not apply. In a language model, drawing $K$ completions per prompt is the dominant cost. Here the environment runs at roughly 4,600 episodes per second and a scenario is reproducible from a seed, so drawing $K$ episodes from one starting state is close to free. Against that, the critic must be fitted on very little data, and [[training-design]] already flags 116 recorded decisions as a regime where a network memorizes.
 
-The cost is real and should be stated. A leave-one-out baseline gives one advantage for the whole episode, so every decision in it receives the same credit, which is coarse when a battle turns on one decision out of thirty. That is the trade in the next section rather than an argument against trying it. The concrete recommendation is that a leave-one-out baseline belongs in the first round of experiments beside the critic, not as a fallback after the critic disappoints.
+The cost is real and should be stated. A leave-one-out baseline gives one advantage for the whole episode, so every decision receives the same credit, which is coarse when a battle turns on one decision out of thirty. That is the trade in the next section rather than an argument against trying it. The concrete recommendation is that a leave-one-out baseline belongs in the first round of experiments beside the critic, not as a fallback after the critic disappoints.
 
 ## The aggregation unit, and an episode-length bias we would otherwise inherit
 
@@ -66,29 +93,49 @@ This is worth recording now because it is invisible until measured and it looks 
 
 ## Where value-network bias actually comes from
 
-The claim that a critic-free method avoids value-network bias is often stated loosely. The precise version is worth having, because it decides whether a critic fitted on very little data is dangerous or merely imprecise.
+The claim that a critic-free method avoids value-network bias is often stated loosely. The precise version decides whether a critic fitted on very little data is dangerous or merely imprecise.
 
 A value estimate used as a pure baseline, subtracted from a Monte Carlo return, leaves the gradient unbiased no matter how bad the estimate is. That follows from the baseline argument in [[rl-methods]], which needs only that the baseline does not depend on the action. A poor critic costs variance reduction, not correctness.
 
 Bias enters with bootstrapping. Replacing the sampled return with a target such as $r_{t+1} + \gamma V_\phi(s_{t+1})$ substitutes the network's own estimate for the truth, so $\mathbb{E}[\hat A_t] \neq A^\pi$ whenever $V_\phi$ is imperfect. That is what buys the variance reduction, and it is the same trade $\lambda$ controls in generalized advantage estimation.
 
-For this project the reading is direct. A critic trained on very little data is safe to use as a plain baseline and becomes a bias risk exactly to the extent that $\lambda$ is pushed toward 0. Starting near $\lambda = 0.95$ and treating a lower value as an explicit bias-for-variance decision is the disciplined way to hold that.
+For this project the reading is direct. A critic trained on very little data is safe as a plain baseline and becomes a bias risk exactly to the extent that $\lambda$ is pushed toward 0. Starting near $\lambda = 0.95$ and treating a lower value as an explicit bias-for-variance decision is the disciplined way to hold that.
 
-## A reference policy this project does have
+## A reference policy this project does have, and an argument against using it
 
-RLHF carries two KL-shaped quantities that [[rl-methods]] warns against conflating. The trust region between $\pi_\theta$ and $\pi_{\theta_{\text{old}}}$ is enforced by the clip. The leash to a fixed reference $\pi_{\text{ref}}$, usually the supervised-fine-tuned model, is a separate regularizer.
+RLHF carries two KL-shaped quantities that [[rl-methods]] warns against conflating. The trust region between $\pi_\theta$ and $\pi_{\theta_{\text{old}}}$ is enforced by the clip. The leash to a fixed reference $\pi_{\text{ref}}$, usually the supervised-fine-tuned model, is a separate regularizer, applied either as a reward penalty or as a loss term.
 
-The obvious reading is that the second does not apply here, since there is no pretrained model to stay near. That reading is wrong, and the reason is the staging in [[decisions/0005-training-and-reward]]. After stage 1 there is a cloned policy that plays competently, and stage 3 can destroy that competence early while the value estimates are still poor. The cloned checkpoint is a genuine reference policy in exactly the sense RLHF means, and a KL penalty against it, decayed as training proceeds, is a principled way to keep the reinforcement stage from throwing away what imitation bought.
+$$r = r_\theta - \lambda_{\text{KL}}\, \mathcal{D}_{\text{KL}}\big(\pi_\theta(y \mid x) \,\|\, \pi_{\text{ref}}(y \mid x)\big)$$
 
-This is a proposal rather than a decision, and it belongs in [[decisions/0005-training-and-reward]] if adopted. What argues for it is that the failure it prevents, an early collapse away from competent play, is the most likely way stage 3 goes wrong. What argues against it is that it adds a coefficient and a schedule to tune, and that the entropy bonus already provides some of the same protection. Measure the collapse before adding the leash.
+The obvious reading is that this does not apply here, since there is no pretrained model to stay near. That reading is wrong. After stage 1 of [[decisions/0005-training-and-reward]] there is a cloned policy that plays competently, and stage 3 can destroy that competence early while value estimates are still poor. The cloned checkpoint is a reference policy in exactly the sense meant, and the book supplies quantitative support: forgetting correlates with the KL divergence between the initial and trained policies at $R^2 = 0.96$.
 
-## Overoptimization, restated for a shaped battle reward
+The same source argues the other way, and honesty requires reporting it. As reasoning training scaled, many systems removed the KL penalty entirely, because it constrains exploration and the verifiable reward removed the failure the penalty was guarding against. This project is in the verifiable-reward regime, which puts it on the side of the argument that drops the leash.
 
-Reward-model overoptimization is the observation that a policy pushed hard against a learned reward improves on that reward while getting worse at what the reward was supposed to measure. The Bradley-Terry model behind those rewards is identified only up to an additive constant, which is why reward normalization is needed for the KL coefficient to mean anything across runs.
+The book also notes a third path that costs nothing. On-policy sampling is itself an implicit regularizer, because updates stay near where the policy already puts probability mass, which is why reinforcement learning forgets less than supervised fine-tuning on distant targets. Stage 3 is on-policy, so some protection is already present without any coefficient.
 
-This project has no learned reward model, so the identifiability part does not apply. The overoptimization part applies in full and is already the stated worry in [[decisions/0005-training-and-reward]], where a shaped per-decision reward risks teaching the proxy rather than the objective. A shaped reward is a hand-written reward model, and it fails the same way.
+The resulting recommendation is narrower than the one this page carried before. Do not add a KL leash by default. Instrument the divergence from the cloned checkpoint, watch whether early stage-3 updates degrade win rate against the teacher, and add the penalty only if that degradation appears. If it does, the reward-penalty and loss-term forms are both available and the book treats the choice as minor.
 
-Two things carry over as practice. Report the true objective, the win rate, alongside whatever shaped quantity is being optimized, so divergence between them is visible rather than inferred. And keep the shaped term potential-based, since that is the one form with a proof that the optimal policy is unchanged.
+## Overoptimization, and the measurement it demands
+
+Overoptimization is the observation that a policy pushed against a proxy improves on the proxy while getting worse at what the proxy was meant to measure. The book separates two forms: quantitative reward overoptimization, where a learned reward's score rises as held-out quality falls, and qualitative degradation, where no metric moves but behavior becomes verbose, sycophantic, or rigid.
+
+Only the first has an analogue here, and only if shaping is used. A shaped per-decision reward is a hand-written reward model, and it fails the same way: a term rewarding damage dealt will trade a stack to deal damage when retreating was correct.
+
+The structural finding worth importing is that overoptimization is measured against a budget, and the budget is KL divergence from the starting policy. Proxy and gold reward track each other for a while and then separate, and where they separate depends on how much KL has been spent. Methods differ in how much they spend, with online reinforcement learning spending more than inference-time selection.
+
+That converts directly into a protocol for this project, and it is cheap. Report the win rate, which is the gold objective and is verifiable, alongside whatever shaped quantity is being optimized, and plot both against the KL divergence from the cloned checkpoint rather than against training steps. Divergence between the two curves is then visible rather than inferred, and the KL axis makes runs with different learning rates comparable. Without the shared axis, a shaped reward that has started teaching the wrong objective looks like a run that is simply training well.
+
+Mitigations the book lists that would carry over are a larger KL penalty and reward ensembling. The one that matters most here is simpler, which is to keep any shaped term potential-based, since that is the only form with a proof that the optimal policy is unchanged.
+
+## Evaluation discipline
+
+The evaluation chapter is about benchmarks for language models and most of it does not apply. Three findings do, and all three bear on how a result from this project should be reported.
+
+Evaluation noise is larger than people assume. The book cites post-training evaluations showing between 0.25 and 1.5 points of standard deviation with the setup held constant, meaning differences smaller than that reflect methodology rather than capability. The analogue here is the seed set. A win rate over a fixed set of seeds carries sampling error that should be reported with it, and a change smaller than that error is not a result.
+
+Hillclimbing on a metric is not the same as evaluating on it. Teams improve against a target benchmark during development and cannot then use it as evidence. This project has a sharper version of the problem, because the five committed fixtures are regression anchors used continuously during development. Using them to report a trained policy's win rate would be reporting a number that development has been optimizing against. A held-out set of scenario seeds, drawn from the same generator and never inspected, has to exist before any headline number is quoted.
+
+Contamination is the same failure at the data level. The battle analogue is training on scenarios drawn from a generator and then evaluating on seeds that generator can also produce, which is legitimate only if the evaluation seeds were fixed in advance and excluded from training. The environment already makes this cheap, since a seed is a small integer and exclusion is a set membership test.
 
 ## What does not transfer
 
@@ -100,13 +147,21 @@ Discounting conventions. Language-model RLHF sets $\gamma = 1$ because the compl
 
 Direct preference optimization and the direct alignment family. These replace a reward model with a closed-form objective on preference pairs. There is no preference data here and no reward model to eliminate.
 
-Instruction tuning, preference data collection, and synthetic data pipelines. These concern getting a language model to a usable starting point and have no analogue in an environment with a scripted teacher.
+Reward modeling from preferences, including the Bradley-Terry loss and its shift-invariance, and the reward normalization that invariance forces. The win-loss signal is computed, not learned, so none of it applies.
 
-Asynchronous training with truncated importance sampling. This corrects for actors and learners running on separate hardware with lagged weights. It becomes relevant only if this project separates them, which the current single-process design does not. The correction to remember if that changes is a one-sided cap on the importance weight, biased upward but bounded in variance, distinct from the two-sided PPO clip.
+Instruction tuning, preference data collection, synthetic data pipelines, and character training. These concern getting a language model to a usable starting point and have no analogue in an environment with a scripted teacher.
+
+Rejection sampling and best-of-N. These select among candidate completions using a learned reward at inference time. The superficially similar move here, sampling several actions and picking the best by a value estimate, is really shallow search and belongs with the planning methods surveyed in [[rl-methods]], not with this family.
+
+Asynchronous training with truncated importance sampling. This corrects for actors and learners on separate hardware with lagged weights. It becomes relevant only if this project separates them, which the current single-process design does not. The correction to remember if that changes is a one-sided cap on the importance weight, biased upward but bounded in variance, distinct from the two-sided PPO clip.
+
+## A note on symbols
+
+The book's Appendix A agrees with [[notation]] on every symbol this tree uses, which is why nothing above needed translating. One difference is worth flagging for anyone reading the book directly. It writes the state distribution $\rho_\pi$ while also using $\rho_t$ for the PPO ratio. This tree keeps $d^\pi$ for the state distribution and $\rho_0$ for the initial-state distribution, leaving $\rho_t(\theta)$ unambiguous.
 
 ## Related
 
 - [[rl-methods]], the techniques themselves, derived.
 - [[training-design]], the architecture and hyperparameters these ideas would modify.
 - [[decisions/0005-training-and-reward]], the decisions this page proposes revisiting.
-- [[notation]], the symbol contract, including where the RLHF sources differ.
+- [[notation]], the symbol contract.
