@@ -79,6 +79,7 @@ The study notes already cover most of the machinery, which is why [[rl-methods]]
 | Value-based methods, DQN family, distributional RL | `rl-026` to `rl-028`, `rl-046`, `rl-056` | why they are not the first path for this problem |
 | Function approximation, deadly triad, fitted Q | `rl-020` to `rl-022` | assumed |
 | Exploration | `rl-023` to `rl-025`, `rl-050`, `rl-200` | surveyed and set aside |
+| Monte Carlo estimation, score-function estimators, control variates, importance and rejection sampling | `rl-008`, `rl-009`, `rl-053`, and the statistics notes behind them | assumed, and used as the reading frame for [[rl-methods]] Part 1 |
 | Imitation, behavior cloning, DAgger, inverse RL | `rl-036`, `rl-037` | [[training-design]] gives the architecture, masked loss, mixing schedule, and hyperparameters for this teacher |
 | Offline RL | `rl-033` to `rl-035`, `rl-059` | surveyed and set aside |
 | Planning, MCTS, model-based RL | `rl-051`, `rl-052`, `rl-057`, `rl-204` | why the door is kept open but not walked through |

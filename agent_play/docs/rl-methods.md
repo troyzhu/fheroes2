@@ -24,6 +24,25 @@ Part 1 derives the chain from the objective to PPO, because those pieces build o
 
 ## Part 1, from the objective to PPO
 
+### Read this part as Monte Carlo estimation
+
+Part 1 is one estimation problem wearing a series of different names. The quantity of interest is $\nabla_\theta J$, it cannot be computed, so it is estimated from samples, and every technique after the first exists to cut the variance of that estimate. Reading it that way is faster than reading it as a sequence of algorithms, because the statistical content is already familiar and only the vocabulary is new.
+
+| Reinforcement learning calls it | Which is |
+|---|---|
+| the policy gradient, REINFORCE | the score-function estimator, $\nabla_\theta \mathbb{E}[f] = \mathbb{E}[f \nabla_\theta \log p_\theta]$ |
+| a baseline $b(s)$ | a control variate with known mean zero |
+| using $V^\pi$ as the baseline | picking the control variate most correlated with the return |
+| the advantage $A^\pi$ | what is left after that control variate is subtracted |
+| bootstrapping | substituting an estimate for the sampled target, trading bias for variance |
+| GAE's $\lambda$ | a one-parameter family of estimators indexed by that trade |
+| the PPO ratio $\rho_t(\theta)$ | an importance weight |
+| the PPO clip | truncated importance sampling |
+| a leave-one-out baseline | the jackknife |
+| group-relative normalization | studentizing the estimator |
+
+Two consequences of that framing get used later. The variance of a control-variate estimator falls by a factor $1 - \rho_{X,C}^2$ at the optimal coefficient, which makes the choice of baseline a question about correlation with the return rather than about accuracy. And an importance-weighted estimator has finite variance only when the proposal covers the target, which is what the clip is really enforcing.
+
 ### The objective
 
 A policy $\pi_\theta$ is scored by the expected return from the initial-state distribution. Battles terminate, so this is the episodic objective rather than an average-reward one, and the start distribution does not depend on the policy.
@@ -65,7 +84,7 @@ The state-distribution form of the same theorem, $\nabla_\theta J(\theta) = \mat
 
 ### Baselines, and why variance is the real enemy
 
-REINFORCE is unbiased and nearly unusable on its own, because its variance is enormous. Subtracting any function of the state leaves it unbiased while reducing that variance.
+REINFORCE is unbiased and nearly unusable on its own, because its variance is enormous. Subtracting any function of the state leaves it unbiased while reducing that variance. This is the control-variate construction: $b(s)$ correlates with the return, its contribution to the gradient has known mean zero, and subtracting it therefore moves variance without moving the estimand.
 
 $$\nabla_\theta J = \mathbb{E}\!\left[\sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t)\,\big(G_t - b(s_t)\big)\right]$$
 
@@ -78,7 +97,9 @@ The baseline used in practice is the state value $V^\pi(s) = \mathbb{E}_\pi[G_t 
 
 $$A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$$
 
-One caveat, since it is easy to overstate. The state value is not the variance-minimizing baseline, which is $Q^\pi$ weighted by $\lVert \nabla_\theta \log \pi_\theta \rVert^2$. It wins on practicality instead, because a critic is being learned anyway and the true optimum would need a second estimator. Your `advantage-function` note makes the same point with the word approximately.
+Read as a control variate this is the natural choice rather than an arbitrary one. Variance falls by $1 - \rho^2$ where $\rho$ is the correlation between the control variate and the quantity being averaged, so the best baseline is whichever available function of the state correlates most with the return, and the expected return from that state is the obvious candidate.
+
+One caveat, since it is easy to overstate. Standard control-variate theory also scales the correction by $\beta^{*} = \operatorname{Cov}(X, C)/\operatorname{Var}(C)$, and policy gradient fixes $\beta = 1$. That is why the state value is not exactly the variance-minimizing baseline, which is $Q^\pi$ weighted by $\lVert \nabla_\theta \log \pi_\theta \rVert^2$. It wins on practicality instead, because a critic is being learned anyway and the true optimum would need a second estimator. Your `advantage-function` note makes the same point with the word approximately.
 
 ### Behavior cloning is this same update
 
@@ -138,6 +159,8 @@ $$\rho_t(\theta) = \frac{\pi_\theta(a_t \mid o_t)}{\pi_{\theta_{\text{old}}}(a_t
 and optimize the clipped surrogate.
 
 $$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t\!\left[\min\Big(\rho_t(\theta)\,\hat A_t,\ \operatorname{clip}\big(\rho_t(\theta), 1-\varepsilon, 1+\varepsilon\big)\,\hat A_t\Big)\right]$$
+
+Stated in estimation terms, the surrogate is an importance-weighted estimate of the objective under $\pi_\theta$ computed from samples drawn under $\pi_{\theta_{\text{old}}}$, and the clip is a truncation of the importance weight. The pathology it guards against is the standard one. An importance-weighted estimator has finite variance only when the proposal covers the target, and its worst case is governed by $\sup_a \pi_\theta(a \mid o) / \pi_{\theta_{\text{old}}}(a \mid o)$, the same supremum that serves as the envelope constant $M$ in rejection sampling. PPO bounds that ratio by construction rather than estimating it.
 
 The clip removes the incentive to move the ratio beyond $1 \pm \varepsilon$. The $\min$ makes the objective pessimistic, so an update that would overshoot gains nothing while an update that would make things worse is still penalized in full. The policy can drift no further than the data support without the optimizer noticing it has stopped improving.
 

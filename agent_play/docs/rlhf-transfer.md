@@ -64,11 +64,13 @@ The cost of ignoring it is specific. Sampling armies uniformly would produce man
 
 PPO needs a critic, and [[training-design]] plans one. The language-model world has largely moved away from that, and the reason applies here more strongly than it does there.
 
-REINFORCE leave-one-out draws $K$ episodes from the same starting state and uses the mean return of the others as the baseline for each.
+REINFORCE leave-one-out draws $K$ episodes from the same starting state and uses the mean return of the others as the baseline for each. It is the jackknife construction, and it inherits the jackknife's reason for excluding the held-out sample.
 
 $$b_k = \frac{1}{K-1}\sum_{i \neq k} G^{(i)}, \qquad \hat A_k = G^{(k)} - b_k$$
 
-Excluding the sample itself is what keeps this exactly unbiased, because $b_k$ is then independent of $a_k$ and the baseline term vanishes by the argument in [[rl-methods]]. Group-relative optimization instead uses the full group mean, which includes the sample and leaves an $O(1/K)$ bias, then divides by the group standard deviation, which is contested and which the Dr. GRPO variant drops.
+Excluding the sample itself is what keeps this exactly unbiased, because $b_k$ is then independent of $a_k$ and the baseline term vanishes by the control-variate argument in [[rl-methods]]. Include it and the baseline correlates with the very sample it is correcting, which is the same finite-sample bias that appears whenever a control-variate coefficient is estimated from the data it is applied to.
+
+Group-relative optimization does include it, taking the full group mean, and accepts the resulting $O(1/K)$ bias. It then divides by the group standard deviation, which is studentization and is contested for the reason studentization usually is. Each group gets rescaled by its own noisy spread, so a group that happens to be homogeneous has its advantages inflated. The Dr. GRPO variant drops the division.
 
 The reason this matters here is that the objection to it does not apply. In a language model, drawing $K$ completions per prompt is the dominant cost. Here the environment runs at roughly 4,600 episodes per second and a scenario is reproducible from a seed, so drawing $K$ episodes from one starting state is close to free. Against that, the critic must be fitted on very little data, and [[training-design]] already flags 116 recorded decisions as a regime where a network memorizes.
 
@@ -151,7 +153,13 @@ Reward modeling from preferences, including the Bradley-Terry loss and its shift
 
 Instruction tuning, preference data collection, synthetic data pipelines, and character training. These concern getting a language model to a usable starting point and have no analogue in an environment with a scripted teacher.
 
-Rejection sampling and best-of-N. These select among candidate completions using a learned reward at inference time. The superficially similar move here, sampling several actions and picking the best by a value estimate, is really shallow search and belongs with the planning methods surveyed in [[rl-methods]], not with this family.
+Rejection sampling and best-of-N, with a caveat about the name. Two unrelated procedures share the phrase and separating them is worth a paragraph, because one of them does carry over.
+
+What the RLHF literature calls rejection sampling generates $N$ completions, keeps the highest-scoring by a learned reward, and fine-tunes on those. There is no envelope and no exactness guarantee, so it is a selection heuristic rather than the classical method. Nothing about it transfers here: there is no learned reward to select by, and the superficially similar move of sampling several actions and picking the best by a value estimate is shallow search, which belongs with the planning methods in [[rl-methods]].
+
+Classical rejection sampling is a different and more useful object. To draw from a target $p$ using a proposal $q$, take $M \ge \sup_x p(x)/q(x)$, sample $x \sim q$ and $u \sim \text{Uniform}(0,1)$, and accept when $u \le p(x)/(M q(x))$. Accepted draws are exact and the acceptance rate is $1/M$. That does not appear anywhere in this project's training loop either, but the constant does.
+
+The envelope constant is the transfer. $\sup_x p(x)/q(x)$ is simultaneously the smallest valid $M$ and the bound on the importance weight $p/q$, so the same supremum that decides whether rejection sampling is efficient decides whether an importance-weighted estimator has usable variance. When it is unbounded, rejection sampling has no valid envelope and importance sampling has infinite variance; these are one failure described twice. Every ratio-bounding device in this document is a response to it. The PPO clip bounds $\pi_\theta / \pi_{\theta_{\text{old}}}$ two-sidedly by construction, and the truncated cap below bounds $\pi_\theta / \mu$ one-sidedly, accepting a known bias for finite variance. Reading them as truncations of the same supremum is the shortest route to why either is needed.
 
 Asynchronous training with truncated importance sampling. This corrects for actors and learners on separate hardware with lagged weights. It becomes relevant only if this project separates them, which the current single-process design does not. The correction to remember if that changes is a one-sided cap on the importance weight, biased upward but bounded in variance, distinct from the two-sided PPO clip.
 
