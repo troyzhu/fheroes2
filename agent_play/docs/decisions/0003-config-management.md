@@ -1,11 +1,37 @@
 # ADR 0003 — Versioned config files govern every tunable; artifacts embed their resolved config
 
-- Status: accepted 2026-07-27 (binding from Milestone 4 onward; C++ scenario JSON per spec §11)
-- Context: user requirement 2026-07-27; spec §11 (scenario schema), §15 (trajectory metadata), §16.4 (determinism metadata); [[../archive/research-runs/2026-07-27-rl-approaches]] §4
+- Status: accepted 2026-07-27, binding from Milestone 4 onward
+- Implementation: not built. No `configs/` tree exists at the repository root as of 2026-07-31, which is consistent with the record binding from Milestone 4 rather than a lapse.
+- Evidence: user requirement 2026-07-27; spec §11 (scenario schema), §15 (trajectory metadata), §16.4 (determinism metadata); [[../archive/research-runs/2026-07-27-rl-approaches]] §4; [[../research/works/vcmi-gym]] as the shipped precedent
+- Hyperparameters this governs: [[../training-design]]
+
+## The sub-problem
+
+Where does a tunable live, and how does a finished artifact prove which values produced it?
+
+The project is about to acquire many independent axes: scenario suites, the observation profile from [[0001-observation-profiles]], the modality from [[0004-spatial-observation-modality]], the algorithm and its hyperparameters from [[0005-training-and-reward]] and [[../training-design]], opponent mixtures, evaluation pools, seeds. The failure this guards against is specific and was named by the owner. A coding agent picking the project up cold, or a human six months later, cannot tell what a number came from if the answer lives in conversation history.
+
+## Options considered
+
+| Option | What it is | For | Against |
+|---|---|---|---|
+| Constants in code | Values live where they are used | Nothing to build | A change is a code change, and a past run is unrecoverable without archaeology through the diff |
+| Command-line flags | Values passed at launch | Easy to sweep | The record of a run lives in a shell history that is not kept. Silent divergence between what was intended and what ran |
+| Plain YAML plus a strict schema (chosen) | Files under `configs/`, validated, with every artifact stamping its resolved config and hash | Diffable, reviewable, and an artifact answers for itself | Requires schema maintenance, and a stamping helper that every producer must call |
+| Hydra or a similar composition framework | Structured composition, sweeps, overrides | Powerful sweep orchestration | Composition indirection makes it harder to answer what a run actually used, which is the one property this record exists to guarantee |
+| Experiment-tracker as source of truth | Let the tracker record parameters | Zero local machinery | Values become unreconstructible if the tracker is unavailable, and the tracker records what it was told, not what ran |
+
+## Why this one, and what it cost
+
+The load-bearing requirement is not configuration but reproducibility, and that inverts how the options rank. Every option can hold values; only one makes an artifact self-describing. Requiring each artifact to embed its resolved configuration, that configuration's hash, the commit, and the schema versions means the question of what produced a number is answered by the number's own file. An artifact whose hash cannot be recomputed is treated as corrupted, which is a stronger contract than a convention.
+
+Hydra was rejected for the reason it is usually adopted. Its composition is convenient and it makes the resolved configuration harder to state plainly, and this record's whole purpose is that the resolved configuration is stated plainly. That is a defensible trade to revisit if sweep orchestration outgrows what population-based training and an experiment tracker provide, and revisiting it means amending this record.
+
+The cost is discipline that nothing enforces yet. A command-line override that bypasses the file record would break the guarantee silently, which is why the record forbids overrides that are not written back into the stamped configuration. Until Milestone 5 ships the stamping helper, that rule is a convention rather than a mechanism.
 
 ## Context
 
-The project is about to accumulate many configuration axes: scenario suites, observation profile (ADR 0001), action-schema version (ADR 0002), RL algorithm variant (masked PPO first; PPG/PPO-DNA/GRPO-style variants are an open axis), network architecture, hyperparameters, opponent mixtures, evaluation suites, seeds, worker counts. Scattering these across code constants, CLI flags and session memory does not survive multi-session work, neither for humans nor for a coding agent picking the project up cold. vcmi-gym (the shipped precedent) runs YAML-configured training with W&B tracking and PBT; our own determinism discipline already hashes scenarios (§11.3).
+The project is about to accumulate many configuration axes: scenario suites, observation profile (ADR 0001), action-schema version (ADR 0002), the reinforcement-learning algorithm variant (masked PPO first, with phasic policy gradient, PPO-DNA, and group-relative variants as an open axis, all defined in [[../rl-methods]] and [[../rlhf-transfer]]), network architecture, hyperparameters, the opponent mixture meaning which configurations of the built-in AI the agent trains against, evaluation suites, seeds, and worker counts. Scattering these across code constants, CLI flags and session memory does not survive multi-session work, neither for humans nor for a coding agent picking the project up cold. vcmi-gym, the shipped precedent, runs YAML-configured training with experiment tracking and population-based training, meaning a population of runs whose hyperparameters are periodically copied from better performers and perturbed. Our own determinism discipline already hashes scenarios (§11.3).
 
 ## Decision
 
@@ -13,7 +39,7 @@ The project is about to accumulate many configuration axes: scenario suites, obs
 
    `configs/train/` (algorithm, model, hyperparameters, opponent mix), `configs/eval/` (fixed pools, seeds, league settings).
 
-2. Strict schemas, no silent defaults. Python side validates with pydantic (unknown fields rejected, mirroring §11.1); every default lives in the schema definition, documented there, never as a bare constant in training code. The C++ worker keeps the spec §11 strict JSON scenario schema; YAML configs *reference* scenario files, they do not replace them.
+2. Strict schemas, no silent defaults. The Python side validates with pydantic, a library that turns a typed class declaration into a validator and rejects unknown fields, mirroring §11.1. Every default lives in the schema definition, documented there, never as a bare constant in training code. The C++ worker keeps the spec §11 strict JSON scenario schema; YAML configs *reference* scenario files, they do not replace them.
 3. Explicit layering only: a config may declare `extends: <relative path>` (deep merge, overlay wins). No CLI-only overrides that bypass the file record, a CLI override must be written into the resolved config that gets stamped (below).
 4.
 

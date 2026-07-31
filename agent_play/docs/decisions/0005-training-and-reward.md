@@ -9,8 +9,9 @@ tags: [adr, training, reward, agent-env]
 
 # ADR 0005 — Training algorithm and reward design
 
-- Status: algorithm choice accepted; reward design deliberately open, with the decision criteria fixed here
-- Context: [[../research/findings]], [[../implementation/teacher-coverage-and-behavior-cloning]], user question 2026-07-30
+- Status: algorithm choice accepted, reward design deliberately open with the decision criteria fixed here
+- Implementation: nothing here is built. No learner exists in this repository by design, and Milestone 2 has recorded 116 teacher decisions across the fixture set, which is the dataset stage 1 would start from. Everything below binds the training milestones, not the current code.
+- Evidence: [[../research/findings]], [[../research/works/alphastar]], [[../implementation/teacher-coverage-and-behavior-cloning]], user question 2026-07-30
 - Techniques: [[../rl-methods]] defines every method named below, with its equation and our verdict.
 - Mechanics: [[../training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
 - Transfer: [[../rlhf-transfer]] works out what the language-model reinforcement-learning literature contributes here, and supplies evidence for two things this record left open.
@@ -23,13 +24,36 @@ The environment ships with no reward function at all. Phase 1a records the termi
 
 Where this record names a technique without teaching it, [[../training-design]] teaches it. That document gives the network architecture, the cross-entropy objective cloning minimizes and why it is masked, the DAgger iteration written out with its mixing schedule and aggregation step, the PPO surrogate with its masking integration, starting hyperparameter tables for both stages, and a compared-alternatives table at every choice point.
 
+## The sub-problem
+
+How does a policy get from random initialization to competent play, given a competent scripted teacher that plays both sides of every episode for free?
+
+The unusual feature of this problem is the teacher. `AI::BattlePlanner` is not a weak baseline; it is the opponent the agent will be measured against, and Milestone 2 already records every decision it makes. That makes the question less "which reinforcement-learning algorithm" and more "how much can be taken from the teacher before reinforcement learning is needed at all, and what does the handover look like".
+
+This record answers that. It does not choose the network architecture, which waits on the observation modalities, and it does not decide the reward, which is part two.
+
 ## Decision, part one: the training algorithm
 
 Accepted. The staging is imitation first, then masked policy-gradient reinforcement learning against a mixture of opponents.
 
+### Options considered
+
+| Option | What it is | For | Against |
+|---|---|---|---|
+| Reinforcement learning from scratch | Ignore the teacher, learn from reward alone | No dependence on teacher quality, and no ceiling at the teacher's level | Discards a free competent demonstrator, and early exploration in a 793-slot space with a sparse terminal reward is the expensive part |
+| Imitation only | Clone the teacher and stop | Cheapest competent policy, fully supervised, needs no reward at all | Cannot exceed the teacher, and compounds error on states the teacher never visited |
+| Imitation then policy gradient (chosen) | Clone, then improve by masked PPO against an opponent mixture | Skips the expensive exploration phase, and retains the ability to exceed the teacher | Two stages to build, and the handover can destroy what cloning bought |
+| Imitation then value-based improvement | Clone, then masked DQN or a distributional variant | Sample efficient through replay, and used by the one shipped comparable system | A cloned policy is not an action-value function, so the warm start does not transfer cleanly |
+| Planning, MCTS or a learned model | Search using the simulator | The simulator is fast and seed-reproducible, which is exactly what search wants | Heavy to build, and premature before any policy exists. The environment deliberately keeps the door open |
+| Self-play league | Populations of agents playing each other | The answer at the top of this genre | Needs a policy worth playing against, which does not yet exist |
+
+Terms used above are defined in [[../rl-methods]], which gives each one its equation and a verdict.
+
 Stage 1, behavior cloning from the built-in AI. The teacher is `AI::BattlePlanner`, it plays both sides of every headless battle, and Milestone 2 already records its decisions. Supervised learning on those decisions is the cheapest route to competent play, and it is validated at the strongest scale available, where AlphaStar's supervised stage reached 87% against its game's strongest built-in opponent before any reinforcement learning. Two qualifications carry over from the review of that evidence. The target is $\pi(a \mid o)$, conditioned on what the deployed policy will actually receive, not on full state. And the analogy is imperfect, because there the demonstrator and the opponent were different agents while here they are the same, so cloning can at best approach the teacher.
 
-Stage 2, DAgger-style correction. Plain cloning degrades once the student visits states the teacher never did, at a rate quadratic in the horizon where DAgger is linear (Ross, Gordon and Bagnell, 2011). The precondition is an expert answerable at arbitrary student-visited states. Whether `AI::BattlePlanner` can be queried without advancing the arena or consuming combat randomness is open and load-bearing, and it should be settled early, because the answer determines whether stage 2 is available at all.
+Stage 2, DAgger-style correction. DAgger stands for dataset aggregation, and it exists to fix one specific failure of plain cloning. A cloned policy is trained on states the teacher visits, but once deployed it visits its own states, and its first mistake lands it somewhere the training data never covered, where its error is larger, which produces the next mistake. DAgger closes that loop by rolling out the student, asking the teacher what it would have done at each state the student actually reached, adding those answers to the dataset, and retraining on the union. The gain is not marginal: cloning error compounds as $O(\epsilon T^2)$ in the horizon while DAgger achieves $O(\epsilon T)$ (Ross, Gordon and Bagnell, 2011), where $\epsilon$ is the per-decision error rate. [[../training-design#Stage 2, DAgger]] writes out the iteration with its mixing schedule and aggregation step.
+
+The precondition is an expert answerable at arbitrary student-visited states, which is a stronger requirement than an expert that plays. Whether `AI::BattlePlanner` can be queried without advancing the arena or consuming combat randomness is open and load-bearing, and it should be settled early, because the answer determines whether stage 2 is available at all.
 
 Stage 3, masked PPO. Proximal policy optimization with legality masking is the workhorse for discrete game actions and the method behind every comparable result in our corpus. The mask must be applied when sampling and again when recomputing log-probabilities, or the ratio is not one at the current iterate and the clipping window is miscentered.
 
@@ -51,7 +75,7 @@ Terminal reward weighted by margin. The win or loss, scaled by surviving force, 
 
 Shaped per-decision reward. Damage dealt minus damage taken, or the change in an army-strength estimate, delivered every decision. Learns fastest and is the most dangerous, because it teaches the proxy rather than the objective. A shaped reward that rewards damage will trade a stack to deal damage when retreating was correct.
 
-Potential-based shaping. Shaping expressed as the difference of a potential function over states, which provably leaves the optimal policy unchanged (Ng, Harada and Russell, 1999) while still densifying the signal. The principled version of the previous option, and the right form to use if shaping is used at all.
+Potential-based shaping. A shaping term of the restricted form $F(s, a, s') = \gamma \Phi(s') - \Phi(s)$ for some potential $\Phi$ over states. Because that form telescopes along any trajectory, it adds a constant depending only on the start state, so it cannot change which policy is optimal (Ng, Harada and Russell, 1999) while still delivering a signal at every decision. [[../rl-methods#Part 4, reward shaping]] carries the derivation. This is the principled version of the previous option, and the right form to use if shaping is used at all.
 
 ### The criteria for choosing
 
