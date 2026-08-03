@@ -22,19 +22,9 @@ Everything built so far concerns battles only, and deliberately so. This note re
 
 ## Where the project stands today
 
-One table, so that the phases below have something to be relative to. Detail and gate results are in [[overview#Where the project stands]].
+[[overview#Where the project stands]] is the single milestone table, with the gate result behind every row. It is not repeated here, because a second copy is what goes stale.
 
-| Stage | State | What it produced or needs |
-|---|---|---|
-| Phase 0, feasibility spike | Done | Headless battles with no game assets, cross-machine determinism |
-| Milestones 1 to 3, the environment | Done and verified | Shared seed helper, decision hook, action space and legality. Gates pass, teacher coverage 116 of 116 |
-| Milestone 4, the protocol | Next | JSONL protocol, strict scenario JSON, observation serialization, an `ENABLE_AGENT` target. Binds [[decisions/0001-observation-profiles]], [[decisions/0003-config-management]], [[decisions/0004-spatial-observation-modality]] |
-| Milestones 5 to 6, client and hardening | Not started | Python client, benchmarks, the hardening pass |
-| Training a battle policy | Not started, designed | Staging and reward criteria in [[decisions/0005-training-and-reward]], mechanics in [[rl/README]] |
-| Phase 1b, wider battles | Not started | Blocked on the capability audit and on re-indexing for two-cell units |
-| Phase 2, the adventure map | Not designed | Blocked on a literature sweep, listed below |
-
-Nothing under `rl/` is implemented. The environment is built and the learner is not, which is the single most important thing to know before reading further.
+In one line: Phase 0 and Milestones 1 through 3 are done and verified, Milestone 4 is next, and nothing under `rl/` is implemented. The phases below all sit after Milestone 6, and each says what it is waiting on.
 
 ## Where the project is aimed
 

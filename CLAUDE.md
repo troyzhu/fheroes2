@@ -67,8 +67,15 @@ that both build systems compile into the normal executable without behavior chan
 make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh \
   && ./agent_play/spike/verify_phase0.sh && ./agent_play/verify_m1.sh \
   && ./agent_play/verify_m2.sh && ./agent_play/verify_m3.sh \
-  && ./agent_play/lint_docs.sh
+  && ./agent_play/lint_docs.sh && ./agent_play/verify_memory.sh
 ```
+
+`verify_memory.sh` checks that this project's agent memory still describes reality. Memory files
+live outside the repository and nothing fails when a claim in one stops being true, which is how a
+line once ended up telling a future session to "correct" the notation into the wrong convention.
+Each memory file declares what makes it true in an HTML comment, and every repository path it names
+in prose is checked as well. **The single milestone table is `overview.md`'s "Where the project
+stands"; do not add a second one anywhere.**
 
 ## Branch `play-harness` — Claude plays the game through the real UI
 
