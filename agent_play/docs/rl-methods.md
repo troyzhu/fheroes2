@@ -196,7 +196,23 @@ Added to the loss with a small coefficient, entropy $H(\pi(\cdot \mid o))$ rewar
 
 Rather than parameterizing the policy, learn $Q_\phi(s, a)$ and act greedily. DQN made this work with deep networks through a replay buffer and a slowly updated target network, both of which exist to stabilize a bootstrapped target that would otherwise chase itself. QR-DQN extends it to learn a distribution over returns rather than a mean, which is more informative under heavy randomness.
 
-The appeal is sample efficiency, since a replay buffer reuses old data indefinitely. The drawback here is that value-based methods compose awkwardly with an imitation warm start, because a cloned policy is not an action-value function, and that large discrete action spaces make the greedy maximization and the target computation more expensive. The one shipped comparable system implemented both families and reported the policy-gradient variants as its production path.
+The appeal is sample efficiency, since a replay buffer reuses old data indefinitely. Two drawbacks apply here, and the first is the one that decided [[decisions/0005-training-and-reward]].
+
+Value-based methods compose awkwardly with an imitation warm start. The claim is often compressed to "a cloned policy is not an action-value function", which is true but hides where the difficulty actually sits, so it is worth separating by part of the network.
+
+The encoder transfers. Whatever representation cloning learned about which stacks matter and how the board is laid out is a function of the observation, and a value network can be initialized from it. Nothing is lost there.
+
+The head does not, and the reason is a specific degeneracy. A softmax head is shift-invariant within a state, so adding any constant $c(o)$ to every logit at $o$ leaves $\pi_\theta(a \mid o)$ unchanged. Cloning therefore never constrains the level of the logits, only their differences inside a state. Action values are not shift-invariant, since $Q^\pi$ has to satisfy a Bellman equation that ties levels across states. The cloned head is undetermined in exactly the dimension a value method needs.
+
+Even the within-state differences are the wrong quantity. They encode how often the teacher picks an action, which is a behavioral frequency, not how much return it earns. Those coincide only if the demonstrator is Boltzmann-rational with respect to our reward at a known temperature, and `AI::BattlePlanner` is a hand-written heuristic planner with no such guarantee. In this project the gap is starker still, because no reward is defined yet, so there is no return for the logits to be calibrated against.
+
+Contrast the policy-gradient path, where the continuation is exact rather than approximate. The cloned network is the object PPO keeps optimizing, with the same parameters and the same functional form, and at $\theta = \theta_{\text{old}}$ the importance ratio is exactly 1, so the first update is a true policy-gradient step by the identity in [[#Why the step must be constrained]]. No conversion, no recalibration, no lost stage.
+
+None of this makes the combination impossible, only different from a warm start. Deep Q-learning from demonstrations (Hester et al., AAAI 2018) does train a value function from demonstration data, but not by reusing a cloned policy. It fits $Q$ directly on the demonstrations with a large-margin classification term that forces the demonstrated action's value above every alternative by a margin, alongside the usual one-step and $n$-step temporal-difference losses. That is a viable route, and it means designing the imitation stage as value pre-training from the start rather than reusing a policy trained for a different purpose.
+
+The second drawback is milder. Large discrete action spaces make the greedy maximization and the bootstrapped target more expensive, since every target needs a maximum over the next state's legal set.
+
+The one shipped comparable system implemented both families and reported the policy-gradient variants as its production path.
 
 ### Distributed actor-critic
 
