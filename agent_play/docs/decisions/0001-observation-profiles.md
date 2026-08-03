@@ -19,6 +19,7 @@ tags: [adr, observation, observability, agent-env]
 - [[#Context]]
 - [[#The sub-problem]]
 - [[#Options considered]]
+- [[#A worked example]]
 - [[#Why this one, and what it cost]]
 - [[#What the choice does not buy]]
 - [[#Decision]]
@@ -50,6 +51,51 @@ This is a question about the observation function $O$ in the sense of [[../rl-an
 | Player-observable only | Serialize only what the battle interface exposes | Honest by construction | Forecloses oracle critics and teacher matching, and cannot be reversed without re-running every episode |
 | Two separate schemas | One message type per mode | Each is clean in isolation | Two serializers, two parsers, two digests, and drift between them is a silent correctness failure |
 | One schema, tagged fields (chosen) | One shape, with `oracle`-tagged fields omitted under the restricted profile | One serializer, one digest, profiles distinguishable on the wire | Requires a field-tag discipline that has to be maintained as fields are added |
+
+## A worked example
+
+One living stack, serialized both ways. Fields are those of the spec §12.3 unit record.
+
+Under `full_v1`:
+
+```json
+{
+  "uid": 2, "side": "attacker", "monster_id": 1,
+  "count": 42, "total_hit_points": 42, "top_creature_hit_points": 1,
+  "attack": 1, "defense": 1, "base_speed": 3, "effective_speed": 3,
+  "shots_left": 0, "head_cell": 34, "is_wide": false,
+  "engine_strength": 42.0
+}
+```
+
+Under `observable_v1`, the same record with one key gone:
+
+```json
+{
+  "uid": 2, "side": "attacker", "monster_id": 1,
+  "count": 42, "total_hit_points": 42, "top_creature_hit_points": 1,
+  "attack": 1, "defense": 1, "base_speed": 3, "effective_speed": 3,
+  "shots_left": 0, "head_cell": 34, "is_wide": false
+}
+```
+
+Everything a player could read off the battle interface survives, including the opposing side's full statistics, because the game's own right-click information panel shows those without ownership gating. What disappears is `engine_strength`, which is the built-in AI's own valuation of the stack and appears nowhere in the interface. The force summary loses `engine_strength_sum` for the same reason.
+
+That single field is the whole disagreement, and it matters more than its size suggests. A policy trained on `full_v1` and cloned from `AI::BattlePlanner` can read the teacher's own evaluation of every stack, which makes matching the teacher easier than matching it honestly would be, so teacher agreement would look better than deployment warrants. At deployment the field does not exist, so the policy would be acting on inputs it never saw in training.
+
+### Why omitted rather than zero-filled
+
+The key is removed, not set to `0.0`. Zero-filling would make the two profiles indistinguishable on the wire, and worse, a policy could not tell the AI valuing a stack at zero apart from the field being withheld. Omission makes the profile a readable property of the message.
+
+### What the other options would have produced
+
+Two separate schemas would give two serializations of one state, and the digest is defined over the full state regardless of profile, so the question of which serialization the digest covers has no good answer. One of them would have to be designated canonical, at which point the second is a filtered view of the first, which is this decision with extra machinery.
+
+Player-observable only would emit the second record above and nothing else, ever. Recovering `engine_strength` later would mean re-running every episode, whereas filtering it out of a full record costs a key lookup.
+
+### What stays in both, and why
+
+`shots_left`, `effective_speed`, and every morale, luck, and spell-effect field appear under both profiles even though some are not obvious from the interface at a glance. The rule is not visibility but influence: an attribute that changes the transition distribution and is not observed makes the observation process non-Markov, so it must either be observed or removed from the dynamics. See [[../implementation/observation-design]].
 
 ## Why this one, and what it cost
 

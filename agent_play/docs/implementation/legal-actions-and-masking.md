@@ -60,6 +60,27 @@ One controlled ablation is available. In full-game microRTS, PPO with no mask re
 | 100 to 198 | RANGED attack on the enemy whose head cell is $c$, index $100 + c$ | 99 |
 | 199 to 792 | MELEE onto target cell $t$ from direction $d$, index $199 + 6t + d$ | 594 |
 
+Direction $d$ runs 0 to 5 over the six real hex directions in the engine's own enum order, `TOP_LEFT`, `TOP_RIGHT`, `RIGHT`, `BOTTOM_RIGHT`, `BOTTOM_LEFT`, `LEFT`, and it is the direction from the attacking cell to the target cell. `Battle::Board::GetDirection(a, b)` returns the direction from `a` to `b`, which fixes the orientation and is worth stating because the reverse convention would silently produce a valid-looking index for the wrong attack.
+
+### A worked index
+
+Take one decision. The board is 11 wide and 9 tall, so cell index is $11 \times \text{row} + \text{column}$ and runs 0 to 98. Our stack stands on cell 34, which is row 3, column 1. An enemy stack occupies cell 35, immediately to its right in the same row, so the direction from 34 to 35 is `RIGHT`, which is index 2.
+
+The four action kinds available against that geometry index as follows.
+
+| Action | Arithmetic | Index |
+|---|---|---|
+| Skip the turn | fixed | 0 |
+| Move onto cell 35 | $1 + 35$ | 36 |
+| Shoot the stack whose head cell is 35 | $100 + 35$ | 135 |
+| Melee cell 35 from the left, meaning direction `RIGHT` | $199 + 6 \times 35 + 2$ | 411 |
+
+Read the melee row carefully, because the two senses of direction are easy to swap. Index 411 means striking the occupant of cell 35 while standing to its left, since the attack travels rightward from attacker to target. The mirror attack, striking cell 34 from the right, would be $199 + 6 \times 34 + 5 = 408$, using `LEFT` at index 5.
+
+A move and a melee are different actions even when they end on adjacent cells. Index 36 walks onto cell 35 and stops, which is only legal if cell 35 is empty, and index 411 attacks whatever occupies cell 35 from the adjacent cell 34.
+
+The mask for that decision is a `uint8[793]` that is zero everywhere except at the indices the enumeration produced. If our stack is a walker with speed 3 and can reach six cells, has one adjacent enemy, and can always skip, the mask carries 1 at index 0, at the six move indices, and at each legal melee index against that enemy, and 0 at the remaining 780-odd entries. The policy's softmax runs over the ones, and [[#How it works]] covers how.
+
 Melee is keyed by target cell and direction rather than by defender id because that pair already determines the attacking cell. The engine derives it by stepping backward from the target along the reflected direction, so indexing the same way keeps our enumeration and its validation aligned by construction.
 
 **One enumeration, two views.** Each decision enumerates candidates once, validating every probe through `battle_action_validation`, the functions `Arena::ApplyAction*` itself executes. That one pass emits the boolean mask for the learner and the candidate list carrying semantic metadata and engine-ready command parameters for the protocol, teacher matching, and debugging. The invariant `mask[i] == 1` exactly when a candidate with index `i` exists is asserted at runtime.
