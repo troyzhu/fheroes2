@@ -16,6 +16,19 @@ tags: [adr, training, reward, agent-env]
 - Mechanics: [[../training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
 - Transfer: [[../rlhf-transfer]] works out what the language-model reinforcement-learning literature contributes here, and supplies evidence for two things this record left open.
 
+## Table of contents
+- [[#Context]]
+- [[#The sub-problem]]
+- [[#Decision, part one: the training algorithm]]
+  - [[#Options considered]]
+- [[#Decision, part two: reward design]]
+  - [[#The sub-problem]], for the reward specifically
+  - [[#Options considered]], the four candidates
+  - [[#Why the leading candidate, and the criteria]]
+  - [[#What must be settled alongside it]]
+- [[#Consequences]]
+- [[#What this record does not decide]]
+
 ## Context
 
 Milestones 1 through 3 built an environment and said almost nothing about what would train on it. That was intentional while the substrate was unproven, but it left two questions unanswered that a reader is entitled to ask, and this record answers the first and scopes the second.
@@ -69,17 +82,24 @@ Not chosen, and why. Value-based methods such as masked DQN variants are viable 
 
 Open by intent. What is fixed here is the criteria and the candidates, so the eventual choice is made against a standard rather than by whichever shaping happened to train first.
 
-### The candidates
+### The sub-problem
 
-Sparse terminal reward. Plus one for a win, minus one for a loss, zero otherwise. Unbiased, in the sense that it encodes exactly the objective and nothing else, and hardest to learn from because the signal arrives once per episode. Battles here are 5 to 40 decisions, which is short enough that sparse reward is genuinely viable, unlike in long-horizon domains where it is hopeless.
+What scalar does the environment hand back, and at which steps?
 
-Terminal reward weighted by margin. The win or loss, scaled by surviving force, so that winning while preserving an army scores better than winning pyrrhically. Closer to what a player actually wants, since a battle is one episode inside a campaign and the surviving army carries forward. Still terminal, so it keeps the sparse signal's honesty while carrying more information.
+This is a question about the reward model in the sense of [[../rl-and-the-battle-domain]], and it is separable from the algorithm above because every candidate below trains with the same masked policy gradient. What makes it hard is that the reward encodes what the agent is being asked to do, so getting it wrong produces an agent that succeeds at the wrong task while every training curve looks healthy.
 
-Shaped per-decision reward. Damage dealt minus damage taken, or the change in an army-strength estimate, delivered every decision. Learns fastest and is the most dangerous, because it teaches the proxy rather than the objective. A shaped reward that rewards damage will trade a stack to deal damage when retreating was correct.
+### Options considered
 
-Potential-based shaping. A shaping term of the restricted form $F(s, a, s') = \gamma \Phi(s') - \Phi(s)$ for some potential $\Phi$ over states. Because that form telescopes along any trajectory, it adds a constant depending only on the start state, so it cannot change which policy is optimal (Ng, Harada and Russell, 1999) while still delivering a signal at every decision. [[../rl-methods#Part 4, reward shaping]] carries the derivation. This is the principled version of the previous option, and the right form to use if shaping is used at all.
+| Candidate | What it is | For | Against |
+|---|---|---|---|
+| Sparse terminal | Plus one for a win, minus one for a loss, zero at every other step | Encodes exactly the objective and nothing else. Verifiable by the engine, so there is no learned reward to exploit | The signal arrives once per episode, which is the hardest case to learn from. Carries no information about how well the battle was won |
+| Margin-weighted terminal (leading) | The win or loss scaled by surviving force | Keeps the terminal signal's honesty while carrying more information. Reflects that the surviving army carries into the wider game, so it composes with the campaign | The weighting is a modeling claim about what an army is worth, and it has to be chosen rather than derived |
+| Shaped per-decision | Damage dealt minus damage taken, or the change in an army-strength estimate, at every decision | Densest signal, learns fastest | Teaches the proxy rather than the objective. A damage bonus will trade a stack to deal damage when retreating was correct, and no amount of tuning fixes that |
+| Potential-based shaping | A term of the restricted form $F(s, a, s') = \gamma \Phi(s') - \Phi(s)$ added to a terminal reward | Densifies the signal with a proof attached, since the form telescopes along any trajectory and so adds a constant depending only on the start state, leaving the optimal policy unchanged (Ng, Harada and Russell, 1999) | Requires a potential $\Phi$ worth having. A poor one wastes the density without breaking correctness, so it buys nothing and costs a design |
 
-### The criteria for choosing
+Battles run 5 to 40 decisions, which is short enough that a purely terminal signal is genuinely viable here, unlike the long-horizon domains where sparse reward is hopeless. That is what keeps the top two rows in contention rather than forcing shaping. [[../rl-methods#Part 4, reward shaping]] derives the telescoping argument in the last row.
+
+### Why the leading candidate, and the criteria
 
 The choice is made against these, in order.
 

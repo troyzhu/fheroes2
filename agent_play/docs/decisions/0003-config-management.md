@@ -1,9 +1,30 @@
+---
+title: "ADR 0003, versioned configuration governs every tunable"
+type: adr
+status: accepted
+updated: 2026-08-03
+related_concepts: ["[[../training-design]]", "[[../overview]]"]
+tags: [adr, config, reproducibility, agent-env]
+---
+
 # ADR 0003 — Versioned config files govern every tunable; artifacts embed their resolved config
 
 - Status: accepted 2026-07-27, binding from Milestone 4 onward
 - Implementation: not built. No `configs/` tree exists at the repository root as of 2026-07-31, which is consistent with the record binding from Milestone 4 rather than a lapse.
 - Evidence: user requirement 2026-07-27; spec §11 (scenario schema), §15 (trajectory metadata), §16.4 (determinism metadata); [[../archive/research-runs/2026-07-27-rl-approaches]] §4; [[../research/works/vcmi-gym]] as the shipped precedent
 - Hyperparameters this governs: [[../training-design]]
+
+## Table of contents
+- [[#Context]]
+- [[#The sub-problem]]
+- [[#Options considered]]
+- [[#Why this one, and what it cost]]
+- [[#Decision]]
+- [[#Consequences]]
+
+## Context
+
+The project is about to accumulate many configuration axes: scenario suites, observation profile (ADR 0001), action-schema version (ADR 0002), the reinforcement-learning algorithm variant (masked PPO first, with phasic policy gradient, PPO-DNA, and group-relative variants as an open axis, all defined in [[../rl-methods]] and [[../rlhf-transfer]]), network architecture, hyperparameters, the opponent mixture meaning which configurations of the built-in AI the agent trains against, evaluation suites, seeds, and worker counts. Scattering these across code constants, CLI flags and session memory does not survive multi-session work, neither for humans nor for a coding agent picking the project up cold. vcmi-gym, the shipped precedent, runs YAML-configured training with experiment tracking and population-based training, meaning a population of runs whose hyperparameters are periodically copied from better performers and perturbed. Our own determinism discipline already hashes scenarios (§11.3).
 
 ## The sub-problem
 
@@ -28,10 +49,6 @@ The load-bearing requirement is not configuration but reproducibility, and that 
 Hydra was rejected for the reason it is usually adopted. Its composition is convenient and it makes the resolved configuration harder to state plainly, and this record's whole purpose is that the resolved configuration is stated plainly. That is a defensible trade to revisit if sweep orchestration outgrows what population-based training and an experiment tracker provide, and revisiting it means amending this record.
 
 The cost is discipline that nothing enforces yet. A command-line override that bypasses the file record would break the guarantee silently, which is why the record forbids overrides that are not written back into the stamped configuration. Until Milestone 5 ships the stamping helper, that rule is a convention rather than a mechanism.
-
-## Context
-
-The project is about to accumulate many configuration axes: scenario suites, observation profile (ADR 0001), action-schema version (ADR 0002), the reinforcement-learning algorithm variant (masked PPO first, with phasic policy gradient, PPO-DNA, and group-relative variants as an open axis, all defined in [[../rl-methods]] and [[../rlhf-transfer]]), network architecture, hyperparameters, the opponent mixture meaning which configurations of the built-in AI the agent trains against, evaluation suites, seeds, and worker counts. Scattering these across code constants, CLI flags and session memory does not survive multi-session work, neither for humans nor for a coding agent picking the project up cold. vcmi-gym, the shipped precedent, runs YAML-configured training with experiment tracking and population-based training, meaning a population of runs whose hyperparameters are periodically copied from better performers and perturbed. Our own determinism discipline already hashes scenarios (§11.3).
 
 ## Decision
 

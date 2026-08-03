@@ -1,3 +1,12 @@
+---
+title: "ADR 0001, dual observation profiles"
+type: adr
+status: accepted
+updated: 2026-08-03
+related_concepts: ["[[../implementation/observation-design]]", "[[../rl-and-the-battle-domain]]", "[[0004-spatial-observation-modality]]"]
+tags: [adr, observation, observability, agent-env]
+---
+
 # ADR 0001 — Dual observation profiles: `full_v1` and `observable_v1`
 
 - Status: accepted 2026-07-27
@@ -5,6 +14,27 @@
 - Evidence: spec §12 (observation schema), [[../archive/research-runs/2026-07-27-rl-approaches]] §2, [[../research/findings]], user requirement 2026-07-27 ("the more realistic agent mode should have a partially observable state")
 - Engine grounding: `src/fheroes2/battle/battle_interface.cpp`, the right-click information path, verified present
 - Mechanism detail: [[../implementation/observation-design]]
+
+## Table of contents
+- [[#Context]]
+- [[#The sub-problem]]
+- [[#Options considered]]
+- [[#Why this one, and what it cost]]
+- [[#What the choice does not buy]]
+- [[#Decision]]
+- [[#Consequences]]
+
+## Context
+
+Observation schema v1 (spec §12) serializes the full true engine state, including engine-internal values a player never sees, most notably `engine_strength`, which comes from the built-in AI's own evaluator. There is no notion of "what a player could actually observe."
+
+Three facts shape the decision:
+
+1. Creature-only fheroes2 battles are informationally symmetric. The battle UI's right-click info (`battle_interface.cpp`, `Cursor::WAR_INFO` → `Dialog::ArmyInfo`) shows the full stat sheet for any unit, own or enemy, with no ownership gating. Real hidden information in HoMM2 begins later: enemy hero mana, and adventure-map fog of war.
+2. The proven pattern for dual modes is one schema with a switch, not two schemas. MicroRTS-Py exposes full observability by default and partial observability via a constructor flag that appends visibility planes to the same tensor (verified 3-0).
+3. A full-state mode stays valuable even when the deployed policy is restricted, since oracle critics, teacher matching, and debugging consume it. This is the asymmetric actor-critic idea, meaning a critic that sees privileged state while the actor sees only what will be available at deployment, defined in [[../rl-methods#Partial observability]] and weighed in [[../implementation/observation-design]]. Searched but unverified at our game class, so kept as an option rather than a dependency.
+
+Additionally, vcmi-gym's hard-won Markov discipline (verified 3-0). A problem is Markov when the current state carries everything needed to predict what comes next, which is what lets a policy look only at the present; [[../rl-and-the-battle-domain]] develops this. The discipline that follows is that every attribute influencing battle dynamics must either appear in the observation or be removed from the dynamics. vcmi-gym chose removal (it deleted morale/luck/terrain effects). We choose exposure.
 
 ## The sub-problem
 
@@ -36,18 +66,6 @@ The cost accepted is a maintenance obligation. Every new observation field has t
 Naming a profile `observable_v1` does not make the problem fully observed under `full_v1`. The combat generator's position sits in the state and is serialized under neither profile, so both are formally partially observed, and [[../implementation/observation-design]] carries that argument. The profiles differ by a small set of tagged fields, not by problem class.
 
 The asymmetric setup this enables, meaning a critic on `full_v1` and an actor on `observable_v1`, is available but not recommended. A state-value critic used to form advantages for an observation-conditioned actor gives a biased gradient in a partially observed problem (Baisero and Amato, 2022), and our own sweep found no verified claim supporting the naive split.
-
-## Context
-
-Observation schema v1 (spec §12) serializes the full true engine state, including engine-internal values a player never sees, most notably `engine_strength`, which comes from the built-in AI's own evaluator. There is no notion of "what a player could actually observe."
-
-Three facts shape the decision:
-
-1. Creature-only fheroes2 battles are informationally symmetric. The battle UI's right-click info (`battle_interface.cpp`, `Cursor::WAR_INFO` → `Dialog::ArmyInfo`) shows the full stat sheet for any unit, own or enemy, with no ownership gating. Real hidden information in HoMM2 begins later: enemy hero mana, and adventure-map fog of war.
-2. The proven pattern for dual modes is one schema with a switch, not two schemas. MicroRTS-Py exposes full observability by default and partial observability via a constructor flag that appends visibility planes to the same tensor (verified 3-0).
-3. A full-state mode stays valuable even when the deployed policy is restricted, since oracle critics, teacher matching, and debugging consume it. This is the asymmetric actor-critic idea, meaning a critic that sees privileged state while the actor sees only what will be available at deployment, defined in [[../rl-methods#Partial observability]] and weighed in [[../implementation/observation-design]]. Searched but unverified at our game class, so kept as an option rather than a dependency.
-
-Additionally, vcmi-gym's hard-won Markov discipline (verified 3-0). A problem is Markov when the current state carries everything needed to predict what comes next, which is what lets a policy look only at the present; [[../rl-and-the-battle-domain]] develops this. The discipline that follows is that every attribute influencing battle dynamics must either appear in the observation or be removed from the dynamics. vcmi-gym chose removal (it deleted morale/luck/terrain effects). We choose exposure.
 
 ## Decision
 

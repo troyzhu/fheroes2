@@ -1,3 +1,12 @@
+---
+title: "ADR 0004, semantic spatial planes, pixels rejected"
+type: adr
+status: accepted
+updated: 2026-08-03
+related_concepts: ["[[../implementation/observation-design]]", "[[0001-observation-profiles]]", "[[../training-design]]"]
+tags: [adr, observation, modality, agent-env]
+---
+
 # ADR 0004 — Semantic spatial-plane observation modality; true pixel rendering rejected
 
 - Status: accepted 2026-07-29, plane emitter lands with Milestone 4
@@ -5,6 +14,23 @@
 - Evidence: user proposal 2026-07-29 (a coarse minimap view for the agent); [[../archive/research-runs/2026-07-29-spatial-observations]], 24 of 25 claims confirmed; [[../research/works/pysc2]], [[../research/works/griddly]], [[../research/works/alphastar]]
 - Extends: [[0001-observation-profiles]], orthogonally. A profile says what may be seen, a modality says how it is shaped.
 - Mechanism detail: [[../implementation/observation-design]]; encoder consequences in [[../training-design]]
+
+## Table of contents
+- [[#Context]]
+- [[#The sub-problem]]
+- [[#Options considered]]
+- [[#Why this one, and what it cost]]
+- [[#Decision]]
+- [[#Consequences]]
+
+## Context
+
+The owner proposed giving the agent a small, coarse, pixel-style minimap plus auxiliary structured information, as a complementary observation mode. The verified literature answer (24/25 claims confirmed): the instinct is right, the pixels are not —
+
+- SC2LE/PySC2's "minimap" is a synthetic semantic rasterization of game state (typed categorical/scalar planes at configurable resolution), never captured render output; DeepMind's stated rationale is that agents shouldn't burn capacity reading numbers out of pixels.
+- Griddly ships a non-pixel VECTOR observer next to three pixel renderers over one game state: final RL performance is consistent across representations in its 150-experiment baseline, and the vector observer is ~14× faster than rendering.
+- AlphaStar's spatial encoder consumes semantic planes, and its scatter connections write each unit's learned embedding into the grid cell that unit occupies, so the two modalities coexist and fuse rather than competing. See [[../research/works/alphastar]].
+- Our headless core loads zero game assets (Phase 0's headline result). A true rendered minimap would reintroduce the display/AGG dependencies the whole architecture exists to avoid.
 
 ## The sub-problem
 
@@ -28,15 +54,6 @@ Pixels are rejected permanently rather than deferred, and the evidence is unusua
 Planes are added alongside entities rather than replacing them because AlphaStar's spatial encoder consumes semantic planes while scatter connections inject entity embeddings into those planes, so the two modalities coexist and fuse. Making them independently toggleable follows PySC2 and Griddly practice and costs nothing when unused.
 
 Two costs are recorded honestly. Whether planes help at 11 by 9 is unmeasured anywhere, so this is an experiment rather than an improvement, and [[../training-design]] keeps the entity encoder as the baseline for that reason. And the board's adjacency is hexagonal with six neighbours in row-offset geometry, so a square convolution kernel covers a receptive field that does not match the game's adjacency. No published evidence favours any hex rasterization convention, which the sweep recorded as a genuine gap, so the engine's own `Battle::Board` indexing is standardized on and written into the schema rather than assumed.
-
-## Context
-
-The owner proposed giving the agent a small, coarse, pixel-style minimap plus auxiliary structured information, as a complementary observation mode. The verified literature answer (24/25 claims confirmed): the instinct is right, the pixels are not —
-
-- SC2LE/PySC2's "minimap" is a synthetic semantic rasterization of game state (typed categorical/scalar planes at configurable resolution), never captured render output; DeepMind's stated rationale is that agents shouldn't burn capacity reading numbers out of pixels.
-- Griddly ships a non-pixel VECTOR observer next to three pixel renderers over one game state: final RL performance is consistent across representations in its 150-experiment baseline, and the vector observer is ~14× faster than rendering.
-- AlphaStar's spatial encoder consumes semantic planes, and its scatter connections write each unit's learned embedding into the grid cell that unit occupies, so the two modalities coexist and fuse rather than competing. See [[../research/works/alphastar]].
-- Our headless core loads zero game assets (Phase 0's headline result). A true rendered minimap would reintroduce the display/AGG dependencies the whole architecture exists to avoid.
 
 ## Decision
 
