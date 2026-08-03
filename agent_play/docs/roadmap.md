@@ -13,18 +13,61 @@ Everything built so far concerns battles only, and deliberately so. This note re
 [[overview]] is the companion to this file. It says what exists and how to build it; this says what does not exist yet and what each next step is waiting on.
 
 ## Table of contents
-- [[#Where the project stands today]]
+- [[#The milestones]]
+- [[#Milestone 4 in detail]]
 - [[#Where the project is aimed]]
 - [[#Why the battle came first]]
 - [[#Phase 1b, wider battles]]
 - [[#Phase 2, the navigation and management agent]]
 - [[#Sequencing]]
 
-## Where the project stands today
+## The milestones
 
-[[overview#Where the project stands]] is the single milestone table, with the gate result behind every row. It is not repeated here, because a second copy is what goes stale.
+The single milestone table. Exit criteria are the specification's own (§20); the gate column names the script that decides whether the criterion is met, which is what makes each row falsifiable rather than a status opinion.
 
-In one line: Phase 0 and Milestones 1 through 3 are done and verified, Milestone 4 is next, and nothing under `rl/` is implemented. The phases below all sit after Milestone 6, and each says what it is waiting on.
+| Milestone | Exit criterion | Gate | State |
+|---|---|---|---|
+| 0, local audit and headless spike | The initialization and asset path are known | `spike/verify_phase0.sh`, 7 of 7 | Done, reproduced on target hardware |
+| 1, deterministic runner | Ten identical runs match | `verify_m1.sh`, 4 of 4 | Done |
+| 2, decision hook and passive logging | Built-in behaviour unchanged under a null controller, and passive logs replay deterministically | `verify_m2.sh`, 8 of 8 | Done |
+| 3, `simple_v1` legal actions | Every supported fixture has valid candidates, at 100% teacher coverage | `verify_m3.sh`, 8 of 8, coverage 116 of 116 | Done, top project risk closed |
+| 4, JSONL worker | Scripted stdin and stdout tests control both sides without a single invalid command | `verify_m4.sh`, not yet written | Next |
+| 5, Python environment and replay | Golden trajectories reproduce across fresh and reused workers | `verify_m5.sh`, not yet written | Not started |
+| 6, hardening and benchmark | The definition of done in specification §22 passes | `verify_m6.sh`, not yet written | Not started |
+| Optional QA, one Battle Only battle through the interface | Owner's call, normal-game regression only | none | Accepted risk, not a training prerequisite |
+
+Per-component detail for what is already built, meaning which file satisfies which specification section and what tests it, is in [[implementation/inventory]]. That is a different object from this table: it maps code, where this maps milestones.
+
+Nothing under `rl/` appears above, because training a policy is not a milestone of the environment. It begins after 6, and [[decisions/0005-training-and-reward]] governs it.
+
+## Milestone 4 in detail
+
+The next one, so the level of detail is higher than for the rest.
+
+| Deliverable | What it means in practice | Specification |
+|---|---|---|
+| Worker target | A dedicated target outside the fheroes2 source glob | §6.1, §6.2 |
+| Protocol v1 | One JSON object per line on stdout and nothing else on that stream, with diagnostics on stderr | §13 |
+| Scenario parsing | Reject an unknown key rather than defaulting it, and name a JSON path and a stable error code in every rejection | §11 |
+| JSON dependency | A pinned, vendored, permissively licensed parser, off by default in the normal build | §6.5 |
+| Blocking external control | The existing hook waits for an `act` message and copies engine-owned commands into the turn | §5.4 |
+| Observation serialization | Both observability profiles and the `planes` modality, from one state source | [[decisions/0001-observation-profiles]], [[decisions/0004-spatial-observation-modality]] |
+| Failure handling | On malformed input emit an error frame and stay alive; on end of stdin skip safely and unwind | §5.4 |
+| Termination reason | The protocol must distinguish a battle that ended from one that hit the round limit | [[decisions/0005-training-and-reward]] |
+
+### Ordering, and why
+
+The parser and the worker target come first, because everything else is tested through them. Blocking control comes next and is the riskiest change, since it turns the existing observer hook into something that can deadlock. Observation serialization is last and is the largest, but it is additive and testable in isolation once the protocol carries frames at all.
+
+### What the gate has to prove
+
+`verify_m4.sh` does not exist yet. Writing it is part of the milestone rather than a follow-up, on the pattern the earlier gates set. At minimum it has to show that a scripted session drives an episode to termination with no invalid command, that a malformed line produces an error frame and a live worker rather than a crash, that closing stdin unwinds cleanly, that a rejected scenario names its JSON path and error code, and that the terminal digest under external control matches the digest the same scenario produces under the built-in AI when the external policy replays the AI's own choices.
+
+### Open before it starts
+
+The two-build-system question. `ENABLE_AGENT` covers the CMake path only, and the specification requires deciding explicitly whether the worker target is also wired into the `src/dist` Makefile or whether that path is declared unsupported for agent builds. Leaving it undecided strands whichever machine lacks CMake, and this machine builds through the Makefile.
+
+Whether `AI::BattlePlanner` can be queried without advancing the arena or consuming combat randomness. This is the precondition for the DAgger stage in [[decisions/0005-training-and-reward]], and that record asks for it to be settled during Milestone 4 while the protocol is being built, because the answer decides whether that stage exists at all.
 
 ## Where the project is aimed
 

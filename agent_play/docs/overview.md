@@ -274,33 +274,11 @@ Full evidence, with a 25-row assumption table, is in `local_source_audit.md`.
 
 ## Where the project stands
 
-| Phase | State | Evidence |
-|---|---|---|
-| Phase 0, audit and headless spike | done, reproduced on target hardware | `verify_phase0.sh`, 7 of 7 |
-| Milestone 1, deterministic runner | done | `verify_m1.sh`, 4 of 4 |
-| Milestone 2, decision hook and passive logging | done | `verify_m2.sh`, 8 of 8 |
-| Milestone 3, `simple_v1` legal actions | done, top risk closed | `verify_m3.sh`, 8 of 8, teacher coverage 100% (116 of 116) |
-| Milestone 4, JSONL worker and protocol v1 | next | — |
-| Milestones 5 and 6, Python environment, hardening, benchmark | not started | — |
-| Optional QA, one Battle Only battle through the interface | accepted risk, owner's call | normal-game regression only, not a training prerequisite |
+[[roadmap#The milestones]] carries the milestone table, with the exit criterion and gate result for each. It is the single place; this section holds only what is true of the branch right now.
 
 Measured throughput is about 4,600 episodes/s on the Apple M2 target machine for the tiny-melee fixture with no protocol layer attached, at 12 MB resident memory, scaling linearly to four worker processes. The learner, not the environment, will be the bottleneck.
 
 The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook (`DecisionController`), and the additive `src/fheroes2/agent/` library. Enumerate them with `git diff master --stat -- src/`.
-
-Milestone 4 in concrete terms:
-
-| Deliverable | What it means in practice | Specification |
-|---|---|---|
-| Protocol v1 | One JSON object per line on stdout, and nothing else on that stream; diagnostics go to stderr | §13 |
-| Scenario parsing | Reject an unknown key rather than defaulting it; every rejection names a JSON path and a stable error code | §11 |
-| JSON dependency | A pinned, vendored, permissively licensed parser, off by default in the normal build | §6.5 |
-| Blocking external control | The existing hook waits for an `act` message and copies engine-owned commands into the turn | §5.4 |
-| Observation serialization | Both observability profiles and the `planes` modality, from one state source | ADR 0001, ADR 0004 |
-| Failure handling | On malformed input, emit an error frame and stay alive; on stdin end, skip safely and unwind | §5.4 |
-| `ENABLE_AGENT` target | A CMake target for the worker, settling the two-build-system question | §6.2 |
-
-Exit criterion: scripted stdin and stdout tests control both sides without a single invalid command.
 
 ## Build and verify
 
