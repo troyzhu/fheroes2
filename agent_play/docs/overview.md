@@ -264,6 +264,18 @@ Four Phase 0 findings overturned the original specification. Do not re-derive th
 
 Headless battles need no game assets at all: no display, audio, AGG, h2d, or HoMM2 data. Monster stats are hardcoded (`monster_info.cpp:384`) and obstacle setup uses ICN identifiers as plain enum tags (`battle_board.cpp:573`), so battle resolution never touches an asset. This was the specification's top risk, and closing it is why pixels stay out.
 
+### How the state is actually obtained
+
+Worth being concrete, because "headless" invites the assumption that something is being read off a picture. Nothing is rendered and nothing is parsed.
+
+The environment constructs the engine's own battle object with rendering switched off, `Battle::Arena( attackingArmy, defendingArmy, tileIndex, false, generator, controller )`, where the fourth argument is the engine's existing `isShowInterface` flag. That flag is not ours; the game already needs it for its own automatic combat resolution. Everything after it is the same code the game runs when a human watches.
+
+State is then read straight off the C++ objects. `collectForce` walks a `Battle::Force`, and for each `Battle::Unit` calls `GetCount()`, `GetHitPoints()`, `GetHeadIndex()`, and `isValid()`. Those are the same accessors the interface itself calls before drawing a number on screen, so the environment and the display read one source and the environment simply stops earlier.
+
+The proof that no asset is involved is direct. Pointing `FHEROES2_DATA` at a path that does not exist still runs all five fixtures to their usual digests. Rendering is skipped rather than replaced, so this is not a reduced or alternative game format; it is the full battle computation with the drawing left out.
+
+One consequence matters for verification. Because it is the same code path, a battle watched through the interface and the same battle run headless under the same seed are the same computation, which is what makes a side-by-side comparison a meaningful check rather than an approximate one. [[roadmap#The state-extraction gap this milestone has to close]] builds a gate on that.
+
 The world seed needs no engine change, because `Rand::CurrentThreadRandomDevice()` (`rand.cpp:85`) returns a mutable reference to a `thread_local PCG32`. The proposed `World` API overload became a deferred cleanup rather than a prerequisite.
 
 A second entry point needs no CMake refactor. Linking a new `main` against the game objects minus `fheroes2.o` worked on the first attempt with no undefined symbols, so the non-entry object set is already library-shaped.

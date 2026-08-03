@@ -34,7 +34,7 @@ The single milestone table. Exit criteria are the specification's own (§20); th
 | 4, JSONL worker | Scripted stdin and stdout tests control both sides without a single invalid command | `verify_m4.sh`, not yet written | Next |
 | 5, Python environment and replay | Golden trajectories reproduce across fresh and reused workers | `verify_m5.sh`, not yet written | Not started |
 | 6, hardening and benchmark | The definition of done in specification §22 passes | `verify_m6.sh`, not yet written | Not started |
-| Optional QA, one Battle Only battle through the interface | Owner's call, normal-game regression only | none | Accepted risk, not a training prerequisite |
+| Interface comparison, part of 4 | Owner signs off that the per-decision state JSON matches a battle watched in the interface | manual, two stages, see below | Required for 4, upgraded from optional on 2026-08-03 |
 
 Per-component detail for what is already built, meaning which file satisfies which specification section and what tests it, is in [[implementation/inventory]]. That is a different object from this table: it maps code, where this maps milestones.
 
@@ -72,6 +72,18 @@ Per-decision state extraction does not exist. `DecisionRecord` holds an engine d
 Terminal state extraction was in the same position and is now checked, as of 2026-08-03. Every gate proved the digest was stable and none asserted what it held, so a systematically wrong extraction would have been perfectly deterministic and would have passed all of them. `verify_m1.sh` now asserts eight invariants on every fixture, chosen so they hold whatever the battle was and therefore need no golden value and no oracle. A golden value would only have locked in whatever the implementation happens to do.
 
 The invariants are that a living stack holds at least one creature and a living creature at least one hit point, that a side with no stacks is zero on every field, that a reported victory or defeat agrees with which side still has stacks, that a decided battle does not leave both sides standing, and that rounds and decisions are at least one. Each was verified to fire by injecting the corresponding corruption, including the pre-death read that motivated the check.
+
+### The visual gate, which supplies the oracle the invariants cannot
+
+The invariants now asserted in `verify_m1.sh` hold whatever the battle was, which is what lets them work without an oracle, and is also their limit. They cannot tell a correct extraction from one that is self-consistently wrong, for instance a serialization that reports every position reflected across the board. Catching that needs an independent view of the same battle, and there is exactly one available: the game's own interface.
+
+Owner requirement, 2026-08-03. Milestone 4 delivers a comparison the owner runs by hand and signs off, in two stages, because the two stages fail for different reasons and conflating them would make a failure uninterpretable.
+
+Stage one is mechanical and establishes that both sides are watching the same battle. The same scenario and seed played through Battle Only in the ordinary executable, and run headless by the worker, must produce the same terminal digest. If they differ, the seeding paths have diverged and nothing about the serialization has been learned yet. This is a prerequisite rather than part of the check.
+
+Stage two is the gate itself. The worker emits per-decision state as JSON for that scenario, the owner watches the same battle in the interface, and the two are compared side by side: which stack is on which cell, how many creatures remain in each, hit points, whose turn it is, and how many shots a shooter has left. The state is the thing being checked, so a human reading the board is the oracle, and no assertion in the repository can substitute for it.
+
+This upgrades the optional interface run in [[#The milestones]] from a normal-game regression that was the owner's call into a required sign-off for Milestone 4. The reason for the upgrade is that per-decision state serialization is new code with no independent check, where the terminal path at least now has invariants.
 
 ### Open before it starts
 
