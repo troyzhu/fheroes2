@@ -60,7 +60,7 @@ The book reports that filtering training problems to those the model solves betw
 
 Two things follow for the design. The generator needs a difficulty parameter that can be measured rather than asserted, and the natural measurement is the win rate of the current policy, or the teacher, over a sample of generated scenarios. And the band moves, because a scenario set that is well calibrated for a freshly cloned policy becomes too easy once training works, which makes this a curriculum rather than a fixed distribution. The five committed fixtures are regression anchors and were never a training distribution; this says what the training distribution has to satisfy.
 
-The cost of ignoring it is specific. Sampling armies uniformly would produce many lopsided matchups, most batches would carry near-zero advantage, and the run would look like a learning-rate problem.
+The cost of ignoring it is specific. Sampling armies uniformly would produce many lopsided matchups, most batches would carry near-zero advantage, and the run would look like a learning-rate problem. [[scenario-distribution]] works the variance argument through, including the case where filtering is the only remedy that helps.
 
 ## Critic-free baselines, which this project should seriously consider
 

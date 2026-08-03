@@ -187,7 +187,7 @@ The value is conditioned on the opponent. Fitted on teacher against teacher, it 
 
 The observation profile has to match the actor's. Fitting on `full_v1` while the actor consumes `observable_v1` reintroduces exactly the asymmetric-critic bias that [[decisions/0001-observation-profiles]] declines to recommend.
 
-Near the start of an episode the fitted value is dominated by the army matchup rather than by tactics, since two identical policies resolve an opening position mostly according to who has the stronger force. That is useful rather than a defect, because subtracting it removes scenario difficulty from the advantage, which is the same variance the leave-one-out baseline in [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] removes by sampling instead of by regression. The two are alternatives addressing one problem, and pre-fitting is the cheaper of them to try first.
+Near the start of an episode the fitted value is dominated by the army matchup rather than by tactics, since two identical policies resolve an opening position mostly according to who has the stronger force. That is useful rather than a defect, because subtracting it removes scenario difficulty from the advantage, which is the same variance the leave-one-out baseline in [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] removes by sampling instead of by regression. The two are alternatives addressing one problem, and pre-fitting is the cheaper of them to try first. [[scenario-distribution#Three mechanisms, one target]] sets both beside difficulty filtering and shows all three removing the same variance term.
 
 ### Starting hyperparameters
 

@@ -57,6 +57,44 @@ That is `fheroes2::agent::snapshotCommand` (`agent_command_snapshot.cpp:31-40`).
 
 Each snapshot renders to a stable key such as `move:7:34`, `attack:1:6:34:45:3`, or `skip:9`. Keys are semantic, so they survive changes to internal storage.
 
+### A worked command
+
+Take the melee from [[legal-actions-and-masking#A worked index]], canonical index 411: our stack, uid 2, standing on cell 34, striking the enemy stack, uid 7, that occupies cell 35, with direction index 2 for `RIGHT`. The engine constructs
+
+```cpp
+Command( Command::ATTACK, 2, 7, -1, 35, 2 )
+//                        │  │   │   │  └─ attack direction
+//                        │  │   │   └──── cell index to attack
+//                        │  │   └──────── cell index to move to, -1 for "act from here"
+//                        │  └──────────── defender uid
+//                        └─────────────── attacker uid
+```
+
+`Command` derives from `std::vector<int>`, and the constructor pushes the parameter pack in reverse. So the object holds
+
+```
+index:  0    1    2    3   4
+value:  2   35   -1    7   2
+        ▲                  ▲
+     direction        attacker uid
+```
+
+Reading is `GetNextValue()`, which takes `back()` and then `pop_back()`. Popping from the back of a reversed vector returns the parameters in the order they were written, so the consumer sees 2, 7, -1, 35, 2 again. The reversal exists precisely to make that true, and it is invisible unless you look at the container.
+
+### The bug this shape invites
+
+Every read is destructive, so any loop that consults `size()` while reading terminates halfway. Written the obvious way,
+
+```cpp
+for ( size_t i = 0; i < scratch.size(); ++i ) {      // WRONG: size() shrinks under the loop
+    params.push_back( scratch.GetNextValue() );
+}
+```
+
+the bound moves toward the counter from both sides and they meet in the middle. For the five-parameter `ATTACK` above the loop runs at $i = 0, 1, 2$ with `size()` at 5, 4, 3, then stops at $i = 3$ against `size()` 2, extracting three parameters of five. For a two-parameter `MOVE` it extracts one of two. Neither case throws, and the snapshot simply records a truncated command.
+
+Hoisting the count before the first read is the whole fix, which is why the shipped loop reads as it does below. This is worth dwelling on because an earlier revision of this document published the broken form as if it were the shipped source.
+
 ### The same command is read two ways, on purpose
 
 `Command::updatePCG32Stream` reads an ATTACK command positionally, at raw indices 2, 3 and 4, and ignores the target cell and direction outright (`battle_command.cpp:42-51`). The engine's own comment gives the reason. The built-in AI and a human may encode the same attack differently, and the random stream must not diverge between them.

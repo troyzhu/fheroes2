@@ -15,6 +15,7 @@ tags: [adr, training, reward, agent-env]
 - Techniques: [[../rl-methods]] defines every method named below, with its equation and our verdict.
 - Mechanics: [[../training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
 - Transfer: [[../rlhf-transfer]] works out what the language-model reinforcement-learning literature contributes here, and supplies evidence for two things this record left open.
+- Scenario spread: [[../scenario-distribution]] analyses why the army matchup dominates outcomes, which bears directly on the reward choice below and on the initial-state distribution this record leaves open.
 
 ## Table of contents
 - [[#Context]]

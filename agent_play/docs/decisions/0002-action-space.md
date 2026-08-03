@@ -18,6 +18,7 @@ tags: [adr, action-space, masking, agent-env]
 - [[#Context]]
 - [[#The sub-problem]]
 - [[#Options considered]]
+- [[#A worked example, both interfaces]]
 - [[#Why this one, and what it cost]]
 - [[#Decision]]
 - [[#Consequences]]
@@ -51,6 +52,44 @@ The engine can enumerate exactly which commands are legal at a decision point, s
 | Factorized multi-head | Split an action into independent components, each with its own softmax | Shrinks a combinatorial space to a few hundred logits | vcmi-gym's factorized variant failed to converge; its flat masked space is what shipped |
 | Pointer network over candidates | Attention selects among a variable-length candidate set | The general answer when the candidate set is genuinely unbounded | Heavyweight, and the architectural home of the original design rather than a near-term option |
 | Penalize illegal actions with negative reward | Keep the space unmasked, teach legality | No masking machinery | Documented to collapse as the illegal fraction grows. Unmasked full-game microRTS PPO reaches 0.0 cumulative win rate against 0.82 to 0.91 masked |
+
+## A worked example, both interfaces
+
+One decision, the same one used in [[../implementation/legal-actions-and-masking#A worked index]]. Our stack stands on cell 34, an enemy occupies cell 35 immediately to its right, and the stack can reach three empty cells.
+
+Under the original specification, the worker emits a variable-length list and the learner picks a position in it.
+
+```json
+{ "candidates": [
+    { "action_id": 0, "type": "SKIP" },
+    { "action_id": 1, "type": "MOVE",  "cell": 22 },
+    { "action_id": 2, "type": "MOVE",  "cell": 23 },
+    { "action_id": 3, "type": "MOVE",  "cell": 45 },
+    { "action_id": 4, "type": "MELEE", "target": 35, "direction": 2 } ] }
+```
+
+Under this record, the same enumeration emits a fixed-width mask, and every candidate carries its canonical index instead of a position.
+
+```
+legal_mask: uint8[793], zero except
+  index   0  → SKIP
+  index  23  → MOVE to cell 22        (1 + 22)
+  index  24  → MOVE to cell 23        (1 + 23)
+  index  46  → MOVE to cell 45        (1 + 45)
+  index 411  → MELEE cell 35, dir 2   (199 + 6·35 + 2)
+```
+
+### Why the first one cannot be learned from
+
+Nothing is wrong with that list as a message. What breaks is using it as a policy's output space, and the reason is that `action_id` 2 means "move to cell 23" only at this decision. One step later, with a different set of reachable cells, `action_id` 2 is some other action entirely.
+
+A softmax head assigns a weight to each output position and updates it from experience. If position 2 denotes a different action at every decision, the gradient for that weight is an average over unrelated actions, and there is nothing stable for it to converge to. The network can only learn from the accompanying metadata, which means reading the semantics of a variable-length set, which is the pointer architecture in the options table rather than a flat head.
+
+Under the canonical indexing, slot 411 means striking cell 35 from its left in every state, in every episode, on every machine. That is what makes a fixed head trainable, and it is also what makes a recorded trajectory comparable across runs, since the stored index is meaningful without replaying the decision that produced it.
+
+### What the mask costs here
+
+Five of 793 slots are legal in this example, so more than 99% of the output is masked. That sounds wasteful and is the standard objection to flat spaces. The measured answer is that masking's time-to-solve stays roughly flat as the illegal fraction grows, which is what makes the trade acceptable rather than merely tolerable.
 
 ## Why this one, and what it cost
 
