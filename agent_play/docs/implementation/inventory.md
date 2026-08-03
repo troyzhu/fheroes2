@@ -73,7 +73,8 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | Property | Command | Expected |
 |---|---|---|
 | Phase 0 invariants (headless, determinism, reuse, seeds) | `verify_phase0.sh` | `7 passed, 0 failed`, map seed `2227197244`, digest `2cfd42cb104aa5e7` |
-| M1 exit: ten identical runs × 5 fixtures | `verify_m1.sh` | `4 passed, 0 failed`, `deterministic=yes` |
+| M1 exit: ten identical runs × 5 fixtures | `verify_m1.sh` | `5 passed, 0 failed`, `deterministic=yes` |
+| Terminal-state correctness, not only stability | `verify_m1.sh` | `terminal-state invariants`, 5 fixtures × 8 properties |
 | M2 exit: null-controller inertness + deterministic passive logs | `verify_m2.sh` | `8 passed, 0 failed` |
 | M3 exit: 100 % teacher coverage + candidates everywhere + digest inertness of enumeration | `verify_m3.sh` | `8 passed, 0 failed`, `teacher_coverage=complete` |
 | Cross-machine | (M3 MacBook baseline) | same seed + digest, reproduced |

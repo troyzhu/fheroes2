@@ -373,7 +373,9 @@ If the Makefile build fails in the `.pot` step, put Homebrew's `gettext` ahead o
 
 The historical top risk, legal-action generation, is closed, with validators extracted, full teacher coverage, and no live-arena probing. What remains:
 
-State extraction is verified for stability and not for correctness, which is the highest of these. The terminal digest covers seven episode scalars and seven fields per unit, and all four gates prove it is byte-identical across runs, processes, machines, and optimization levels. Nothing asserts what it contains. A systematically wrong extraction, reading a count before deaths are applied or including an already-dead unit, would be perfectly deterministic and would pass every gate. The determinism discipline that makes this project trustworthy is also what hides this particular failure. [[roadmap#Milestone 4 in detail]] specifies the invariant test that closes it.
+Per-decision state extraction does not exist, which makes it the highest remaining risk because everything downstream waits on it. The recorded decisions carry an engine decision index, a unit id, and the chosen commands, with nothing about the board, so the 116 decisions Milestone 2 captured cannot train anything until Milestone 4 adds an observation emitter. [[roadmap#The state-extraction gap this milestone has to close]] carries the detail.
+
+Terminal state extraction was in the same position until 2026-08-03 and is now checked. `verify_m1.sh` asserts eight invariants per fixture that must hold whatever the battle was, which closes the specific hole that every gate proving byte-identical digests could not: a systematically wrong extraction would have been perfectly deterministic and would have passed all of them.
 
 The protocol and JSON surface arriving in Milestone 4, where a strict parser boundary and a vendored dependency enter the tree, and where stdout discipline and invalid-input handling decide whether the worker stays healthy.
 

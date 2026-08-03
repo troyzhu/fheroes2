@@ -54,6 +54,47 @@ if [ -x "${WORKER}" ]; then
     cmp -s "${WORKDIR}/proc_a.log" "${WORKDIR}/proc_b.log"
     report "cross-process determinism" "$?" "two fresh processes, byte-identical output"
 
+    # Terminal-state invariants (spec §18.2 item 7, "state-core canonicalization").
+    #
+    # Every other check in this file proves the extracted state is STABLE: identical across
+    # runs, processes, machines and optimization levels. None of them proves it is CORRECT.
+    # An extraction that read counts before deaths were applied, or that kept a dead stack,
+    # would be perfectly deterministic and would pass all of them. These assert properties
+    # that must hold whatever the battle was, so they need no golden value and no oracle;
+    # a golden value would only lock in whatever the current implementation happens to do.
+    invariants="$(awk '
+        /^fixture=/ {
+            for ( i = 1; i <= NF; ++i ) { split($i, kv, "="); v[kv[1]] = kv[2] }
+            n = v["fixture"]
+
+            # A living stack holds at least one creature, and a living creature at least one
+            # hit point. Catches an inverted or unit-confused aggregation.
+            if ( v["a_creatures"] < v["a_stacks"] || v["a_hp"] < v["a_creatures"] ) bad[n] = bad[n] " attacker-ordering"
+            if ( v["d_creatures"] < v["d_stacks"] || v["d_hp"] < v["d_creatures"] ) bad[n] = bad[n] " defender-ordering"
+
+            # A side with no stacks must be zero everywhere. This is the check that catches
+            # reading the force before deaths are applied.
+            if ( v["a_stacks"] == 0 && (v["a_creatures"] != 0 || v["a_hp"] != 0) ) bad[n] = bad[n] " attacker-wiped-nonzero"
+            if ( v["d_stacks"] == 0 && (v["d_creatures"] != 0 || v["d_hp"] != 0) ) bad[n] = bad[n] " defender-wiped-nonzero"
+
+            # The reported termination and the surviving forces must agree.
+            if ( v["termination"] == "victory" && !(v["a_stacks"] > 0 && v["d_stacks"] == 0) ) bad[n] = bad[n] " victory-disagrees"
+            if ( v["termination"] == "defeat"  && !(v["d_stacks"] > 0 && v["a_stacks"] == 0) ) bad[n] = bad[n] " defeat-disagrees"
+
+            # A decided battle cannot leave both sides standing.
+            if ( (v["termination"] == "victory" || v["termination"] == "defeat") && v["a_stacks"] > 0 && v["d_stacks"] > 0 ) bad[n] = bad[n] " both-sides-alive"
+
+            if ( v["rounds"] < 1 ) bad[n] = bad[n] " rounds<1"
+            if ( v["decisions"] < 1 ) bad[n] = bad[n] " decisions<1"
+            ++seen
+        }
+        END {
+            for ( f in bad ) printf "%s:%s ", f, bad[f]
+            if ( seen == 0 ) printf "no-fixture-lines "
+        }' "${WORKDIR}/proc_a.log")"
+    [ -z "${invariants}" ]
+    report "terminal-state invariants" "$?" "${invariants:-$(grep -c '^fixture=' "${WORKDIR}/proc_a.log") fixtures, 8 properties each}"
+
     echo
     sed -n 's/^fixture=/  /p' "${WORKDIR}/proc_a.log"
 else
