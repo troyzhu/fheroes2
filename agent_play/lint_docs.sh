@@ -97,19 +97,40 @@ def paragraphs(text):
         yield s
 
 
+def headings_of(path):
+    """Normalized heading text of a file, for anchor resolution."""
+    try:
+        src = path.read_text(encoding="utf-8")
+    except OSError:
+        return set()
+    return {
+        re.sub(r"\s+", " ", h.strip().lower())
+        for h in re.findall(r"^#{1,6}\s+(.+?)\s*$", src, re.M)
+    }
+
+
 def resolve_wikilinks(path, text):
-    """Return unresolved [[target]] links. Same-file anchors [[#...]] are skipped."""
+    """Return unresolved [[target]] links, checking both the file and the heading anchor.
+
+    An anchor that does not name a real heading is the failure mode a file rename or a
+    section retitle produces, and it is invisible on GitHub, so it is checked here."""
     bad = []
     for raw in re.findall(r"\[\[([^\]]+)\]\]", text):
         # Inside a table cell the alias pipe is escaped as \| so the row does not split.
-        target = raw.replace("\\|", "|").split("|", 1)[0].split("#", 1)[0].strip()
-        if not target:
-            continue  # [[#heading]], an intra-file anchor
-        cand = (path.parent / target).resolve()
-        if cand.suffix != ".md":
-            cand = cand.with_suffix(".md")
-        if not cand.exists():
-            bad.append(raw)
+        target = raw.replace("\\|", "|").split("|", 1)[0]
+        stem, _, anchor = target.partition("#")
+        stem = stem.strip()
+        if not stem:
+            cand = path  # [[#heading]], an intra-file anchor
+        else:
+            cand = (path.parent / stem).resolve()
+            if cand.suffix != ".md":
+                cand = cand.with_suffix(".md")
+            if not cand.exists():
+                bad.append(raw)
+                continue
+        if anchor and re.sub(r"\s+", " ", anchor.strip().lower()) not in headings_of(cand):
+            bad.append(raw + "  (no such heading)")
     return bad
 
 

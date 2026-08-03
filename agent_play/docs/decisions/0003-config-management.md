@@ -3,7 +3,7 @@ title: "ADR 0003, versioned configuration governs every tunable"
 type: adr
 status: accepted
 updated: 2026-08-03
-related_concepts: ["[[../training-design]]", "[[../overview]]"]
+related_concepts: ["[[../rl/training-design]]", "[[../overview]]"]
 tags: [adr, config, reproducibility, agent-env]
 ---
 
@@ -12,7 +12,7 @@ tags: [adr, config, reproducibility, agent-env]
 - Status: accepted 2026-07-27, binding from Milestone 4 onward
 - Implementation: not built. No `configs/` tree exists at the repository root as of 2026-07-31, which is consistent with the record binding from Milestone 4 rather than a lapse.
 - Evidence: user requirement 2026-07-27; spec §11 (scenario schema), §15 (trajectory metadata), §16.4 (determinism metadata); [[../archive/research-runs/2026-07-27-rl-approaches]] §4; [[../research/works/vcmi-gym]] as the shipped precedent
-- Hyperparameters this governs: [[../training-design]]
+- Hyperparameters this governs: [[../rl/training-design]]
 
 ## Table of contents
 - [[#Context]]
@@ -24,13 +24,13 @@ tags: [adr, config, reproducibility, agent-env]
 
 ## Context
 
-The project is about to accumulate many configuration axes: scenario suites, observation profile (ADR 0001), action-schema version (ADR 0002), the reinforcement-learning algorithm variant (masked PPO first, with phasic policy gradient, PPO-DNA, and group-relative variants as an open axis, all defined in [[../rl-methods]] and [[../rlhf-transfer]]), network architecture, hyperparameters, the opponent mixture meaning which configurations of the built-in AI the agent trains against, evaluation suites, seeds, and worker counts. Scattering these across code constants, CLI flags and session memory does not survive multi-session work, neither for humans nor for a coding agent picking the project up cold. vcmi-gym, the shipped precedent, runs YAML-configured training with experiment tracking and population-based training, meaning a population of runs whose hyperparameters are periodically copied from better performers and perturbed. Our own determinism discipline already hashes scenarios (§11.3).
+The project is about to accumulate many configuration axes: scenario suites, observation profile (ADR 0001), action-schema version (ADR 0002), the reinforcement-learning algorithm variant (masked PPO first, with phasic policy gradient, PPO-DNA, and group-relative variants as an open axis, all defined in [[../rl/rl-methods]] and [[../rl/rlhf-transfer]]), network architecture, hyperparameters, the opponent mixture meaning which configurations of the built-in AI the agent trains against, evaluation suites, seeds, and worker counts. Scattering these across code constants, CLI flags and session memory does not survive multi-session work, neither for humans nor for a coding agent picking the project up cold. vcmi-gym, the shipped precedent, runs YAML-configured training with experiment tracking and population-based training, meaning a population of runs whose hyperparameters are periodically copied from better performers and perturbed. Our own determinism discipline already hashes scenarios (§11.3).
 
 ## The sub-problem
 
 Where does a tunable live, and how does a finished artifact prove which values produced it?
 
-The project is about to acquire many independent axes: scenario suites, the observation profile from [[0001-observation-profiles]], the modality from [[0004-spatial-observation-modality]], the algorithm and its hyperparameters from [[0005-training-and-reward]] and [[../training-design]], opponent mixtures, evaluation pools, seeds. The failure this guards against is specific and was named by the owner. A coding agent picking the project up cold, or a human six months later, cannot tell what a number came from if the answer lives in conversation history.
+The project is about to acquire many independent axes: scenario suites, the observation profile from [[0001-observation-profiles]], the modality from [[0004-spatial-observation-modality]], the algorithm and its hyperparameters from [[0005-training-and-reward]] and [[../rl/training-design]], opponent mixtures, evaluation pools, seeds. The failure this guards against is specific and was named by the owner. A coding agent picking the project up cold, or a human six months later, cannot tell what a number came from if the answer lives in conversation history.
 
 ## Options considered
 

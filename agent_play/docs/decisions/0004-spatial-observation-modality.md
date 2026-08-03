@@ -3,7 +3,7 @@ title: "ADR 0004, semantic spatial planes, pixels rejected"
 type: adr
 status: accepted
 updated: 2026-08-03
-related_concepts: ["[[../implementation/observation-design]]", "[[0001-observation-profiles]]", "[[../training-design]]"]
+related_concepts: ["[[../implementation/observation-design]]", "[[0001-observation-profiles]]", "[[../rl/training-design]]"]
 tags: [adr, observation, modality, agent-env]
 ---
 
@@ -13,7 +13,7 @@ tags: [adr, observation, modality, agent-env]
 - Implementation: not built. No occurrence of `planes_v1` or `observation_modalities` exists in `src/fheroes2/agent/` or `python/` as of 2026-07-31.
 - Evidence: user proposal 2026-07-29 (a coarse minimap view for the agent); [[../archive/research-runs/2026-07-29-spatial-observations]], 24 of 25 claims confirmed; [[../research/works/pysc2]], [[../research/works/griddly]], [[../research/works/alphastar]]
 - Extends: [[0001-observation-profiles]], orthogonally. A profile says what may be seen, a modality says how it is shaped.
-- Mechanism detail: [[../implementation/observation-design]]; encoder consequences in [[../training-design]]
+- Mechanism detail: [[../implementation/observation-design]]; encoder consequences in [[../rl/training-design]]
 
 ## Table of contents
 - [[#Context]]
@@ -53,7 +53,7 @@ Pixels are rejected permanently rather than deferred, and the evidence is unusua
 
 Planes are added alongside entities rather than replacing them because AlphaStar's spatial encoder consumes semantic planes while scatter connections inject entity embeddings into those planes, so the two modalities coexist and fuse. Making them independently toggleable follows PySC2 and Griddly practice and costs nothing when unused.
 
-Two costs are recorded honestly. Whether planes help at 11 by 9 is unmeasured anywhere, so this is an experiment rather than an improvement, and [[../training-design]] keeps the entity encoder as the baseline for that reason. And the board's adjacency is hexagonal with six neighbours in row-offset geometry, so a square convolution kernel covers a receptive field that does not match the game's adjacency. No published evidence favours any hex rasterization convention, which the sweep recorded as a genuine gap, so the engine's own `Battle::Board` indexing is standardized on and written into the schema rather than assumed.
+Two costs are recorded honestly. Whether planes help at 11 by 9 is unmeasured anywhere, so this is an experiment rather than an improvement, and [[../rl/training-design]] keeps the entity encoder as the baseline for that reason. And the board's adjacency is hexagonal with six neighbours in row-offset geometry, so a square convolution kernel covers a receptive field that does not match the game's adjacency. No published evidence favours any hex rasterization convention, which the sweep recorded as a genuine gap, so the engine's own `Battle::Board` indexing is standardized on and written into the schema rather than assumed.
 
 ## Decision
 

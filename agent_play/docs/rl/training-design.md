@@ -2,13 +2,13 @@
 title: Training design
 type: design
 updated: 2026-07-30
-related_concepts: ["[[notation]]", "[[decisions/0005-training-and-reward]]", "[[rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]"]
+related_concepts: ["[[../overview#Notation]]", "[[../decisions/0005-training-and-reward]]", "[[rl-and-the-battle-domain]]", "[[../implementation/legal-actions-and-masking]]"]
 tags: [agent-env, training, design]
 ---
 
 # Training design
 
-Techniques named here are defined in [[rl-methods]], which derives the chain from the policy gradient to PPO and surveys every alternative. This document says how a battle policy is actually fitted: what the network consumes and emits, what loss each stage minimizes, which algorithm optimizes it, which hyperparameters it starts from, and what the alternatives were at each choice. [[decisions/0005-training-and-reward]] records the decisions; this is the reasoning and the mechanics behind them. Nothing here is implemented yet, so every number is a starting point to be measured rather than a tuned result.
+Techniques named here are defined in [[rl-methods]], which derives the chain from the policy gradient to PPO and surveys every alternative. This document says how a battle policy is actually fitted: what the network consumes and emits, what loss each stage minimizes, which algorithm optimizes it, which hyperparameters it starts from, and what the alternatives were at each choice. [[../decisions/0005-training-and-reward]] records the decisions; this is the reasoning and the mechanics behind them. Nothing here is implemented yet, so every number is a starting point to be measured rather than a tuned result.
 
 ## Table of contents
 - [[#The learning problem]]
@@ -24,11 +24,11 @@ Techniques named here are defined in [[rl-methods]], which derives the chain fro
 
 A policy maps an observation to a distribution over the 793 canonical actions, of which typically five to thirty are legal. Two different objectives fit that same network in sequence. Imitation fits it to reproduce a teacher's choices, which is a supervised classification problem. Reinforcement learning then fits it to maximize return, which is not.
 
-The teacher is the engine's own `AI::BattlePlanner`, described in [[implementation/teacher-coverage-and-behavior-cloning]]. It plays both sides of every headless battle, so demonstration data costs only the time to run episodes.
+The teacher is the engine's own `AI::BattlePlanner`, described in [[../implementation/teacher-coverage-and-behavior-cloning]]. It plays both sides of every headless battle, so demonstration data costs only the time to run episodes.
 
 ## Notation
 
-These follow the contract in [[notation]], which matches the owner's RL wiki and lists what this project adds on top of it.
+These follow the contract in [[../overview#Notation]], which matches the owner's RL wiki and lists what this project adds on top of it.
 
 | Symbol | Meaning |
 |---|---|
@@ -47,7 +47,7 @@ These follow the contract in [[notation]], which matches the owner's RL wiki and
 
 ## The policy network
 
-The observation has two parts, so the encoder does too. Entity records are ten fixed slots of per-stack fields, and the optional plane tensor is $11 \times 9 \times C$ over the board. Both are described in [[implementation/observation-design]].
+The observation has two parts, so the encoder does too. Entity records are ten fixed slots of per-stack fields, and the optional plane tensor is $11 \times 9 \times C$ over the board. Both are described in [[../implementation/observation-design]].
 
 ### The encoder, smallest first
 
@@ -116,7 +116,7 @@ That last row is the one most easily got wrong. Two decisions from the same batt
 
 The current recorded corpus is 116 decisions across five fixtures, which is a regression anchor rather than a training set. Cloning needs orders of magnitude more, and getting it costs only compute, since the environment runs at roughly 4,600 episodes per second and the teacher plays itself.
 
-The real constraint is diversity rather than volume. Ten thousand episodes of the same five fixtures would give a large dataset covering a tiny region of state space. The scenario generator, currently undefined and flagged in [[decisions/0005-training-and-reward]] as the largest open modeling choice, is what determines whether the data are worth collecting.
+The real constraint is diversity rather than volume. Ten thousand episodes of the same five fixtures would give a large dataset covering a tiny region of state space. The scenario generator, currently undefined and flagged in [[../decisions/0005-training-and-reward]] as the largest open modeling choice, is what determines whether the data are worth collecting.
 
 ### What success looks like
 
@@ -177,15 +177,15 @@ The reason this is worth doing here rather than being a generic nicety is an asy
 
 It also removes a weakness at the moment it is most dangerous. Early stage-3 updates are worst when the critic is uninformative, because the advantage is then mostly noise, and that is exactly when the cloned policy's competence is most at risk of being destroyed. See [[rlhf-transfer#A reference policy this project does have, and an argument against using it]] for the other half of that problem.
 
-The prerequisite is a reward, since a value is defined relative to one. That is open in [[decisions/0005-training-and-reward]], but not blocking, because the terminal record already carries the winner and the surviving force, so returns for the margin-weighted terminal candidate can be computed retroactively without re-running anything.
+The prerequisite is a reward, since a value is defined relative to one. That is open in [[../decisions/0005-training-and-reward]], but not blocking, because the terminal record already carries the winner and the surviving force, so returns for the margin-weighted terminal candidate can be computed retroactively without re-running anything.
 
 The policy mismatch does not break it, which is the part worth being clear about. $V^{\pi^{*}}$ is not $V^{\pi_\theta}$, and after stage 3 begins the learner drifts away from the teacher. A baseline only has to be independent of the action to leave the gradient unbiased, by the control-variate argument in [[rl-methods#Baselines, and why variance is the real enemy]], and $V^{\pi^{*}}(o)$ is a function of the observation alone. Using it is therefore unbiased however far the learner has drifted. It buys less variance reduction than the correct critic would, nothing worse. Bias enters only through bootstrapping, meaning through $\lambda < 1$, which is the trade that parameter already controls.
 
 Three caveats worth recording.
 
-The value is conditioned on the opponent. Fitted on teacher against teacher, it estimates returns against one opponent, while [[decisions/0005-training-and-reward]] requires training against a mixture of engine configurations. That is acceptable for an initialization and wrong for a frozen baseline, so the value loss must keep training it.
+The value is conditioned on the opponent. Fitted on teacher against teacher, it estimates returns against one opponent, while [[../decisions/0005-training-and-reward]] requires training against a mixture of engine configurations. That is acceptable for an initialization and wrong for a frozen baseline, so the value loss must keep training it.
 
-The observation profile has to match the actor's. Fitting on `full_v1` while the actor consumes `observable_v1` reintroduces exactly the asymmetric-critic bias that [[decisions/0001-observation-profiles]] declines to recommend.
+The observation profile has to match the actor's. Fitting on `full_v1` while the actor consumes `observable_v1` reintroduces exactly the asymmetric-critic bias that [[../decisions/0001-observation-profiles]] declines to recommend.
 
 Near the start of an episode the fitted value is dominated by the army matchup rather than by tactics, since two identical policies resolve an opening position mostly according to who has the stronger force. That is useful rather than a defect, because subtracting it removes scenario difficulty from the advantage, which is the same variance the leave-one-out baseline in [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] removes by sampling instead of by regression. The two are alternatives addressing one problem, and pre-fitting is the cheaper of them to try first. [[scenario-distribution#Three mechanisms, one target]] sets both beside difficulty filtering and shows all three removing the same variance term.
 
@@ -236,11 +236,11 @@ Whether the plane modality helps at $11 \times 9$ is unmeasured anywhere, and th
 
 Learner throughput on Apple silicon is unmeasured at these model sizes. The environment produces roughly 4,600 episodes per second, and whether the learner keeps up decides whether four workers is the right number.
 
-The reward is not chosen. [[decisions/0005-training-and-reward]] fixes the candidates and the criteria, and stage 3 cannot start without it.
+The reward is not chosen. [[../decisions/0005-training-and-reward]] fixes the candidates and the criteria, and stage 3 cannot start without it.
 
 ## Related
 
-- [[decisions/0005-training-and-reward]], the decision record this document expands.
-- [[implementation/teacher-coverage-and-behavior-cloning]], the teacher and the coverage measurement.
-- [[implementation/legal-actions-and-masking]], the mask this design depends on throughout.
-- [[research/findings]], the evidence behind the algorithm choice.
+- [[../decisions/0005-training-and-reward]], the decision record this document expands.
+- [[../implementation/teacher-coverage-and-behavior-cloning]], the teacher and the coverage measurement.
+- [[../implementation/legal-actions-and-masking]], the mask this design depends on throughout.
+- [[../research/findings]], the evidence behind the algorithm choice.

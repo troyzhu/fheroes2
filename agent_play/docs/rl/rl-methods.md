@@ -2,7 +2,7 @@
 title: Reinforcement learning methods, a reference
 type: reference
 updated: 2026-07-30
-related_concepts: ["[[notation]]", "[[training-design]]", "[[rl-and-the-battle-domain]]", "[[decisions/0005-training-and-reward]]"]
+related_concepts: ["[[../overview#Notation]]", "[[training-design]]", "[[rl-and-the-battle-domain]]", "[[../decisions/0005-training-and-reward]]"]
 tags: [agent-env, rl, reference, methods-map]
 ---
 
@@ -61,7 +61,7 @@ The gradient factor points in the direction that makes $a_t$ more likely. The sc
 
 $$\Psi_t \in \Big\{\ \underbrace{G_t}_{\text{REINFORCE}},\quad \underbrace{G_t - b(s_t)}_{\text{with baseline}},\quad Q^\pi(s_t, a_t),\quad \underbrace{A^\pi(s_t, a_t)}_{\text{lowest variance}},\quad \underbrace{r_{t+1} + \gamma V(s_{t+1}) - V(s_t)}_{\text{TD residual}}\ \Big\}$$
 
-Keeping this frame in view is what makes the rest of Part 1 a sequence of substitutions rather than a list of unrelated algorithms. It also explains something about the staging in [[decisions/0005-training-and-reward]] that is otherwise easy to miss, and [[#Behavior cloning is this same update]] returns to it.
+Keeping this frame in view is what makes the rest of Part 1 a sequence of substitutions rather than a list of unrelated algorithms. It also explains something about the staging in [[../decisions/0005-training-and-reward]] that is otherwise easy to miss, and [[#Behavior cloning is this same update]] returns to it.
 
 ### The policy gradient and REINFORCE
 
@@ -123,7 +123,7 @@ $$V_\phi(s_t) \leftarrow r_{t+1} + \gamma\, V_\phi(s_{t+1})$$
 
 That substitution of an estimate into its own target is bootstrapping. It creates a distinction the environment must respect, and it is the most common environment-side bug in reinforcement learning.
 
-When an episode ends because the task genuinely finished, there is no future, so the target is $r_{t+1}$ alone. When an episode ends because a step limit was reached, the future still exists and was merely cut off, so the target must bootstrap $r_{t+1} + \gamma\, V_\phi(s_T)$. Treating a truncation as a termination tells the learner that the world ends at the limit, which biases every value estimate downward. This is why [[decisions/0005-training-and-reward]] requires the protocol to report which case occurred, rather than only that the episode is over.
+When an episode ends because the task genuinely finished, there is no future, so the target is $r_{t+1}$ alone. When an episode ends because a step limit was reached, the future still exists and was merely cut off, so the target must bootstrap $r_{t+1} + \gamma\, V_\phi(s_T)$. Treating a truncation as a termination tells the learner that the world ends at the limit, which biases every value estimate downward. This is why [[../decisions/0005-training-and-reward]] requires the protocol to report which case occurred, rather than only that the episode is over.
 
 ### GAE
 
@@ -196,7 +196,7 @@ Added to the loss with a small coefficient, entropy $H(\pi(\cdot \mid o))$ rewar
 
 Rather than parameterizing the policy, learn $Q_\phi(s, a)$ and act greedily. DQN made this work with deep networks through a replay buffer and a slowly updated target network, both of which exist to stabilize a bootstrapped target that would otherwise chase itself. QR-DQN extends it to learn a distribution over returns rather than a mean, which is more informative under heavy randomness.
 
-The appeal is sample efficiency, since a replay buffer reuses old data indefinitely. Two drawbacks apply here, and the first is the one that decided [[decisions/0005-training-and-reward]].
+The appeal is sample efficiency, since a replay buffer reuses old data indefinitely. Two drawbacks apply here, and the first is the one that decided [[../decisions/0005-training-and-reward]].
 
 Value-based methods compose awkwardly with an imitation warm start. The claim is often compressed to "a cloned policy is not an action-value function", which is true but hides where the difficulty actually sits, so it is worth separating by part of the network.
 
@@ -252,7 +252,7 @@ Both assume strength is transitive. That assumption is exactly what cyclic strat
 
 ## Part 3, partial observability
 
-The battle is close to fully observed, so none of this is needed yet. The adventure map in [[roadmap]] is genuinely fogged, so all of it becomes relevant then.
+The battle is close to fully observed, so none of this is needed yet. The adventure map in [[../roadmap]] is genuinely fogged, so all of it becomes relevant then.
 
 Frame stacking concatenates the last $k$ observations. It is the cheapest possible memory and handles short-range hidden state such as velocity, but nothing beyond the window.
 
@@ -260,7 +260,7 @@ Recurrence carries a hidden state across steps, usually with an LSTM or GRU, and
 
 A belief state is the posterior over true states given the history. It is sufficient in the formal sense, meaning a policy on the belief loses nothing, and computing or learning it is usually harder than the control problem itself.
 
-An asymmetric or privileged critic exploits the fact that the critic is discarded at deployment, letting it read state the actor cannot. The caution from Part 1 applies with force. A critic conditioned on state that the actor cannot see correlates with the action through the unobserved component, which breaks the baseline argument and biases the gradient. The unbiased construction conditions on history as well as state. Our own evidence sweep found no verified claim supporting the naive version, so [[implementation/observation-design]] treats it as an available option rather than a default.
+An asymmetric or privileged critic exploits the fact that the critic is discarded at deployment, letting it read state the actor cannot. The caution from Part 1 applies with force. A critic conditioned on state that the actor cannot see correlates with the action through the unobserved component, which breaks the baseline argument and biases the gradient. The unbiased construction conditions on history as well as state. Our own evidence sweep found no verified claim supporting the naive version, so [[../implementation/observation-design]] treats it as an available option rather than a default.
 
 ## Part 4, reward shaping
 
@@ -296,7 +296,7 @@ A pointer network selects an element of a variable-length input set by attending
 | Masked PPO with GAE | Chosen, stage 3 | Strongest evidence for masked discrete actions |
 | Entropy bonus over the legal set | Chosen, small and decayed | Cloned start needs less exploration pressure |
 | Potential-based shaping | Permitted if shaping is needed | Only form that provably preserves the objective |
-| Sparse or margin-weighted terminal reward | Candidates, undecided | See [[decisions/0005-training-and-reward]] |
+| Sparse or margin-weighted terminal reward | Candidates, undecided | See [[../decisions/0005-training-and-reward]] |
 | DQN and QR-DQN | Not first | Composes poorly with an imitation start |
 | IMPALA, Sample Factory | Rejected | Built for scales we do not have |
 | MCTS, AlphaZero, MuZero | Open, blocked | Needs a copyable state the arena singleton prevents |
@@ -305,7 +305,7 @@ A pointer network selects an element of a variable-length input set by attending
 | Self-play, fictitious play, leagues | Later | Premature before a policy worth playing exists |
 | Population-based training | Later | Tune after a single run is reliable |
 | Elo, TrueSkill | Adopted for evaluation | Report the pairwise matrix alongside, cycles break transitivity |
-| Frame stacking, recurrence, belief states | Not needed yet | Battle is near fully observed; see [[roadmap]] |
+| Frame stacking, recurrence, belief states | Not needed yet | Battle is near fully observed; see [[../roadmap]] |
 | Asymmetric critic | Option, not default | Naive form is biased; no verified support in our sweep |
 | Attention, transformers | Upgrade path | Ten entities does not require it yet |
 | Scatter connections, pointer networks | Compatible, unused | Both remain reachable from the current interfaces |
@@ -313,6 +313,6 @@ A pointer network selects an element of a variable-length input set by attending
 ## Related
 
 - [[training-design]], how these are configured for our stages, with hyperparameters.
-- [[decisions/0005-training-and-reward]], the decisions and the open reward question.
+- [[../decisions/0005-training-and-reward]], the decisions and the open reward question.
 - [[rl-and-the-battle-domain]], the vocabulary Part 1 assumes.
-- [[research/findings]], the verified evidence behind the choices.
+- [[../research/findings]], the verified evidence behind the choices.

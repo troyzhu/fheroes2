@@ -54,7 +54,7 @@ This project's action space is 793 slots with typically 5 to 30 legal after mask
 
 ## Verdict for this project
 
-Worth testing, with the magnitude honestly uncertain. See [[../../rlhf-transfer#The ratio is a one-sample estimate of a divergence you can afford to compute]].
+Worth testing, with the magnitude honestly uncertain. See [[../../rl/rlhf-transfer#The ratio is a one-sample estimate of a divergence you can afford to compute]].
 
 The pathology is driven by the dynamic range of the behavior probabilities, which in a language model spans $10^{-5}$ to $0.99$. A masked categorical over 5 to 30 legal actions, initialized from behavior cloning, has a far narrower range, so the effect should be milder here than the paper measures. What makes it worth trying anyway is that the remedy costs almost nothing at this action-space size, and that the failure it prevents is the one this project is most exposed to, namely a destabilizing early update from a cloned policy that is already confident.
 
@@ -64,6 +64,6 @@ Their motivating instability is training-inference mismatch, where the sampling 
 
 ## Related
 
-- [[../../rl-methods#Why the step must be constrained]], where the clip is derived.
-- [[../../rlhf-transfer]], which works out what applies to battles.
+- [[../../rl/rl-methods#Why the step must be constrained]], where the clip is derived.
+- [[../../rl/rlhf-transfer]], which works out what applies to battles.
 - [[invalid-action-masking]], the masking result this would compose with.

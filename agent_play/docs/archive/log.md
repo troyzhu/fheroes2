@@ -14,7 +14,7 @@ tags: [log, agent-env]
 
 Specification v0.3 written and cross-checked against the source. Headless battle spike built under `agent_play/spike/`, with 7 of 7 automated experiments passing from a clean clone.
 
-Four findings overturned the specification, detailed in [[../README#What we learned that changed the plan]]: headless battles need no game assets, the world seed needs no engine change, a second entry point needs no CMake refactor, and the repository has two build systems.
+Four findings overturned the specification, detailed in [[../overview#What we learned that changed the plan]]: headless battles need no game assets, the world seed needs no engine change, a second entry point needs no CMake refactor, and the repository has two build systems.
 
 Indicative measurements only: about 5,000 episodes/s, 12.9 MB peak resident memory, and 2,000 sequential arenas in one process. The report is `local_source_audit.md`.
 

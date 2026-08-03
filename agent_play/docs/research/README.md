@@ -17,7 +17,7 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/vcmi-gym]] | project | 2023–26 | primary | Heroes III battle RL shipped as an in-game AI; padded-entity plus per-hex encoding; flat masked action space; CleanRL-style stack | ADR 0002, ADR 0003 |
 | [[works/gym-microrts]] | paper | 2021 | primary | Masking ablations (0% unmasked to 82–91% fully masked); factorized heads; state of the art in ~60 h on one 16 GB machine | ADR 0002, hardware plan |
 | [[works/invalid-action-masking]] | paper | 2022 | primary | Masking is a valid policy gradient; the $-10^8$ implementation; penalties collapse as the illegal space grows | ADR 0002 |
-| [[works/dppo-trust-region]] | paper | 2026 | primary | PPO's clip constrains a one-sample estimate of TV divergence, not the divergence; over-penalizes low-probability actions and under-penalizes high ones. The exact divergence is affordable at 793 slots | [[../rlhf-transfer]] |
+| [[works/dppo-trust-region]] | paper | 2026 | primary | PPO's clip constrains a one-sample estimate of TV divergence, not the divergence; over-penalizes low-probability actions and under-penalizes high ones. The exact divergence is affordable at 793 slots | [[../rl/rlhf-transfer]] |
 | [[works/sc2le]] | paper | 2017 | primary | Feature layers as synthetic semantic rasterizations, never RGB; structured tensors alongside planes | ADR 0004 |
 | [[works/alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
 | [[works/griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |

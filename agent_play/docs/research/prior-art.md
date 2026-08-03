@@ -2,7 +2,7 @@
 title: Open-source repositories — an orientation
 type: overview
 updated: 2026-07-30
-related_concepts: ["[[../rl-and-the-battle-domain]]", "[[../implementation/legal-actions-and-masking]]"]
+related_concepts: ["[[../rl/rl-and-the-battle-domain]]", "[[../implementation/legal-actions-and-masking]]"]
 tags: [reference, repos, agent-env]
 ---
 
@@ -60,4 +60,4 @@ For the closest analogue to what we are building, read vcmi-gym first, including
 
 - [[README]] — the scannable source catalogue with quality grades.
 - [[findings]] — what the corpus collectively establishes.
-- [[../rl-and-the-battle-domain]] — how these environments differ from ours.
+- [[../rl/rl-and-the-battle-domain]] — how these environments differ from ours.

@@ -2,11 +2,11 @@
 title: Reinforcement learning and the fheroes2 battle domain
 type: primer
 updated: 2026-07-30
-related_concepts: ["[[overview]]", "[[notation]]", "[[implementation/legal-actions-and-masking]]", "[[implementation/observation-design]]"]
+related_concepts: ["[[../overview]]", "[[../overview#Notation]]", "[[../implementation/legal-actions-and-masking]]", "[[../implementation/observation-design]]"]
 tags: [agent-env, primer, rl, entry-point]
 ---
 
-> **What this note is.** The conceptual entry point. Part 1 fixes the vocabulary of reinforcement learning for games from scratch. Part 2 explains what a Heroes of Might and Magic II battle is, restates it in that vocabulary, and places it against the environments this project borrows from. Part 3 draws out what the comparison implies for the design. It assumes no reinforcement learning, no fheroes2 knowledge, and no C++. Read it before [[overview]] if either half is unfamiliar, and read [[overview]] first if you only need the build and the current state. Symbols used here are fixed in [[notation]].
+> **What this note is.** The conceptual entry point. Part 1 fixes the vocabulary of reinforcement learning for games from scratch. Part 2 explains what a Heroes of Might and Magic II battle is, restates it in that vocabulary, and places it against the environments this project borrows from. Part 3 draws out what the comparison implies for the design. It assumes no reinforcement learning, no fheroes2 knowledge, and no C++. Read it before [[../overview]] if either half is unfamiliar, and read [[../overview]] first if you only need the build and the current state. Symbols used here are fixed in [[../overview#Notation]].
 
 ## Table of contents
 - [[#Part 1 — the vocabulary]]
@@ -38,7 +38,7 @@ One property is assumed throughout and is easiest to state now. A problem is Mar
 
 ## Notation
 
-Symbols match the owner's existing RL wiki, so that this documentation extends those notes rather than running a second vocabulary alongside them. [[notation]] carries the full contract, including which wiki note already defines each concept and which symbols this project has to add for masking and partial observability.
+Symbols match the owner's existing RL wiki, so that this documentation extends those notes rather than running a second vocabulary alongside them. [[../overview#Notation]] carries the full contract, including which wiki note already defines each concept and which symbols this project has to add for masking and partial observability.
 
 | Symbol | Meaning |
 |---|---|
@@ -70,7 +70,7 @@ State is everything the simulator needs to continue. In a battle that is which u
 
 Action is one choice by the acting player, and the shape of $\mathcal{A}$ is the single most consequential design decision in a game environment, because it decides what the policy's output layer looks like. The shapes that recur are these. A flat discrete space enumerates every action as one integer, which is simple and works up to roughly $10^4$ entries. A factorized space splits an action into independent components, each with its own softmax, which is how a space of $10^7$ joint actions becomes a few hundred logits. A parameterized space picks a discrete type and then continuous parameters. A pointer space selects among a variable-length set of candidates by attention, which is the general answer when the candidate set is genuinely unbounded.
 
-Transition is how the world evolves. Games are usually stochastic through damage rolls, critical hits, or hidden shuffles. Stochasticity is not the same as unpredictability from bad engineering. A seeded generator leaves $P$ unchanged and makes the sampler reproducible, which is what makes replay and regression testing possible. See [[implementation/determinism-seeds-and-digests]].
+Transition is how the world evolves. Games are usually stochastic through damage rolls, critical hits, or hidden shuffles. Stochasticity is not the same as unpredictability from bad engineering. A seeded generator leaves $P$ unchanged and makes the sampler reproducible, which is what makes replay and regression testing possible. See [[../implementation/determinism-seeds-and-digests]].
 
 Reward is the per-transition scalar. What a policy maximizes is the expected return $J(\theta)$, not $R$ itself. Game environments typically offer a sparse terminal signal, meaning win or lose at the end, which is unbiased but hard to learn from, or a shaped signal such as damage dealt minus damage taken, which learns faster and risks teaching the wrong objective. The choice is a modeling decision and does not have to be made when the environment is built.
 
@@ -80,12 +80,12 @@ The policy maps observations to a distribution over actions, and two properties 
 
 Observability decides the problem class. If the agent sees the full state, the problem is a Markov decision process and a memoryless policy suffices. If it sees a function of the state, $o = O(s)$, the problem is a partially observed MDP, and a memoryless policy is provably insufficient in general, so agents add recurrence, frame stacking, or an explicit belief state. Many game environments sit in between. A battle where all units are visible is close to fully observed, while a strategy game with fog of war is not.
 
-A useful consequence is the asymmetric actor-critic pattern. Because the critic exists only during training, it may read privileged full state while the actor reads only what will be available at deployment. That requires the environment to expose both views, which is a reason to build the distinction into the observation schema rather than into the training code. See [[implementation/observation-design]].
+A useful consequence is the asymmetric actor-critic pattern. Because the critic exists only during training, it may read privileged full state while the actor reads only what will be available at deployment. That requires the environment to expose both views, which is a reason to build the distinction into the observation schema rather than into the training code. See [[../implementation/observation-design]].
 
 Legality is the second property. Almost every game restricts which actions are available in a state, and the standard mechanism is masking. The illegal entries of the policy's output are set to a large negative constant before the softmax, so they receive no probability and no gradient.
  Masking is not a heuristic, and the reason is narrower than it first appears. Replacing a logit with a large negative constant is not a differentiable function of that logit; it discards it.
 
-What licenses the method is that the mask depends on $s$ alone and never on the policy parameters, so the masked softmax is itself a well-formed parameterized policy $\pi^{\text{mask}}_\theta$ over $\mathcal{A}(s)$. The usual estimator is then an unbiased gradient of $J(\theta)$ for that masked policy class, which is the objective over legal play. The policy class being optimized has changed, so a policy trained with a mask is undefined behavior if the mask is removed at deployment. The alternative of penalizing illegal actions with negative reward is well documented to collapse as the illegal fraction grows. See [[implementation/legal-actions-and-masking]].
+What licenses the method is that the mask depends on $s$ alone and never on the policy parameters, so the masked softmax is itself a well-formed parameterized policy $\pi^{\text{mask}}_\theta$ over $\mathcal{A}(s)$. The usual estimator is then an unbiased gradient of $J(\theta)$ for that masked policy class, which is the objective over legal play. The policy class being optimized has changed, so a policy trained with a mask is undefined behavior if the mask is removed at deployment. The alternative of penalizing illegal actions with negative reward is well documented to collapse as the illegal fraction grows. See [[../implementation/legal-actions-and-masking]].
 
 ## The axes along which game environments differ
 
@@ -138,15 +138,15 @@ The environment is close to fully observed in the sense that matters for the uni
 | Environment | Timing | Board | Units per side | Action space | Observability | Stochastic | Speed |
 |---|---|---|---|---|---|---|---|
 | fheroes2 battle (this project) | turn-based, alternating | 99 hex cells | 1 to 5 stacks | 793, masked | effectively full | yes, damage and morale | ~4,600 episodes/s |
-| Heroes III battle ([[research/works/vcmi-gym\|vcmi-gym]]) | turn-based, alternating | 165 hex cells | up to 7 stacks | 2,312, masked | effectively full | yes | not published |
-| microRTS ([[research/works/gym-microrts\|gym-µRTS]]) | real-time, simultaneous | 16×16 grid | dozens | factorized per cell | full or fogged by flag | mostly deterministic | very high |
-| StarCraft II ([[research/works/pysc2\|PySC2]]) | real-time, simultaneous | large minimap | hundreds | huge, structured | fogged | yes | low |
-| NetHack ([[research/works/nle\|NLE]]) | turn-based, single agent | 21×79 glyphs | one hero | ~100 discrete | fogged, partial | yes | high |
-| Battle for Wesnoth ([[research/works/arlinbfw\|ARLinBfW]]) | turn-based, alternating | hex map | several | small discrete | full on the map | yes | low |
+| Heroes III battle ([[../research/works/vcmi-gym\|vcmi-gym]]) | turn-based, alternating | 165 hex cells | up to 7 stacks | 2,312, masked | effectively full | yes | not published |
+| microRTS ([[../research/works/gym-microrts\|gym-µRTS]]) | real-time, simultaneous | 16×16 grid | dozens | factorized per cell | full or fogged by flag | mostly deterministic | very high |
+| StarCraft II ([[../research/works/pysc2\|PySC2]]) | real-time, simultaneous | large minimap | hundreds | huge, structured | fogged | yes | low |
+| NetHack ([[../research/works/nle\|NLE]]) | turn-based, single agent | 21×79 glyphs | one hero | ~100 discrete | fogged, partial | yes | high |
+| Battle for Wesnoth ([[../research/works/arlinbfw\|ARLinBfW]]) | turn-based, alternating | hex map | several | small discrete | full on the map | yes | low |
 | Chess and Go | turn-based, alternating | 64 or 361 cells | fixed | hundreds to thousands | full | no | very high |
-| Dota 2 ([[research/works/openai-five\|OpenAI Five]]) | real-time, simultaneous | large map | five heroes | large, parameterized | fogged | yes | low |
+| Dota 2 ([[../research/works/openai-five\|OpenAI Five]]) | real-time, simultaneous | large map | five heroes | large, parameterized | fogged | yes | low |
 
-For what each of those codebases actually contains and where to look inside it, see [[research/prior-art]].
+For what each of those codebases actually contains and where to look inside it, see [[../research/prior-art]].
 
 ## What is unusually easy here
 
@@ -158,15 +158,15 @@ Turn-based alternating play means one decision at a time and no action-delay mod
 
 The engine is fast and deterministic under a seed, at roughly 4,600 episodes per second on the target machine, so the learner will be the bottleneck rather than the simulator, and planning methods stay viable later.
 
-A competent scripted opponent already exists inside the game. It plays both sides for free, supplying both a demonstration source and an evaluation baseline without writing either. See [[implementation/teacher-coverage-and-behavior-cloning]].
+A competent scripted opponent already exists inside the game. It plays both sides for free, supplying both a demonstration source and an evaluation baseline without writing either. See [[../implementation/teacher-coverage-and-behavior-cloning]].
 
 ## What is unusually awkward here
 
 The constraints below show up rarely in published environments. Both come from embedding in a real game engine rather than a purpose-built simulator.
 
-The engine exposes no legal-action API. Its validation logic lived inside the functions that execute commands, so the environment either extracts that logic or re-derives battle legality and risks disagreeing with the engine. This was the project's largest risk and it is why the validators were lifted into a shared module rather than reimplemented. See [[implementation/legal-actions-and-masking]].
+The engine exposes no legal-action API. Its validation logic lived inside the functions that execute commands, so the environment either extracts that logic or re-derives battle legality and risks disagreeing with the engine. This was the project's largest risk and it is why the validators were lifted into a shared module rather than reimplemented. See [[../implementation/legal-actions-and-masking]].
 
-Control is inverted and the arena is a singleton. The engine advances a whole round per call and owns the call stack, so the environment blocks inside a hook rather than exposing a callable step, and only one battle can exist per process, which makes parallelism process-level. See [[implementation/battle-turn-dispatch]].
+Control is inverted and the arena is a singleton. The engine advances a whole round per call and owns the call stack, so the environment blocks inside a hook rather than exposing a callable step, and only one battle can exist per process, which makes parallelism process-level. See [[../implementation/battle-turn-dispatch]].
 
 A third and milder awkwardness is that the stochasticity is coarse. Morale and luck can grant an entire extra action, so a single lucky roll changes a turn's structure rather than nudging a number, which makes variance across seeds larger than damage rolls alone would suggest.
 
@@ -194,7 +194,7 @@ Three environment properties matter independently of the agent. Determinism unde
 
 The comparison explains why our decisions diverge from the environments we borrow evidence from. We use a flat masked action space rather than microRTS's factorized one because 793 entries do not need factoring. We keep both an entity list and an optional plane tensor rather than committing, because at this scale neither is expensive and no published ablation settles which wins on an 11 by 9 board. We ship an observability profile despite full observability today, because the seam is free now and expensive to retrofit when hero mana and fog arrive. And we invest in seed and digest discipline more heavily than comparable projects do, because a fast deterministic engine makes that discipline cheap and it is the only affordable proof that engine edits changed nothing.
 
-Every design record in this project cites one of the six objects from Part 1. The observability profiles are a choice about $O$ ([[decisions/0001-observation-profiles|ADR 0001]]), the canonical action space and mask are a choice about $\mathcal{A}$ and $\mathcal{A}(s)$ ([[decisions/0002-action-space|ADR 0002]]), the seed discipline is a choice about reproducing $P$, and the deliberate absence of a reward in Phase 1a is a choice to defer $R$ until the substrate is trustworthy.
+Every design record in this project cites one of the six objects from Part 1. The observability profiles are a choice about $O$ ([[../decisions/0001-observation-profiles|ADR 0001]]), the canonical action space and mask are a choice about $\mathcal{A}$ and $\mathcal{A}(s)$ ([[../decisions/0002-action-space|ADR 0002]]), the seed discipline is a choice about reproducing $P$, and the deliberate absence of a reward in Phase 1a is a choice to defer $R$ until the substrate is trustworthy.
 
 ## Key terms
 
@@ -227,8 +227,8 @@ Part 1 is vocabulary rather than method, so it does not recommend an algorithm a
 ## Go deeper
 
 - [[rl-methods]] — every technique named here, derived, from the policy gradient through PPO and the alternatives.
-- [[overview]], the system as it stands, the build, and the current state.
-- [[notation]], the symbol contract, and what this tree assumes from a standard RL text.
-- [[implementation/README|Concept primers]] — how each implemented mechanism works.
-- [[research/findings|Literature synthesis]] — what the evidence establishes.
-- [[research/prior-art|Repository orientation]] — the codebases behind the comparison.
+- [[../overview]], the system as it stands, the build, and the current state.
+- [[../overview#Notation]], the symbol contract, and what this tree assumes from a standard RL text.
+- [[../implementation/README|Concept primers]] — how each implemented mechanism works.
+- [[../research/findings|Literature synthesis]] — what the evidence establishes.
+- [[../research/prior-art|Repository orientation]] — the codebases behind the comparison.

@@ -3,7 +3,7 @@ title: "ADR 0001, dual observation profiles"
 type: adr
 status: accepted
 updated: 2026-08-03
-related_concepts: ["[[../implementation/observation-design]]", "[[../rl-and-the-battle-domain]]", "[[0004-spatial-observation-modality]]"]
+related_concepts: ["[[../implementation/observation-design]]", "[[../rl/rl-and-the-battle-domain]]", "[[0004-spatial-observation-modality]]"]
 tags: [adr, observation, observability, agent-env]
 ---
 
@@ -33,15 +33,15 @@ Three facts shape the decision:
 
 1. Creature-only fheroes2 battles are informationally symmetric. The battle UI's right-click info (`battle_interface.cpp`, `Cursor::WAR_INFO` → `Dialog::ArmyInfo`) shows the full stat sheet for any unit, own or enemy, with no ownership gating. Real hidden information in HoMM2 begins later: enemy hero mana, and adventure-map fog of war.
 2. The proven pattern for dual modes is one schema with a switch, not two schemas. MicroRTS-Py exposes full observability by default and partial observability via a constructor flag that appends visibility planes to the same tensor (verified 3-0).
-3. A full-state mode stays valuable even when the deployed policy is restricted, since oracle critics, teacher matching, and debugging consume it. This is the asymmetric actor-critic idea, meaning a critic that sees privileged state while the actor sees only what will be available at deployment, defined in [[../rl-methods#Partial observability]] and weighed in [[../implementation/observation-design]]. Searched but unverified at our game class, so kept as an option rather than a dependency.
+3. A full-state mode stays valuable even when the deployed policy is restricted, since oracle critics, teacher matching, and debugging consume it. This is the asymmetric actor-critic idea, meaning a critic that sees privileged state while the actor sees only what will be available at deployment, defined in [[../rl/rl-methods#Part 3, partial observability]] and weighed in [[../implementation/observation-design]]. Searched but unverified at our game class, so kept as an option rather than a dependency.
 
-Additionally, vcmi-gym's hard-won Markov discipline (verified 3-0). A problem is Markov when the current state carries everything needed to predict what comes next, which is what lets a policy look only at the present; [[../rl-and-the-battle-domain]] develops this. The discipline that follows is that every attribute influencing battle dynamics must either appear in the observation or be removed from the dynamics. vcmi-gym chose removal (it deleted morale/luck/terrain effects). We choose exposure.
+Additionally, vcmi-gym's hard-won Markov discipline (verified 3-0). A problem is Markov when the current state carries everything needed to predict what comes next, which is what lets a policy look only at the present; [[../rl/rl-and-the-battle-domain]] develops this. The discipline that follows is that every attribute influencing battle dynamics must either appear in the observation or be removed from the dynamics. vcmi-gym chose removal (it deleted morale/luck/terrain effects). We choose exposure.
 
 ## The sub-problem
 
 One question only. When the environment serializes a battle state, does it emit everything the engine knows, or only what a player could obtain through the game's own interface?
 
-This is a question about the observation function $O$ in the sense of [[../rl-and-the-battle-domain]]. It is not a question about the state, which is fixed by the engine, nor about the digest, nor about representation, which is [[0004-spatial-observation-modality]]. What makes it non-trivial is that the answer changes the problem class: a policy that sees the full state faces a Markov decision process, and one that sees a strict function of it faces a partially observed problem where a memoryless policy is not in general sufficient.
+This is a question about the observation function $O$ in the sense of [[../rl/rl-and-the-battle-domain]]. It is not a question about the state, which is fixed by the engine, nor about the digest, nor about representation, which is [[0004-spatial-observation-modality]]. What makes it non-trivial is that the answer changes the problem class: a policy that sees the full state faces a Markov decision process, and one that sees a strict function of it faces a partially observed problem where a memoryless policy is not in general sufficient.
 
 ## Options considered
 

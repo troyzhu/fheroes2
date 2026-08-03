@@ -2,11 +2,11 @@
 title: Concept primers, index
 type: moc
 updated: 2026-07-30
-related_concepts: ["[[../overview]]", "[[../rl-and-the-battle-domain]]"]
+related_concepts: ["[[../overview]]", "[[../rl/rl-and-the-battle-domain]]"]
 tags: [concept, index, moc, agent-env]
 ---
 
-> **What this note is.** Six deep dives on the mechanisms this project actually implements. They assume the vocabulary of [[../rl-and-the-battle-domain]], which explains reinforcement learning and the Heroes battle domain from scratch, and they assume no C++.
+> **What this note is.** Six deep dives on the mechanisms this project actually implements. They assume the vocabulary of [[../rl/rl-and-the-battle-domain]], which explains reinforcement learning and the Heroes battle domain from scratch, and they assume no C++.
 
 These are reference material rather than a course. Read the one covering whatever you are about to touch.
 
@@ -23,9 +23,9 @@ Each follows the same shape: motivation, the idea in one sentence, an intuition 
 
 ## Related
 
-- [[../rl-and-the-battle-domain]], the conceptual entry point these primers build on.
+- [[../rl/rl-and-the-battle-domain]], the conceptual entry point these primers build on.
 - [[../overview]], the system as it stands.
-- [[../notation]], the symbol contract used throughout.
+- [[../overview#Notation]], the symbol contract used throughout.
 - [[inventory]], what is actually built and how it was verified.
 - [[../research/findings|Literature synthesis]], the evidence behind these ideas.
 - `../decisions/`, the ADRs these concepts justify.

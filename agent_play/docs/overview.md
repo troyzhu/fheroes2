@@ -6,11 +6,11 @@ goal: "A deterministic, headless, structured battle environment for fheroes2 tha
 branch: agent-env
 date_started: 2026-07-26
 updated: 2026-07-30
-related_concepts: ["[[rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]", "[[implementation/observation-design]]"]
+related_concepts: ["[[rl/rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]", "[[implementation/observation-design]]"]
 tags: [agent-env, rl-environment, fheroes2, entry-point]
 ---
 
-> **What this note is.** The front door. It says what the project is, gives the terms and the shape of the system, states where it stands, and tells you how to build and verify it. Two companions carry the depth: [[rl-and-the-battle-domain]] explains reinforcement learning and the Heroes battle domain from scratch, and [[archive/log]] holds the dated history.
+> **What this note is.** The front door. It says what the project is, gives the terms and the shape of the system, states where it stands, and tells you how to build and verify it. Two companions carry the depth: [[rl/rl-and-the-battle-domain]] explains reinforcement learning and the Heroes battle domain from scratch, and [[archive/log]] holds the dated history.
 
 ## Where to start
 
@@ -18,7 +18,7 @@ Pick the row that matches why you are here.
 
 | If you want to | Read, in order |
 |---|---|
-| Understand the problem, with no RL or fheroes2 background | [[rl-and-the-battle-domain]], then this note |
+| Understand the problem, with no RL or fheroes2 background | [[rl/rl-and-the-battle-domain]], then this note |
 | Get it building and see the current state | This note, sections [[#Build and verify]] and [[#Where the project stands]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] for a specific source |
 | Understand what is implemented and how | [[implementation/inventory]] for the inventory, then [[implementation/README]] for how each mechanism works |
@@ -26,15 +26,25 @@ Pick the row that matches why you are here.
 | Reconstruct history | [[archive/log]] |
 
 ## Table of contents
-- [[#The problem in one page]]
-- [[#Notation and key terms]]
-- [[#Scope]]
+
+Orientation, in reading order.
+
+- [[#The problem in one page]], the environment stated as a Markov decision process
+- [[#Notation]], both vocabularies
+  - [[#Mathematical symbols]], the symbol contract and what this project adds
+  - [[#Project terms]], episode, decision, digest, fixture, gate
+  - [[#What is recap and what is new]], which topics this tree carries and which it assumes
+  - [[#Reading Zhao alongside this]], a translation table for that textbook
+- [[#Scope]], what Phase 1a covers and what it deliberately excludes
 - [[#Architecture at a glance]]
 - [[#The five ideas the design rests on]]
 - [[#What we learned that changed the plan]]
-- [[#Where the project stands]]
-- [[#Build and verify]]
-- [[#Where everything is]]
+
+Practical.
+
+- [[#Where the project stands]], milestones and gate results
+- [[#Build and verify]], the commands
+- [[#Where everything is]], the map of every document and its purpose
 - [[#Decisions not to relitigate]]
 - [[#Gotchas that will bite]]
 - [[#Remaining risks, in order]]
@@ -43,7 +53,7 @@ Pick the row that matches why you are here.
 
 Build a deterministic, headless, structured environment for fheroes2 battles so a policy can be trained on them. The environment reads true engine state and selects from engine-generated legal actions, never pixels and never synthetic input.
 
-Stated as a Markov decision process, which [[rl-and-the-battle-domain]] develops from first principles:
+Stated as a Markov decision process, which [[rl/rl-and-the-battle-domain]] develops from first principles:
 
 | MDP element | Here |
 |---|---|
@@ -63,7 +73,59 @@ Only one episode runs per process at a time. The engine's arena is a file-static
 
 Determinism here is conditional, exactly like `env.reset(seed=k)`. Seed in, episode out. The distribution a policy trains on is over world seeds and army compositions; the five committed fixtures pin regression anchors, not the training set. Within an episode the dynamics remain stochastic from the policy's point of view, since damage, morale, and luck are drawn from a combat-seeded generator that never appears in the observation.
 
-## Notation and key terms
+## Notation
+
+Two vocabularies meet in this project and both are fixed here. The mathematical symbols match the owner's own reinforcement-learning study notes so that material written here continues from them rather than running a second vocabulary alongside. The engineering terms are this project's own and are defined nowhere else.
+
+### Mathematical symbols
+
+| Symbol | Meaning | Defined in |
+|---|---|---|
+| $\mathcal{S}$, $\mathcal{A}$, $\mathcal{A}(s)$ | State space, action space, and the legal actions at $s$ | [[rl/rl-and-the-battle-domain]] |
+| $P(s' \mid s, a)$, $R(s, a, s')$ | Transition function and reward | [[rl/rl-and-the-battle-domain]] |
+| $\gamma$, $\lambda$ | Discount factor, and the trace parameter in generalized advantage estimation | [[rl/rl-methods]] |
+| $\tau$ | Trajectory, one episode of $s_0, a_0, r_1, s_1, \ldots$ | [[rl/rl-methods]] |
+| $G_t = \sum_{k \ge 0} \gamma^k r_{t+k+1}$ | Discounted return from step $t$ | [[rl/rl-methods]] |
+| $\pi(a \mid s)$, $\pi_\theta(a \mid s)$ | Policy, and the same policy parameterized by $\theta$ | [[rl/rl-methods]] |
+| $\pi^{*}$ | The teacher policy, here `AI::BattlePlanner` | [[rl/training-design]] |
+| $V^\pi(s)$, $Q^\pi(s, a)$ | State value and action value | [[rl/rl-methods]] |
+| $A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$ | Advantage | [[rl/rl-methods]] |
+| $V_\phi$ | Learned critic, parameters $\phi$ distinct from the actor's $\theta$ | [[rl/training-design]] |
+| $b(s)$ | Baseline | [[rl/rl-methods]] |
+| $d^\pi(s)$ | State distribution induced by $\pi$ | [[rl/rl-methods]] |
+| $J(\theta)$ | The objective being maximized | [[rl/rl-methods]] |
+| $\Psi_t$ | The scoring term in the shared policy-gradient shape | [[rl/rl-methods]] |
+| $\delta_t = r_{t+1} + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)$ | Temporal-difference residual | [[rl/rl-methods]] |
+| $\hat A_t = \sum_l (\gamma\lambda)^l \delta_{t+l}$ | Generalized advantage estimate | [[rl/rl-methods]] |
+| $\rho_t(\theta) = \pi_\theta(a_t \mid o_t) / \pi_{\theta_{\text{old}}}(a_t \mid o_t)$ | Importance ratio | [[rl/rl-methods]] |
+| $\varepsilon$ | PPO clipping half-width | [[rl/rl-methods]] |
+| $\epsilon$ | Per-decision error rate of a fitted policy, in the DAgger bound | [[rl/training-design]] |
+| $\log$ | Logarithm, spelled this way throughout | convention |
+
+Symbols this project has to add, because the study notes are written for a fully observed single-agent setting with no legality constraints.
+
+The study notes are written for reinforcement learning in general and, more recently, for language models. Each addition below exists because this project is a game environment rather than either.
+
+| Symbol | Meaning | Why the notes have no equivalent |
+|---|---|---|
+| $o \in \Omega$ | Observation, what the agent actually receives | their standard setting is fully observed |
+| $O(o \mid s)$ | Observation function, in general stochastic | same |
+| $\pi_\theta(a \mid o)$ | Observation-conditioned policy, the object actually trained here | same |
+| $m(o) \in \{0,1\}^{793}$ | Legality mask, with $m_i = 1$ exactly when action $i$ is legal | action masking appears nowhere in the notes |
+| $\ell_\theta(o) \in \mathbb{R}^{793}$ | Policy-head logits before masking | same |
+| $\rho_0$ | Initial-state distribution, here the scenario and army generator | episodic start distributions do not arise in the bandit framing of language-model RL |
+| $\Phi(s)$ | Potential function in potential-based shaping | shaping is discussed without a fixed symbol |
+| $\mathcal{D}$ | Dataset of observation and action pairs | the demonstrator is left unnamed |
+| $T$ | Episode length in decisions, 5 to 40 here | horizon rarely appears explicitly |
+| $c_v$, $c_e$ | Value and entropy coefficients in the combined loss | the losses are given separately |
+
+The importance ratio is $\rho_t(\theta)$ and the clip half-width is $\varepsilon$. Both the RLHF book and the owner's most recent notes on it use these. The older reinforcement-learning cards write the ratio $r_t(\theta)$, following the PPO paper, and use $\epsilon$ for the clip. This tree takes $\rho_t$ and $\varepsilon$ for two reasons: they match the newest of the two sources, and they leave $r$ meaning a reward and nothing else, which matters in a document that writes $r_{t+1}$ constantly.
+
+That frees $\epsilon$ for the per-decision imitation error rate, which is what card `rl-036` already calls it. The two are never used in the same equation.
+
+The discount range is relaxed. Most treatments require $\gamma \in [0, 1)$ so infinite-horizon returns converge. Battles terminate within 5 to 40 decisions, so $\gamma = 1$ is admissible and this tree uses $\gamma \in [0, 1]$. The relaxation is safe only because termination is guaranteed, and it would not carry to the adventure-map problem scoped in [[roadmap]].
+
+### Project terms
 
 | Term | Meaning |
 |---|---|
@@ -93,6 +155,55 @@ Determinism here is conditional, exactly like `env.reset(seed=k)`. Seed in, epis
 | episodes/s | Throughput unit for the environment alone, measured with no protocol layer attached. |
 
 Board constants: 11 by 9 gives 99 cells, six hex directions, and an action space of $1 + 99 + 99 + 594 = 793$ slots.
+
+### What is recap and what is new
+
+The study notes already cover most of the machinery, which is why [[rl/rl-methods]] states results and gives the load-bearing derivation rather than teaching from scratch. Rows marked absent are where this tree carries material the notes do not, and they are the pages worth reading on their own account.
+
+| Topic | Covered in the notes | Here |
+|---|---|---|
+| MDP objects, Bellman equations, dynamic programming | `rl-001` to `rl-006`, `rl-048` | instantiated for a battle in [[rl/rl-and-the-battle-domain]] |
+| Monte Carlo, temporal difference, TD($\lambda$) | `rl-007` to `rl-012`, `rl-201` | the bias-variance contrast, used to motivate GAE |
+| Policy gradient theorem, REINFORCE, natural gradient | `rl-013`, `rl-014`, `rl-016`, `rl-047` | trajectory form and the baseline derivation |
+| Generalized advantage estimation | `rl-015`, `rl-054`, `rl-210` | recap, plus the backward recursion and the choice of $\lambda$ for a 5 to 40 step horizon |
+| Actor-critic, A2C, V-trace, deterministic gradients | `rl-017` to `rl-019`, `rl-049` | recap |
+| Trust regions, TRPO, PPO | `rl-029`, `rl-030`, `rl-060`, `rl-203` | recap, plus what masking does to the ratio, which is new |
+| Value-based methods, DQN family, distributional RL | `rl-026` to `rl-028`, `rl-046`, `rl-056` | why they are not the first path for this problem |
+| Function approximation, deadly triad, fitted Q | `rl-020` to `rl-022` | assumed |
+| Exploration | `rl-023` to `rl-025`, `rl-050`, `rl-200` | surveyed and set aside |
+| Monte Carlo estimation, score-function estimators, control variates, importance and rejection sampling | `rl-008`, `rl-009`, `rl-053`, and the statistics notes behind them | assumed, and used as the reading frame for [[rl/rl-methods]] Part 1 |
+| Imitation, behavior cloning, DAgger, inverse RL | `rl-036`, `rl-037` | [[rl/training-design]] gives the architecture, masked loss, mixing schedule, and hyperparameters for this teacher |
+| Offline RL | `rl-033` to `rl-035`, `rl-059` | surveyed and set aside |
+| Planning, MCTS, model-based RL | `rl-051`, `rl-052`, `rl-057`, `rl-204` | why the door is kept open but not walked through |
+| Policy-gradient family shape, RLOO, GRPO, loss aggregation | the RLHF math companion, ch. 6a to 6d | [[rl/rlhf-transfer]] works out what applies to battles |
+| Verifiable rewards, difficulty filtering of the training set | beyond where the companion reaches | [[rl/rlhf-transfer]], read from the open-source book; it supplies an acceptance criterion for $\rho_0$ |
+| Overoptimization measured against a KL budget | beyond where the companion reaches | [[rl/rlhf-transfer]], which turns it into a reporting protocol |
+| Evaluation variance, hillclimbing, contamination | beyond where the companion reaches | [[rl/rlhf-transfer]], applied to the fixture set |
+| Legal-action masking | absent | [[implementation/legal-actions-and-masking]], the main new RL content here |
+| Elo and TrueSkill for ranking agents | absent | [[rl/rl-and-the-battle-domain]] Part 3 |
+| Asymmetric actor-critic, privileged critics | absent | [[implementation/observation-design]], including the bias result |
+| Truncation against termination bootstrapping | absent | [[rl/rl-methods]], and it constrains the Milestone 4 protocol |
+| Episode-length normalization bias | absent for episodes | [[rl/rlhf-transfer]] derives it from the token-length version |
+| Game-environment engineering | absent | all of [[implementation/README]], the bulk of this repository |
+| The fheroes2 battle domain | absent | [[rl/rl-and-the-battle-domain]] Part 2 |
+
+### Reading Zhao alongside this
+
+Zhao's *Mathematical Foundations of Reinforcement Learning* is cited in the owner's notes for its treatment of the Bellman operator as a $\gamma$-contraction, and it uses a different and internally consistent set of symbols. This table translates, so a chapter can be read against this tree without re-deriving anything.
+
+| Here | Zhao |
+|---|---|
+| $V^\pi(s)$, $Q^\pi(s, a)$ | $v_\pi(s)$, $q_\pi(s, a)$ |
+| $A^\pi(s, a)$ | $\delta_\pi(s, a)$, deliberately sharing a letter with the TD error that estimates it |
+| $\pi_\theta(a \mid s)$ | $\pi(a \mid s, \theta)$ |
+| $P(s' \mid s, a)$, $R(s, a, s')$ | $p(s' \mid s, a)$, $p(r \mid s, a)$ |
+| $\rho_0$ | $d_0$ |
+| $d^\pi(s)$ | $d_\pi(s)$ stationary, $\eta(s)$ in the policy gradient theorem |
+| $J(\theta)$ for an episodic task | $\bar v_\pi^{\,0}$, one of three metrics it distinguishes |
+| $V_\phi(s)$ | $v(s, w)$ |
+| $\log$ | $\ln$ |
+
+One of its observations is worth borrowing without its notation. It derives the variance-minimizing baseline as $Q^\pi$ weighted by $\lVert \nabla_\theta \log \pi_\theta \rVert^2$ rather than $V^\pi$, which is why [[rl/rl-methods]] calls the state value the practical choice rather than the optimal one.
 
 ## Scope
 
@@ -226,26 +337,29 @@ FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/s
 
 ## Where everything is
 
+The tree has two documents at the top, then four directories. `README.md` routes, this file orients, and [[roadmap]] says where the project is going. Everything else lives in the directory that matches what it is.
+
 | Path | What it is | Read when |
 |---|---|---|
-| `agent_play/docs/README.md` | routing index for this tree | to find anything |
-| `agent_play/docs/overview.md` | this file, the system as it stands | first |
-| `agent_play/docs/notation.md` | the symbol contract, and what is recap of the RL wiki vs new here | before any of the mathematical documents |
-| `agent_play/docs/rl-and-the-battle-domain.md` | RL vocabulary, the battle domain, comparison with other environments | first, if the vocabulary is new |
-| `agent_play/docs/rl-methods.md` | every RL technique the docs name, derived, with verdicts | to look one up |
-| `agent_play/docs/rlhf-transfer.md` | what the language-model RL literature contributes here | before choosing a baseline or an aggregation scheme |
-| `agent_play/docs/training-design.md` | architecture, losses, hyperparameters, and the alternatives at each choice | before training anything |
-| `agent_play/docs/roadmap.md` | scope, battles now, wider battles and the adventure-map agent later | to see what is deliberately not built yet |
-| `agent_play/docs/decisions/` | accepted ADRs amending the specification | before implementing the area they touch |
-| `agent_play/docs/implementation/` | what exists, plus a primer per built mechanism | to review or extend the code |
+| `agent_play/docs/README.md` | routing index, the only file GitHub renders by default | to find anything |
+| `agent_play/docs/overview.md` | this file. The problem, both vocabularies, scope, state, build, and this map | first |
+| `agent_play/docs/roadmap.md` | where the project is aimed, what each phase involves, what research is owed | to see what is deliberately not built yet |
+| `agent_play/docs/rl/` | the learning side. Domain, methods, training design, scenario distribution, RLHF transfer | before designing or training a policy |
+| `agent_play/docs/implementation/` | the environment side. What exists, plus a primer per built mechanism | to review or extend the code |
+| `agent_play/docs/decisions/` | accepted decision records, each with its options and trade-offs | before implementing the area one touches |
 | `agent_play/docs/research/` | consolidated findings, prior art, and a note per source | to consult or extend the evidence base |
 | `agent_play/docs/archive/` | dated history, benchmarks, raw research runs, fetched sources | when you need why or when, never as a reading path |
-| `agent_play/fheroes2_agent_system_spec_v0.3.md` | the full design document | when implementing a milestone |
-| `agent_play/lint_docs.sh` | the documentation gate, style contract plus wikilink resolution | before claiming a doc change is done |
-| `agent_play/verify_m*.sh` | the milestone verification gates | after touching engine or agent code |
-| `agent_play/spike/README.md` | Phase 0 spike usage and limits | before running it |
 
-The specification is large. Sections 0.1, 4, 9, 10, 13, and 22 carry the weight. Where an ADR and the specification disagree, the ADR wins, having been written later and with verified evidence.
+Two directories are reading paths and two are lookups. `rl/` and `implementation/` are written to be read through; `decisions/` and `research/` are written to be looked up, and `archive/` is provenance rather than prose.
+
+Outside the documentation tree:
+
+| Path | What it is |
+|---|---|
+| `agent_play/fheroes2_agent_system_spec_v0.3.md` | the full design document. Where a decision record disagrees with it, the record wins |
+| `agent_play/lint_docs.sh` | the documentation gate, style contract plus wikilink resolution |
+| `agent_play/verify_m*.sh` | the milestone verification gates |
+| `agent_play/spike/README.md` | Phase 0 spike usage and limits |
 
 ## Decisions not to relitigate
 

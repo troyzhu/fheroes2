@@ -2,7 +2,7 @@
 title: "The scenario distribution, and why the matchup dominates the outcome"
 type: design
 updated: 2026-08-03
-related_concepts: ["[[decisions/0005-training-and-reward]]", "[[training-design]]", "[[rlhf-transfer]]", "[[rl-and-the-battle-domain]]"]
+related_concepts: ["[[../decisions/0005-training-and-reward]]", "[[training-design]]", "[[rlhf-transfer]]", "[[rl-and-the-battle-domain]]"]
 tags: [agent-env, scenario, variance, curriculum, evaluation]
 ---
 
@@ -42,7 +42,7 @@ That is the worst possible case for learning, and it is worth being precise abou
 
 Under the margin-weighted terminal reward, the same hopeless matchup stops being dead weight. The return still varies with how much force survives, so $\operatorname{Var}(G \mid Z = z) > 0$ and the scenario teaches something real, namely how to lose cheaply. That is not a consolation prize. A battle is one episode inside a campaign, the surviving army carries forward, and losing while preserving three stacks is genuinely a better outcome than losing while preserving none.
 
-This is an argument for the margin-weighted candidate in [[decisions/0005-training-and-reward#Options considered]] that the record does not currently make. Its stated case is that the reward should compose with the wider game. The additional case is that it keeps a whole region of the scenario distribution informative instead of degenerate, which matters more the wider the generator's spread.
+This is an argument for the margin-weighted candidate in [[../decisions/0005-training-and-reward#Options considered]] that the record does not currently make. Its stated case is that the reward should compose with the wider game. The additional case is that it keeps a whole region of the scenario distribution informative instead of degenerate, which matters more the wider the generator's spread.
 
 ## Three mechanisms, one target
 
@@ -66,7 +66,7 @@ A `Scenario` in this environment fixes the terrain, the tile index, the world se
 
 The quantity that matters is a property of the army matchup, estimated over a distribution of seeds and over the policy's own sampling. Concretely, hold the two `SideSpec` lists fixed, vary the world seed, sample the policy, and take the empirical win rate over the resulting episodes. At roughly 4,600 episodes per second this is cheap enough to do routinely rather than once.
 
-Two consequences follow. Difficulty is policy-relative, so a matchup that is hopeless for a freshly cloned policy may be winnable later, which is why [[decisions/0005-training-and-reward]] treats the target band as a curriculum rather than a fixed filter. And the generator should expose the army matchup and the seed as separate axes, because collapsing them into one scenario identifier makes the measurement above impossible to express.
+Two consequences follow. Difficulty is policy-relative, so a matchup that is hopeless for a freshly cloned policy may be winnable later, which is why [[../decisions/0005-training-and-reward]] treats the target band as a curriculum rather than a fixed filter. And the generator should expose the army matchup and the seed as separate axes, because collapsing them into one scenario identifier makes the measurement above impossible to express.
 
 ## Evaluation, where the same problem returns
 
@@ -92,7 +92,7 @@ The caveat is that the two sides are not symmetric here. Starting positions diff
 
 ## What is decided and what is open
 
-Decided. The acceptance criterion for the generator, in [[decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.
+Decided. The acceptance criterion for the generator, in [[../decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.
 
 Open, and now with the analysis attached. Which of the three mechanisms is used, and in what combination, since they are complementary rather than exclusive. The generator itself, which remains the largest undocumented modeling choice in the project. Whether evaluation adopts paired seeds and both-sides play, which this page recommends and which nothing currently depends on.
 
@@ -100,7 +100,7 @@ Not yet investigated. Whether the difficulty band should be measured against the
 
 ## Related
 
-- [[decisions/0005-training-and-reward]], where the reward and the initial-state distribution are decided and deferred.
+- [[../decisions/0005-training-and-reward]], where the reward and the initial-state distribution are decided and deferred.
 - [[rlhf-transfer]], for difficulty filtering and critic-free baselines with their sources.
 - [[training-design]], for critic pre-fitting and the hyperparameters these choices touch.
 - [[rl-and-the-battle-domain]], for why a win rate is a statement about $\rho_0$.

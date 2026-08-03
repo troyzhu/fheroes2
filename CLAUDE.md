@@ -9,14 +9,19 @@ projects live on their own branches; the branch you are on determines which appl
 under `agent_play/`, not under `docs/`, because `docs/` is the source of the project's published
 website (`.github/workflows/pages.yml` builds Jekyll from it) and this material is internal.
 
-The tree separates reading material from records. `README.md` routes; `overview.md` carries
-orientation, scope, build and current state; `notation.md` fixes the mathematical symbols;
-`rl-and-the-battle-domain.md` teaches the reinforcement-learning vocabulary and the battle domain
-from scratch; `research/` holds the literature; `implementation/` holds one primer per built
-mechanism; `decisions/` holds the accepted records; and `archive/` holds dated logs, benchmarks,
-and raw research runs, which are provenance rather than a reading path.
+Two documents sit at the top and everything else lives in a directory that says what it is.
+`README.md` routes. `overview.md` carries the problem, both vocabularies including the notation
+contract, scope, build, current state, and the full map. `roadmap.md` says where the project is
+aimed and what each phase is waiting on. Then `rl/` holds the learning side (domain, methods,
+training design, scenario distribution, RLHF transfer), `implementation/` holds the environment
+side with one primer per built mechanism, `decisions/` holds the accepted records, `research/`
+holds the literature, and `archive/` holds dated logs and raw runs, which are provenance rather
+than a reading path.
 
-**Notation is not a free choice.** `agent_play/docs/notation.md` is the contract, and the tree is
+**The split that matters is `rl/` against `implementation/`.** The environment is built and
+verified; nothing under `rl/` is implemented. Do not describe anything in `rl/` as if it exists.
+
+**Notation is not a free choice.** `agent_play/docs/overview.md`'s Notation section is the contract, and the tree is
 self-contained: no page depends on a file outside this repository. The symbols match the owner's
 own RL study notes so this material reads as a continuation of them. Concretely: `V^\pi(s)`,
 `Q^\pi(s,a)`, `A^\pi(s,a)`, `\pi_\theta(a \mid s)`, `P(s' \mid s,a)`, `R(s,a,s')`, `\rho_0`,
@@ -27,11 +32,11 @@ and `\log` rather than `\ln`.
 Do NOT "correct" these toward Zhao's `v_\pi`/`q_\pi`/`\delta_\pi`/`\pi(a \mid s,\theta)`/`d_0`/`\ln`.
 That was tried once and fully reverted. The owner cites Zhao for the Bellman-contraction material
 but writes in the Sutton-Barto convention throughout, verified by counting symbols across their
-notes. `notation.md` keeps a Zhao translation table for reading the book alongside.
+notes. That section keeps a Zhao translation table for reading the book alongside.
 
 **The owner's notes live at `/Volumes/External Drive/Dropbox/Papers/`, and that tree is READ-ONLY.**
 Never create, edit, move, or reorganize anything under it. The relevant parts are
-`Papers/study/problems/reinforcement-learning/` (74 problem cards, cited in `notation.md` by id as
+`Papers/study/problems/reinforcement-learning/` (74 problem cards, cited in the overview's Notation section by id as
 `rl-014`), `Papers/study/dive/rlhf-book-lambert/`, and `Papers/wiki/concepts/`. Read them to check
 a convention, then make every change on the fheroes2 side. **The fork is public**, so their notes
 must never be copied in verbatim; write original pages citing card ids as provenance instead.
@@ -39,15 +44,16 @@ must never be copied in verbatim; write original pages citing card ids as proven
 **Run `./agent_play/lint_docs.sh` before claiming any documentation change is done.** It enforces
 the writing contract at `~/.claude/plugins/marketplaces/troyzhu/docs/WRITING_STYLE.md` (em-dash and
 bold budgets, banned constructions, no question headings, paragraphs under 160 words, and no
-hard-wrapped prose, since this vault is one paragraph per line) and resolves every wikilink, which
-is what catches the silent breakage that a file rename causes.
+hard-wrapped prose, since this vault is one paragraph per line) and resolves every wikilink
+including its heading anchor, which is what catches the silent breakage a file rename or a section
+retitle causes.
 
 Scope note: everything built so far is the **battle** environment. `agent_play/docs/roadmap.md`
 records the wider goal, including the adventure-map agent covering movement, recruitment, and town
 management, and the research owed before any of it is designed. `decisions/0005-training-and-reward.md`
 records how a policy will be trained and what it will be rewarded for, and
-`agent_play/docs/training-design.md` carries the mechanics behind it (network architecture,
-losses, hyperparameter tables, alternatives at each choice), and `agent_play/docs/rl-methods.md`
+`agent_play/docs/rl/training-design.md` carries the mechanics behind it (network architecture,
+losses, hyperparameter tables, alternatives at each choice), and `agent_play/docs/rl/rl-methods.md`
 defines every RL technique the documentation names, deriving the chain from the policy gradient
 through PPO and giving a verdict on each alternative.
 

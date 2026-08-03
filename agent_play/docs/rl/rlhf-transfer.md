@@ -2,7 +2,7 @@
 title: What transfers from RLHF to a battle agent
 type: reference
 updated: 2026-07-30
-related_concepts: ["[[rl-methods]]", "[[training-design]]", "[[decisions/0005-training-and-reward]]", "[[notation]]"]
+related_concepts: ["[[rl-methods]]", "[[training-design]]", "[[../decisions/0005-training-and-reward]]", "[[../overview#Notation]]"]
 tags: [agent-env, rl, rlhf, reference]
 ---
 
@@ -10,7 +10,7 @@ tags: [agent-env, rl, rlhf, reference]
 
 Most reinforcement learning written about today is applied to language models, so most of the recent engineering experience lives there. This project has no language model, no preference data, and no pretrained reference policy, which makes it fair to ask what any of that experience is worth here. The answer is that a specific and useful subset transfers, one chapter transfers almost completely, and the rest actively misleads.
 
-The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rlhfbook.com](https://rlhfbook.com)), which is open source, read here in full rather than only where the owner's notes reach. Its Appendix A uses the same symbols this tree does, including $V^\pi$, $Q^\pi$, $A^\pi$, $\pi_\theta$, and $\log$, so nothing below needs translating. Techniques named here are defined in [[rl-methods]]; symbols are fixed in [[notation]].
+The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rlhfbook.com](https://rlhfbook.com)), which is open source, read here in full rather than only where the owner's notes reach. Its Appendix A uses the same symbols this tree does, including $V^\pi$, $Q^\pi$, $A^\pi$, $\pi_\theta$, and $\log$, so nothing below needs translating. Techniques named here are defined in [[rl-methods]]; symbols are fixed in [[../overview#Notation]].
 
 ## Table of contents
 - [[#The short version]]
@@ -29,13 +29,13 @@ The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rl
 | Idea | Transfers | Why |
 |---|---|---|
 | Verifiable rewards, and what follows from them | Almost completely | A win or loss is a verifiable reward in exactly the book's sense |
-| Difficulty filtering of the training distribution | Yes, and it is the sharpest finding here | Answers an open question in [[decisions/0005-training-and-reward]] about the scenario generator |
+| Difficulty filtering of the training distribution | Yes, and it is the sharpest finding here | Answers an open question in [[../decisions/0005-training-and-reward]] about the scenario generator |
 | Group and leave-one-out baselines instead of a critic | Yes, strongly | Battles are cheap and seed-repeatable, so the sampling this needs is nearly free |
 | Aggregation unit, per-decision against per-episode | Yes | Battles vary 5 to 40 decisions, the same length-bias structure as variable completion length |
 | The exact statement of value-network bias | Yes | Decides whether a critic fitted on very little data is safe |
 | A KL leash to a reference policy | Contested, and the book argues both sides | The cloned policy is a genuine reference, but reasoning practice removed the leash to allow exploration |
 | Replacing the clipped ratio with a computed divergence | Yes, and the usual cost objection is absent here | 793 slots with 5 to 30 legal makes the exact divergence nearly free |
-| Overoptimization and the proxy-against-gold measurement | Yes | The shaped-reward risk in [[decisions/0005-training-and-reward]] is the same failure |
+| Overoptimization and the proxy-against-gold measurement | Yes | The shaped-reward risk in [[../decisions/0005-training-and-reward]] is the same failure |
 | Evaluation variance, contamination, hillclimbing | Yes | The five fixtures cannot be both regression anchors and the reported evaluation |
 | Truncated importance sampling for async training | Later | Only once actors and learners are separated, which is not the current design |
 | Token-level structure, DPO, preference data, instruction tuning | No | There is no language model and no human preference signal here |
@@ -48,7 +48,7 @@ A battle is won or it is lost, computed by the engine. This project is therefore
 
 Overoptimization mostly stops being a concern. The failure in RLHF is that a policy pushed hard against a *learned* reward exploits that model's errors. A verifiable reward has no errors to exploit, and the book reports these domains are robust to overoptimization for exactly that reason. The residual risk here is not the win-loss signal but any *shaped* term added beside it, which is a hand-written reward model and does have errors to exploit.
 
-Sparse binary outcome rewards are the practice, not a compromise. The book records that reasoning models train on correct-or-incorrect at the end rather than on step-level process rewards, with auxiliary terms only for format. That is independent support for the terminal-first criterion already in [[decisions/0005-training-and-reward]], and it is worth more than the usual argument that sparse reward is merely tolerable at short horizons. The strongest recent results in a comparable regime chose it.
+Sparse binary outcome rewards are the practice, not a compromise. The book records that reasoning models train on correct-or-incorrect at the end rather than on step-level process rewards, with auxiliary terms only for format. That is independent support for the terminal-first criterion already in [[../decisions/0005-training-and-reward]], and it is worth more than the usual argument that sparse reward is merely tolerable at short horizons. The strongest recent results in a comparable regime chose it.
 
 The third consequence is large enough to have its own section.
 
@@ -56,7 +56,7 @@ The third consequence is large enough to have its own section.
 
 The book reports that filtering training problems to those the model solves between roughly 20 and 80 percent of the time is essential, because a problem solved every time and a problem never solved both produce no gradient. With a group-relative or leave-one-out baseline this is not a heuristic but an identity: if every rollout in a group earns the same return, the advantage of every member is zero and the batch contributes nothing.
 
-[[decisions/0005-training-and-reward]] calls the initial-state distribution the largest undocumented modeling choice in the project and leaves it open. This gives it a concrete acceptance criterion. A scenario and army generator is suitable when the policy being trained wins somewhere in a middle band, and unsuitable when it wins almost always or almost never, regardless of how realistic the matchups look.
+[[../decisions/0005-training-and-reward]] calls the initial-state distribution the largest undocumented modeling choice in the project and leaves it open. This gives it a concrete acceptance criterion. A scenario and army generator is suitable when the policy being trained wins somewhere in a middle band, and unsuitable when it wins almost always or almost never, regardless of how realistic the matchups look.
 
 Two things follow for the design. The generator needs a difficulty parameter that can be measured rather than asserted, and the natural measurement is the win rate of the current policy, or the teacher, over a sample of generated scenarios. And the band moves, because a scenario set that is well calibrated for a freshly cloned policy becomes too easy once training works, which makes this a curriculum rather than a fixed distribution. The five committed fixtures are regression anchors and were never a training distribution; this says what the training distribution has to satisfy.
 
@@ -111,7 +111,7 @@ RLHF carries two KL-shaped quantities that [[rl-methods]] warns against conflati
 
 $$r = r_\theta - \lambda_{\text{KL}}\, \mathcal{D}_{\text{KL}}\big(\pi_\theta(y \mid x) \,\|\, \pi_{\text{ref}}(y \mid x)\big)$$
 
-The obvious reading is that this does not apply here, since there is no pretrained model to stay near. That reading is wrong. After stage 1 of [[decisions/0005-training-and-reward]] there is a cloned policy that plays competently, and stage 3 can destroy that competence early while value estimates are still poor. The cloned checkpoint is a reference policy in exactly the sense meant, and the book supplies quantitative support: forgetting correlates with the KL divergence between the initial and trained policies at $R^2 = 0.96$.
+The obvious reading is that this does not apply here, since there is no pretrained model to stay near. That reading is wrong. After stage 1 of [[../decisions/0005-training-and-reward]] there is a cloned policy that plays competently, and stage 3 can destroy that competence early while value estimates are still poor. The cloned checkpoint is a reference policy in exactly the sense meant, and the book supplies quantitative support: forgetting correlates with the KL divergence between the initial and trained policies at $R^2 = 0.96$.
 
 The same source argues the other way, and honesty requires reporting it. As reasoning training scaled, many systems removed the KL penalty entirely, because it constrains exploration and the verifiable reward removed the failure the penalty was guarding against. This project is in the verifiable-reward regime, which puts it on the side of the argument that drops the leash.
 
@@ -121,7 +121,7 @@ The resulting recommendation is narrower than the one this page carried before. 
 
 ## The ratio is a one-sample estimate of a divergence you can afford to compute
 
-Everything above takes PPO's clip as given. A 2026 result from the group behind Dr. GRPO argues the clip constrains the wrong object, and the argument is worth carrying because the reason it is impractical for language models does not hold here. Full detail in [[research/works/dppo-trust-region]].
+Everything above takes PPO's clip as given. A 2026 result from the group behind Dr. GRPO argues the clip constrains the wrong object, and the argument is worth carrying because the reason it is impractical for language models does not hold here. Full detail in [[../research/works/dppo-trust-region]].
 
 The identity at the centre of it is that the total-variation divergence between behavior and current policy at a state is the mean absolute deviation of the ratio from one.
 
@@ -167,7 +167,7 @@ Recording these so they are not imported by analogy.
 
 Token-level structure. A completion is a sequence of actions under one reward, which motivates sequence-level ratios and per-token clipping. A battle decision is a genuine action in a genuine state, so the per-decision form is correct here and the machinery built to compensate for the bandit framing is unnecessary.
 
-Discounting conventions. Language-model RLHF sets $\gamma = 1$ because the completion is scored as a whole. Battles terminate quickly enough that a value near 1 is defensible, but for a different reason, and [[notation]] records why the range is relaxed at all.
+Discounting conventions. Language-model RLHF sets $\gamma = 1$ because the completion is scored as a whole. Battles terminate quickly enough that a value near 1 is defensible, but for a different reason, and [[../overview#Notation]] records why the range is relaxed at all.
 
 Direct preference optimization and the direct alignment family. These replace a reward model with a closed-form objective on preference pairs. There is no preference data here and no reward model to eliminate.
 
@@ -187,11 +187,11 @@ Asynchronous training with truncated importance sampling. This corrects for acto
 
 ## A note on symbols
 
-The book's Appendix A agrees with [[notation]] on every symbol this tree uses, which is why nothing above needed translating. One difference is worth flagging for anyone reading the book directly. It writes the state distribution $\rho_\pi$ while also using $\rho_t$ for the PPO ratio. This tree keeps $d^\pi$ for the state distribution and $\rho_0$ for the initial-state distribution, leaving $\rho_t(\theta)$ unambiguous.
+The book's Appendix A agrees with [[../overview#Notation]] on every symbol this tree uses, which is why nothing above needed translating. One difference is worth flagging for anyone reading the book directly. It writes the state distribution $\rho_\pi$ while also using $\rho_t$ for the PPO ratio. This tree keeps $d^\pi$ for the state distribution and $\rho_0$ for the initial-state distribution, leaving $\rho_t(\theta)$ unambiguous.
 
 ## Related
 
 - [[rl-methods]], the techniques themselves, derived.
 - [[training-design]], the architecture and hyperparameters these ideas would modify.
-- [[decisions/0005-training-and-reward]], the decisions this page proposes revisiting.
-- [[notation]], the symbol contract.
+- [[../decisions/0005-training-and-reward]], the decisions this page proposes revisiting.
+- [[../overview#Notation]], the symbol contract.

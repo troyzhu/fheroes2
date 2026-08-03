@@ -141,5 +141,5 @@ Local copies live in `files/`, with `manifest.tsv` recording the URL, status, si
 - [[README]], the scannable source catalogue with quality grades.
 - [[prior-art]], what each open-source codebase contains and where to look inside it.
 - [[../archive/research-runs/2026-07-27-rl-approaches]] and [[../archive/research-runs/2026-07-29-spatial-observations]], the claim-by-claim reports with verification votes.
-- [[../rl-and-the-battle-domain]], the RL vocabulary and the battle domain these findings apply to.
+- [[../rl/rl-and-the-battle-domain]], the RL vocabulary and the battle domain these findings apply to.
 - [[../overview]], the system as it stands.

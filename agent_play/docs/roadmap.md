@@ -2,7 +2,7 @@
 title: Scope and roadmap
 type: roadmap
 updated: 2026-07-30
-related_concepts: ["[[rl-and-the-battle-domain]]", "[[overview]]"]
+related_concepts: ["[[rl/rl-and-the-battle-domain]]", "[[overview]]"]
 tags: [agent-env, roadmap, scope]
 ---
 
@@ -10,11 +10,37 @@ tags: [agent-env, roadmap, scope]
 
 Everything built so far concerns battles only, and deliberately so. This note records what the wider goal is, why the battle came first, what the later phases involve, and which questions have to be answered with evidence before any of them starts. It exists so that the current narrow scope is not mistaken for the intended end state.
 
+[[overview]] is the companion to this file. It says what exists and how to build it; this says what does not exist yet and what each next step is waiting on.
+
+## Table of contents
+- [[#Where the project stands today]]
+- [[#Where the project is aimed]]
+- [[#Why the battle came first]]
+- [[#Phase 1b, wider battles]]
+- [[#Phase 2, the navigation and management agent]]
+- [[#Sequencing]]
+
+## Where the project stands today
+
+One table, so that the phases below have something to be relative to. Detail and gate results are in [[overview#Where the project stands]].
+
+| Stage | State | What it produced or needs |
+|---|---|---|
+| Phase 0, feasibility spike | Done | Headless battles with no game assets, cross-machine determinism |
+| Milestones 1 to 3, the environment | Done and verified | Shared seed helper, decision hook, action space and legality. Gates pass, teacher coverage 116 of 116 |
+| Milestone 4, the protocol | Next | JSONL protocol, strict scenario JSON, observation serialization, an `ENABLE_AGENT` target. Binds [[decisions/0001-observation-profiles]], [[decisions/0003-config-management]], [[decisions/0004-spatial-observation-modality]] |
+| Milestones 5 to 6, client and hardening | Not started | Python client, benchmarks, the hardening pass |
+| Training a battle policy | Not started, designed | Staging and reward criteria in [[decisions/0005-training-and-reward]], mechanics in [[rl/README]] |
+| Phase 1b, wider battles | Not started | Blocked on the capability audit and on re-indexing for two-cell units |
+| Phase 2, the adventure map | Not designed | Blocked on a literature sweep, listed below |
+
+Nothing under `rl/` is implemented. The environment is built and the learner is not, which is the single most important thing to know before reading further.
+
 ## Where the project is aimed
 
 The end state is an agent that plays fheroes2, which means two quite different problems joined together.
 
-A battle is a small, turn-based, nearly fully observed tactical problem on 99 hex cells with at most ten stacks. That is the problem the current environment solves, and [[rl-and-the-battle-domain]] describes it in full.
+A battle is a small, turn-based, nearly fully observed tactical problem on 99 hex cells with at most ten stacks. That is the problem the current environment solves, and [[rl/rl-and-the-battle-domain]] describes it in full.
 
 The adventure map is everything outside a battle. A hero moves across a large map under fog of war, picks up resources and artifacts, visits locations, recruits creatures, manages towns, and decides which battles to start in the first place. It is a strategy problem rather than a tactical one, and almost every property that makes the battle tractable is absent from it.
 
@@ -60,7 +86,7 @@ The engine seam is unknown. Milestones 1 through 3 depended on finding a clean h
 
 ### Where it sits among comparable environments
 
-On the axes in [[rl-and-the-battle-domain]], the adventure map moves from the fheroes2-battle row to somewhere near StarCraft II and the Lux AI competitions. Turn-based rather than real-time, which helps, but fogged, long-horizon, hierarchical, and with a heterogeneous action space, which does not.
+On the axes in [[rl/rl-and-the-battle-domain]], the adventure map moves from the fheroes2-battle row to somewhere near StarCraft II and the Lux AI competitions. Turn-based rather than real-time, which helps, but fogged, long-horizon, hierarchical, and with a heterogeneous action space, which does not.
 
 The natural structural answer is hierarchy, with a strategic policy choosing where to go and what to build, and the existing battle policy invoked when a fight starts. That is an assumption rather than a conclusion. Hierarchical reinforcement learning has a mixed record, and a flat policy over a well-designed action abstraction sometimes beats an explicit hierarchy.
 
@@ -86,6 +112,6 @@ Phase 1b and Phase 2 both wait on that, for the same reason the battle came firs
 ## Related
 
 - [[overview]], current state and the milestone table.
-- [[rl-and-the-battle-domain]], the battle domain and the axes this note compares against.
+- [[rl/rl-and-the-battle-domain]], the battle domain and the axes this note compares against.
 - [[decisions/0005-training-and-reward]], the training and reward design, including what is deliberately still open.
 - [[research/findings]], the evidence base the battle decisions rest on.
