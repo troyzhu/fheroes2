@@ -116,7 +116,7 @@ fheroes2::agent::TrajectoryWriter::TrajectoryWriter( const std::string & filePat
 
 void fheroes2::agent::TrajectoryWriter::writeHeader( const Scenario & scenario, const uint32_t mapSeed, const uint32_t combatSeed )
 {
-    _out << "{\"record\":\"episode_header\",\"schema\":\"agent_passive_v0\""
+    _out << "{\"record\":\"episode_header\",\"schema\":\"agent_passive_v1\""
          << ",\"scenario_id\":\"" << escapeJson( scenario.scenarioId ) << '"' //
          << ",\"ground_type\":" << scenario.groundType //
          << ",\"tile_index\":" << scenario.tileIndex //
@@ -166,6 +166,29 @@ void fheroes2::agent::TrajectoryWriter::writeTerminal( const EpisodeOutcome & ou
          << ",\"decision_count\":" << decisionCount //
          << ",\"decision_digest\":\"" << escapeJson( decisionDigest ) << '"' //
          << ",\"state_digest\":\"" << escapeJson( outcome.stateDigest ) << '"' //
-         << "}\n";
+         << ",\"attacker\":{\"live_stacks\":" << outcome.attacker.liveStacks << ",\"live_creatures\":" << outcome.attacker.liveCreatures
+         << ",\"hit_points\":" << outcome.attacker.hitPoints << '}' //
+         << ",\"defender\":{\"live_stacks\":" << outcome.defender.liveStacks << ",\"live_creatures\":" << outcome.defender.liveCreatures
+         << ",\"hit_points\":" << outcome.defender.hitPoints << '}';
+
+    // Per-unit terminal state. These fields were previously computed, folded into the state
+    // digest, and then discarded, so the only inspectable form of the extracted state was a
+    // hash. Serializing them is what lets a human compare the recorded state against a battle
+    // watched through the interface, which is the only independent oracle available for the
+    // extraction (agent spec section 15; roadmap, "The visual gate").
+    _out << ",\"units\":[";
+    for ( size_t i = 0; i < outcome.units.size(); ++i ) {
+        const UnitTerminalState & unit = outcome.units[i];
+        _out << ( i == 0 ? "" : "," ) //
+             << "{\"uid\":" << unit.uid //
+             << ",\"monster_id\":" << unit.monsterId //
+             << ",\"side\":\"" << ( unit.isAttacker ? "attacker" : "defender" ) << '"' //
+             << ",\"count\":" << unit.count //
+             << ",\"hit_points\":" << unit.hitPoints //
+             << ",\"head_cell\":" << unit.headCell //
+             << ",\"alive\":" << ( unit.isValid ? "true" : "false" ) //
+             << '}';
+    }
+    _out << "]}\n";
     _out.flush();
 }

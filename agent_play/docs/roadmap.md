@@ -67,7 +67,7 @@ The parser and the worker target come first, because everything else is tested t
 
 Worth stating separately, because it is the foundation everything after it rests on and it is currently the weakest verified part of the project.
 
-Per-decision state extraction does not exist. `DecisionRecord` holds an engine decision index, a unit id, and the chosen commands, and the source says so at `src/fheroes2/agent/agent_trajectory.h`, that the `agent_passive_v0` schema carries no observations, no legal-action lists, and no teacher matching. The consequence for [[decisions/0005-training-and-reward]] is concrete and easy to miss. Behaviour cloning needs observation and action pairs, and Milestone 2 recorded 116 actions with nothing about the board beside them, so the recorded decisions cannot train anything as they stand. The data is recoverable rather than lost, since episodes are reproducible from a seed and can be re-run once an observation emitter exists, but the emitter is a Milestone 4 deliverable and nothing downstream of it can start first.
+Per-decision state extraction does not exist. `DecisionRecord` holds an engine decision index, a unit id, and the chosen commands, and the source says so at `src/fheroes2/agent/agent_trajectory.h`, that the `agent_passive_v1` schema carries no observations, no legal-action lists, and no teacher matching. The consequence for [[decisions/0005-training-and-reward]] is concrete and easy to miss. Behaviour cloning needs observation and action pairs, and Milestone 2 recorded 116 actions with nothing about the board beside them, so the recorded decisions cannot train anything as they stand. The data is recoverable rather than lost, since episodes are reproducible from a seed and can be re-run once an observation emitter exists, but the emitter is a Milestone 4 deliverable and nothing downstream of it can start first.
 
 Terminal state extraction was in the same position and is now checked, as of 2026-08-03. Every gate proved the digest was stable and none asserted what it held, so a systematically wrong extraction would have been perfectly deterministic and would have passed all of them. `verify_m1.sh` now asserts eight invariants on every fixture, chosen so they hold whatever the battle was and therefore need no golden value and no oracle. A golden value would only have locked in whatever the implementation happens to do.
 
@@ -81,7 +81,16 @@ Owner requirement, 2026-08-03. Milestone 4 delivers a comparison the owner runs 
 
 Stage one is mechanical and establishes that both sides are watching the same battle. The same scenario and seed played through Battle Only in the ordinary executable, and run headless by the worker, must produce the same terminal digest. If they differ, the seeding paths have diverged and nothing about the serialization has been learned yet. This is a prerequisite rather than part of the check.
 
-Stage two is the gate itself. The worker emits per-decision state as JSON for that scenario, the owner watches the same battle in the interface, and the two are compared side by side: which stack is on which cell, how many creatures remain in each, hit points, whose turn it is, and how many shots a shooter has left. The state is the thing being checked, so a human reading the board is the oracle, and no assertion in the repository can substitute for it.
+Stage two is the gate itself. The worker emits state as JSON for that scenario, the owner watches the same battle in the interface, and the two are compared side by side: which stack is on which cell, how many creatures remain in each, hit points, whose turn it is, and how many shots a shooter has left. The state is the thing being checked, so a human reading the board is the oracle, and no assertion in the repository can substitute for it.
+
+Terminal state can be checked this way today. Running the worker with `--trajectory-dir` writes one JSONL file per episode, and as of the `agent_passive_v1` schema its terminal record carries per-unit state: uid, monster, side, count, hit points, head cell, and whether the stack survived, alongside the two side summaries. Those fields were previously computed, folded into the state digest and discarded, so the extraction could be checked for stability and could not be read at all.
+
+```bash
+./src/agent_worker/fheroes2_agent_worker --runs 1 --fixture m1_tiny_melee --trajectory-dir /tmp/gate
+python3 -m json.tool < /tmp/gate/m1_tiny_melee-run00.jsonl   # one record per line
+```
+
+Per-decision state cannot be checked this way yet, which is the remaining half of this milestone. A decision record still carries only an index, a unit id, and the chosen commands, so the board between decisions is not observable and the sign-off can currently cover the start of the battle, the action sequence, and the end of it, but not the positions in between.
 
 This upgrades the optional interface run in [[#The milestones]] from a normal-game regression that was the owner's call into a required sign-off for Milestone 4. The reason for the upgrade is that per-decision state serialization is new code with no independent check, where the terminal path at least now has invariants.
 

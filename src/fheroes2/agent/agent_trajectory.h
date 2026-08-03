@@ -72,11 +72,16 @@ namespace fheroes2::agent
     // Writes one episode as JSON Lines: an episode_header record, one decision record per
     // full-fledged decision, and a terminal record.
     //
-    // Schema tag "agent_passive_v0": a deliberate subset of the spec section 15 v1 records —
-    // no observations, legal-action lists or teacher-matching yet (those arrive with
-    // Milestones 3-4), and no wall-clock fields, so identical episodes produce byte-identical
+    // Schema tag "agent_passive_v1": still a deliberate subset of the spec section 15 v1
+    // records — no observations, legal-action lists or teacher-matching yet (those arrive with
+    // Milestone 4), and no wall-clock fields, so identical episodes produce byte-identical
     // files (determinism first; timestamps can be reintroduced as explicitly-excluded metadata
     // later).
+    //
+    // v1 adds per-unit terminal state and the two side summaries to the terminal record. Those
+    // were previously computed, folded into the state digest and discarded, so the extracted
+    // state was verifiable only as a hash and could not be read by a human at all. Serializing
+    // them is what makes the interface comparison in the roadmap possible.
     class TrajectoryWriter
     {
     public:
