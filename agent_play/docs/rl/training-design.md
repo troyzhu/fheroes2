@@ -189,6 +189,26 @@ The observation profile has to match the actor's. Fitting on `full_v1` while the
 
 Near the start of an episode the fitted value is dominated by the army matchup rather than by tactics, since two identical policies resolve an opening position mostly according to who has the stronger force. That is useful rather than a defect, because subtracting it removes scenario difficulty from the advantage, which is the same variance the leave-one-out baseline in [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] removes by sampling instead of by regression. The two are alternatives addressing one problem, and pre-fitting is the cheaper of them to try first. [[scenario-distribution#Three mechanisms, one target]] sets both beside difficulty filtering and shows all three removing the same variance term.
 
+### Measured, 2026-08-03
+
+Stage 1 now exists and has been run. Numbers below are from `python/fheroes2_agent/train_bc.py` on 2,000 recorded episodes.
+
+| Quantity | Value |
+|---|---|
+| Training decisions | 36,819, from 1,600 episodes |
+| Held-out decisions | 8,561, from 400 episodes, split by episode rather than by decision |
+| Parameters | 392,634 |
+| Held-out teacher agreement | 0.887 |
+| Baseline, always the most common teacher action | 0.131 |
+| Baseline, uniform over the legal set | 0.079 |
+| Wall clock | 13 seconds for 25 epochs on the Apple M2 |
+
+Splitting by episode rather than by decision matters more than it looks. Consecutive decisions inside one battle are nearly the same board, so a decision-level split puts a state and its successor on opposite sides and reports an agreement that has partly memorized the answer.
+
+Agreement is a ceiling rather than a target. The teacher plays both sides, so a perfect clone equals the teacher and does not beat it, and the minimum achievable loss is the teacher's conditional entropy given what the observation shows rather than zero. Held-out loss flattened near 0.38 while training loss continued to 0.28, which is the mild overfitting expected at this data scale and is why the network was sized down from 626k parameters to 393k.
+
+The data came from replaying the five fixtures under 400 world seeds each. That varies the obstacle layout and the combat seed while holding the army matchup fixed, which is the separation [[scenario-distribution]] requires, and it produced 129 distinct teacher decision streams from the first 200 episodes, so the seeds do change the teacher's behaviour rather than merely its outcomes.
+
 ### Starting hyperparameters
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.

@@ -44,6 +44,8 @@
 int main( int argc, char ** argv )
 {
     int runs = 10;
+    // Number of world seeds per fixture. Each seed is a different battle from the same armies.
+    int seedCount = 1;
     std::string onlyFixture;
     std::string trajectoryDir;
     std::string capabilityAuditPath;
@@ -61,6 +63,9 @@ int main( int argc, char ** argv )
 
         if ( std::strcmp( argv[i], "--runs" ) == 0 ) {
             runs = std::atoi( next( "--runs" ) );
+        }
+        else if ( std::strcmp( argv[i], "--seeds" ) == 0 ) {
+            seedCount = std::atoi( next( "--seeds" ) );
         }
         else if ( std::strcmp( argv[i], "--fixture" ) == 0 ) {
             onlyFixture = next( "--fixture" );
@@ -85,7 +90,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -95,6 +100,11 @@ int main( int argc, char ** argv )
 
     if ( runs < 1 ) {
         std::fprintf( stderr, "--runs must be at least 1\n" );
+        return 2;
+    }
+
+    if ( seedCount < 1 ) {
+        std::fprintf( stderr, "--seeds must be at least 1\n" );
         return 2;
     }
 
@@ -112,8 +122,23 @@ int main( int argc, char ** argv )
 
     std::vector<fheroes2::agent::Scenario> scenarios;
     for ( const auto & scenario : fheroes2::agent::milestone1Fixtures() ) {
-        if ( onlyFixture.empty() || scenario.scenarioId == onlyFixture ) {
-            scenarios.push_back( scenario );
+        if ( !onlyFixture.empty() && scenario.scenarioId != onlyFixture ) {
+            continue;
+        }
+
+        // --seeds N replays a fixture's armies under N different world seeds. The map seed and
+        // therefore the obstacle layout and the combat seed all derive from it, so each is a
+        // genuinely different battle rather than a repeat, while the army matchup is held
+        // fixed. That separation of matchup from seed is what
+        // agent_play/docs/rl/scenario-distribution.md requires of a generator: difficulty is a
+        // property of the matchup, estimated over seeds.
+        for ( int s = 0; s < seedCount; ++s ) {
+            fheroes2::agent::Scenario variant = scenario;
+            if ( s > 0 ) {
+                variant.worldSeed = scenario.worldSeed + static_cast<uint32_t>( s );
+                variant.scenarioId = scenario.scenarioId + "-seed" + std::to_string( s );
+            }
+            scenarios.push_back( variant );
         }
     }
     if ( scenarios.empty() ) {
@@ -129,7 +154,7 @@ int main( int argc, char ** argv )
         }
     }
 
-    std::fprintf( stderr, "[worker] fixtures=%zu runs=%d\n", scenarios.size(), runs );
+    std::fprintf( stderr, "[worker] fixtures=%zu runs=%d seeds=%d\n", scenarios.size(), runs, seedCount );
 
     std::map<std::string, std::set<std::string>> digestsPerScenario;
     std::map<std::string, std::set<std::string>> decisionDigestsPerScenario;
