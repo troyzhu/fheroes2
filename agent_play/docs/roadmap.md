@@ -61,7 +61,15 @@ The parser and the worker target come first, because everything else is tested t
 
 ### What the gate has to prove
 
-`verify_m4.sh` does not exist yet. Writing it is part of the milestone rather than a follow-up, on the pattern the earlier gates set. At minimum it has to show that a scripted session drives an episode to termination with no invalid command, that a malformed line produces an error frame and a live worker rather than a crash, that closing stdin unwinds cleanly, that a rejected scenario names its JSON path and error code, and that the terminal digest under external control matches the digest the same scenario produces under the built-in AI when the external policy replays the AI's own choices.
+`verify_m4.sh` does not exist yet. Writing it is part of the milestone rather than a follow-up, on the pattern the earlier gates set. At minimum it has to show that a scripted session drives an episode to termination with no invalid command, that a malformed line produces an error frame and a live worker rather than a crash, that closing stdin unwinds cleanly, that a rejected scenario names its JSON path and error code, that the terminal digest under external control matches the digest the same scenario produces under the built-in AI when the external policy replays the AI's own choices, and that the terminal-state invariants below hold on every fixture.
+
+### The state-extraction gap this milestone has to close
+
+Worth stating separately, because it is the foundation everything after it rests on and it is currently the weakest verified part of the project.
+
+Per-decision state extraction does not exist. `DecisionRecord` holds an engine decision index, a unit id, and the chosen commands, and the source says so at `src/fheroes2/agent/agent_trajectory.h`, that the `agent_passive_v0` schema carries no observations, no legal-action lists, and no teacher matching. The consequence for [[decisions/0005-training-and-reward]] is concrete and easy to miss. Behaviour cloning needs observation and action pairs, and Milestone 2 recorded 116 actions with nothing about the board beside them, so the recorded decisions cannot train anything as they stand. The data is recoverable rather than lost, since episodes are reproducible from a seed and can be re-run once an observation emitter exists, but the emitter is a Milestone 4 deliverable and nothing downstream of it can start first.
+
+Terminal state extraction does exist and is verified in the wrong dimension. Every gate proves the digest is stable; no test asserts what it holds. The fix is not a golden value, which would only lock in whatever the current implementation does, but invariants that must hold whatever the battle was: the winning side has at least one living unit and the losing side none, no unit's count exceeds its initial count, dead and living counts sum to the initial count, a unit marked invalid has count zero, and the round count is at least one and no greater than the scenario's limit. Those catch a systematically wrong extraction without needing an independent oracle, which a characterization test cannot do.
 
 ### Open before it starts
 

@@ -371,7 +371,9 @@ If the Makefile build fails in the `.pot` step, put Homebrew's `gettext` ahead o
 
 ## Remaining risks, in order
 
-The historical top risk, legal-action generation, is closed: validators extracted, full teacher coverage, no live-arena probing. What remains:
+The historical top risk, legal-action generation, is closed, with validators extracted, full teacher coverage, and no live-arena probing. What remains:
+
+State extraction is verified for stability and not for correctness, which is the highest of these. The terminal digest covers seven episode scalars and seven fields per unit, and all four gates prove it is byte-identical across runs, processes, machines, and optimization levels. Nothing asserts what it contains. A systematically wrong extraction, reading a count before deaths are applied or including an already-dead unit, would be perfectly deterministic and would pass every gate. The determinism discipline that makes this project trustworthy is also what hides this particular failure. [[roadmap#Milestone 4 in detail]] specifies the invariant test that closes it.
 
 The protocol and JSON surface arriving in Milestone 4, where a strict parser boundary and a vendored dependency enter the tree, and where stdout discipline and invalid-input handling decide whether the worker stays healthy.
 
