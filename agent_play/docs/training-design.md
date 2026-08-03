@@ -165,7 +165,29 @@ $$L(\theta, \phi) = -L^{\text{CLIP}}(\theta) + c_v\, \hat{\mathbb{E}}_t\big[(V_\
 
 Advantages come from generalized advantage estimation, which trades bias against variance through $\lambda$ and is derived in [[rl-methods#GAE]].
 
-Two integration details decide whether this works. The mask must be applied when sampling and again when recomputing log-probabilities during the update, or $r_t \neq 1$ at $\theta = \theta_{\text{old}}$ and the clipping window is centered on the wrong point. And the entropy bonus must be computed over the legal set only, since entropy over 793 outputs where 760 are masked is dominated by the mask rather than by the policy's actual indecision.
+Two integration details decide whether this works. The mask must be applied when sampling and again when recomputing log-probabilities during the update, or $\rho_t \neq 1$ at $\theta = \theta_{\text{old}}$ and the clipping window is centered on the wrong point. And the entropy bonus must be computed over the legal set only, since entropy over 793 outputs where 760 are masked is dominated by the mask rather than by the policy's actual indecision.
+
+### Pre-fitting the critic on teacher play
+
+Owner proposal, 2026-08-03. Stage 1 trains a policy head and leaves the value head at initialization, which wastes something the setup gives away for free.
+
+The teacher plays both sides of every headless battle, so a rollout yields an observation sequence and a terminal outcome without any learner involved. Regressing a value head on the realized returns of those rollouts is Monte Carlo policy evaluation, a supervised problem, and it fits $V^{\pi^{*}}$, the value of the teacher's policy against a teacher opponent.
+
+The reason this is worth doing here rather than being a generic nicety is an asymmetry in data. The policy head is limited by how many teacher decisions have been recorded, currently 116, and getting more means recording more. The value head needs only observation and return pairs, and the environment produces those at roughly 4,600 episodes per second from a seed. Value data is effectively unlimited where policy data is not.
+
+It also removes a weakness at the moment it is most dangerous. Early stage-3 updates are worst when the critic is uninformative, because the advantage is then mostly noise, and that is exactly when the cloned policy's competence is most at risk of being destroyed. See [[rlhf-transfer#A reference policy this project does have, and an argument against using it]] for the other half of that problem.
+
+The prerequisite is a reward, since a value is defined relative to one. That is open in [[decisions/0005-training-and-reward]], but not blocking, because the terminal record already carries the winner and the surviving force, so returns for the margin-weighted terminal candidate can be computed retroactively without re-running anything.
+
+The policy mismatch does not break it, which is the part worth being clear about. $V^{\pi^{*}}$ is not $V^{\pi_\theta}$, and after stage 3 begins the learner drifts away from the teacher. A baseline only has to be independent of the action to leave the gradient unbiased, by the control-variate argument in [[rl-methods#Baselines, and why variance is the real enemy]], and $V^{\pi^{*}}(o)$ is a function of the observation alone. Using it is therefore unbiased however far the learner has drifted. It buys less variance reduction than the correct critic would, nothing worse. Bias enters only through bootstrapping, meaning through $\lambda < 1$, which is the trade that parameter already controls.
+
+Three caveats worth recording.
+
+The value is conditioned on the opponent. Fitted on teacher against teacher, it estimates returns against one opponent, while [[decisions/0005-training-and-reward]] requires training against a mixture of engine configurations. That is acceptable for an initialization and wrong for a frozen baseline, so the value loss must keep training it.
+
+The observation profile has to match the actor's. Fitting on `full_v1` while the actor consumes `observable_v1` reintroduces exactly the asymmetric-critic bias that [[decisions/0001-observation-profiles]] declines to recommend.
+
+Near the start of an episode the fitted value is dominated by the army matchup rather than by tactics, since two identical policies resolve an opening position mostly according to who has the stronger force. That is useful rather than a defect, because subtracting it removes scenario difficulty from the advantage, which is the same variance the leave-one-out baseline in [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] removes by sampling instead of by regression. The two are alternatives addressing one problem, and pre-fitting is the cheaper of them to try first.
 
 ### Starting hyperparameters
 
@@ -184,7 +206,7 @@ These are the community defaults, adjusted for a small fast environment. Every o
 | Value coefficient $c_v$ | 0.5 | Standard |
 | Entropy coefficient $c_e$ | 0.01, decayed | Starting from a cloned policy, less exploration pressure is needed |
 | Gradient clipping | Global norm 0.5 | Standard |
-| Initialization | Cloned weights, value head fresh | The point of stage 1 |
+| Initialization | Cloned weights for the actor, value head pre-fitted per below | The point of stage 1, extended to the critic |
 
 The interaction worth watching is between the cloned initialization and the entropy bonus. A well-cloned policy is confident, so a standard entropy coefficient will actively push it back toward uniformity over the legal set and can undo stage 1 in the first few updates. Starting lower and decaying, or warming up the policy loss, is the expected adjustment.
 
