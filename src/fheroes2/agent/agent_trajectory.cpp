@@ -129,7 +129,7 @@ void fheroes2::agent::TrajectoryWriter::writeHeader( const Scenario & scenario, 
          << "}\n";
 }
 
-void fheroes2::agent::TrajectoryWriter::writeDecision( const DecisionRecord & decision )
+void fheroes2::agent::TrajectoryWriter::writeDecision( const DecisionRecord & decision, const DecisionCoverage * coverage, const Observation * observation )
 {
     _out << "{\"record\":\"decision\",\"engine_decision_index\":" << decision.engineDecisionIndex //
          << ",\"unit_uid\":" << decision.unitUid //
@@ -153,8 +153,28 @@ void fheroes2::agent::TrajectoryWriter::writeDecision( const DecisionRecord & de
         }
         _out << "]}";
     }
+    _out << ']';
 
-    _out << "]}\n";
+    if ( observation != nullptr ) {
+        _out << ",\"observation\":" << observationToJson( *observation );
+    }
+
+    if ( coverage != nullptr ) {
+        _out << ",\"legal_actions\":[";
+        for ( size_t i = 0; i < coverage->legalActions.size(); ++i ) {
+            if ( i > 0 ) {
+                _out << ',';
+            }
+            _out << coverage->legalActions[i];
+        }
+        _out << "],\"teacher_resolved\":" << ( coverage->teacherResolved ? "true" : "false" ) //
+             << ",\"teacher_matched\":" << ( coverage->teacherMatched ? "true" : "false" );
+        if ( coverage->teacherResolved ) {
+            _out << ",\"teacher_action\":" << coverage->teacherCanonicalIndex;
+        }
+    }
+
+    _out << "}\n";
 }
 
 void fheroes2::agent::TrajectoryWriter::writeTerminal( const EpisodeOutcome & outcome, const size_t decisionCount, const std::string & decisionDigest )

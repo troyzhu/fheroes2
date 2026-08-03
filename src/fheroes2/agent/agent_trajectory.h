@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "agent_command_snapshot.h"
+#include "agent_observation.h"
 
 namespace fheroes2::agent
 {
@@ -50,6 +51,11 @@ namespace fheroes2::agent
         bool teacherResolved{ false };
         bool teacherMatched{ false };
         uint32_t teacherCanonicalIndex{ 0 };
+        // The legal set as canonical indices, ascending. Stored as a list rather than as the
+        // 793-wide mask because 5 to 30 entries are legal at a typical decision, and the two
+        // are interconvertible. This plus the observation and the teacher index is one
+        // behaviour-cloning sample.
+        std::vector<uint32_t> legalActions;
     };
 
     // Filled by runEpisode() when a recording is requested.
@@ -62,6 +68,9 @@ namespace fheroes2::agent
         std::vector<DecisionRecord> decisions;
         // Parallel to `decisions` when auditTeacherCoverage was set.
         std::vector<DecisionCoverage> coverage;
+        // Parallel to `decisions` when auditTeacherCoverage was set: the board as a policy
+        // would have seen it, captured before the teacher's commands are applied.
+        std::vector<Observation> observations;
         // SHA-256 over the canonical byte serialization of every decision
         // ("agent_decisions_v0"): replay-equality of the chosen-command stream.
         std::string decisionDigest;
@@ -96,7 +105,9 @@ namespace fheroes2::agent
         }
 
         void writeHeader( const Scenario & scenario, const uint32_t mapSeed, const uint32_t combatSeed );
-        void writeDecision( const DecisionRecord & decision );
+        // `coverage` and `observation` are optional; passing them writes a complete
+        // behaviour-cloning sample rather than an action alone.
+        void writeDecision( const DecisionRecord & decision, const DecisionCoverage * coverage = nullptr, const Observation * observation = nullptr );
         void writeTerminal( const EpisodeOutcome & outcome, const size_t decisionCount, const std::string & decisionDigest );
 
     private:

@@ -95,6 +95,13 @@ records="$(grep -c '"monster_id":' "${WORKDIR}/caps.json")"
 [ "${records}" -ge 60 ] || caps_ok=1
 report "capability audit written and sane" "${caps_ok}" "${records} monster records"
 
+# Behaviour-cloning samples: observation, legal set and teacher index together, not an action
+# alone. See agent_play/tests/check_bc_samples.py for what is asserted and why.
+mkdir -p "${WORKDIR}/bc"
+HOME="${WORKDIR}" "${WORKER}" --runs 1 --audit-coverage --trajectory-dir "${WORKDIR}/bc" > /dev/null 2>&1
+bc_detail="$("${REPO_ROOT}/agent_play/tests/check_bc_samples.py" "${WORKDIR}/bc" 2>&1)"
+report "cloning samples are complete" "$?" "${bc_detail}"
+
 echo
 echo "  ${PASS} passed, ${FAIL} failed"
 [ "${FAIL}" -eq 0 ]

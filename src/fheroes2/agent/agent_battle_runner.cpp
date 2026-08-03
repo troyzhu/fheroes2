@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "agent_action_space.h"
+#include "agent_observation.h"
 #include "agent_command_snapshot.h"
 #include "agent_digest.h"
 #include "agent_trajectory.h"
@@ -96,6 +97,10 @@ namespace
 
                 fheroes2::agent::DecisionCoverage cov;
                 cov.candidateCount = static_cast<uint32_t>( set.candidates.size() );
+                cov.legalActions.reserve( set.candidates.size() );
+                for ( const fheroes2::agent::ActionCandidate & candidate : set.candidates ) {
+                    cov.legalActions.push_back( candidate.canonicalIndex );
+                }
 
                 const std::optional<uint32_t> teacherIndex = fheroes2::agent::resolveTeacherActionIndex( currentUnit, record.actions );
                 cov.teacherResolved = teacherIndex.has_value();
@@ -105,6 +110,12 @@ namespace
                 }
 
                 coverage.push_back( cov );
+
+                // The board exactly as a policy would have been shown it, before the teacher's
+                // commands are applied. Together with the legal set above and the teacher's
+                // canonical index, this is one complete behaviour-cloning sample; recording the
+                // action alone, as this did before, gives only a label with no input.
+                observations.push_back( fheroes2::agent::captureObservation( arena, currentUnit ) );
             }
 
             decisions.push_back( std::move( record ) );
@@ -113,6 +124,7 @@ namespace
         bool auditCoverage{ false };
         std::vector<DecisionRecord> decisions;
         std::vector<fheroes2::agent::DecisionCoverage> coverage;
+        std::vector<fheroes2::agent::Observation> observations;
     };
 
     void fillArmy( Army & army, const PlayerColor color, const fheroes2::agent::SideSpec & side )
@@ -277,6 +289,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     if ( recording != nullptr ) {
         recording->decisions = std::move( recorder.decisions );
         recording->coverage = std::move( recorder.coverage );
+        recording->observations = std::move( recorder.observations );
         recording->decisionDigest = computeDecisionDigest( recording->decisions );
     }
 

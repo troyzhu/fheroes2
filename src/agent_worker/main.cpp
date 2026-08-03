@@ -183,8 +183,13 @@ int main( int argc, char ** argv )
                 }
 
                 writer.writeHeader( scenario, outcome.mapSeed, outcome.combatSeed );
-                for ( const fheroes2::agent::DecisionRecord & decision : recording.decisions ) {
-                    writer.writeDecision( decision );
+                for ( size_t d = 0; d < recording.decisions.size(); ++d ) {
+                    // Coverage and observations are recorded only under --audit-coverage, and
+                    // are parallel to decisions when they are. Passing them turns each record
+                    // from a bare action into a complete behaviour-cloning sample.
+                    const fheroes2::agent::DecisionCoverage * cov = ( d < recording.coverage.size() ) ? &recording.coverage[d] : nullptr;
+                    const fheroes2::agent::Observation * obs = ( d < recording.observations.size() ) ? &recording.observations[d] : nullptr;
+                    writer.writeDecision( recording.decisions[d], cov, obs );
                 }
                 writer.writeTerminal( outcome, recording.decisions.size(), recording.decisionDigest );
             }
