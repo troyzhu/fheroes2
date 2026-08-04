@@ -98,18 +98,29 @@ Calibrated pool of 45 split 33 for training and 12 held out, 40 iterations of 4 
 
 76 s total including both evaluations.
 
-### Generalization, at the size the smaller run asked for
+### Generalization, at the size the smaller run asked for, twice
 
-Calibrated pool of 140 split 90 for training and 50 held out, everything else as above. 8 minutes including both evaluations.
+Calibrated pool of 140 split 90 for training and 50 held out, everything else as above. Run once with the group defect described below and again without it.
 
-| | Before | After | Change |
+| Configuration | Training gain | Held-out gain | Held out, after |
 |---|---|---|---|
-| Training, 90 | $0.459 \pm 0.021$ | $0.694 \pm 0.036$ | $+0.234 \pm 0.042$ (5.6 SE) |
-| Held out, 50 | $0.467 \pm 0.026$ | $0.514 \pm 0.047$ | $+0.047 \pm 0.054$ (0.9 SE) |
+| Groups spanning eight matchups | $+0.234 \pm 0.042$ | $+0.047 \pm 0.054$ | $0.514 \pm 0.047$ |
+| Groups sharing one matchup, seed 0 | $+0.191 \pm 0.041$ | $+0.261 \pm 0.051$ | $0.682 \pm 0.044$ |
+| Groups sharing one matchup, seed 1 | $+0.190 \pm 0.043$ | $+0.240 \pm 0.050$ | $0.708 \pm 0.043$ |
 
-The held-out gain is still not separable from zero. The difference between the two gains is: $+0.187 \pm 0.068$, 2.7 standard errors, a ratio near fivefold. Before training the two halves measured within 0.007 of each other, so the split is not confounded with difficulty, and both sat within 0.04 of the 0.5 the pool targeted, which is the calibration holding at 24 evaluation episodes against the 8 used to probe.
+The first row was written up as a generalization gap of $+0.187 \pm 0.068$, 2.7 standard errors, a ratio near fivefold. It was an artifact. Comparing the trained policies directly avoids the before-measurement noise, since all three start from the same checkpoint: held-out win rate after training is 0.514 against 0.695, and the gap is gone.
 
-Three measurements of the same quantity, in order: $-0.208$ on 2 held-out matchups, $+0.104 \pm 0.126$ on 12, $+0.047 \pm 0.054$ on 50.
+Four measurements of the same quantity, in order: $-0.208$ on 2 held-out matchups, $+0.104 \pm 0.126$ on 12, $+0.047 \pm 0.054$ on 50 with the defect, and $+0.25$ on 50 without it.
+
+### The group that never shared a starting position
+
+`MatchupPool.reset` drew a new army pair every call and `collect_group` calls it once per episode, so a group of eight was eight different battles. Leave-one-out, GRPO and Dr. GRPO all compare an episode with the others beside it, so the baseline was subtracting scenario difficulty instead of establishing a reference for play. GRPO on a language model samples several completions of one prompt; this sampled one completion each of eight prompts and compared them.
+
+Fitting the training matchups still worked, because the useful part survives averaging over a batch. Transfer did not, because the advantage carried mostly which matchup had been drawn.
+
+Nothing statistical would have caught it. The defective run produced a tight, internally consistent, confidently wrong result at 2.7 standard errors, and more seeds would only have narrowed the error around the wrong number. What caught it was a second method, PPO with a learned critic, generalizing four times better on the same pool, which made no sense until the group composition was checked.
+
+The pool now resamples on `new_group`, called once per group. Rotation per episode remains the default, which is correct for a critic-based trainer: a critic conditions on the observation and does not care which episodes sit beside it in the batch.
 
 ### Generalization, first attempt, superseded
 

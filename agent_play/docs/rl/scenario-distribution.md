@@ -125,24 +125,25 @@ The improvement on trained matchups is unambiguous. The held-out change is posit
 
 Errors here are across matchups rather than across episodes, because the claim is about the pool. Held-out spread is wide, about 0.39 across twelve matchups, so resolving a change of 0.1 to two standard errors needs roughly fifty held-out matchups. That measurement has since been made.
 
-### At the size the previous entry asked for
+### At the size the previous entry asked for, and the defect it exposed
 
-A calibrated pool of 140, split 90 for training and 50 held out, 40 iterations of 4 groups of 8, leave-one-out advantage under the ratio clip, 24 evaluation episodes per matchup.
+A calibrated pool of 140, split 90 for training and 50 held out, 40 iterations of 4 groups of 8, leave-one-out advantage under the ratio clip, 24 evaluation episodes per matchup. Run once with a defect and again without it, and only the second is a measurement of the method.
 
-| | Before | After | Change |
-|---|---|---|---|
-| Training matchups, 90 | $0.459 \pm 0.021$ | $0.694 \pm 0.036$ | $+0.234 \pm 0.042$, 5.6 standard errors |
-| Held-out matchups, 50 | $0.467 \pm 0.026$ | $0.514 \pm 0.047$ | $+0.047 \pm 0.054$, 0.9 standard errors |
+| Configuration | Training gain | Held-out gain |
+|---|---|---|
+| Groups spanning eight matchups, defective | $+0.234$ | $+0.047$ |
+| Groups sharing one matchup, seed 0 | $+0.191 \pm 0.041$ | $+0.261 \pm 0.051$ |
+| Groups sharing one matchup, seed 1 | $+0.190 \pm 0.043$ | $+0.240 \pm 0.050$ |
 
-Neither column is the answer. The held-out gain is still not separable from zero, and running it at the size that was supposed to settle the question did not settle it, because the estimate shrank from $+0.104$ to $+0.047$ as fast as the error did.
+The defect is in how the pool composed with a group-relative baseline. `MatchupPool` drew a new army pair on every reset and the trainer resets once per episode, so a group of eight was eight different battles. Every mode here compares an episode with the others beside it, which is why GRPO on a language model samples several completions of one prompt, and comparing one completion each of eight prompts measures which prompt was easy. The baseline was subtracting scenario difficulty rather than establishing a reference for play.
 
-The comparison between the two columns is separable. The training gain exceeds the held-out gain by $+0.187 \pm 0.068$, which is 2.7 standard errors, a ratio near fivefold. The two matchup sets are disjoint so their errors combine independently, and the sets are not confounded with difficulty: before training they measured 0.459 and 0.467, agreeing to 0.007.
+That explains the shape of the defective run exactly. Fitting the training matchups still worked, because the useful signal survives averaging over a batch. Transfer did not, because the advantage carried mostly which matchup had been drawn, and that is information with nothing to transfer.
 
-So there is a real generalization gap, and it is not the regression the first attempt claimed. Training improves what it trains on by roughly five times what it transfers, and the transfer itself is small enough that this pool and this budget cannot show it is nonzero. What the earlier entries could not do was tell those two statements apart.
+With groups sharing a starting position the held-out win rate after training goes from 0.514 to 0.695, and the gap the earlier version of this section reported is gone. On both seeds the held-out gain is at least as large as the training gain, and the difference between them is within one standard error of zero.
 
-The calibration also holds at scale, which is worth recording separately: the pool targeted 0.5 and both halves measured within 0.04 of it against the checkpoint that calibrated them, on 24 evaluation episodes rather than the 8 used to probe.
+The calibration holds at scale, which is worth recording separately: the pool targeted 0.5 and both halves measured within 0.05 of it against the checkpoint that calibrated them, on 24 evaluation episodes rather than the 8 used to probe.
 
-The lesson is about method rather than about reinforcement learning. A two-matchup holdout cannot support a claim in either direction, and the earlier write-up hedged the number without declining to draw a picture from it. The lesson from the larger run is different and easy to miss: a quantity too small to resolve may still be large enough to matter, and the difference of two such quantities can be resolvable when neither is.
+Three lessons, and the first two are the ones this page kept having to learn. A two-matchup holdout cannot support a claim in either direction. A quantity too small to resolve may still be large enough to matter, and the difference of two such quantities can be resolvable when neither is, which is how the defective run produced a confident and wrong conclusion at 2.7 standard errors. The third is that a statistically clean result computed from a broken configuration is still broken, and no amount of seeds or standard errors would have caught it; what caught it was a second method disagreeing.
 
 ## The generator, built and measured
 
