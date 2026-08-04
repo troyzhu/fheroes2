@@ -172,7 +172,24 @@ Two repairs were tried. Dropping the batch when every episode scores alike, whic
 
 Dropping fixes one collapse and makes the other worse. The trace explains why: at seed 9 the spread at iterations 17 to 20 is 0.013 to 0.018, small enough to amplify fiftyfold but far above a $10^{-6}$ threshold, so the drop never fires before the collapse. Afterwards the spread is exactly zero because the policy now loses every episode, the drop does fire, and it blocks every remaining update, freezing the run at 0.000. A guard meant to protect a winning policy traps a collapsed one instead.
 
-Flooring fixes both and leaves the control alone, so it is what both trainers now use.
+Flooring fixes both and leaves the control alone, so it is what both trainers now use. The floor sits at 0.1, which is not derived from anything: the terminal reward spans $[-1, 2]$ so its natural scale is about one, and a floor of 0.1 caps amplification near tenfold against that scale. A healthy raw spread on the matchups measured here is 0.3 to 1.0 and a degenerate one 0.02 to 0.07, so the value separates them with room on both sides, which is the whole of its justification.
+
+### Across twenty seeds
+
+| Arm | Last-five win rate | Spread | Worst run | Collapsed |
+|---|---|---|---|---|
+| Unfloored | $0.903 \pm 0.039$ | 0.174 | 0.319 | 2/20 |
+| Floor at 0.1 | $0.961 \pm 0.009$ | 0.039 | 0.856 | 0/20 |
+
+The collapse comparison is again $p = 0.244$, and at a rate near 2 in 60 no affordable number of seeds settles it by counting. The evidence that the floor works is mechanistic rather than statistical: the instrumented trace shows the amplification, and rerunning the two seeds that collapsed turns 0.494 into 0.975 and 0.319 into 0.994 while leaving a seed that never collapsed at 0.931 against 0.938.
+
+### What the reward design was already protecting against
+
+Raising the event rate looked like the way to settle it, since a matchup already solved should sit in the degenerate regime from the first iteration. It does not. On 50 Peasants against 30, which the cloned policy wins every time, the reward spread is 0.166 rather than zero and no iteration of any seed fell below the floor.
+
+The margin-weighted terminal reward is why. It is $\pm 1 + h_T/h_0$, so with the win-loss bit constant the surviving-force term still varies between episodes and keeps the spread alive. That is the property [[../../rl/reward-design]] claims for it, holding in the one case where it matters most.
+
+The collapse therefore needs episodes identical in outcome and in surviving force, not merely a matchup that is always won, which is a much narrower condition and accounts for the low rate better than "solved" does.
 
 ## Defects found by running things
 

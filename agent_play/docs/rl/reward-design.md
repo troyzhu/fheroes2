@@ -32,6 +32,8 @@ Two things were learned by running it. The obvious form of the margin, $(h^{\tex
 
 And the claim in [[scenario-distribution]] that a margin-weighted reward keeps hopeless matchups informative holds only for partial losses. In a matchup where the agent is always wiped out, the survival term is zero every time, the reward is $-1$ with no variance, and no reward shape rescues it. That is a statement about the scenario rather than about the reward.
 
+The mirror case is where the survival term earns its place, and it did so unplanned. On 50 Peasants against 30, which the cloned policy wins every time, pure win-loss would produce a reward with no variance at all. The margin-weighted form measures 0.166, because the surviving force differs between episodes even when the outcome does not, and that residual variance was enough to keep every training iteration above the advantage floor. The collapse recorded in [[training-design#An amplification in advantage normalization]] needs episodes identical in outcome and in surviving force together, so this term is what makes the condition rare rather than routine. It was chosen to distinguish a clean win from a pyrrhic one; keeping a decided matchup trainable is a second benefit that was not argued for in advance.
+
 ## The terminal family
 
 Everything here keeps the signal at the end of the episode, which is what makes it honest: the objective is the thing being optimized rather than a proxy for it.
