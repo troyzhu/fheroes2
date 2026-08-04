@@ -198,11 +198,24 @@ The collapse comparison is again $p = 0.244$, and at a rate near 2 in 60 no affo
 
 ### What the reward design was already protecting against
 
-Raising the event rate looked like the way to settle it, since a matchup already solved should sit in the degenerate regime from the first iteration. It does not. On 50 Peasants against 30, which the cloned policy wins every time, the reward spread is 0.166 rather than zero and no iteration of any seed fell below the floor.
+Raising the event rate looked like the way to settle it, since a matchup already solved should sit in the degenerate regime from the first iteration. On 50 Peasants against 30, which the cloned policy wins every time, both arms finished every one of twenty seeds at exactly 1.000 and neither collapsed once.
 
-The margin-weighted terminal reward is why. It is $\pm 1 + h_T/h_0$, so with the win-loss bit constant the surviving-force term still varies between episodes and keeps the spread alive. That is the property [[../../rl/reward-design]] claims for it, holding in the one case where it matters most.
+| Arm | Last-five win rate | Worst run | Collapsed |
+|---|---|---|---|
+| Unfloored | $1.000 \pm 0.000$ | 1.000 | 0/20 |
+| Floor at 0.1 | $1.000 \pm 0.000$ | 1.000 | 0/20 |
 
-The collapse therefore needs episodes identical in outcome and in surviving force, not merely a matchup that is always won, which is a much narrower condition and accounts for the low rate better than "solved" does.
+The margin-weighted terminal reward is why. It is $\pm 1 + h_T/h_0$, so with the win-loss bit constant the surviving-force term still varies between episodes, and the reward spread measures 0.166 rather than zero. That is the property [[../../rl/reward-design]] claims for it, holding in the case where it matters most.
+
+The collapse therefore needs episodes identical in outcome and in surviving force, not merely a matchup that is always won. That is a much narrower condition and accounts for the low rate better than "solved" does.
+
+### How often the floor fires, and what it costs
+
+The same run answers a question the floor's introduction left open, because the two arms are otherwise identical. Across the twenty floored runs the advantage spread fell below 0.1 on between 20 and 24 of 25 iterations, and every one of those runs still finished at exactly 1.000.
+
+So the floor is blunt. On a solved matchup it engages almost every iteration, far more often than a collapse is anywhere near, and in every measurement made so far that costs nothing: 1.000 against 1.000 here, 0.961 against 0.903 on the contested matchup, and a training gain of $+0.234$ on the 140-matchup pool with it enabled.
+
+What that does not establish is that 0.1 is the right value. A lower floor would intervene less and might do the same work, and no measurement here separates them, because nothing yet has been found that the floor slows down. The value stands on the reward scale rather than on tuning, and the honest position is that it is a safe default with an untested cost rather than an optimized one.
 
 ## Defects found by running things
 
