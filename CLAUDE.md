@@ -18,8 +18,12 @@ side with one primer per built mechanism, `decisions/` holds the accepted record
 holds the literature, and `archive/` holds dated logs and raw runs, which are provenance rather
 than a reading path.
 
-**The split that matters is `rl/` against `implementation/`.** The environment is built and
-verified; nothing under `rl/` is implemented. Do not describe anything in `rl/` as if it exists.
+**`rl/` used to be entirely unimplemented and no longer is, so check before claiming either way.**
+As of 2026-08-03 stage 1 cloning, stage 2b critic pre-fitting and stage 3 reinforcement learning are
+built under `python/fheroes2_agent/` and gated by `verify_agent.sh`, along with the calibrated
+scenario generator. Still unbuilt: stage 2 DAgger, every reward candidate but the margin-weighted
+terminal one, the `observable_v1` profile and `planes_v1`. Each page under `rl/` says which of its
+own content exists; `implementation/inventory.md` is the per-component list.
 
 **Notation is not a free choice.** `agent_play/docs/overview.md`'s Notation section is the contract, and the tree is
 self-contained: no page depends on a file outside this repository. The symbols match the owner's
@@ -58,17 +62,25 @@ defines every RL technique the documentation names, deriving the chain from the 
 through PPO and giving a verdict on each alternative.
 
 Quick orientation: Phase 0 and Milestones 1 through 3 are complete and verified on the target
-Apple M2 Mac mini. Engine changes are deliberately small: two verbatim lifts
-(`battle_seed.{h,cpp}`, `battle_action_validation.{h,cpp}`), one optional hook
-(`battle_decision_controller.h`), and the entry-point-free library under `src/fheroes2/agent/`
-that both build systems compile into the normal executable without behavior change. Verify with:
+Apple M2 Mac mini, and the training work ran ahead of Milestones 4 through 6 rather than after
+them. Engine changes are deliberately small: two verbatim lifts (`battle_seed.{h,cpp}`,
+`battle_action_validation.{h,cpp}`), one optional hook (`battle_decision_controller.h`), and the
+entry-point-free library under `src/fheroes2/agent/` that both build systems compile into the
+normal executable without behavior change. Verify with:
 
 ```bash
 make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh \
   && ./agent_play/spike/verify_phase0.sh && ./agent_play/verify_m1.sh \
   && ./agent_play/verify_m2.sh && ./agent_play/verify_m3.sh \
+  && ./agent_play/verify_agent.sh \
   && ./agent_play/lint_docs.sh && ./agent_play/verify_memory.sh
 ```
+
+`agent_play/experiments/` holds measurements too slow for a gate, with results in
+`agent_play/docs/archive/experiments/`. **Do not run a verification gate while one is in flight**:
+the gates relink the worker binary and an experiment spawns it once per episode, which killed a
+sixty-seed sweep at seed 34. Pass a copy of the binary instead, which every script accepts as an
+argument for exactly this reason.
 
 `verify_memory.sh` checks that this project's agent memory still describes reality. Memory files
 live outside the repository and nothing fails when a claim in one stops being true, which is how a
