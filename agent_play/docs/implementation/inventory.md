@@ -1,6 +1,6 @@
 # Implementation report — `agent-env` branch
 
-> Review-oriented inventory of everything implemented on this branch, as of 2026-07-27. Covers commits `d02c9236d..85c30a11f` (six commits on top of the Phase 0 baseline `b16e6f698`). The spec (§6.1) calls for this file; it will grow per milestone.
+> Review-oriented inventory of everything implemented on this branch, as of 2026-08-03. Covers `b16e6f698..d57d8987b`, the Phase 0 baseline through the training work. The spec (§6.1) calls for this file; it will grow per milestone.
 
 ## How to review this branch in ~20 minutes
 
@@ -10,8 +10,12 @@
    ```bash
    make -C src/dist -j"$(sysctl -n hw.ncpu)"
    ./agent_play/spike/build_spike.sh
-   ./agent_play/spike/verify_phase0.sh      # 7 passed — Phase 0 invariants
-   ./agent_play/verify_m1.sh                # 4 passed — Milestone 1 exit criteria
+   ./agent_play/spike/verify_phase0.sh      # 7 passed  — Phase 0 invariants
+   ./agent_play/verify_m1.sh                # 5 passed  — Milestone 1 exit criteria
+   ./agent_play/verify_m2.sh                # 8 passed  — decision hook, passive logging
+   ./agent_play/verify_m3.sh                # 9 passed  — legal actions, teacher coverage
+   ./agent_play/verify_agent.sh             # 11 passed — cloning, critic, PPO
+   ./agent_play/lint_docs.sh                # 50 files clean
    ```
 
 3. Review the commits in order, each is self-contained:
@@ -31,6 +35,12 @@
    | `18f4f6ef1` | Obsidian reference vault (43 local sources) | docs only |
    | `d689c4e3e` | Engine refactor: legality lifted into `battle_action_validation.{h,cpp}` | the third behavior-relevant engine diff, verbatim lift, digest-proven |
    | `7015980ba` | Milestone 3: capability audit, `Discrete(793)` action space, teacher coverage, `verify_m3.sh` | the top-risk milestone |
+   | `1f30192c6`, `b704b1aed` | Terminal and per-decision state serialization, which completes the cloning sample | the observation emitter, scheduled for M4 and built early |
+   | `f2c1a171c` | Blocking external control: a policy drives a battle over stdin and stdout | the fourth engine-adjacent seam, `agent_external_controller` |
+   | `5269f4759`, `95c17a29c` | Stage 1 cloning to 0.887 agreement, then masked PPO | the Python side begins here |
+   | `82147c6ab` | Stage 2b critic pre-fitting, and the advantage-normalization floor | a defect found by running things, see the experiment log |
+
+   Roughly forty documentation commits sit between these and are not worth reviewing in order. The docs tree is its own artifact with its own gate, and [[../README]] routes it.
 
 ## Engine-source surface (what could possibly affect the game)
 
@@ -40,7 +50,7 @@ Everything the branch changes under `src/` (enumerate: `git diff master --stat -
 - `src/fheroes2/battle/battle_seed.{h,cpp}`, new shared helper (spec §7.3). Pinned by golden-value unit tests (four engine-derived seeds + sensitivity invariants).
 - `src/fheroes2/battle/battle_decision_controller.h` + `battle_arena.{h,cpp}` (Milestone 2), optional `DecisionController *` constructor parameter (default `nullptr` preserves every caller), dispatch + observer in the full-fledged branch of `UnitTurn` (§9.2; observer runs before the command stream updates the combat RNG), and a full-fledged decision counter (`GetEngineDecisionIndex`, §9.4). Proof of inertness: spike digest `2cfd42cb104aa5e7` and all five Milestone 1 fixture digests unchanged; with the passive recorder *attached*, state digests still equal the goldens (the observer perturbs nothing).
 - `src/fheroes2/battle/battle_action_validation.{h,cpp}` + `battle_action.cpp` (Milestone 3), the `checkParameters` lambdas of `ApplyAction{Move,Attack,Skip}` and the anonymous-namespace helpers (`calculateAttackTarget`, `calculateAttackDirection`, `checkMoveParams`→`isMoveDestinationValid`) moved verbatim into a shared module; `ApplyActionX` now gates through `isMoveCommandValid`/`isSkipCommandValid`/ `resolveAttackCommand` (the latter returns the resolved target/direction the lambda used to discard). `ERROR_LOG`/`assert` stay at the call sites. Proof of inertness: all golden digests byte-identical across Phase 0 / M1 / M2 / M3 gates.
-- `src/fheroes2/agent/` (6 files), entry-point-free library, compiled into the normal executable by both build systems (spec §6.1 sanctions this) but unreachable from game code: no game translation unit includes an `agent_*` header. Launch smoke tests of both binaries pass.
+- `src/fheroes2/agent/` (18 files), entry-point-free library, compiled into the normal executable by both build systems (spec §6.1 sanctions this) but unreachable from game code: no game translation unit includes an `agent_*` header. Launch smoke tests of both binaries pass. The two added since Milestone 3 are `agent_observation.{h,cpp}`, which serializes the per-decision board, and `agent_external_controller.{h,cpp}`, which blocks on a callback so a Python policy can answer a decision.
 - `src/agent_worker/`, worker `main.cpp` + build script; outside both source globs, cannot affect the game.
 
 Everything else on the branch is docs, scripts under `agent_play/`, or tests.
@@ -67,8 +77,16 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | `agent_play/spike/bench_m2.sh` + `agent_play/docs/benchmark_m2.md` | Mode A benchmark deliverable on target hardware | §19 | reproducible via script |
 | `agent_play/docs/references/report-rl-approaches.md` | Adversarially verified literature consolidation (23 sources) | — | citations + verification votes inline |
 | `agent_play/docs/decisions/000{1,2,3}-*.md` | Accepted ADRs: observation profiles; action space; config management | amend §10, §12 | — |
+| `src/fheroes2/agent/agent_observation.{h,cpp}` | Per-decision board serialization: every stack's identity, position, strength and flags, sorted by uid, plus whose turn it is | §12, ADR 0001 `full_v1` | `test_agent_observation` (19 checks) + `check_bc_samples.py` |
+| `src/fheroes2/agent/agent_external_controller.{h,cpp}` | Blocking decision callback so an outside policy answers a turn; controllable side, rejection and end-of-input both fall back to skip | §5.4 | `test_protocol.py` (15 checks) |
+| `src/agent_worker/main.cpp` flags `--protocol`, `--side`, `--attacker`, `--defender`, `--dump-map` | Line protocol for external control, army overrides, and reading a real map through the engine's own loader | §13 subset | `test_protocol.py`, `verify_agent.sh` |
+| `python/fheroes2_agent/{encoding,dataset,policy}.py` | 634-wide observation encoding, episode-split loader with discounted returns, 396,570-parameter masked policy | ADR 0001, 0002 | `test_encoding.py` (32), `test_policy.py` (11) |
+| `python/fheroes2_agent/train_{bc,critic,ppo,rloo,group}.py` | Stage 1 cloning, stage 2b critic pre-fitting, stage 3 PPO, and the group-relative trainer covering leave-one-out, GRPO and Dr. GRPO under either trust region | ADR 0005 | `verify_agent.sh` |
+| `python/fheroes2_agent/{objectives,env,scenarios,render,watch}.py` | Advantage estimators and trust regions, the Gym-shaped environment and matchup pool, calibrated scenario generation, and a battle viewer | ADR 0005 | `test_objectives.py` (28), `test_ppo.py` (27) |
+| `agent_play/verify_agent.sh` | Training gate: 11 checks, unit tests, recording, sample consistency, cloning against trivial baselines, critic fit with the policy frozen, external control, PPO closing the loop, encoding stamp | ADR 0005 | self |
+| `agent_play/experiments/` | Measurements too slow for a gate: generalization on a calibrated pool, critic pre-fitting, the advantage floor | — | results in [[../archive/experiments/2026-08-03-training-runs]] |
 
-## Verification matrix (all green as of `85c30a11f` on the M2 mini)
+## Verification matrix (all green as of `d57d8987b` on the M2 mini)
 
 | Property | Command | Expected |
 |---|---|---|
@@ -76,7 +94,9 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | M1 exit: ten identical runs × 5 fixtures | `verify_m1.sh` | `5 passed, 0 failed`, `deterministic=yes` |
 | Terminal-state correctness, not only stability | `verify_m1.sh` | `terminal-state invariants`, 5 fixtures × 8 properties |
 | M2 exit: null-controller inertness + deterministic passive logs | `verify_m2.sh` | `8 passed, 0 failed` |
-| M3 exit: 100 % teacher coverage + candidates everywhere + digest inertness of enumeration | `verify_m3.sh` | `8 passed, 0 failed`, `teacher_coverage=complete` |
+| M3 exit: 100 % teacher coverage + candidates everywhere + digest inertness of enumeration | `verify_m3.sh` | `9 passed, 0 failed`, `teacher_coverage=complete` |
+| Training: cloning, critic fit with the policy frozen, external control, PPO closing the loop | `verify_agent.sh` | `11 passed, 0 failed` |
+| Documentation: writing contract and wikilink resolution | `lint_docs.sh` | `50 files clean` |
 | Cross-machine | (M3 MacBook baseline) | same seed + digest, reproduced |
 | Build-type invariance | Debug `-O0` vs Release `-O3` | identical digests, verified |
 | Sanitizers | `FHEROES2_WITH_ASAN=1` build + suite | 0 reports (1 900 spike episodes + full M1 suite) |
@@ -94,7 +114,9 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 
 ## Not implemented yet
 
-- M4 (next): JSONL protocol v1, strict scenario JSON parsing (vendored JSON lib per §6.5), blocking external control via the `DecisionController` seam, observation serialization (ADR 0001 profiles + ADR 0004 `planes_v1`), `ENABLE_AGENT` CMake target.
-- M4: JSONL worker + protocol v1 + scenario JSON parsing; CMake `ENABLE_AGENT` target.
-- M5: Python package, policies, replay, worker pool. M6: hardening + full benchmark modes B/C.
+Milestones 4 and 5 were partly overtaken. Blocking external control, the observation emitter and a working Python package all exist, because the training work needed them and building them was cheaper than waiting. What each milestone still owes is therefore narrower than its original scope.
+
+- M4: strict scenario JSON parsing that names a path and a stable error code on rejection, a vendored JSON parser per §6.5, the `observable_v1` profile and the `planes_v1` modality per ADR 0001 and ADR 0004, an `ENABLE_AGENT` CMake target, and `verify_m4.sh` itself. Blocking external control is done, and the current line protocol is a working subset of §13 rather than protocol v1.
+- M5: golden-trajectory replay across fresh and reused workers, and a worker pool. The Python package and its policies exist.
+- M6: hardening and benchmark modes B and C.
 - Runbook §6.3 human item: one Battle Only battle through the real UI, accepted-risk optional QA (battle path digest-proven unchanged; both binaries launch); not a training or data prerequisite. Teacher demonstrations come from the built-in AI, automated, at M2.
