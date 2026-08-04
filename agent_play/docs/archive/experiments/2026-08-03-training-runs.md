@@ -97,6 +97,8 @@ Five seeds each over the 140-matchup pool with groups held within a matchup, 30 
 
 Nothing separates. The studentization penalty shrinks from $+0.068$ to $+0.011$ and stops being resolvable, and the divergence trust region flips from $+0.036$ to $-0.031$, which is the opposite sign at comparable magnitude. The two divergence rows are identical to three decimals in every column, which is the $K/(K-1)$ identity showing itself: on this pool the floor never binds differently between them, so the two arms are literally the same run.
 
+The flip did not survive the next morning. Continuing the same five seeds to 60 iterations, bit-identical over their first 30, reads $+0.034 \pm 0.031$: the 30-iteration number caught a slower-starting arm mid-climb. [[2026-08-04-flip-and-collapse]] carries the continuation, the threshold sweep, and the telemetry.
+
 The one survivor is a variance effect rather than a mean one. Studentized GRPO's spread across seeds is 0.143 against 0.067 for the other ratio-clip arms, and its worst run is 0.362 against 0.550, which is what dividing each group by its own noisy spread should do.
 
 So the ranking measured on one matchup does not survive a distribution, and the defaults are not being changed. What a single matchup measures is that matchup.
@@ -287,9 +289,9 @@ Raising the event rate looked like the way to settle it, since a matchup already
 | Unfloored | $1.000 \pm 0.000$ | 1.000 | 0/20 |
 | Floor at 0.1 | $1.000 \pm 0.000$ | 1.000 | 0/20 |
 
-The margin-weighted terminal reward is why. It is $\pm 1 + h_T/h_0$, so with the win-loss bit constant the surviving-force term still varies between episodes, and the reward spread measures 0.166 rather than zero. That is the property [[../../rl/reward-design]] claims for it, holding in the case where it matters most.
+The explanation this section originally gave for that was wrong, and the correction is recorded in place because the error is instructive. The claim was that the margin-weighted reward's survival term keeps the spread at 0.166 and every training iteration above the advantage floor. The 0.166 was measured with the cloned policy; the "no iteration fell below the floor" reading came from the unfloored arm's counter, which counts spreads below its own floor parameter of $10^{-8}$ and therefore says nothing about 0.1. The floored arm's counters in the same log, 2 to 22 iterations below the floor per seed, contradicted the claim and went unnoticed.
 
-The collapse therefore needs episodes identical in outcome and in surviving force, not merely a matchup that is always won. That is a much narrower condition and accounts for the low rate better than "solved" does.
+Measured directly the next day, with the spread recorded per iteration: a policy trained to this matchup wins with nearly identical survival, the training-time reward spread averages 0.029, and unfloored runs spend 0.87 of their iterations below the floor, reaching spreads of $10^{-4}$, without ever dipping. So the survival term keeps the spread nonzero but nowhere near healthy, no trainability protection follows from it, and what the zero-dip record actually shows is that amplification is the background condition of any solved matchup while the knock-off stays rare everywhere. [[2026-08-04-flip-and-collapse]] carries the corrected census.
 
 ### Two explanations for the collapse, both refuted
 
