@@ -119,11 +119,21 @@ torch.manual_seed(1)
 c = BattlePolicy()
 check(policy_fingerprint(a) == policy_fingerprint(b), "identical weights fingerprint identically")
 check(policy_fingerprint(a) != policy_fingerprint(c), "different weights fingerprint differently")
+
+# The value head does not choose actions, so fitting a critic leaves difficulty untouched and must
+# leave the fingerprint untouched. Otherwise a pool calibrated before stage 2b is rejected after
+# it, for a difference that cannot change which battles are won.
+with torch.no_grad():
+    for name, parameter in b.named_parameters():
+        if name.startswith("value_head"):
+            parameter += 0.5
+check(policy_fingerprint(a) == policy_fingerprint(b), "fitting the value head leaves the fingerprint alone")
+
 # The whole point is detecting a policy that has moved, which is what makes a calibrated pool
 # stale. A fingerprint insensitive to a small update would pass a stale pool through.
 with torch.no_grad():
-    next(iter(a.parameters()))[0] += 1e-3
-check(policy_fingerprint(a) != policy_fingerprint(b), "a single perturbed weight changes the fingerprint")
+    next(p for n, p in a.named_parameters() if not n.startswith("value_head"))[0] += 1e-3
+check(policy_fingerprint(a) != policy_fingerprint(b), "a single perturbed policy weight changes the fingerprint")
 
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

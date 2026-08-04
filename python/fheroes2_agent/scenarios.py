@@ -25,12 +25,18 @@ from .policy import BattlePolicy
 
 
 def policy_fingerprint(model: BattlePolicy) -> str:
-    """A short, stable hash of a policy's weights.
+    """A short, stable hash of the weights that decide actions.
 
     Difficulty is policy-relative, so a calibrated pool is only valid for the checkpoint that
     measured it. Recording a fingerprint alongside the pool is what lets a later run detect that
     it is about to reuse someone else's calibration, which otherwise fails silently as a pool of
     matchups that are merely easy.
+
+    The value head is excluded, and that is the whole point of hashing by name rather than hashing
+    the file. `measure` samples from the logits, so the value head never touches which action is
+    taken, and a checkpoint whose critic has been fitted plays exactly the same battles as the one
+    it was fitted from. Hashing everything would reject that checkpoint for a difference that
+    cannot affect difficulty.
 
     Hashed from the weights rather than from a file path, because the path says nothing about
     whether the file still holds the same tensors.
@@ -39,6 +45,8 @@ def policy_fingerprint(model: BattlePolicy) -> str:
 
     digest = hashlib.sha256()
     for name, tensor in sorted(model.state_dict().items()):
+        if name.startswith("value_head"):
+            continue
         digest.update(name.encode())
         digest.update(tensor.detach().cpu().numpy().tobytes())
     return digest.hexdigest()[:16]
