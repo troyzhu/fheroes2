@@ -150,6 +150,10 @@ def train(
         old_logps = torch.from_numpy(np.asarray(rows_logp, dtype=np.float32))
         old_logits = torch.from_numpy(np.stack(rows_logits).astype(np.float32))
         adv_all = torch.from_numpy(np.asarray(rows_adv, dtype=np.float32))
+        # Recorded before normalization, because afterwards the spread is one by construction and
+        # the information is gone. This is what lets a later analysis tell a batch that carried
+        # signal from one that carried amplified residue.
+        raw_advantage_std = float(adv_all.std())
         # Floored, for the reason normalize_advantages documents. The group filter above drops
         # only an exactly-degenerate group; a near-degenerate one survives it and would then be
         # rescaled to unit spread here, which is the same amplification by another route.
@@ -182,6 +186,7 @@ def train(
                 batches += 1
 
         entry = {"iteration": iteration, "win_rate": wins, "steps": int(n), "degenerate_groups": degenerate,
+                 "raw_advantage_std": raw_advantage_std,
                  "clip_fraction": clipped / max(batches, 1), "shifted_fraction": blocked_total / max(batches, 1)}
         history.append(entry)
         if not quiet:

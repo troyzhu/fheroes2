@@ -79,7 +79,7 @@ Paired by seed, one factor at a time:
 | Leave-one-out against studentized | $+0.056 \pm 0.025$ | 2.3 |
 | Dr. GRPO against leave-one-out, ratio clip | $+0.011 \pm 0.012$ | 0.9 |
 
-Two things separate and one cannot. The studentization hurts, which is Dr. GRPO's own claim reproduced in a setting nothing like a language model. The divergence trust region helps, which is DPPO's. Leave-one-out against Dr. GRPO is not a measurable contrast at all, for a reason found only after running it: the two advantages are proportional by $K/(K-1)$ and batch normalization divides that constant straight back out, so they issue identical updates except where the advantage floor binds for one and not the other. The $+0.011 \pm 0.012$ in the table is floor behaviour, not a baseline effect.
+Two things separate and one cannot. The studentization hurts, which is Dr. GRPO's own claim reproduced in a setting nothing like a language model. The divergence trust region helps, which is DPPO's. Leave-one-out against Dr. GRPO is not a measurable contrast at all, for a reason found only after running it: the two advantages are proportional by $K/(K-1)$ and batch normalization divides that constant straight back out, so they issue identical updates except where the advantage floor binds for one and not the other. The $+0.011 \pm 0.012$ in the table is floor behaviour, not a baseline effect. The proportionality is Proposition 1 of [[../../research/works/group-std-identity]], located the following morning; the re-derivation here was independent and the citation supersedes it.
 
 The best arm is Dr. GRPO's advantage under the divergence trust region, at $0.954 \pm 0.006$ with the tightest spread of the five.
 

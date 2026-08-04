@@ -60,6 +60,10 @@ def main() -> None:
     # here, or the baseline compares an episode with episodes of other army pairs.
     parser.add_argument("--pool", default=None, help="calibrated pool JSON, instead of one matchup")
     parser.add_argument("--seeds", type=int, default=10)
+    parser.add_argument("--seed-start", type=int, default=0)
+    parser.add_argument("--threshold", type=float, default=0.05, help="divergence trust-region threshold")
+    parser.add_argument("--arm", action="append", default=None,
+                        help="advantage:trust_region, repeatable; default runs all five")
     parser.add_argument("--iterations", type=int, default=25)
     parser.add_argument("--groups", type=int, default=4)
     parser.add_argument("--group-size", type=int, default=8)
@@ -72,26 +76,32 @@ def main() -> None:
     if matchups:
         print(f"rotating over {len(matchups)} calibrated matchups, held within each group", flush=True)
 
+    arms = [tuple(a.split(":")) for a in args.arm] if args.arm else ARMS
     started = time.time()
     rows = []
-    for advantage, trust in ARMS:
-        for seed in range(args.seeds):
+    for advantage, trust in arms:
+        for seed in range(args.seed_start, args.seed_start + args.seeds):
             env = MatchupPool(args.worker, matchups, seed=seed, hold_within_group=True) if matchups else None
             r = train(args.worker, checkpoint=args.checkpoint, attacker=args.attacker,
                       defender=args.defender, advantage=advantage, trust_region=trust,
                       iterations=args.iterations, groups_per_iter=args.groups,
-                      group_size=args.group_size, seed=seed, quiet=True, env=env)
+                      group_size=args.group_size, divergence_threshold=args.threshold,
+                      seed=seed, quiet=True, env=env)
             wins = [h["win_rate"] for h in r["history"]]
+            # The whole history, not just wins. The first version kept wins alone and threw away
+            # the clip and shifted fractions train_group had already computed, which made the
+            # trust-region question unanswerable from the record and forced reruns.
             rows.append({"advantage": advantage, "trust_region": trust, "seed": seed,
+                         "threshold": args.threshold,
                          "initial": r["initial_win_rate"], "final5": r["final_win_rate"],
-                         "best": r["best_win_rate"], "history": wins,
+                         "best": r["best_win_rate"], "history": r["history"],
                          "degenerate_groups": sum(h.get("degenerate_groups", 0) for h in r["history"])})
             print(f"  {advantage:7s} {trust:11s} seed {seed:2d}  {r['initial_win_rate']:.3f} -> "
                   f"{r['final_win_rate']:.3f}", flush=True)
 
     print(f"\n  {'advantage':10s} {'trust region':12s} {'last-five':>16s} {'spread':>9s} {'worst':>8s}")
     summary = []
-    for advantage, trust in ARMS:
+    for advantage, trust in arms:
         a = [r["final5"] for r in rows if r["advantage"] == advantage and r["trust_region"] == trust]
         s = {"advantage": advantage, "trust_region": trust, "n": len(a),
              "mean": statistics.mean(a), "stdev": statistics.stdev(a) if len(a) > 1 else 0.0,
@@ -103,7 +113,7 @@ def main() -> None:
     # Paired against leave-one-out with the ratio clip, which is what the trainers default to.
     base = {r["seed"]: r["final5"] for r in rows if r["advantage"] == "loo" and r["trust_region"] == "ratio"}
     print(f"\n  paired against loo + ratio, over {len(base)} shared seeds")
-    for advantage, trust in ARMS[1:]:
+    for advantage, trust in arms[1:]:
         arm = {r["seed"]: r["final5"] for r in rows if r["advantage"] == advantage and r["trust_region"] == trust}
         d = [arm[s] - base[s] for s in sorted(base) if s in arm]
         se = statistics.stdev(d) / len(d) ** 0.5 if len(d) > 1 else 0.0
