@@ -231,6 +231,18 @@ Searching for a band by varying army sizes turned up something the design did no
 
 A band therefore needs matchups where variance is large relative to the mean, or where the creature types make positioning decide the fight. Five against five sits at 0.79 because a single unlucky exchange is a fifth of the army. That is the first entry in what a scenario generator has to look like, and it is an empirical constraint rather than a preference.
 
+### Checked against the research corpus, 2026-08-03
+
+The implementation followed the design documents, which were themselves derived from the evidence sweeps. Going back to the primary work notes afterwards found one real omission and two pieces of context that change how the numbers above should be read.
+
+What the corpus had already settled and the implementation followed. A flat masked action space rather than a factorized one, since vcmi-gym's factorized variant failed to converge while its flat masked space shipped. Masking applied at both sampling and log-probability recomputation, with a large negative constant rather than an infinity. Padded entity slots rather than tokenized entity lists, which [[../research/works/entity-based-rl]] records as the choice for a first version with transformers as the upgrade path. A single-file implementation rather than a framework, which is what the one shipped comparable system used. And exposure rather than removal for morale and luck, which is where [[../decisions/0001-observation-profiles]] deliberately departs from vcmi-gym, so both appear in the observation.
+
+The omission. The `obs_encoding_v1` feature vector had no creature identity at all, leaving the policy to infer type from attack, defense, speed and the ability flags. [[../research/works/vcmi-gym]] encodes categories explicitly as one-hot with a NULL for empty slots, which is the practice this should have followed from the start. `obs_encoding_v2` adds a one-hot over the 41 monsters the `simple_v1` allowlist supports, widening an observation from 224 to 634.
+
+It made almost no difference: held-out teacher agreement moved from 0.8867 to 0.8873. That is the honest result and it has an explanation. The fixtures use three creature types whose stat lines already separate them, so identity was redundant information at this data scale. The change is still right, because a roster with creatures sharing a stat line and differing in something unmodelled would need it, and that is what widening past `simple_v1` will produce.
+
+The context that reframes the numbers. vcmi-gym reports roughly five days, 2.5 million battles and $45 of GPU per model, reaching about 45 percent against its strong scripted opponent initially and about 65 percent after moving to a graph encoder. The runs recorded above are a few thousand battles. Three orders of magnitude separate them, so nothing here should be read as evidence about what this architecture reaches, only that the machinery works. Its observation is also 12,685 floats against this one's 634, and includes 165 per-hex vectors where this has no spatial channel at all, since the `planes_v1` modality of [[../decisions/0004-spatial-observation-modality]] is specified and unbuilt.
+
 ### Starting hyperparameters
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.

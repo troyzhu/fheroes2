@@ -121,8 +121,11 @@ import torch, sys
 c = torch.load(sys.argv[1], map_location='cpu', weights_only=True)
 print(c.get('encoding_version', 'MISSING'))
 " "${WORKDIR}/policy.pt" 2>/dev/null)"
-[ "${stamp}" = "obs_encoding_v1" ]
-report "checkpoint stamps its encoding version" "$?" "${stamp:-unreadable}"
+# Compared against what the code declares, not a frozen literal, so bumping the encoding does
+# not require editing this gate. The property under test is that the two agree.
+expected="$(cd "${PY}" && python3 -c "from fheroes2_agent.encoding import ENCODING_VERSION; print(ENCODING_VERSION)")"
+[ -n "${stamp}" ] && [ "${stamp}" = "${expected}" ]
+report "checkpoint stamps its encoding version" "$?" "${stamp:-unreadable} matches ${expected}"
 
 echo
 echo "  ${PASS} passed, ${FAIL} failed"

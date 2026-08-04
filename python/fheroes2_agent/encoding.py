@@ -20,7 +20,22 @@ from typing import Any
 
 import numpy as np
 
-ENCODING_VERSION = "obs_encoding_v1"
+ENCODING_VERSION = "obs_encoding_v2"
+
+# The 41 monsters the simple_v1 allowlist supports, from the generated capability audit. Creature
+# identity is one-hot rather than a scalar id, because ids are labels and their magnitudes mean
+# nothing: encoding Swordsman as 6 and Peasant as 1 would tell the network that a Swordsman is six
+# Peasants. vcmi-gym, the only shipped comparable system, encodes categories the same way with an
+# explicit NULL for empty slots, which the `present` flag serves here.
+#
+# v1 omitted identity entirely, leaving the policy to infer creature type from attack, defense,
+# speed and the ability flags. Those carry most of it, which is why v1 trained at all, but they do
+# not separate creatures that share a stat line and differ in something unmodelled.
+SIMPLE_V1_MONSTERS: tuple[int, ...] = (
+    1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 16, 17, 18, 19, 22, 23, 24, 25, 26,
+    27, 33, 34, 39, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 58, 63, 64, 65, 66,
+)
+MONSTER_SLOT = {monster_id: index for index, monster_id in enumerate(SIMPLE_V1_MONSTERS)}
 
 # The battlefield is 11 wide and 9 tall, so a cell index is 11 * row + column.
 BOARD_WIDTH = 11
@@ -56,7 +71,7 @@ FEATURE_NAMES: tuple[str, ...] = (
     "is_flying",
     "is_archer",
     "is_hand_fighting",
-)
+) + tuple(f"is_monster_{monster_id}" for monster_id in SIMPLE_V1_MONSTERS)
 
 GLOBAL_FEATURE_NAMES: tuple[str, ...] = (
     "round",
@@ -124,6 +139,12 @@ def encode_observation(observation: dict[str, Any]) -> np.ndarray:
         out[base + 19] = float(unit["flying"])
         out[base + 20] = float(unit["archer"])
         out[base + 21] = float(unit["hand_fighting"])
+        # One-hot creature identity. An id outside the allowlist leaves every slot zero rather
+        # than raising, because the capability gate should have rejected the scenario earlier and
+        # a training run should not die on a stale allowlist.
+        identity = MONSTER_SLOT.get(unit["monster_id"])
+        if identity is not None:
+            out[base + 22 + identity] = 1.0
 
     g = SLOT_COUNT * SLOT_FEATURES
     out[g + 0] = observation["round"] / _ROUND_SCALE
