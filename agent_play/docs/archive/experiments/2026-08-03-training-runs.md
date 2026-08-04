@@ -184,6 +184,21 @@ The conclusion is a negative one and should be read as such. Pre-fitting produce
 
 Chasing the two collapses is what turned up the defect below, and the defect explains them better than the critic does.
 
+### The critic on a rotating pool, where there is no ceiling
+
+The single matchup could not show a difference because every run solved it. The 140-matchup pool does not saturate, so the same comparison was run there with PPO and GAE on both arms, three paired seeds, 40 iterations of 32 episodes, evaluated on the same 90 and 50 split.
+
+| | Pre-fitted minus cold | Standard errors |
+|---|---|---|
+| Training matchups | $+0.043 \pm 0.012$ | 3.5 |
+| Held-out matchups | $-0.017 \pm 0.009$ | 1.9 |
+
+Every pre-fitted seed beat every cold seed on the training matchups, at 0.722, 0.725 and 0.732 against 0.678, 0.704 and 0.669. Two of three were worse held out.
+
+So the pre-fitted critic helps optimization and not generalization, which is a more specific finding than the single matchup's nothing, and is what a better critic should be expected to do: it makes the advantage more accurate on the distribution being trained on, and a policy that exploits that distribution more precisely has no reason to transfer further.
+
+One thing worth separating out. The critic was fitted on teacher play from the five Milestone 1 fixtures, and its value loss on the pool's first rollout is 0.99 against the cold head's 6.17, on army pairs it never saw. The value function generalizes across matchups even where the policy improvement it enables does not.
+
 The 60-seed sweep was killed at pre-fitted seed 34 when a verification gate relinked the worker binary underneath it. The completed runs are reported; nothing was rerun to fill the gap.
 
 ## The advantage-normalization collapse

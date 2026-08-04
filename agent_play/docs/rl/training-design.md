@@ -199,7 +199,11 @@ Freezing has a cost worth stating. A 193-parameter head over a 192-wide trunk is
 
 It does not measurably help stage 3, which is worth stating plainly because the argument for it was persuasive and the measurement disagrees. Over 60 cold and 35 pre-fitted seeds the paired difference in final win rate is $+0.033 \pm 0.027$, and both arms solve the training matchup every time. At twenty seeds the pre-fitted arm looked six times less variable and had avoided two collapses; forty further cold seeds produced no more collapses, which put the rate at 2 in 60 and made 0 in 35 exactly what chance predicts. The collapses had a cause of their own, described next.
 
-A matchup every run solves cannot show which run solved it better, so this is evidence about the matchup as much as about the critic. The measurement worth making next is on the rotating pool rather than a single army pair, where the ceiling is not reached and a better critic has room to show.
+A matchup every run solves cannot show which run solved it better, so that is evidence about the matchup as much as about the critic. On the 140-matchup pool, which does not saturate, it does show: three paired seeds put the pre-fitted arm $+0.043 \pm 0.012$ ahead on the training matchups, with every pre-fitted seed beating every cold one, and $-0.017 \pm 0.009$ behind on the held-out ones.
+
+That is the shape a better critic should have. A more accurate advantage on the distribution being trained on buys a policy that exploits that distribution more precisely, and nothing about it argues for transfer. Pre-fitting is therefore an optimization aid rather than a generalization aid, which is worth knowing before it is asked to carry more than that.
+
+The value function itself does transfer, which is a separate claim and holds. Fitted on teacher play from the five Milestone 1 fixtures, its value loss on the pool's first rollout is 0.99 against a cold head's 6.17, on army pairs it never saw.
 
 ### An amplification in advantage normalization
 
