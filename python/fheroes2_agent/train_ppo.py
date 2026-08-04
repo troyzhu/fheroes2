@@ -115,6 +115,7 @@ def train(
     out: str | None = None,
     quiet: bool = False,
     advantage_std_floor: float = 0.1,
+    env: object | None = None,
 ) -> dict:
     torch.manual_seed(seed)
     model = BattlePolicy()
@@ -129,7 +130,11 @@ def train(
     if not quiet:
         print(f"starting from {started_from}")
 
-    env = BattleEnv(worker, fixture=fixture, side=side, attacker=attacker, defender=defender)
+    # A caller may pass its own environment. `collect` needs only reset and step, so a MatchupPool
+    # rotating over many army pairs substitutes for a single fixed one, which is what turns a
+    # result about one matchup into a result about a distribution. Matches `train_group`.
+    if env is None:
+        env = BattleEnv(worker, fixture=fixture, side=side, attacker=attacker, defender=defender)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     baseline = collect(env, model, episodes_per_iter)
@@ -173,8 +178,14 @@ def train(
         # minibatch of the iteration so it reflects the critic the rollout was collected with
         # rather than the one left behind after the update.
         with torch.no_grad():
-            _, values_before = model(obs, masks)
+            logits_before, values_before = model(obs, masks)
             value_loss_before = float(((values_before - ret_t) ** 2).mean())
+            # Entropy over the legal set alone, so it measures the policy's indecision rather than
+            # the mask. A policy that has learned is sharp, and a sharp policy is what a noisy
+            # update can push off a cliff; a diffuse one absorbs the same noise harmlessly. This is
+            # the diagnostic that distinguishes those two states, and it was missing when the
+            # collapse was first traced.
+            entropy_before = float(torch.distributions.Categorical(logits=logits_before).entropy().mean())
 
         for _ in range(epochs):
             order = torch.randperm(n)
@@ -205,10 +216,11 @@ def train(
         mean_reward = float(np.mean(episode_rewards))
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
                         "steps": int(n), "value_loss": value_loss_before,
-                        "raw_advantage_std": raw_advantage_std, "reward_std": reward_std})
+                        "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
+                        "entropy": entropy_before})
         if not quiet:
             print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  "
-                  f"value_loss {value_loss_before:.3f}  steps {n}")
+                  f"value_loss {value_loss_before:.3f}  entropy {entropy_before:.3f}  steps {n}")
 
     env.close()
     final_win = history[-1]["win_rate"] if history else initial_win

@@ -209,6 +209,24 @@ The margin-weighted terminal reward is why. It is $\pm 1 + h_T/h_0$, so with the
 
 The collapse therefore needs episodes identical in outcome and in surviving force, not merely a matchup that is always won. That is a much narrower condition and accounts for the low rate better than "solved" does.
 
+### Two explanations for the collapse, both refuted
+
+Raising the event rate needed a rule for which matchups are vulnerable, and neither candidate survived contact.
+
+The first was that a reward spread near zero is enough. It is not. On 10 Archers and 20 Peasants against 60 Peasants, which measures a reward spread of exactly 0.000 over 24 episodes, twenty unfloored seeds all finished at 1.000 with no collapse.
+
+The second was that a collapse needs a sharp policy, since a diffuse one absorbs a noisy update harmlessly. Entropy over the legal set, measured per iteration, says otherwise.
+
+| Case | Entropy at start | Minimum | At end | Final win rate |
+|---|---|---|---|---|
+| Collapsed, 6 Archers and 10 Peasants against 121 | 0.369 | 0.039 | 0.255 | 0.494 |
+| Safe, 50 Peasants against 30 | 0.091 | 0.008 | 0.041 | 1.000 |
+| Safe, exactly degenerate spread | 0.314 | 0.041 | 0.041 | 1.000 |
+
+The safe run is the sharpest of the three by a wide margin and does not collapse.
+
+What remains established is narrower than a mechanism and is worth stating as exactly that. On the contested matchup, seeds 1 and 9 collapse reproducibly without the floor; the collapse coincides with a reward spread of zero and roughly fiftyfold amplification; the floor prevents both, reproducibly; and it costs nothing across three matchups. What distinguishes a vulnerable matchup from a safe one is not known. The one property the vulnerable case has and neither safe case does is that it was contested and had to be learned, starting near 0.19 rather than at 1.000, but that has not been tested.
+
 ### How often the floor fires, and what it costs
 
 The same run answers a question the floor's introduction left open, because the two arms are otherwise identical. Across the twenty floored runs the advantage spread fell below 0.1 on between 20 and 24 of 25 iterations, and every one of those runs still finished at exactly 1.000.
