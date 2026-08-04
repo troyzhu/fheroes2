@@ -231,9 +231,18 @@ What remains established is narrower than a mechanism and is worth stating as ex
 
 The same run answers a question the floor's introduction left open, because the two arms are otherwise identical. Across the twenty floored runs the advantage spread fell below 0.1 on between 20 and 24 of 25 iterations, and every one of those runs still finished at exactly 1.000.
 
-So the floor is blunt. On a solved matchup it engages almost every iteration, far more often than a collapse is anywhere near, and in every measurement made so far that costs nothing: 1.000 against 1.000 here, 0.961 against 0.903 on the contested matchup, and a training gain of $+0.234$ on the 140-matchup pool with it enabled.
+So the floor is blunt. On a solved matchup it engages almost every iteration, far more often than a collapse is anywhere near.
 
-What that does not establish is that 0.1 is the right value. A lower floor would intervene less and might do the same work, and no measurement here separates them, because nothing yet has been found that the floor slows down. The value stands on the reward scale rather than on tuning, and the honest position is that it is a safe default with an untested cost rather than an optimized one.
+Its cost can be measured directly, because the contested run is paired by seed. Dropping the two seeds that collapsed without it leaves eighteen pairs that were never going to collapse either way, and on those the floor is worth $-0.001 \pm 0.007$, which is nothing at 0.1 standard errors.
+
+| Seeds | Unfloored | Floored | Paired difference |
+|---|---|---|---|
+| The 18 that never collapsed | $0.959 \pm 0.005$ | $0.958 \pm 0.009$ | $-0.001 \pm 0.007$ |
+| The 2 that did | 0.494 and 0.319 | 0.975 and 0.994 | — |
+
+The floor's entire effect on the mean is the two collapses it prevents. It changes nothing else, on a matchup where it fires most iterations, which is as close to free insurance as a measurement of this kind gets.
+
+What that does not establish is that 0.1 is the right value. A lower floor would intervene less and might do the same work, and nothing here separates them, because nothing has been found that the floor slows down. The value stands on the reward scale rather than on tuning: a safe default with a measured cost of zero, not an optimized one.
 
 ## Defects found by running things
 

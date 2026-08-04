@@ -209,6 +209,10 @@ Measured on a calibrated matchup, a raw spread of 0.02 against a healthy 0.3 to 
 
 The repair is a floor on the divisor rather than dropping the batch. Dropping is what `train_group` already did for a group whose returns are exactly equal, and it fails twice over: the spread that does the damage is small rather than zero, so the drop never fires before the collapse, and after the collapse the spread is exactly zero again because the policy now loses every episode, so the drop does fire and blocks the updates that would recover it. A floor keeps the sign and ranking of every advantage and turns a degenerate batch into a small update. Both trainers now share it.
 
+It is free, in the sense that can be measured. Across twenty paired seeds on the contested matchup, dropping the two that collapsed leaves eighteen where the floor is worth $-0.001 \pm 0.007$, and it fires on most iterations of those runs. Its whole effect on the mean is the collapses it prevents.
+
+What makes a matchup vulnerable is not known, and two candidate rules were tested and refuted. A reward spread of exactly zero is not sufficient, and neither is a sharp policy, since the safest matchups measured are the sharpest. [[../archive/experiments/2026-08-03-training-runs#Two explanations for the collapse, both refuted]] records both. The floor is therefore justified by a demonstrated failure it reliably prevents at no measured cost, rather than by a mechanism that is understood end to end.
+
 The same hazard sits inside GRPO's studentization, which divides each group by its own spread, and [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] already records that as the reason Dr. GRPO drops the term. That the identical failure appears in the batch normalization every variant applies afterwards was not noticed until it destroyed a run.
 
 ### Measured, 2026-08-03
