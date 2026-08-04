@@ -185,3 +185,84 @@ def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, ta
     confirmed["calibrated"] = bool(confirmed["in_band"])
     confirmed["search_range"] = (low, high)
     return confirmed
+
+
+# --------------------------------------------------------------------------------------------
+# The generator. Sampling and filtering wastes most of its budget, because a battle outcome is
+# close to a deterministic function of the army pair, so this calibrates instead: pick a
+# composition, then search the defender scale that makes it contested.
+
+
+def sample_composition(rng: random.Random, max_stacks: int = 3, strength: float | None = None) -> str:
+    """One side's composition, without regard to whether it is balanced against anything."""
+    stacks = rng.randint(1, max_stacks)
+    if strength is None:
+        strength = rng.choice([20, 40, 60, 100, 150])
+    share = strength / stacks
+    parts = []
+    for _ in range(stacks):
+        monster, hp, _ = rng.choice(ROSTER)
+        parts.append(f"{monster}:{max(1, min(500, int(round(share / hp))))}")
+    return ",".join(parts)
+
+
+def build_pool(
+    model: BattlePolicy,
+    worker: str,
+    target_size: int,
+    seed: int = 0,
+    target: float = 0.5,
+    episodes: int = 10,
+    max_attempts: int | None = None,
+    side: str = "attacker",
+    progress: bool = False,
+) -> dict:
+    """Calibrate compositions until `target_size` of them sit inside the band.
+
+    The pool records which policy calibrated it. Difficulty is policy-relative, so a pool is only
+    valid for the checkpoint it was measured against, and a pool used with a stronger policy is
+    quietly a pool of easy matchups. That is the moving-band problem
+    `agent_play/docs/rl/scenario-distribution.md` describes, made explicit rather than left to be
+    rediscovered.
+    """
+    rng = random.Random(seed)
+    attempts = max_attempts if max_attempts is not None else target_size * 6
+    pool, tried, calibrated = [], 0, 0
+
+    while len(pool) < target_size and tried < attempts:
+        tried += 1
+        attacker = sample_composition(rng)
+        defender = sample_composition(rng)
+        try:
+            result = calibrate(model, worker, attacker, defender, target=target, episodes=episodes, side=side)
+        except Exception:
+            # A composition the scenario schema rejects is not a calibration failure; skip it.
+            continue
+        if not result["calibrated"]:
+            continue
+        calibrated += 1
+        pool.append({
+            "attacker": result["matchup"].attacker,
+            "defender": result["matchup"].defender,
+            "win_rate": result["win_rate"],
+            "reward_std": result["reward_std"],
+            "mean_length": result["mean_length"],
+            "scale": result["scale"],
+        })
+        if progress:
+            print(f"  {len(pool):3d}/{target_size}  win {result['win_rate']:.2f}  std {result['reward_std']:.2f}  "
+                  f"{result['mean_length']:.0f} dec  (tried {tried})")
+
+    return {
+        "matchups": pool,
+        "attempts": tried,
+        "hit_rate": len(pool) / tried if tried else 0.0,
+        "target": target,
+        "episodes_per_probe": episodes,
+        "side": side,
+        "seed": seed,
+    }
+
+
+def pool_matchups(pool: dict) -> list[Matchup]:
+    return [Matchup(m["attacker"], m["defender"]) for m in pool["matchups"]]

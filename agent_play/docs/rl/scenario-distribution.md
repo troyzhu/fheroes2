@@ -132,6 +132,16 @@ Ten of thirteen hero armies and sixty-six of ninety-three neutral stacks are rep
 
 And no hero is present in a battle here. Catarina's attack of 2 and defence of 4 modify every damage roll in the real fight, and the profile is commander-free, so even a representable army is a different battle from the one on the map.
 
+## The generator, built and measured
+
+Everything above says what a generator has to do. `scenarios.build_pool` does it, and the mechanism is calibration rather than filtering.
+
+Sampling a composition and keeping it if it happens to be contested wastes most of its budget, at three percent on a real map and eight to ten on synthetic pairs. Calibrating instead samples a composition and then searches the defender scale that makes that pair contested, which converts a rejection problem into a bisection. Measured hit rate is **38.7 percent**, four to thirteen times better, at roughly three seconds per accepted matchup on the target machine.
+
+A pool records the policy that calibrated it, and this matters more than it looks. Difficulty is a property of the pair *and the policy*, so a pool measured against one checkpoint and reused with a stronger one is quietly a pool of easy matchups. That is the moving-band problem stated earlier; storing the provenance is what turns it from something to remember into something checkable.
+
+What calibration cannot do is rescue a matchup whose win rate is a step function, and those exist: `calibrate` reports `calibrated: false` when no scale inside its range lands in band, rather than returning the least-bad probe. Roughly three in five sampled compositions are like this, which is why the hit rate is 39 percent rather than higher.
+
 ## What is decided and what is open
 
 Decided. The acceptance criterion for the generator, in [[../decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.

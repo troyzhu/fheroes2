@@ -88,5 +88,24 @@ check(abs(float(as_ppo)) > 0, "|rho-1| as the divergence reproduces PPO's decisi
 
 check(abs(ob.clip_fraction(torch.tensor([0.5, 1.0, 1.5]), 0.2) - 2 / 3) < 1e-6, "clip fraction counts both tails")
 
+# --- the generator's pure parts
+from fheroes2_agent.scenarios import Matchup, pool_matchups, sample_composition, scale_army  # noqa: E402
+import random  # noqa: E402
+
+rng = random.Random(0)
+spec = sample_composition(rng, max_stacks=3)
+check(1 <= len(spec.split(",")) <= 3, "a sampled composition has one to three stacks", spec)
+check(all(int(part.split(":")[1]) >= 1 for part in spec.split(",")), "every sampled stack holds at least one creature")
+check(sample_composition(random.Random(5)) == sample_composition(random.Random(5)), "sampling is reproducible from its seed")
+
+pool = {"matchups": [{"attacker": "1:5", "defender": "1:6"}, {"attacker": "2:3", "defender": "1:40"}]}
+mus = pool_matchups(pool)
+check(len(mus) == 2 and isinstance(mus[0], Matchup), "a pool converts to matchups")
+check(mus[0].attacker == "1:5" and mus[1].defender == "1:40", "pool entries keep their armies")
+
+# Scaling has to stay monotone, or the calibration bisection is searching a non-monotone space.
+check(int(scale_army("1:10", 2.0).split(":")[1]) > int(scale_army("1:10", 1.0).split(":")[1]),
+      "scaling up increases counts")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)
