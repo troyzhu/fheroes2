@@ -35,7 +35,7 @@ report() {
     fi
 }
 
-echo "fheroes2 agent behaviour-cloning verification"
+echo "fheroes2 agent training verification (cloning and PPO)"
 echo "  repo:   ${REPO_ROOT}"
 echo "  commit: $(cd "${REPO_ROOT}" && git rev-parse --short HEAD) ($(cd "${REPO_ROOT}" && git branch --show-current))"
 echo
@@ -89,6 +89,32 @@ report "cloning beats trivial baselines" "$?" "${verdict}"
 
 timeout 300 "${REPO_ROOT}/agent_play/tests/test_protocol.py" "${WORKER}" > "${WORKDIR}/proto.log" 2>&1
 report "external control drives a battle" "$?" "$(grep -c '^  PASS' "${WORKDIR}/proto.log") checks, scripted stdin and stdout"
+
+python3 "${PY}/tests/test_ppo.py" > "${WORKDIR}/ppo.log" 2>&1
+report "reward, GAE and truncation unit tests" "$?" "$(grep -c '^  PASS' "${WORKDIR}/ppo.log") checks"
+
+# PPO end to end on a matchup measured to sit inside the difficulty band. Five iterations is
+# enough to show the loop closes; the published improvement comes from a longer run.
+( cd "${PY}" && timeout 600 python3 -m fheroes2_agent.train_ppo "${WORKER}" \
+    --checkpoint "${WORKDIR}/policy.pt" --attacker 1:5 --defender 1:5 \
+    --iterations 5 --episodes 16 --report "${WORKDIR}/ppo_report.json" ) > "${WORKDIR}/ppo_run.log" 2>&1
+ppo_rc=$?
+ppo_detail="$(python3 - "${WORKDIR}/ppo_report.json" "${ppo_rc}" <<'PYEOF'
+import json, pathlib, sys
+if sys.argv[2] != "0" or not pathlib.Path(sys.argv[1]).exists():
+    print("PPO did not complete")
+    sys.exit(1)
+r = json.loads(pathlib.Path(sys.argv[1]).read_text())
+wins = [h["win_rate"] for h in r["history"]]
+# The gate proves the loop closes and does not collapse, not that it reaches a given number:
+# a five-iteration run is far too short to hold to a target, and a threshold on it would be a
+# coin flip dressed as a check.
+ok = len(wins) == r["iterations"] and max(wins) >= r["initial_win_rate"]
+print(f"win rate {r['initial_win_rate']:.3f} -> best {max(wins):.3f} over {r['iterations']} iterations")
+sys.exit(0 if ok else 1)
+PYEOF
+)"
+report "PPO closes the loop without collapsing" "$?" "${ppo_detail}"
 
 stamp="$(python3 -c "
 import torch, sys

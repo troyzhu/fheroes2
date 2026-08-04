@@ -44,12 +44,54 @@
 #include "agent_trajectory.h"
 #include "logging.h"
 
+
+namespace
+{
+    // "1:50,2:10" -> Peasant x50, Archer x10. Returns false on anything malformed, because a
+    // silently ignored army specification would produce a battle nobody asked for.
+    bool parseSideSpec( const std::string & text, fheroes2::agent::SideSpec & side )
+    {
+        for ( auto & slot : side.slots ) {
+            slot = {};
+        }
+
+        size_t slot = 0;
+        size_t pos = 0;
+        while ( pos < text.size() ) {
+            const size_t comma = text.find( ',', pos );
+            const std::string item = text.substr( pos, ( comma == std::string::npos ) ? std::string::npos : comma - pos );
+            const size_t colon = item.find( ':' );
+            if ( colon == std::string::npos || slot >= side.slots.size() ) {
+                return false;
+            }
+            try {
+                side.slots[slot].monsterId = std::stoi( item.substr( 0, colon ) );
+                side.slots[slot].count = static_cast<uint32_t>( std::stoul( item.substr( colon + 1 ) ) );
+            }
+            catch ( ... ) {
+                return false;
+            }
+            ++slot;
+            if ( comma == std::string::npos ) {
+                break;
+            }
+            pos = comma + 1;
+        }
+        return slot > 0;
+    }
+}
+
 int main( int argc, char ** argv )
 {
     int runs = 10;
     // Protocol mode: one JSON object per line on stdout, an action index per line on stdin.
     bool protocolMode = false;
     std::string controlledSide = "attacker";
+    // Army overrides, "monsterId:count,monsterId:count". Empty leaves the fixture's own armies.
+    // This is the difficulty control decisions/0005-training-and-reward.md requires: a generator
+    // whose effect is measured as a win rate rather than asserted from army sizes.
+    std::string attackerSpec;
+    std::string defenderSpec;
     // Number of world seeds per fixture. Each seed is a different battle from the same armies.
     int seedCount = 1;
     std::string onlyFixture;
@@ -79,6 +121,12 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--side" ) == 0 ) {
             controlledSide = next( "--side" );
         }
+        else if ( std::strcmp( argv[i], "--attacker" ) == 0 ) {
+            attackerSpec = next( "--attacker" );
+        }
+        else if ( std::strcmp( argv[i], "--defender" ) == 0 ) {
+            defenderSpec = next( "--defender" );
+        }
         else if ( std::strcmp( argv[i], "--fixture" ) == 0 ) {
             onlyFixture = next( "--fixture" );
         }
@@ -102,7 +150,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -146,6 +194,14 @@ int main( int argc, char ** argv )
         // property of the matchup, estimated over seeds.
         for ( int s = 0; s < seedCount; ++s ) {
             fheroes2::agent::Scenario variant = scenario;
+            if ( !attackerSpec.empty() && !parseSideSpec( attackerSpec, variant.attacker ) ) {
+                std::fprintf( stderr, "cannot parse --attacker %s\n", attackerSpec.c_str() );
+                return 2;
+            }
+            if ( !defenderSpec.empty() && !parseSideSpec( defenderSpec, variant.defender ) ) {
+                std::fprintf( stderr, "cannot parse --defender %s\n", defenderSpec.c_str() );
+                return 2;
+            }
             if ( s > 0 ) {
                 variant.worldSeed = scenario.worldSeed + static_cast<uint32_t>( s );
                 variant.scenarioId = scenario.scenarioId + "-seed" + std::to_string( s );

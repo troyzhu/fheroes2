@@ -1,0 +1,225 @@
+"""Stage 3: refine the cloned policy with masked PPO.
+
+The clipped surrogate and GAE are derived in `agent_play/docs/rl/rl-methods.md`. Two integration
+details decide whether this works at all, and both are asserted rather than assumed.
+
+The mask is applied when sampling and again when recomputing log-probabilities, or the ratio is
+not one at the current iterate and the clipping window is centred on the wrong point.
+
+Truncation is distinguished from termination. A battle that hit the round limit has a future that
+was cut off, so its final value must be bootstrapped rather than treated as zero; treating the
+two alike biases every value estimate downward, and is the most common environment-side bug in
+reinforcement learning.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import pathlib
+import time
+
+import numpy as np
+import torch
+
+from .encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, OBSERVATION_SIZE
+from .env import BattleEnv
+from .policy import BattlePolicy
+
+
+def collect(env: BattleEnv, model: BattlePolicy, episodes: int) -> dict:
+    """Roll out whole episodes. Battles are 5 to 40 decisions, so an episode is the natural unit."""
+    obs_buf, mask_buf, act_buf, logp_buf, val_buf, rew_buf, done_buf = [], [], [], [], [], [], []
+    outcomes = []
+
+    for _ in range(episodes):
+        observation, mask = env.reset()
+        while True:
+            obs_t = torch.from_numpy(observation).unsqueeze(0)
+            mask_t = torch.from_numpy(mask).unsqueeze(0)
+            with torch.no_grad():
+                logits, value = model(obs_t, mask_t)
+                distribution = torch.distributions.Categorical(logits=logits)
+                action = distribution.sample()
+                logp = distribution.log_prob(action)
+
+            step = env.step(int(action))
+            obs_buf.append(observation)
+            mask_buf.append(mask)
+            act_buf.append(int(action))
+            logp_buf.append(float(logp))
+            val_buf.append(float(value))
+            rew_buf.append(step.reward)
+            done_buf.append(step.done)
+
+            if step.done:
+                outcomes.append(step.info)
+                break
+            observation, mask = step.observation, step.mask
+
+    return {
+        "observations": np.stack(obs_buf).astype(np.float32),
+        "masks": np.stack(mask_buf),
+        "actions": np.asarray(act_buf, dtype=np.int64),
+        "logps": np.asarray(logp_buf, dtype=np.float32),
+        "values": np.asarray(val_buf, dtype=np.float32),
+        "rewards": np.asarray(rew_buf, dtype=np.float32),
+        "dones": np.asarray(done_buf, dtype=bool),
+        "outcomes": outcomes,
+    }
+
+
+def compute_gae(rewards, values, dones, truncated, gamma=0.99, lam=0.95) -> tuple[np.ndarray, np.ndarray]:
+    """Backward recursion, which is the O(T) form rather than the O(T^2) sum.
+
+    `truncated` marks a step that ended because the round limit was reached. Its successor value
+    is bootstrapped; a genuine termination's is zero.
+    """
+    advantages = np.zeros_like(rewards)
+    running = 0.0
+    next_value = 0.0
+    for t in reversed(range(len(rewards))):
+        if dones[t]:
+            # A truncated episode still has a future, so bootstrap it; a finished one does not.
+            next_value = values[t] if truncated[t] else 0.0
+            running = 0.0
+        delta = rewards[t] + gamma * next_value - values[t]
+        running = delta + gamma * lam * running
+        advantages[t] = running
+        next_value = values[t]
+    return advantages, advantages + values
+
+
+def win_rate(outcomes: list[dict], side: str) -> float:
+    target = "victory" if side == "attacker" else "defeat"
+    return float(np.mean([o["termination"] == target for o in outcomes])) if outcomes else 0.0
+
+
+def train(
+    worker: str,
+    checkpoint: str | None = None,
+    fixture: str = "m1_tiny_melee",
+    side: str = "attacker",
+    attacker: str | None = None,
+    defender: str | None = None,
+    iterations: int = 20,
+    episodes_per_iter: int = 32,
+    epochs: int = 4,
+    minibatch: int = 256,
+    lr: float = 1e-4,
+    clip: float = 0.2,
+    value_coef: float = 0.5,
+    entropy_coef: float = 0.01,
+    seed: int = 0,
+) -> dict:
+    torch.manual_seed(seed)
+    model = BattlePolicy()
+
+    started_from = "random initialization"
+    if checkpoint:
+        state = torch.load(checkpoint, map_location="cpu", weights_only=True)
+        if state.get("encoding_version") != ENCODING_VERSION:
+            raise ValueError(f"checkpoint encoding {state.get('encoding_version')} does not match {ENCODING_VERSION}")
+        model.load_state_dict(state["state_dict"])
+        started_from = f"cloned policy ({checkpoint})"
+    print(f"starting from {started_from}")
+
+    env = BattleEnv(worker, fixture=fixture, side=side, attacker=attacker, defender=defender)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    baseline = collect(env, model, episodes_per_iter)
+    initial_win = win_rate(baseline["outcomes"], side)
+    initial_reward = float(np.mean([r for r, d in zip(baseline["rewards"], baseline["dones"]) if d]))
+    print(f"before training: win rate {initial_win:.3f}, mean terminal reward {initial_reward:.3f}")
+
+    history = []
+    started = time.time()
+
+    for iteration in range(iterations):
+        batch = collect(env, model, episodes_per_iter)
+        truncated = np.array([o["termination"] == "round_limit" for o in batch["outcomes"]])
+        # Expand per-episode truncation onto the step that ended each episode.
+        step_truncated = np.zeros_like(batch["dones"])
+        step_truncated[np.flatnonzero(batch["dones"])] = truncated
+
+        advantages, returns = compute_gae(batch["rewards"], batch["values"], batch["dones"], step_truncated)
+        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+
+        obs = torch.from_numpy(batch["observations"])
+        masks = torch.from_numpy(batch["masks"])
+        actions = torch.from_numpy(batch["actions"])
+        old_logps = torch.from_numpy(batch["logps"])
+        adv_t = torch.from_numpy(advantages.astype(np.float32))
+        ret_t = torch.from_numpy(returns.astype(np.float32))
+
+        n = len(actions)
+        for _ in range(epochs):
+            order = torch.randperm(n)
+            for start in range(0, n, minibatch):
+                rows = order[start : start + minibatch]
+                # The mask is applied here too. Without it the ratio is not one at theta_old and
+                # the clipping window is centred on the wrong point.
+                logits, values = model(obs[rows], masks[rows])
+                distribution = torch.distributions.Categorical(logits=logits)
+                logps = distribution.log_prob(actions[rows])
+
+                ratio = torch.exp(logps - old_logps[rows])
+                surrogate = torch.min(ratio * adv_t[rows], torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t[rows])
+                # Entropy over the legal set alone, or it measures the mask rather than the
+                # policy's indecision.
+                entropy = distribution.entropy().mean()
+                loss = -surrogate.mean() + value_coef * ((values - ret_t[rows]) ** 2).mean() - entropy_coef * entropy
+
+                optimizer.zero_grad(set_to_none=True)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+                optimizer.step()
+
+        wr = win_rate(batch["outcomes"], side)
+        mean_reward = float(np.mean([r for r, d in zip(batch["rewards"], batch["dones"]) if d]))
+        history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward, "steps": int(n)})
+        print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  steps {n}")
+
+    env.close()
+    final_win = history[-1]["win_rate"] if history else initial_win
+    result = {
+        "encoding_version": ENCODING_VERSION,
+        "started_from": started_from,
+        "fixture": fixture,
+        "side": side,
+        "attacker": attacker,
+        "defender": defender,
+        "initial_win_rate": initial_win,
+        "final_win_rate": final_win,
+        "initial_mean_terminal_reward": initial_reward,
+        "iterations": iterations,
+        "episodes_per_iteration": episodes_per_iter,
+        "seconds": round(time.time() - started, 1),
+        "history": history,
+    }
+    print(f"\nwin rate {initial_win:.3f} -> {final_win:.3f} over {iterations} iterations ({result['seconds']}s)")
+    return result
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Refine a battle policy with masked PPO.")
+    parser.add_argument("worker")
+    parser.add_argument("--checkpoint", default=None, help="cloned policy to start from")
+    parser.add_argument("--fixture", default="m1_tiny_melee")
+    parser.add_argument("--side", default="attacker")
+    parser.add_argument("--attacker", default=None, help="army override, monsterId:count,...")
+    parser.add_argument("--defender", default=None)
+    parser.add_argument("--iterations", type=int, default=20)
+    parser.add_argument("--episodes", type=int, default=32)
+    parser.add_argument("--report", default=None)
+    args = parser.parse_args()
+
+    result = train(args.worker, checkpoint=args.checkpoint, fixture=args.fixture, side=args.side,
+                   attacker=args.attacker, defender=args.defender,
+                   iterations=args.iterations, episodes_per_iter=args.episodes)
+    if args.report:
+        pathlib.Path(args.report).write_text(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    main()

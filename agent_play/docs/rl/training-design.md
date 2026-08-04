@@ -209,6 +209,28 @@ Agreement is a ceiling rather than a target. The teacher plays both sides, so a 
 
 The data came from replaying the five fixtures under 400 world seeds each. That varies the obstacle layout and the combat seed while holding the army matchup fixed, which is the separation [[scenario-distribution]] requires, and it produced 129 distinct teacher decision streams from the first 200 episodes, so the seeds do change the teacher's behaviour rather than merely its outcomes.
 
+### Stage 3 measured, 2026-08-03
+
+PPO now runs against the blocking worker, starting from the cloned weights. The result that means something and the two that do not are worth separating.
+
+| Matchup | Cloned policy | After PPO | Reading |
+|---|---|---|---|
+| 5 Peasants against 5 Peasants | 0.646 | 0.979 | The real result. Measured to sit inside the difficulty band before training |
+| `m1_tiny_melee`, 50 against 50 | 0.958 | 1.000 | Near the ceiling already, so it shows little |
+| `m1_three_stack` | 0.000 | 0.000 | Degenerate. Every rollout scored exactly -1.000 |
+
+The third row is the finding rather than a failure. That matchup is unwinnable, so every rollout returned the same reward, the advantage was identically zero, and fifteen iterations changed nothing. [[scenario-distribution]] predicted this on the argument that equal returns across a batch make every advantage in it zero, and here it is measured.
+
+It also sharpens the claim that a margin-weighted reward keeps hopeless matchups informative. It does so only when the loss is partial. In this matchup the attacker is always wiped out, so the survival term is zero every time and the reward is degenerate whatever its shape. The claim holds for losses that vary in cost, not for a rout.
+
+### The difficulty band is narrow, and mirror matchups have none
+
+Measuring the cloned policy against every fixture put four of five above 0.95 and the fifth at zero. None is in the 20 to 80 percent band, which confirms in measurement what the records already said, that the fixtures are regression anchors rather than a training distribution.
+
+Searching for a band by varying army sizes turned up something the design did not anticipate. In a mirror matchup the win rate is a step function of the count: 50 Peasants beat 70 defenders 96.9 percent of the time and beat 71 zero percent of the time. Damage rolls average out across fifty creatures, so the outcome is decided by arithmetic and play barely matters.
+
+A band therefore needs matchups where variance is large relative to the mean, or where the creature types make positioning decide the fight. Five against five sits at 0.79 because a single unlucky exchange is a fifth of the army. That is the first entry in what a scenario generator has to look like, and it is an empirical constraint rather than a preference.
+
 ### Starting hyperparameters
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.
