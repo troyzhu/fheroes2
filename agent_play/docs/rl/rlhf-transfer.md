@@ -151,6 +151,10 @@ The honest caveat is magnitude. The pathology is driven by the dynamic range of 
 
 One caution against importing their framing wholesale. Their motivating instability is training-inference mismatch, where the sampling engine and the trainer disagree on probabilities from identical parameters. This project runs one process, one code path, and a seeded generator, so that does not arise. The ratio-against-divergence argument stands independently of it.
 
+Measured, 2026-08-04, and the measurement went through a wrong reading on the way. On one calibrated matchup the divergence mask beats the ratio clip by $+0.036 \pm 0.014$ over ten paired seeds. On the 140-matchup pool at 30 iterations the same comparison read $-0.031 \pm 0.037$, which looked like a reversal. Continuing the same five seeds to 60 iterations, bit-identical over their first 30, reads $+0.034 \pm 0.031$: the mask suppresses about twice the gradient the clip does, 15 percent of samples against 7, so the arm starts slower on a 90-matchup task and a short-horizon reading catches it mid-climb.
+
+A threshold sweep agrees, since at 0.20 the mask fires on 2 percent of samples and the arm beats the clip at the original budget. Nothing here says the divergence trust region hurts on a distribution, and nothing yet separates it cleanly enough to move a default. The threshold does not carry across settings, which their paper, tuning per setting, never claimed it would. [[../archive/experiments/2026-08-04-flip-and-collapse]] carries the runs.
+
 ## Overoptimization, and the measurement it demands
 
 Overoptimization is the observation that a policy pushed against a proxy improves on the proxy while getting worse at what the proxy was meant to measure. The book separates two forms: quantitative reward overoptimization, where a learned reward's score rises as held-out quality falls, and qualitative degradation, where no metric moves but behavior becomes verbose, sycophantic, or rigid.

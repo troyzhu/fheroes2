@@ -64,11 +64,26 @@ The one dip that did occur carries the signature the prediction asked for. Unflo
 
 Against the registered prediction: one dip in 36 unfloored contested runs, where a rate uniform with matchup A's 3 in 40 would have produced zero dips with probability 0.06 and one or fewer with probability 0.23. So the phenomenon generalizes, the signature travels with it, and matchup A is still several times more dip-prone per run than any other matchup measured. Adjusting roughly for exposure, its knock-off rate per amplified iteration is near an order of magnitude above the census matchups', which is what the solved-region probe below was built to explain.
 
+The safe matchups rerun with telemetry show the same background more strongly: exposure 0.87 and 0.72 of iterations, spreads reaching $10^{-4}$, and zero dips in six runs on top of the eighty earlier ones recorded without telemetry. The earlier conclusion that the reward's survival term keeps these matchups above the floor rested on the unfloored arm's counter, which counts spreads below its own $10^{-8}$ parameter and says nothing about 0.1; the correction is recorded in [[2026-08-03-training-runs#What the reward design was already protecting against]], and exposure here is computed from the recorded spreads instead.
+
 ## The solved-region width probe
 
-Registered prediction, from the script before the numbers existed: the one matchup that collapses degrades fastest under parameter noise.
+Registered prediction, written into the script before the numbers existed: the one matchup that collapses degrades fastest under parameter noise. Method: train one floored run per matchup to plateau, add Gaussian noise scaled per tensor by that tensor's own spread, and measure the win rate as the noise grows, three draws per scale, 24 episodes per draw. A first pass with scales up to 0.10 left every curve flat, so the scales were widened until something moved.
 
-PENDING_MARGIN
+| Matchup | Plateau | 0.10 | 0.20 | 0.30 | 0.50 | Unfloored dips on record |
+|---|---|---|---|---|---|---|
+| 6 Archers, 10 Peasants against 121 Peasants | 0.931 | 0.94 | 0.88 | 0.79 | 0.51 | 3 of 40, two terminal |
+| 7:1 against 7:1 | 0.969 | 0.96 | 0.96 | 0.93 | 0.82 | 0 of 12 |
+| 5:2,4:3,1:50 against 4:4,3:4 | 0.994 | 1.00 | 1.00 | 1.00 | 0.94 | 0 of 12 |
+| 4:3,3:5,7:2 against 2:15 | 0.988 | 1.00 | 0.99 | 0.99 | 0.96 | 1 of 12, recovered |
+| 1:50 against 1:30 | 1.000 | 1.00 | 1.00 | 1.00 | 1.00 | 0 of 23 |
+| 2:10,1:20 against 1:60 | 1.000 | 1.00 | 1.00 | 1.00 | 1.00 | 0 of 23 |
+
+The prediction holds at the extremes. The only matchup with terminal collapses is the narrowest by a wide margin, losing half its wins at scale 0.5 where the next-narrowest holds 0.82, and the two matchups completely flat at that scale have never dipped in 46 recorded runs. The middle is not resolved: the second-narrowest produced no dips in twelve seeds and the one that produced the single transient dip barely degrades, so at one dip and six matchups the width predicts the extremes and says nothing about the ordering between them. One training seed per matchup and one noise model, so this is a measurement of a proxy, not a theory of the geometry.
+
+## The mechanism, assembled
+
+Solving a matchup drives episode outcomes toward identical, the raw advantage spread toward zero, and the unfloored normalization then rescales critic residue to unit size, on 40 to 87 percent of post-solve iterations across every matchup measured. Those unit-size noise steps random-walk the policy. Whether the walk ever exits the winning region depends on the region's width: matchups flat under half-scale parameter noise never dipped, and the narrowest matchup measured produced every terminal collapse on record. The floor does not prevent the knock-offs, whose rate is similar floored and unfloored on the vulnerable matchup; it shrinks the steps, and every floored dip recovered while both unfloored terminal collapses did not. Why the floored runs still dip at all is not answerable from the record, because those histories were stored as win rates alone before today's telemetry fix.
 
 ## Sources consulted
 
