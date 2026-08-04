@@ -37,6 +37,13 @@
 
 #include <iostream>
 #include <optional>
+#include "heroes.h"
+#include "maps_tiles_helper.h"
+#include "army_troop.h"
+#include "maps_fileinfo.h"
+#include "world.h"
+#include "settings.h"
+#include "army.h"
 #include "agent_battle_runner.h"
 #include "agent_external_controller.h"
 #include "agent_capabilities.h"
@@ -92,6 +99,10 @@ int main( int argc, char ** argv )
     // whose effect is measured as a win rate rather than asserted from army sizes.
     std::string attackerSpec;
     std::string defenderSpec;
+    // Dump a map's starting heroes and neutral stacks, so a real scenario can be reproduced as a
+    // fixture instead of guessed at. Uses the engine's own loader, because monster counts are
+    // computed during load rather than stored verbatim.
+    std::string dumpMapPath;
     // Number of world seeds per fixture. Each seed is a different battle from the same armies.
     int seedCount = 1;
     std::string onlyFixture;
@@ -126,6 +137,9 @@ int main( int argc, char ** argv )
         }
         else if ( std::strcmp( argv[i], "--defender" ) == 0 ) {
             defenderSpec = next( "--defender" );
+        }
+        else if ( std::strcmp( argv[i], "--dump-map" ) == 0 ) {
+            dumpMapPath = next( "--dump-map" );
         }
         else if ( std::strcmp( argv[i], "--fixture" ) == 0 ) {
             onlyFixture = next( "--fixture" );
@@ -177,6 +191,66 @@ int main( int argc, char ** argv )
             return 2;
         }
         std::printf( "CAPABILITY_AUDIT path=%s monsters=%zu\n", capabilityAuditPath.c_str(), fheroes2::agent::auditAllMonsters().size() );
+        return 0;
+    }
+
+    if ( !dumpMapPath.empty() ) {
+        // Players and races come from the map's own header. Initializing them by hand trips an
+        // assertion in race handling, because a colour with no race set is not a valid player.
+        Maps::FileInfo mapInfo;
+        if ( !mapInfo.readMP2Map( dumpMapPath, false ) ) {
+            std::fprintf( stderr, "cannot read map header %s\n", dumpMapPath.c_str() );
+            return 2;
+        }
+
+        Settings & conf = Settings::Get();
+        conf.setCurrentMapInfo( mapInfo );
+        conf.GetPlayers().Init( mapInfo );
+        conf.GetPlayers().SetStartGame();
+
+        const bool isOriginal = ( mapInfo.version == GameVersion::SUCCESSION_WARS );
+        if ( !world.LoadMapMP2( dumpMapPath, isOriginal ) ) {
+            std::fprintf( stderr, "cannot load map %s\n", dumpMapPath.c_str() );
+            return 2;
+        }
+
+        std::printf( "{\"record\":\"map\",\"path\":\"%s\",\"width\":%d,\"height\":%d}\n", dumpMapPath.c_str(), world.w(), world.h() );
+
+        const auto dumpArmy = []( const Army & army ) {
+            bool first = true;
+            for ( size_t s = 0; s < army.Size(); ++s ) {
+                const Troop * troop = army.GetTroop( s );
+                if ( troop == nullptr || !troop->isValid() ) {
+                    continue;
+                }
+                std::printf( "%s{\"monster_id\":%d,\"name\":\"%s\",\"count\":%u}", first ? "" : ",", troop->GetID(), troop->GetName(), troop->GetCount() );
+                first = false;
+            }
+        };
+
+        for ( int32_t index = 0; index < world.w() * world.h(); ++index ) {
+            const Maps::Tile & tile = world.getTile( index );
+            const MP2::MapObjectType type = tile.getMainObjectType();
+            const int32_t x = index % world.w();
+            const int32_t y = index / world.w();
+
+            if ( type == MP2::OBJ_HERO ) {
+                const Heroes * hero = world.GetHeroes( { x, y } );
+                if ( hero == nullptr ) {
+                    continue;
+                }
+                std::printf( "{\"record\":\"hero\",\"name\":\"%s\",\"color\":%d,\"x\":%d,\"y\":%d,\"attack\":%d,\"defense\":%d,\"army\":[",
+                             hero->GetName().c_str(), static_cast<int>( hero->GetColor() ), x, y, hero->GetAttack(), hero->GetDefense() );
+                dumpArmy( hero->GetArmy() );
+                std::printf( "]}\n" );
+            }
+            else if ( type == MP2::OBJ_MONSTER ) {
+                const Troop troop = Maps::getTroopFromTile( tile );
+                std::printf( "{\"record\":\"monster\",\"x\":%d,\"y\":%d,\"monster_id\":%d,\"name\":\"%s\",\"count\":%u}\n", x, y, troop.GetID(),
+                             troop.GetName(), troop.GetCount() );
+            }
+        }
+
         return 0;
     }
 

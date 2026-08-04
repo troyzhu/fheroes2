@@ -243,6 +243,27 @@ It made almost no difference: held-out teacher agreement moved from 0.8867 to 0.
 
 The context that reframes the numbers. vcmi-gym reports roughly five days, 2.5 million battles and $45 of GPU per model, reaching about 45 percent against its strong scripted opponent initially and about 65 percent after moving to a graph encoder. The runs recorded above are a few thousand battles. Three orders of magnitude separate them, so nothing here should be read as evidence about what this architecture reaches, only that the machinery works. Its observation is also 12,685 floats against this one's 634, and includes 165 per-hex vectors where this has no spatial channel at all, since the `planes_v1` modality of [[../decisions/0004-spatial-observation-modality]] is specified and unbuilt.
 
+### Advantage and trust region compared, 2026-08-03
+
+`objectives.py` separates two choices that are usually bundled into one algorithm name. The advantage is the baseline: a learned critic with GAE, a leave-one-out group mean, the full group mean studentized as group-relative optimization does it, or that mean without the studentization as the Dr. GRPO variant prefers. The trust region is what bounds the step: PPO's clip on the sampled ratio, or the divergence mask from [[../research/works/dppo-trust-region]].
+
+Keeping them separate is what makes them comparable, since a run that changes both cannot attribute its result to either.
+
+The divergence trust region is computed exactly here rather than approximated. That paper spends most of its methodology on binary and top-$K$ lower bounds because summing over a $10^5$-token vocabulary at every position is prohibitive. This action space is 793 slots with 5 to 30 legal after masking, so the exact total-variation distance over the legal set costs a handful of operations.
+
+Four runs on a calibrated opening-fight matchup, six Archers and ten Peasants against 121 Peasants, twenty iterations of four groups of eight from the same cloned checkpoint and the same seed:
+
+| Advantage | Trust region | Start | Last five | Best |
+|---|---|---|---|---|
+| Leave-one-out | ratio | 0.188 | 0.925 | 1.000 |
+| Group-relative, studentized | ratio | 0.188 | 0.925 | 0.969 |
+| Group-relative, no studentizing | ratio | 0.188 | 0.925 | 1.000 |
+| Leave-one-out | divergence | 0.188 | 0.944 | 1.000 |
+
+They are indistinguishable. At 32 episodes an iteration the standard error on a win rate is about 0.05, so the spread between 0.925 and 0.944 is well inside noise, and no ranking can be read from this. The honest conclusion is that at this scale and on this matchup the choice does not matter, and separating them would need many seeds and a task where the cloned policy does not saturate within twenty iterations.
+
+That is a useful negative result rather than a disappointment. It says the machinery is not the bottleneck, and the scenario distribution is, which is the same conclusion [[scenario-distribution]] reached from the variance side.
+
 ### Starting hyperparameters
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.

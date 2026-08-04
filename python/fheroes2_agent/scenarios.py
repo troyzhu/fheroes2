@@ -165,4 +165,13 @@ def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, ta
             low = mid
         else:
             high = mid
-    return best
+
+    # Re-measure the chosen point. The search keeps the probe closest to the target, which is a
+    # maximum over several noisy estimates and therefore optimistically biased toward the target:
+    # a probe that landed near 0.5 by luck is exactly the one selected. Measuring again on fresh
+    # episodes gives the number to quote. Observed once at a factor of two, where a calibration
+    # reporting 0.42 measured 0.19 when re-run.
+    confirmed = measure(model, worker, best["matchup"], episodes * 2, side)
+    confirmed["scale"] = best["scale"]
+    confirmed["search_win_rate"] = best["win_rate"]
+    return confirmed
