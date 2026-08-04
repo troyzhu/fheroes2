@@ -111,6 +111,7 @@ def train(
     value_coef: float = 0.5,
     entropy_coef: float = 0.01,
     seed: int = 0,
+    out: str | None = None,
 ) -> dict:
     torch.manual_seed(seed)
     model = BattlePolicy()
@@ -176,6 +177,9 @@ def train(
                 optimizer.step()
 
         wr = win_rate(batch["outcomes"], side)
+        if out:
+            torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION,
+                        "win_rate": wr, "iteration": iteration}, out)
         mean_reward = float(np.mean([r for r, d in zip(batch["rewards"], batch["dones"]) if d]))
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward, "steps": int(n)})
         print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  steps {n}")
@@ -212,11 +216,12 @@ def main() -> None:
     parser.add_argument("--iterations", type=int, default=20)
     parser.add_argument("--episodes", type=int, default=32)
     parser.add_argument("--report", default=None)
+    parser.add_argument("--out", default=None, help="checkpoint path for the refined policy")
     args = parser.parse_args()
 
     result = train(args.worker, checkpoint=args.checkpoint, fixture=args.fixture, side=args.side,
                    attacker=args.attacker, defender=args.defender,
-                   iterations=args.iterations, episodes_per_iter=args.episodes)
+                   iterations=args.iterations, episodes_per_iter=args.episodes, out=args.out)
     if args.report:
         pathlib.Path(args.report).write_text(json.dumps(result, indent=2))
 

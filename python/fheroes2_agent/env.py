@@ -136,3 +136,44 @@ def terminal_reward(record: dict, side: str, own_initial_hit_points: float) -> f
     survived = record[own]["hit_points"] / own_initial_hit_points if own_initial_hit_points > 0 else 0.0
     won = record["termination"] == ("victory" if side == "attacker" else "defeat")
     return (1.0 if won else -1.0) + survived
+
+
+class MatchupPool:
+    """Rotate over several matchups, one battle at a time.
+
+    Training on a single matchup measures that matchup, not the policy. Rotating means the
+    gradient comes from a distribution, which is what makes a reported number a statement about
+    the generator rather than about one army pair.
+    """
+
+    def __init__(self, worker: str, matchups, side: str = "attacker", seed: int = 0, home: str = "/tmp"):
+        import random
+
+        self._worker = worker
+        self._matchups = list(matchups)
+        self._side = side
+        self._rng = random.Random(seed)
+        self._home = home
+        self._env: BattleEnv | None = None
+        self.side = side
+        self.current = None
+
+    def reset(self):
+        self.close()
+        self.current = self._rng.choice(self._matchups)
+        self._env = BattleEnv(self._worker, side=self._side, attacker=self.current.attacker,
+                              defender=self.current.defender, home=self._home)
+        return self._env.reset()
+
+    def step(self, action: int) -> Step:
+        assert self._env is not None
+        return self._env.step(action)
+
+    def close(self) -> None:
+        if self._env is not None:
+            self._env.close()
+            self._env = None
+
+    @property
+    def _pending(self):
+        return self._env._pending if self._env else None

@@ -90,6 +90,28 @@ Since a scenario names an attacker and a defender separately, the same army pair
 
 The caveat is that the two sides are not symmetric here. Starting positions differ and the speed queue decides who acts first, so swapping sides controls for the armies without controlling for the positional advantage. It is a useful variance reduction and not a proof of fairness.
 
+## Measured, 2026-08-03
+
+The argument above was written before any of it could be tested. It now has been, and two of its predictions held while a third assumption turned out to be wrong in a way that matters.
+
+### The band is intrinsically narrow
+
+Sampling 90 matchups over the `simple_v1` roster and measuring each with the cloned policy put 8 percent inside the 20 to 80 percent band. Thirty-one were too easy, fifty-two too hard, and the median win rate was 0.05. Constraining the sampler to small totals and to sides within 15 percent of each other, on the theory that variance needs to be large relative to the mean, raised that only to 10 percent.
+
+The reason is visible in a mirror matchup, where the win rate is a step function of the count. Fifty Peasants beat seventy defenders 96.9 percent of the time and beat seventy-one zero percent of the time. Damage rolls average out across fifty creatures, so arithmetic decides the battle and play barely moves it. Small stacks behave better, and five against five sits at 0.79 because one bad exchange is a fifth of the army, but the general picture is that a battle outcome is close to a deterministic function of the matchup.
+
+The consequence for the generator is concrete. Rejection sampling is the wrong mechanism at a 10 percent hit rate. A usable generator has to calibrate each matchup, searching the count that puts a given army pair in band, which the 70 against 71 result shows is a one-step search rather than a hard one. That is a different and more expensive design than sampling and filtering, and it was not anticipated here.
+
+### Reward variance is the cheaper filter
+
+Every degenerate matchup measured a reward standard deviation of exactly 0.00, and every in-band one measured between 1.0 and 1.3. That is the same fact the identity predicts, since equal returns across a group make every advantage zero, and it is a better filter in practice than the win rate: it needs no threshold, it is what the gradient actually depends on, and a matchup that produces zero variance can be discarded after a handful of episodes.
+
+### Training across matchups overfits at this scale
+
+The prediction this page did not make, and the most important of the three. Splitting a pool of in-band matchups into five for training and two held out, PPO improved the training matchups by 0.267 win rate and made the held-out ones **worse** by 0.208. The policy specialized rather than generalized.
+
+At twelve evaluation episodes per matchup the standard error is around 0.14, so the regression is roughly one and a half standard errors and is suggestive rather than settled. The direction is what matters: with a pool this small there is nothing forcing a general policy, and reporting the training-matchup number alone would have been badly misleading. Any future result has to be quoted on matchups the policy never trained on, which is the held-out obligation this document already required for seeds and which turns out to bind at least as hard for matchups.
+
 ## What is decided and what is open
 
 Decided. The acceptance criterion for the generator, in [[../decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.
