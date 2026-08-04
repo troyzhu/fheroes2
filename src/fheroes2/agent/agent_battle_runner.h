@@ -26,6 +26,11 @@
 
 #include "agent_scenario.h"
 
+namespace Battle
+{
+    class DecisionController;
+}
+
 namespace fheroes2::agent
 {
     // Why an episode ended (the Milestone 1 subset of agent spec, section 8.5; the external
@@ -91,5 +96,9 @@ namespace fheroes2::agent
     // When `recording` is non-null, every full-fledged built-in-AI decision is captured
     // passively (typed command snapshots plus a decision-stream digest) through the
     // Battle::DecisionController observer; the battle outcome itself is unaffected.
-    EpisodeOutcome runEpisode( const Scenario & scenario, EpisodeRecording * recording = nullptr );
+    // `controller`, when given, plays the side it claims and the built-in AI plays the rest.
+    // Passing one alongside a recording still records every decision, including the ones the
+    // controller made, so an externally driven episode is auditable the same way a teacher
+    // episode is.
+    EpisodeOutcome runEpisode( const Scenario & scenario, EpisodeRecording * recording = nullptr, Battle::DecisionController * controller = nullptr );
 }

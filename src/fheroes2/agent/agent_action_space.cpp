@@ -32,6 +32,35 @@
 
 namespace
 {
+    // Parameter order is the engine's own, asserted by the static_asserts in Battle::Command's
+    // constructor: MOVE takes a uid and a destination cell, ATTACK takes attacker uid, defender
+    // uid, the cell to move to, the cell to attack, and the direction, and SKIP takes a uid.
+    Battle::Command buildCommand( const Battle::Unit & activeUnit, const fheroes2::agent::ActionCandidate & candidate )
+    {
+        const uint32_t uid = activeUnit.GetUID();
+        switch ( candidate.type ) {
+        case fheroes2::agent::CandidateType::Skip:
+            return Battle::Command( Battle::Command::SKIP, static_cast<int>( uid ) );
+        case fheroes2::agent::CandidateType::Move:
+            return Battle::Command( Battle::Command::MOVE, static_cast<int>( uid ), candidate.moveCell );
+        case fheroes2::agent::CandidateType::RangedAttack:
+        case fheroes2::agent::CandidateType::MeleeAttack:
+            return Battle::Command( Battle::Command::ATTACK, static_cast<int>( uid ), static_cast<int>( candidate.defenderUid ), candidate.moveCell,
+                                    candidate.targetCell, candidate.direction );
+        default:
+            assert( 0 );
+            return Battle::Command( Battle::Command::SKIP, static_cast<int>( uid ) );
+        }
+    }
+}
+
+Battle::Command fheroes2::agent::commandForCandidate( const Battle::Unit & activeUnit, const ActionCandidate & candidate )
+{
+    return buildCommand( activeUnit, candidate );
+}
+
+namespace
+{
     using fheroes2::agent::ActionCandidate;
     using fheroes2::agent::ActionSet;
     using fheroes2::agent::CandidateType;

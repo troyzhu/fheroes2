@@ -87,6 +87,9 @@ PYEOF
 )"
 report "cloning beats trivial baselines" "$?" "${verdict}"
 
+timeout 300 "${REPO_ROOT}/agent_play/tests/test_protocol.py" "${WORKER}" > "${WORKDIR}/proto.log" 2>&1
+report "external control drives a battle" "$?" "$(grep -c '^  PASS' "${WORKDIR}/proto.log") checks, scripted stdin and stdout"
+
 stamp="$(python3 -c "
 import torch, sys
 c = torch.load(sys.argv[1], map_location='cpu', weights_only=True)

@@ -35,7 +35,10 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+#include <optional>
 #include "agent_battle_runner.h"
+#include "agent_external_controller.h"
 #include "agent_capabilities.h"
 #include "agent_scenario.h"
 #include "agent_trajectory.h"
@@ -44,6 +47,9 @@
 int main( int argc, char ** argv )
 {
     int runs = 10;
+    // Protocol mode: one JSON object per line on stdout, an action index per line on stdin.
+    bool protocolMode = false;
+    std::string controlledSide = "attacker";
     // Number of world seeds per fixture. Each seed is a different battle from the same armies.
     int seedCount = 1;
     std::string onlyFixture;
@@ -66,6 +72,12 @@ int main( int argc, char ** argv )
         }
         else if ( std::strcmp( argv[i], "--seeds" ) == 0 ) {
             seedCount = std::atoi( next( "--seeds" ) );
+        }
+        else if ( std::strcmp( argv[i], "--protocol" ) == 0 ) {
+            protocolMode = true;
+        }
+        else if ( std::strcmp( argv[i], "--side" ) == 0 ) {
+            controlledSide = next( "--side" );
         }
         else if ( std::strcmp( argv[i], "--fixture" ) == 0 ) {
             onlyFixture = next( "--fixture" );
@@ -90,7 +102,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -155,6 +167,80 @@ int main( int argc, char ** argv )
     }
 
     std::fprintf( stderr, "[worker] fixtures=%zu runs=%d seeds=%d\n", scenarios.size(), runs, seedCount );
+
+    if ( protocolMode ) {
+        // Protocol v1, the smallest thing that lets an external policy drive a battle.
+        //
+        //   worker -> {"record":"decision","observation":{...},"legal_actions":[...]}
+        //   client -> 411
+        //   worker -> {"record":"terminal",...}
+        //
+        // One JSON object per line on stdout and nothing else on that stream, so a client can
+        // parse line by line; diagnostics go to stderr (agent spec section 13).
+        fheroes2::agent::ControlledSide side = fheroes2::agent::ControlledSide::Attacker;
+        if ( controlledSide == "defender" ) {
+            side = fheroes2::agent::ControlledSide::Defender;
+        }
+        else if ( controlledSide == "both" ) {
+            side = fheroes2::agent::ControlledSide::Both;
+        }
+        else if ( controlledSide != "attacker" ) {
+            std::fprintf( stderr, "--side must be attacker, defender or both\n" );
+            return 2;
+        }
+
+        for ( const auto & scenario : scenarios ) {
+            auto decide = []( const fheroes2::agent::Observation & observation,
+                              const fheroes2::agent::ActionSet & set ) -> std::optional<uint32_t> {
+                std::printf( "{\"record\":\"decision\",\"observation\":%s,\"legal_actions\":[", fheroes2::agent::observationToJson( observation ).c_str() );
+                for ( size_t i = 0; i < set.candidates.size(); ++i ) {
+                    std::printf( "%s%u", ( i == 0 ) ? "" : ",", set.candidates[i].canonicalIndex );
+                }
+                std::printf( "]}\n" );
+                std::fflush( stdout );
+
+                // Blocking read. The engine owns the call stack, so this waits inside
+                // Arena::UnitTurn until the client answers. End of input unwinds the episode.
+                std::string line;
+                if ( !std::getline( std::cin, line ) ) {
+                    return std::nullopt;
+                }
+                try {
+                    return static_cast<uint32_t>( std::stoul( line ) );
+                }
+                catch ( ... ) {
+                    // Malformed input is recoverable: report it and let the controller reject
+                    // the selection, which skips the turn rather than killing the worker.
+                    std::fprintf( stderr, "[worker] unparseable action %s\n", line.c_str() );
+                    return static_cast<uint32_t>( fheroes2::agent::actionSpaceSize );
+                }
+            };
+
+            fheroes2::agent::ExternalDecisionController controller( side, decide );
+            fheroes2::agent::EpisodeRecording recording;
+            recording.auditTeacherCoverage = true;
+
+            std::printf( "{\"record\":\"episode_start\",\"scenario_id\":\"%s\",\"controlled_side\":\"%s\"}\n", scenario.scenarioId.c_str(),
+                         controlledSide.c_str() );
+            std::fflush( stdout );
+
+            const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, &recording, &controller );
+
+            std::printf( "{\"record\":\"terminal\",\"scenario_id\":\"%s\",\"termination\":\"%s\",\"rounds\":%d"
+                         ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
+                         ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
+                         ",\"decisions_seen\":%u,\"decisions_answered\":%u,\"rejected\":%u,\"client_closed\":%s"
+                         ",\"state_digest\":\"%s\"}\n",
+                         scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds, outcome.attacker.liveStacks,
+                         outcome.attacker.liveCreatures, outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures,
+                         outcome.defender.hitPoints, controller.decisionsSeen(), controller.decisionsAnswered(), controller.rejectedSelections(),
+                         controller.isFinished() ? "true" : "false", outcome.stateDigest.c_str() );
+            std::fflush( stdout );
+        }
+
+        return 0;
+    }
+
 
     std::map<std::string, std::set<std::string>> digestsPerScenario;
     std::map<std::string, std::set<std::string>> decisionDigestsPerScenario;

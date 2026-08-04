@@ -27,6 +27,7 @@
 
 #include "agent_command_snapshot.h"
 #include "battle_cell.h"
+#include "battle_command.h"
 
 namespace Battle
 {
@@ -106,4 +107,10 @@ namespace fheroes2::agent
     // the canonical action index, using the same resolver as enumeration. std::nullopt when
     // the decision is outside simple_v1 (multi-command decisions, morale, spells, ...).
     std::optional<uint32_t> resolveTeacherActionIndex( const Battle::Unit & activeUnit, const std::vector<CommandSnapshot> & actions );
+
+    // Turns a chosen candidate back into the engine command that realizes it. The inverse of the
+    // enumeration above: the external policy only ever selects a canonical index, and the command
+    // is built here from parameters the enumeration already validated, so a policy can never
+    // hand the engine something it has not accepted (agent spec section 10.1).
+    Battle::Command commandForCandidate( const Battle::Unit & activeUnit, const ActionCandidate & candidate );
 }

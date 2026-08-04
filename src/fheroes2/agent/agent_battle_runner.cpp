@@ -127,6 +127,42 @@ namespace
         std::vector<fheroes2::agent::Observation> observations;
     };
 
+    // The arena accepts one hook, but an externally driven episode needs two behaviours: the
+    // external policy decides, and the passive recorder still observes every decision so the
+    // episode stays auditable. This forwards each half to its owner.
+    class CompositeController final : public Battle::DecisionController
+    {
+    public:
+        CompositeController( Battle::DecisionController * decider, Battle::DecisionController * observer )
+            : _decider( decider )
+            , _observer( observer )
+        {
+            // Intentionally empty.
+        }
+
+        bool handlesDecision( const Battle::Arena & arena, const Battle::Unit & currentUnit ) const override
+        {
+            return _decider != nullptr && _decider->handlesDecision( arena, currentUnit );
+        }
+
+        void chooseActions( Battle::Arena & arena, const Battle::Unit & currentUnit, Battle::Actions & output ) override
+        {
+            assert( _decider != nullptr );
+            _decider->chooseActions( arena, currentUnit, output );
+        }
+
+        void observeChosenActions( const Battle::Arena & arena, const Battle::Unit & currentUnit, const Battle::Actions & actions ) override
+        {
+            if ( _observer != nullptr ) {
+                _observer->observeChosenActions( arena, currentUnit, actions );
+            }
+        }
+
+    private:
+        Battle::DecisionController * _decider;
+        Battle::DecisionController * _observer;
+    };
+
     void fillArmy( Army & army, const PlayerColor color, const fheroes2::agent::SideSpec & side )
     {
         army.Reset( false );
@@ -210,7 +246,8 @@ const char * fheroes2::agent::terminationName( const Termination termination )
     }
 }
 
-fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & scenario, EpisodeRecording * recording /* = nullptr */ )
+fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & scenario, EpisodeRecording * recording /* = nullptr */,
+                                                             Battle::DecisionController * controller /* = nullptr */ )
 {
     assert( validateScenario( scenario ).empty() );
 
@@ -252,7 +289,11 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     {
         // Scoped: the engine allows one arena per process and asserts on a second, so the arena
         // must be destroyed before this function can run again.
-        Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, false, randomGenerator, ( recording != nullptr ) ? &recorder : nullptr );
+        Battle::DecisionController * observer = ( recording != nullptr ) ? &recorder : nullptr;
+        CompositeController composite( controller, observer );
+        Battle::DecisionController * hook = ( controller != nullptr ) ? &composite : observer;
+
+        Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, false, randomGenerator, hook );
 
         while ( arena.BattleValid() && outcome.rounds < scenario.maxRounds ) {
             arena.Turns();
