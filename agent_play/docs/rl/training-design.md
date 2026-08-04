@@ -197,7 +197,9 @@ The value head is frozen against the rest of the network, which was not obvious 
 
 Freezing has a cost worth stating. A 193-parameter head over a 192-wide trunk is linear regression on the cloned policy's features, so the representation caps the fit: on identical data a trunk cloned to 0.606 agreement reaches $+0.489$ where one cloned to 0.887 reaches $+0.841$. Improving the clone improves the critic for free, and no quantity of value data substitutes for it.
 
-Whether this helps stage 3 is not settled. Over twenty paired seeds both arms solved the training matchup every time, and the difference in final win rate was $+0.050 \pm 0.040$. The pre-fitted arm avoided two collapses the cold arm suffered, but 2 against 0 out of 20 is $p = 0.244$, and the collapses turned out to have a cause of their own, described next.
+It does not measurably help stage 3, which is worth stating plainly because the argument for it was persuasive and the measurement disagrees. Over 60 cold and 35 pre-fitted seeds the paired difference in final win rate is $+0.033 \pm 0.027$, and both arms solve the training matchup every time. At twenty seeds the pre-fitted arm looked six times less variable and had avoided two collapses; forty further cold seeds produced no more collapses, which put the rate at 2 in 60 and made 0 in 35 exactly what chance predicts. The collapses had a cause of their own, described next.
+
+A matchup every run solves cannot show which run solved it better, so this is evidence about the matchup as much as about the critic. The measurement worth making next is on the rotating pool rather than a single army pair, where the ceiling is not reached and a better critic has room to show.
 
 ### An amplification in advantage normalization
 

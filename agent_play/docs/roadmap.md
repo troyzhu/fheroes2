@@ -1,7 +1,7 @@
 ---
 title: Scope and roadmap
 type: roadmap
-updated: 2026-07-30
+updated: 2026-08-03
 related_concepts: ["[[rl/rl-and-the-battle-domain]]", "[[overview]]"]
 tags: [agent-env, roadmap, scope]
 ---
@@ -28,9 +28,9 @@ The single milestone table. Exit criteria are the specification's own (§20); th
 | Milestone | Exit criterion | Gate | State |
 |---|---|---|---|
 | 0, local audit and headless spike | The initialization and asset path are known | `spike/verify_phase0.sh`, 7 of 7 | Done, reproduced on target hardware |
-| 1, deterministic runner | Ten identical runs match | `verify_m1.sh`, 4 of 4 | Done |
+| 1, deterministic runner | Ten identical runs match | `verify_m1.sh`, 5 of 5 | Done |
 | 2, decision hook and passive logging | Built-in behaviour unchanged under a null controller, and passive logs replay deterministically | `verify_m2.sh`, 8 of 8 | Done |
-| 3, `simple_v1` legal actions | Every supported fixture has valid candidates, at 100% teacher coverage | `verify_m3.sh`, 8 of 8, coverage 116 of 116 | Done, top project risk closed |
+| 3, `simple_v1` legal actions | Every supported fixture has valid candidates, at 100% teacher coverage | `verify_m3.sh`, 9 of 9, coverage 116 of 116 | Done, top project risk closed |
 | 4, JSONL worker | Scripted stdin and stdout tests control both sides without a single invalid command | `verify_m4.sh`, not yet written | Next |
 | 5, Python environment and replay | Golden trajectories reproduce across fresh and reused workers | `verify_m5.sh`, not yet written | Not started |
 | 6, hardening and benchmark | The definition of done in specification §22 passes | `verify_m6.sh`, not yet written | Not started |
@@ -38,7 +38,9 @@ The single milestone table. Exit criteria are the specification's own (§20); th
 
 Per-component detail for what is already built, meaning which file satisfies which specification section and what tests it, is in [[implementation/inventory]]. That is a different object from this table: it maps code, where this maps milestones.
 
-Nothing under `rl/` appears above, because training a policy is not a milestone of the environment. It begins after 6, and [[decisions/0005-training-and-reward]] governs it.
+Nothing under `rl/` appears above, because training a policy is not a milestone of the environment. The plan was that it begins after 6, and [[decisions/0005-training-and-reward]] governs it.
+
+That is not what happened, and the table would misread the project if it did not say so. Stage 1 cloning, stage 2b critic pre-fitting and stage 3 reinforcement learning were all built and measured during 2026-08-03, while milestones 4 through 6 remain unstarted. The training work reached far enough with a Python worker driving the existing protocol that the hardening milestones were never the blocker they were expected to be. Its own gate is `verify_agent.sh`, 11 of 11, and its record lives in [[archive/experiments/2026-08-03-training-runs]]. The milestone chain above is still the environment's exit criteria and is still owed; what changed is that it is no longer on the critical path to a trained policy.
 
 ## Milestone 4 in detail
 
@@ -63,11 +65,13 @@ The parser and the worker target come first, because everything else is tested t
 
 `verify_m4.sh` does not exist yet. Writing it is part of the milestone rather than a follow-up, on the pattern the earlier gates set. At minimum it has to show that a scripted session drives an episode to termination with no invalid command, that a malformed line produces an error frame and a live worker rather than a crash, that closing stdin unwinds cleanly, that a rejected scenario names its JSON path and error code, that the terminal digest under external control matches the digest the same scenario produces under the built-in AI when the external policy replays the AI's own choices, and that the terminal-state invariants below hold on every fixture.
 
-### The state-extraction gap this milestone has to close
+### The state-extraction gap, closed
 
-Worth stating separately, because it is the foundation everything after it rests on and it is currently the weakest verified part of the project.
+Worth stating separately, because it is the foundation everything after it rests on and it was for a time the weakest verified part of the project.
 
-Per-decision state extraction does not exist. `DecisionRecord` holds an engine decision index, a unit id, and the chosen commands, and the source says so at `src/fheroes2/agent/agent_trajectory.h`, that the `agent_passive_v1` schema carries no observations, no legal-action lists, and no teacher matching. The consequence for [[decisions/0005-training-and-reward]] is concrete and easy to miss. Behaviour cloning needs observation and action pairs, and Milestone 2 recorded 116 actions with nothing about the board beside them, so the recorded decisions cannot train anything as they stand. The data is recoverable rather than lost, since episodes are reproducible from a seed and can be re-run once an observation emitter exists, but the emitter is a Milestone 4 deliverable and nothing downstream of it can start first.
+Per-decision state extraction did not exist as of 2026-07-30. `DecisionRecord` held an engine decision index, a unit id and the chosen commands, and nothing about the board, so the 116 recorded actions could not train anything: behaviour cloning needs observation and action pairs. The emitter was scheduled as a Milestone 4 deliverable with everything downstream blocked on it.
+
+It was built ahead of that schedule on 2026-08-03, in `src/fheroes2/agent/agent_observation.{h,cpp}` with 19 unit tests. A decision record now carries the observation, the legal-action list, the teacher's chosen index and whether the teacher's command was matched, which is exactly one supervised sample. The recorder produced 45,380 of them from 2,000 episodes, and `agent_play/tests/check_bc_samples.py` asserts that every sample is complete and that every teacher action lies inside its own legal mask. What remains for Milestone 4 is the `observable_v1` profile and the `planes` modality, which [[decisions/0001-observation-profiles]] and [[decisions/0004-spatial-observation-modality]] govern, rather than the extraction itself.
 
 Terminal state extraction was in the same position and is now checked, as of 2026-08-03. Every gate proved the digest was stable and none asserted what it held, so a systematically wrong extraction would have been perfectly deterministic and would have passed all of them. `verify_m1.sh` now asserts eight invariants on every fixture, chosen so they hold whatever the battle was and therefore need no golden value and no oracle. A golden value would only have locked in whatever the implementation happens to do.
 

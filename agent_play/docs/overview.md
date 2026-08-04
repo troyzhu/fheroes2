@@ -274,7 +274,7 @@ State is then read straight off the C++ objects. `collectForce` walks a `Battle:
 
 The proof that no asset is involved is direct. Pointing `FHEROES2_DATA` at a path that does not exist still runs all five fixtures to their usual digests. Rendering is skipped rather than replaced, so this is not a reduced or alternative game format; it is the full battle computation with the drawing left out.
 
-One consequence matters for verification. Because it is the same code path, a battle watched through the interface and the same battle run headless under the same seed are the same computation, which is what makes a side-by-side comparison a meaningful check rather than an approximate one. [[roadmap#The state-extraction gap this milestone has to close]] builds a gate on that.
+One consequence matters for verification. Because it is the same code path, a battle watched through the interface and the same battle run headless under the same seed are the same computation, which is what makes a side-by-side comparison a meaningful check rather than an approximate one. [[roadmap#The state-extraction gap, closed]] builds a gate on that.
 
 The world seed needs no engine change, because `Rand::CurrentThreadRandomDevice()` (`rand.cpp:85`) returns a mutable reference to a `thread_local PCG32`. The proposed `World` API overload became a deferred cleanup rather than a prerequisite.
 
@@ -385,7 +385,7 @@ If the Makefile build fails in the `.pot` step, put Homebrew's `gettext` ahead o
 
 The historical top risk, legal-action generation, is closed, with validators extracted, full teacher coverage, and no live-arena probing. What remains:
 
-Per-decision state extraction does not exist, which makes it the highest remaining risk because everything downstream waits on it. The recorded decisions carry an engine decision index, a unit id, and the chosen commands, with nothing about the board, so the 116 decisions Milestone 2 captured cannot train anything until Milestone 4 adds an observation emitter. [[roadmap#The state-extraction gap this milestone has to close]] carries the detail.
+Per-decision state extraction was the highest remaining risk, because everything downstream waited on it, and it was closed on 2026-08-03 ahead of the milestone that owned it. A decision record now carries the observation, the legal-action list and the teacher's chosen index, which is one supervised sample, and 2,000 episodes produce 45,380 of them. What Milestone 4 still owes is the `observable_v1` profile and the `planes` modality rather than the extraction itself. [[roadmap#The state-extraction gap, closed]] carries the detail.
 
 Terminal state extraction was in the same position until 2026-08-03 and is now checked. `verify_m1.sh` asserts eight invariants per fixture that must hold whatever the battle was, which closes the specific hole that every gate proving byte-identical digests could not: a systematically wrong extraction would have been perfectly deterministic and would have passed all of them.
 

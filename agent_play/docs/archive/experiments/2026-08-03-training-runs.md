@@ -132,16 +132,20 @@ The gate's own 200-episode dataset reaches only $+0.109$ in 20 epochs, which is 
 
 ### Does it help reinforcement learning
 
-Twenty seeds per arm, paired so both arms share an action-sampling stream, on 6 Archers and 10 Peasants against 121 Peasants, 25 iterations of 32 episodes. Collapse means a run that reached 0.95 at some iteration and finished with a last-five mean below 0.5.
+Paired so both arms share an action-sampling stream, on 6 Archers and 10 Peasants against 121 Peasants, 25 iterations of 32 episodes. Collapse means a run that reached 0.95 at some iteration and finished with a last-five mean below 0.5. The run was extended twice, and the extension changed the answer, so both readings are recorded.
 
-| Arm | Last-five win rate | Spread | Solved | Collapsed |
+| Sample | Cold critic | Pre-fitted critic | Paired difference | Collapses |
 |---|---|---|---|---|
-| Cold critic | $0.901 \pm 0.039$ | 0.173 | 20/20 | 2/20 |
-| Pre-fitted critic | $0.951 \pm 0.006$ | 0.028 | 20/20 | 0/20 |
+| First 20 seeds | $0.901 \pm 0.039$ | $0.951 \pm 0.006$ | $+0.050 \pm 0.040$ | 2/20 against 0/20, $p = 0.244$ |
+| 60 and 35 seeds | $0.923 \pm 0.015$ | $0.938 \pm 0.009$ | $+0.033 \pm 0.027$ | 2/60 against 0/35, $p = 0.396$ |
 
-The paired difference is $+0.050 \pm 0.040$, or 1.2 standard errors, which settles nothing. Both arms solve the matchup every time. The whole difference is two collapses in the cold arm, and 2 against 0 out of 20 is a one-sided Fisher exact $p = 0.244$. Rollout value loss starts at 12.177 against 2.099 and ends at 0.280 against 0.132, so the pre-fitted critic is informative from the first iteration rather than after roughly ten.
+At twenty seeds the cold arm looked six times as variable and the two collapses looked like a pattern. Forty further cold seeds produced no more collapses at all, so the rate is 2 in 60 rather than 2 in 20, and at that rate the expected number in 35 pre-fitted runs is 1.2. Observing zero is unremarkable.
 
-Chasing those two collapses is what turned up the defect below, and the defect explains them better than the critic does.
+The conclusion is a negative one and should be read as such. Pre-fitting produces a much better critic and no measurable improvement in what stage 3 achieves on this matchup. Rollout value loss starts at 12.177 against 2.099 and ends at 0.280 against 0.132, so the critic really is informative from the first iteration rather than after roughly ten, and that advantage does not show up in the win rate. Both arms solve the matchup every time, which is the most likely reason: a matchup that every run solves cannot show which run solved it better.
+
+Chasing the two collapses is what turned up the defect below, and the defect explains them better than the critic does.
+
+The 60-seed sweep was killed at pre-fitted seed 34 when a verification gate relinked the worker binary underneath it. The completed runs are reported; nothing was rerun to fill the gap.
 
 ## The advantage-normalization collapse
 

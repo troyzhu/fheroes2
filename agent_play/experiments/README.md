@@ -20,3 +20,10 @@ Every script accepts `--seed` and reports across seeds where the answer could pl
 Errors are taken across the unit that will vary in use. For a pool of matchups that means across matchups rather than across episodes, because episodes inside one matchup share an army pair and pooling them understates the spread.
 
 Results belong in `../docs/archive/experiments/`, which is provenance. Conclusions belong in `../docs/rl/`. Decisions belong in `../docs/decisions/`, and only once the evidence supports one.
+
+## Do not rebuild while an experiment is running
+
+The verification gates relink `src/agent_worker/fheroes2_agent_worker`, and a running experiment spawns that binary once per episode. A gate run during a sweep killed one at seed 34 of 60 with a `FileNotFoundError`, because the file did not exist during the relink window.
+
+Either wait, or copy the binary somewhere else and pass that path, since every script takes it as an argument for exactly this reason.
+
