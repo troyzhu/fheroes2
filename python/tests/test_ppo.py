@@ -72,5 +72,22 @@ check(train_ppo.win_rate(outcomes, "attacker") == 0.5, "attacker win rate counts
 check(train_ppo.win_rate(outcomes, "defender") == 0.5, "defender win rate counts the attacker's defeats")
 check(train_ppo.win_rate([], "attacker") == 0.0, "an empty batch has a defined win rate")
 
+# --- army specs: names, ids, and the calibration helper
+from fheroes2_agent.render import parse_army, describe_army  # noqa: E402
+from fheroes2_agent.scenarios import scale_army  # noqa: E402
+
+check(parse_army("pikeman:20,archer:10") == "4:20,2:10", "creature names resolve to ids")
+check(parse_army("4:20,2:10") == "4:20,2:10", "raw ids pass through unchanged")
+check(parse_army("PIKEMAN:5") == "4:5", "name matching ignores case")
+check(describe_army("4:20,2:10") == "20 Pikeman, 10 Archer", "ids render back into names")
+try:
+    parse_army("dragon:5")
+    check(False, "an unknown creature name raises")
+except ValueError:
+    check(True, "an unknown creature name raises")
+
+check(scale_army("4:20,2:10", 0.5) == "4:10,2:5", "scaling an army multiplies every stack")
+check(scale_army("4:1,2:1", 0.1) == "4:1,2:1", "scaling never empties a stack")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

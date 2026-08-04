@@ -128,3 +128,41 @@ def band_report(results: list[dict]) -> str:
         f"{int((rates > 0.8).sum())} too easy, {int((rates < 0.2).sum())} too hard. "
         f"Win rate mean {rates.mean():.3f}, median {np.median(rates):.3f}"
     )
+
+
+def scale_army(spec: str, factor: float) -> str:
+    """Multiply every stack's count, keeping at least one creature per stack."""
+    parts = []
+    for item in spec.split(","):
+        monster_id, _, count = item.partition(":")
+        parts.append(f"{monster_id}:{max(1, int(round(int(count) * factor)))}")
+    return ",".join(parts)
+
+
+def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, target: float = 0.5,
+              episodes: int = 12, steps: int = 7, side: str = "attacker") -> dict:
+    """Find the defender scale that puts a matchup at the target win rate.
+
+    This is the mechanism a usable generator needs. Rejection sampling puts about one matchup in
+    ten inside the band, because a battle outcome is close to a deterministic function of the
+    army pair, so filtering a stream of samples wastes most of the budget. Calibrating instead
+    searches the scale that makes a given pair contested, and the search is short because the
+    win rate is close to monotone in the defender's strength.
+
+    Returns the best matchup found and the scale that produced it.
+    """
+    low, high = 0.25, 3.0
+    best = None
+    for _ in range(steps):
+        mid = (low + high) / 2
+        candidate = Matchup(attacker, scale_army(defender, mid))
+        result = measure(model, worker, candidate, episodes, side)
+        result["scale"] = mid
+        if best is None or abs(result["win_rate"] - target) < abs(best["win_rate"] - target):
+            best = result
+        if result["win_rate"] > target:
+            # Winning too often, so the defender needs to be stronger.
+            low = mid
+        else:
+            high = mid
+    return best

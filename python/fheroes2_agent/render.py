@@ -86,3 +86,36 @@ def describe_action(index: int) -> str:
     cell, direction = divmod(offset, 6)
     names = ["top-left", "top-right", "right", "bottom-right", "bottom-left", "left"]
     return f"MELEE cell {cell} from the {names[direction]}"
+
+
+# Reverse of MONSTER_NAMES, so armies can be written as "archer:6,peasant:20" instead of "2:6,1:20".
+NAME_TO_ID = {name.lower(): monster_id for monster_id, name in MONSTER_NAMES.items()}
+
+
+def parse_army(spec: str) -> str:
+    """Accept names or ids and return the id form the worker expects.
+
+    "pikeman:20,archer:10" and "4:20,2:10" mean the same thing. The worker parses ids only,
+    because a name table in C++ would duplicate the engine's own translated strings.
+    """
+    parts = []
+    for item in spec.split(","):
+        name, _, count = item.strip().partition(":")
+        key = name.strip().lower()
+        monster_id = NAME_TO_ID.get(key)
+        if monster_id is None:
+            if not key.isdigit():
+                known = ", ".join(sorted(NAME_TO_ID))
+                raise ValueError(f"unknown creature {name!r}; known names are {known}")
+            monster_id = int(key)
+        parts.append(f"{monster_id}:{int(count)}")
+    return ",".join(parts)
+
+
+def describe_army(spec: str) -> str:
+    """The id form back into something readable, for a transcript header."""
+    out = []
+    for item in spec.split(","):
+        monster_id, _, count = item.partition(":")
+        out.append(f"{count} {monster_name(int(monster_id))}")
+    return ", ".join(out)

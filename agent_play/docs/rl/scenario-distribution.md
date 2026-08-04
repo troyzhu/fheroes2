@@ -102,6 +102,8 @@ The reason is visible in a mirror matchup, where the win rate is a step function
 
 The consequence for the generator is concrete. Rejection sampling is the wrong mechanism at a 10 percent hit rate. A usable generator has to calibrate each matchup, searching the count that puts a given army pair in band, which the 70 against 71 result shows is a one-step search rather than a hard one. That is a different and more expensive design than sampling and filtering, and it was not anticipated here.
 
+`scenarios.calibrate` implements it. Given an army pair it bisects a scale on the defender's counts until the win rate reaches a target, which is cheap because the win rate is close to monotone in the defender's strength. Seven steps of twelve episodes turned a matchup the cloned policy lost every time into one it wins 58 percent of the time, over nineteen decisions with a reward standard deviation of 1.12. Hand-designed matchups do no better than sampled ones at finding the band: five built deliberately to look balanced measured four at zero and one at one. Calibration is what makes a given pair usable, not judgement about army composition.
+
 ### Reward variance is the cheaper filter
 
 Every degenerate matchup measured a reward standard deviation of exactly 0.00, and every in-band one measured between 1.0 and 1.3. That is the same fact the identity predicts, since equal returns across a group make every advantage zero, and it is a better filter in practice than the win rate: it needs no threshold, it is what the gradient actually depends on, and a matchup that produces zero variance can be discarded after a handful of episodes.

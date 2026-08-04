@@ -12,7 +12,7 @@ import torch
 from .encoding import ENCODING_VERSION
 from .env import BattleEnv
 from .policy import BattlePolicy
-from .render import describe_action, draw_board
+from .render import describe_action, describe_army, draw_board, parse_army
 
 
 def main() -> None:
@@ -27,6 +27,10 @@ def main() -> None:
     parser.add_argument("--greedy", action="store_true", help="take the most likely legal action")
     parser.add_argument("--out", default=None, help="write the transcript here instead of stdout")
     args = parser.parse_args()
+
+    # Names are friendlier than ids and the worker only understands ids.
+    args.attacker = parse_army(args.attacker) if args.attacker else None
+    args.defender = parse_army(args.defender) if args.defender else None
 
     model = BattlePolicy()
     label = "untrained policy"
@@ -48,6 +52,10 @@ def main() -> None:
     emit()
     emit(f"policy `{label}`, playing the {args.side}. "
          f"Attacker stacks are uppercase, defender lowercase, the stack on turn is in brackets.")
+    if args.attacker or args.defender:
+        emit()
+        emit(f"- attacker: {describe_army(args.attacker) if args.attacker else 'fixture default'}")
+        emit(f"- defender: {describe_army(args.defender) if args.defender else 'fixture default'}")
     emit()
 
     for episode in range(args.episodes):
