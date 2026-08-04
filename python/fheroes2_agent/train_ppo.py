@@ -24,6 +24,7 @@ import torch
 
 from .encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, OBSERVATION_SIZE
 from .env import BattleEnv
+from .objectives import normalize_advantages
 from .policy import BattlePolicy
 
 
@@ -112,6 +113,8 @@ def train(
     entropy_coef: float = 0.01,
     seed: int = 0,
     out: str | None = None,
+    quiet: bool = False,
+    advantage_std_floor: float = 0.1,
 ) -> dict:
     torch.manual_seed(seed)
     model = BattlePolicy()
@@ -123,7 +126,8 @@ def train(
             raise ValueError(f"checkpoint encoding {state.get('encoding_version')} does not match {ENCODING_VERSION}")
         model.load_state_dict(state["state_dict"])
         started_from = f"cloned policy ({checkpoint})"
-    print(f"starting from {started_from}")
+    if not quiet:
+        print(f"starting from {started_from}")
 
     env = BattleEnv(worker, fixture=fixture, side=side, attacker=attacker, defender=defender)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -131,9 +135,11 @@ def train(
     baseline = collect(env, model, episodes_per_iter)
     initial_win = win_rate(baseline["outcomes"], side)
     initial_reward = float(np.mean([r for r, d in zip(baseline["rewards"], baseline["dones"]) if d]))
-    print(f"before training: win rate {initial_win:.3f}, mean terminal reward {initial_reward:.3f}")
+    if not quiet:
+        print(f"before training: win rate {initial_win:.3f}, mean terminal reward {initial_reward:.3f}")
 
     history = []
+    degenerate = 0
     started = time.time()
 
     for iteration in range(iterations):
@@ -144,7 +150,15 @@ def train(
         step_truncated[np.flatnonzero(batch["dones"])] = truncated
 
         advantages, returns = compute_gae(batch["rewards"], batch["values"], batch["dones"], step_truncated)
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        # Recorded before normalization. As a matchup is solved every episode returns nearly the
+        # same reward, so this shrinks toward zero, and dividing by it turns whatever noise is
+        # left into full-sized advantages. That is a mechanism for a converged run to destroy
+        # itself, and it is invisible after normalization, which always reports a spread of one.
+        raw_advantage_std = float(advantages.std())
+        episode_rewards = [r for r, d in zip(batch["rewards"], batch["dones"]) if d]
+        reward_std = float(np.std(episode_rewards))
+        degenerate += raw_advantage_std < advantage_std_floor
+        advantages = normalize_advantages(advantages, advantage_std_floor)
 
         obs = torch.from_numpy(batch["observations"])
         masks = torch.from_numpy(batch["masks"])
@@ -154,6 +168,14 @@ def train(
         ret_t = torch.from_numpy(returns.astype(np.float32))
 
         n = len(actions)
+        # Value loss on the rollout, before any update touches it. This is what a critic
+        # pre-fitted on teacher play is supposed to reduce, and it is measured at the first
+        # minibatch of the iteration so it reflects the critic the rollout was collected with
+        # rather than the one left behind after the update.
+        with torch.no_grad():
+            _, values_before = model(obs, masks)
+            value_loss_before = float(((values_before - ret_t) ** 2).mean())
+
         for _ in range(epochs):
             order = torch.randperm(n)
             for start in range(0, n, minibatch):
@@ -180,9 +202,13 @@ def train(
         if out:
             torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION,
                         "win_rate": wr, "iteration": iteration}, out)
-        mean_reward = float(np.mean([r for r, d in zip(batch["rewards"], batch["dones"]) if d]))
-        history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward, "steps": int(n)})
-        print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  steps {n}")
+        mean_reward = float(np.mean(episode_rewards))
+        history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
+                        "steps": int(n), "value_loss": value_loss_before,
+                        "raw_advantage_std": raw_advantage_std, "reward_std": reward_std})
+        if not quiet:
+            print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  "
+                  f"value_loss {value_loss_before:.3f}  steps {n}")
 
     env.close()
     final_win = history[-1]["win_rate"] if history else initial_win
@@ -198,10 +224,16 @@ def train(
         "initial_mean_terminal_reward": initial_reward,
         "iterations": iterations,
         "episodes_per_iteration": episodes_per_iter,
+        # Reported rather than buried. A run that spent most of its budget below the floor was
+        # training on batches with almost no outcome spread, which is a statement about the
+        # matchup having been solved rather than about the method.
+        "advantage_std_floor": advantage_std_floor,
+        "floored_iterations": int(degenerate),
         "seconds": round(time.time() - started, 1),
         "history": history,
     }
-    print(f"\nwin rate {initial_win:.3f} -> {final_win:.3f} over {iterations} iterations ({result['seconds']}s)")
+    if not quiet:
+        print(f"\nwin rate {initial_win:.3f} -> {final_win:.3f} over {iterations} iterations ({result['seconds']}s)")
     return result
 
 
@@ -217,11 +249,16 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=32)
     parser.add_argument("--report", default=None)
     parser.add_argument("--out", default=None, help="checkpoint path for the refined policy")
+    # Rollouts sample from the policy, so the seed is what makes one run differ from another on
+    # an identical configuration. Without it on the command line a comparison across methods
+    # cannot be separated from a comparison across noise.
+    parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
     result = train(args.worker, checkpoint=args.checkpoint, fixture=args.fixture, side=args.side,
                    attacker=args.attacker, defender=args.defender,
-                   iterations=args.iterations, episodes_per_iter=args.episodes, out=args.out)
+                   iterations=args.iterations, episodes_per_iter=args.episodes,
+                   seed=args.seed, out=args.out)
     if args.report:
         pathlib.Path(args.report).write_text(json.dumps(result, indent=2))
 

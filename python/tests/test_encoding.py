@@ -110,5 +110,58 @@ with tempfile.TemporaryDirectory() as tmp:
     except ValueError:
         check(True, "a teacher action outside its mask is rejected")
 
+
+# --- discounted returns, the targets a pre-fitted critic regresses on
+def decision(is_attacker, hp_attacker=100, hp_defender=100):
+    units = [stack(1, "attacker", 0, count=hp_attacker, active=is_attacker),
+             stack(2, "defender", 50, count=hp_defender, active=not is_attacker)]
+    return dict(record="decision", teacher_resolved=True, teacher_action=0, legal_actions=[0],
+                observation=obs(units, active_is_attacker=is_attacker))
+
+
+def terminal(termination, hp_attacker, hp_defender):
+    return dict(record="terminal", termination=termination,
+                attacker=dict(hit_points=hp_attacker), defender=dict(hit_points=hp_defender))
+
+
+# Attacker wins with 60 of its 100 hit points left; defender is wiped out.
+episode = [decision(True), decision(False), decision(True), terminal("victory", 60, 0)]
+r = dataset.episode_returns(episode, gamma=1.0)
+check(len(r) == 3, "one return per decision carrying an observation")
+check(abs(r[2] - 1.6) < 1e-6, "the winner's last decision earns win plus surviving fraction")
+check(abs(r[1] - (-1.0)) < 1e-6, "the loser's decision earns the loser's reward, in the same episode")
+check(r[0] > 0 and r[1] < 0, "sign follows whichever side was on turn")
+
+# Discounting is by decisions still to come, so magnitude grows toward the end.
+d = dataset.episode_returns(episode, gamma=0.5)
+check(abs(d[2] - 1.6) < 1e-6, "the final decision is undiscounted")
+check(abs(d[0] - 1.6 * 0.25) < 1e-6, "an earlier decision is discounted by the steps remaining")
+check(abs(d[0]) < abs(d[2]), "discounting shrinks returns further from the terminal")
+
+# The survival fraction is read from the first observation, before any damage.
+hurt = [decision(True, hp_attacker=100), decision(True, hp_attacker=40), terminal("victory", 40, 0)]
+check(abs(dataset.episode_returns(hurt, gamma=1.0)[0] - 1.4) < 1e-6,
+      "survival is measured against the starting force, not the current one")
+
+# A rout scores -1 exactly, which is the degenerate case scenario-distribution.md warns about.
+routed = [decision(True), terminal("defeat", 0, 90)]
+check(abs(dataset.episode_returns(routed, gamma=1.0)[0] + 1.0) < 1e-6, "a rout scores exactly -1")
+
+# An episode recorded without --audit-coverage has no observations and so no returns, and the
+# loader must drop them rather than mis-align them against the decisions it did encode.
+with tempfile.TemporaryDirectory() as tmp:
+    root = pathlib.Path(tmp)
+    (root / "full.jsonl").write_text("\n".join(json.dumps(x) for x in episode) + "\n")
+    s = dataset.load_dir(root)
+    check(s.returns is not None and len(s.returns) == len(s), "returns line up row for row with actions")
+    check(np.isfinite(s.returns).all(), "a complete episode yields finite returns")
+
+    bare = [dict(record="decision", teacher_resolved=True, teacher_action=0, legal_actions=[0],
+                 observation=obs([stack(1, "attacker", 0, active=True)]))]
+    (root / "noterminal.jsonl").write_text("\n".join(json.dumps(x) for x in bare) + "\n")
+    s = dataset.load_dir(root)
+    check(len(s) == 4, "an episode without a terminal record still yields its samples")
+    check(np.isnan(s.returns).sum() == 1, "its returns are dropped rather than guessed")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

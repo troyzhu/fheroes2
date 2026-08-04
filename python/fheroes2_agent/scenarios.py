@@ -23,6 +23,26 @@ import torch
 from .env import BattleEnv
 from .policy import BattlePolicy
 
+
+def policy_fingerprint(model: BattlePolicy) -> str:
+    """A short, stable hash of a policy's weights.
+
+    Difficulty is policy-relative, so a calibrated pool is only valid for the checkpoint that
+    measured it. Recording a fingerprint alongside the pool is what lets a later run detect that
+    it is about to reuse someone else's calibration, which otherwise fails silently as a pool of
+    matchups that are merely easy.
+
+    Hashed from the weights rather than from a file path, because the path says nothing about
+    whether the file still holds the same tensors.
+    """
+    import hashlib
+
+    digest = hashlib.sha256()
+    for name, tensor in sorted(model.state_dict().items()):
+        digest.update(name.encode())
+        digest.update(tensor.detach().cpu().numpy().tobytes())
+    return digest.hexdigest()[:16]
+
 # Monster ids from the simple_v1 allowlist: single-cell, walking or shooting, ordinary targeting.
 # Values are (id, hit points, is shooter), used only to keep sampled armies roughly comparable.
 ROSTER = [
@@ -261,6 +281,7 @@ def build_pool(
         "episodes_per_probe": episodes,
         "side": side,
         "seed": seed,
+        "policy_fingerprint": policy_fingerprint(model),
     }
 
 

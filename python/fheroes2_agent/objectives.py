@@ -60,6 +60,28 @@ def group_advantages(returns: np.ndarray, mode: str) -> np.ndarray:
     raise ValueError(f"unknown group advantage mode {mode!r}")
 
 
+def normalize_advantages(advantages, floor: float = 0.1):
+    """Centre and rescale a batch, dividing by a spread never allowed below `floor`.
+
+    Normalization exists so the step size does not depend on the reward scale. The hazard is at
+    the other end. Once a matchup is solved every episode scores alike, the spread collapses
+    toward zero, and dividing by it rescales what is left, which is value-function error, up to
+    unit variance. Measured on a calibrated matchup: a raw spread of 0.02 against a healthy 0.3 to
+    1.0, so the amplification reaches fiftyfold, and four epochs of it drove a policy from a 1.000
+    win rate to 0.000 in two iterations.
+
+    Flooring beats dropping the batch. Dropping is symmetric in the wrong way, since it fires when
+    every episode loses too, which is when a collapsed run most needs a gradient, and it freezes
+    the run instead. A floor keeps the sign and the ranking of every advantage and makes a
+    degenerate batch produce a small update rather than a huge one or none.
+
+    Accepts a numpy array or a torch tensor, since the two trainers hold advantages in different
+    forms at the point they normalize.
+    """
+    spread = float(advantages.std())
+    return (advantages - advantages.mean()) / max(spread, floor)
+
+
 def total_variation(new_logits: torch.Tensor, old_logits: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     """Exact total-variation distance between two masked policies, per row.
 

@@ -20,6 +20,38 @@ import numpy as np
 from .encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, encode_mask, encode_observation
 
 
+def episode_returns(records: list[dict], gamma: float = 0.99) -> list[float]:
+    """The discounted return at each decision of one recorded teacher episode.
+
+    Rewards are terminal only, so the return at decision t is the terminal reward discounted by
+    the number of decisions still to come. The teacher plays both sides, so the sign depends on
+    whose turn it was: a decision taken by the side that went on to lose earns the loser's
+    reward. That is what makes one episode supply both positive and negative targets, and it is
+    the whole reason a critic fitted on teacher play is worth anything.
+    """
+    from .env import terminal_reward
+
+    terminal = next(r for r in records if r.get("record") == "terminal")
+    decisions = [r for r in records if r.get("record") == "decision" and "observation" in r]
+
+    # Own starting hit points per side, read from the first observation, which is before damage.
+    first = decisions[0]["observation"] if decisions else None
+    start = {"attacker": 0.0, "defender": 0.0}
+    if first is not None:
+        for unit in first["units"]:
+            start[unit["side"]] += unit["hit_points"]
+
+    rewards = {side: terminal_reward(terminal, side, start[side] or 1.0) for side in ("attacker", "defender")}
+
+    out = []
+    total = len(decisions)
+    for index, record in enumerate(decisions):
+        side = "attacker" if record["observation"]["active_is_attacker"] else "defender"
+        # Steps remaining for this decision, counted in decisions rather than rounds.
+        out.append(rewards[side] * (gamma ** (total - 1 - index)))
+    return out
+
+
 @dataclass
 class Samples:
     """Encoded decisions. Rows line up across all four arrays."""
@@ -28,22 +60,29 @@ class Samples:
     masks: np.ndarray  # (n, 793) bool
     actions: np.ndarray  # (n,) int64, the teacher's canonical index
     episode_ids: np.ndarray  # (n,) int64, which episode each row came from
+    returns: np.ndarray | None = None  # (n,) float32, discounted return, for critic fitting
     encoding_version: str = ENCODING_VERSION
 
     def __len__(self) -> int:
         return len(self.actions)
 
     def subset(self, rows: np.ndarray) -> "Samples":
-        return Samples(self.observations[rows], self.masks[rows], self.actions[rows], self.episode_ids[rows])
+        return Samples(self.observations[rows], self.masks[rows], self.actions[rows], self.episode_ids[rows],
+                       None if self.returns is None else self.returns[rows])
 
 
-def load_episode(path: pathlib.Path) -> tuple[list[np.ndarray], list[np.ndarray], list[int]]:
+def load_episode(path: pathlib.Path, gamma: float = 0.99) -> tuple[list[np.ndarray], list[np.ndarray], list[int], list[float]]:
     observations: list[np.ndarray] = []
     masks: list[np.ndarray] = []
     actions: list[int] = []
 
-    for line in path.read_text().splitlines():
-        record = json.loads(line)
+    records = [json.loads(line) for line in path.read_text().splitlines()]
+    try:
+        returns = episode_returns(records, gamma)
+    except (StopIteration, KeyError, IndexError):
+        returns = []
+
+    for record in records:
         if record.get("record") != "decision":
             continue
         # A decision recorded without --audit-coverage has no observation and no label, so it is
@@ -56,7 +95,12 @@ def load_episode(path: pathlib.Path) -> tuple[list[np.ndarray], list[np.ndarray]
         masks.append(encode_mask(record["legal_actions"]))
         actions.append(int(record["teacher_action"]))
 
-    return observations, masks, actions
+    # Returns are computed over decisions carrying an observation, which is the same filter
+    # applied above, so the two line up. A mismatch means the episode was recorded without
+    # --audit-coverage and its returns are dropped rather than misaligned.
+    if len(returns) != len(actions):
+        returns = []
+    return observations, masks, actions, returns
 
 
 def load_dir(root: str | pathlib.Path) -> Samples:
@@ -69,13 +113,15 @@ def load_dir(root: str | pathlib.Path) -> Samples:
     all_masks: list[np.ndarray] = []
     all_actions: list[int] = []
     all_episodes: list[int] = []
+    all_returns: list[float] = []
 
     for episode_id, path in enumerate(files):
-        observations, masks, actions = load_episode(path)
+        observations, masks, actions, returns = load_episode(path)
         all_obs.extend(observations)
         all_masks.extend(masks)
         all_actions.extend(actions)
         all_episodes.extend([episode_id] * len(actions))
+        all_returns.extend(returns if returns else [float("nan")] * len(actions))
 
     if not all_actions:
         raise ValueError(f"{len(files)} files under {root} produced no samples; was --audit-coverage set when recording?")
@@ -85,6 +131,7 @@ def load_dir(root: str | pathlib.Path) -> Samples:
         masks=np.stack(all_masks),
         actions=np.asarray(all_actions, dtype=np.int64),
         episode_ids=np.asarray(all_episodes, dtype=np.int64),
+        returns=np.asarray(all_returns, dtype=np.float32),
     )
 
     # The teacher's action must be legal. Milestone 3 already asserts this engine-side over the

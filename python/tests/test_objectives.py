@@ -107,5 +107,23 @@ check(mus[0].attacker == "1:5" and mus[1].defender == "1:40", "pool entries keep
 check(int(scale_army("1:10", 2.0).split(":")[1]) > int(scale_army("1:10", 1.0).split(":")[1]),
       "scaling up increases counts")
 
+# --- the policy fingerprint that ties a calibrated pool to the checkpoint that measured it
+from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.scenarios import policy_fingerprint  # noqa: E402
+
+torch.manual_seed(0)
+a = BattlePolicy()
+torch.manual_seed(0)
+b = BattlePolicy()
+torch.manual_seed(1)
+c = BattlePolicy()
+check(policy_fingerprint(a) == policy_fingerprint(b), "identical weights fingerprint identically")
+check(policy_fingerprint(a) != policy_fingerprint(c), "different weights fingerprint differently")
+# The whole point is detecting a policy that has moved, which is what makes a calibrated pool
+# stale. A fingerprint insensitive to a small update would pass a stale pool through.
+with torch.no_grad():
+    next(iter(a.parameters()))[0] += 1e-3
+check(policy_fingerprint(a) != policy_fingerprint(b), "a single perturbed weight changes the fingerprint")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

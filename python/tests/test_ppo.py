@@ -89,5 +89,33 @@ except ValueError:
 check(scale_army("4:20,2:10", 0.5) == "4:10,2:5", "scaling an army multiplies every stack")
 check(scale_army("4:1,2:1", 0.1) == "4:1,2:1", "scaling never empties a stack")
 
+# --- advantage normalization, and the floor that stops a solved matchup destroying its policy
+normalize = train_ppo.normalize_advantages
+
+healthy = np.array([-1.0, -0.5, 0.0, 0.5, 1.0], dtype=np.float32)
+out = normalize(healthy, floor=0.1)
+check(abs(out.mean()) < 1e-6, "normalized advantages are centred")
+check(abs(out.std() - 1.0) < 1e-5, "a healthy batch is rescaled to unit spread, as PPO expects")
+
+# A batch whose spread is far below the floor must not be blown up to unit variance. This is the
+# property that matters: it is the amplification, not the small numbers, that destroys a policy.
+tiny = np.array([-0.02, -0.01, 0.0, 0.01, 0.02], dtype=np.float32)
+out = normalize(tiny, floor=0.1)
+check(out.std() < 0.2, "a degenerate batch stays small instead of being rescaled to unit spread",
+      f"std {out.std():.3f}")
+check(float(np.max(np.abs(out))) < float(np.max(np.abs(normalize(tiny, floor=1e-8)))),
+      "the floor strictly shrinks what an unfloored divisor would produce")
+
+# The ordering has to survive, or the floor would be discarding the signal it is protecting.
+check(np.all(np.diff(normalize(tiny, floor=0.1)) > 0), "flooring preserves the ranking of advantages")
+check(np.all(np.sign(normalize(tiny, floor=0.1)) == np.sign(tiny - tiny.mean())),
+      "flooring preserves the sign of every advantage")
+
+# An all-equal batch has nothing to say, and must say nothing rather than dividing by zero.
+flat = np.zeros(8, dtype=np.float32)
+out = normalize(flat, floor=0.1)
+check(np.all(np.isfinite(out)) and float(np.abs(out).max()) == 0.0,
+      "an all-equal batch yields exactly zero advantages, with no division by zero")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

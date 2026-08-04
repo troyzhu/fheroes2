@@ -6,7 +6,8 @@
 #   2. the worker records complete cloning samples across many seeds;
 #   3. the dataset loads, and every teacher action lies inside its own legal mask;
 #   4. a short training run beats both trivial baselines by a wide margin;
-#   5. the checkpoint carries the encoding version it was trained against.
+#   5. the value head fits on teacher returns without moving the cloned policy;
+#   6. the checkpoint carries the encoding version it was trained against.
 #
 # Kept fast enough to run on every change: the whole gate is well under a minute, because
 # recording 200 episodes takes about a third of a second and five epochs takes a few.
@@ -86,6 +87,38 @@ sys.exit(0 if ok else 1)
 PYEOF
 )"
 report "cloning beats trivial baselines" "$?" "${verdict}"
+
+# Stage 2b, the critic pre-fitted on teacher play. Two properties are checked, and the second
+# matters more than the first: fitting the value head must leave the cloned policy bit-identical,
+# because the trunk is shared and an unfrozen fit measurably damages it (0.887 -> 0.701 agreement
+# on the full dataset). The explained-variance floor is deliberately low. On this gate's 200
+# episodes the fit reaches only about 0.11, since both the data volume and the weak trunk bind;
+# the published 0.835 comes from ten times the data behind a trunk cloned to 0.887.
+( cd "${PY}" && python3 -m fheroes2_agent.train_critic "${WORKDIR}/data" "${WORKDIR}/policy.pt" \
+    --epochs 20 --out "${WORKDIR}/critic.pt" --report "${WORKDIR}/critic.json" ) > "${WORKDIR}/critic.log" 2>&1
+critic_rc=$?
+
+critic_detail="$(cd "${PY}" && python3 - "${WORKDIR}" "${critic_rc}" <<'PYEOF'
+import json, pathlib, sys, torch
+work = pathlib.Path(sys.argv[1])
+if sys.argv[2] != "0" or not (work / "critic.json").exists():
+    print("critic fitting did not complete")
+    sys.exit(1)
+r = json.loads((work / "critic.json").read_text())
+before, after = r["before"]["explained_variance"], r["after"]["explained_variance"]
+
+# The frozen fit must not move one policy parameter. Compared tensor by tensor rather than by a
+# metric, because an agreement score can be unchanged while the weights have drifted.
+old = torch.load(work / "policy.pt", map_location="cpu", weights_only=True)["state_dict"]
+new = torch.load(work / "critic.pt", map_location="cpu", weights_only=True)["state_dict"]
+moved = [k for k in old if not k.startswith("value_head") and not torch.equal(old[k], new[k])]
+frozen = not moved
+print(f"explained variance {before:+.3f} -> {after:+.3f}, policy weights "
+      + ("untouched" if frozen else f"MOVED in {len(moved)} tensors"))
+sys.exit(0 if (before < 0 and after > 0.05 and frozen) else 1)
+PYEOF
+)"
+report "critic fits on teacher play, policy frozen" "$?" "${critic_detail}"
 
 timeout 300 "${REPO_ROOT}/agent_play/tests/test_protocol.py" "${WORKER}" > "${WORKDIR}/proto.log" 2>&1
 report "external control drives a battle" "$?" "$(grep -c '^  PASS' "${WORKDIR}/proto.log") checks, scripted stdin and stdout"

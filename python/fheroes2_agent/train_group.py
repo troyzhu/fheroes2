@@ -22,7 +22,8 @@ import torch
 
 from .encoding import ENCODING_VERSION
 from .env import BattleEnv
-from .objectives import ADVANTAGE_MODES, TRUST_REGIONS, clip_fraction, group_advantages, surrogate, total_variation
+from .objectives import (ADVANTAGE_MODES, TRUST_REGIONS, clip_fraction, group_advantages,
+                         normalize_advantages, surrogate, total_variation)
 from .policy import BattlePolicy
 
 
@@ -72,6 +73,8 @@ def train(
     seed: int = 0,
     out: str | None = None,
     quiet: bool = False,
+    env: object | None = None,
+    advantage_std_floor: float = 0.1,
 ) -> dict:
     if advantage not in ADVANTAGE_MODES:
         raise ValueError(f"advantage must be one of {ADVANTAGE_MODES}")
@@ -86,7 +89,11 @@ def train(
             raise ValueError(f"checkpoint encoding {state.get('encoding_version')} does not match {ENCODING_VERSION}")
         model.load_state_dict(state["state_dict"])
 
-    env = BattleEnv(worker, side=side, attacker=attacker, defender=defender)
+    # A caller may pass its own environment. `collect_group` needs only reset and step, so a
+    # MatchupPool rotating over many army pairs substitutes for a single fixed one, which is what
+    # turns a result about one matchup into a result about a distribution.
+    if env is None:
+        env = BattleEnv(worker, side=side, attacker=attacker, defender=defender)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     target = "victory" if side == "attacker" else "defeat"
 
@@ -132,7 +139,10 @@ def train(
         old_logps = torch.from_numpy(np.asarray(rows_logp, dtype=np.float32))
         old_logits = torch.from_numpy(np.stack(rows_logits).astype(np.float32))
         adv_all = torch.from_numpy(np.asarray(rows_adv, dtype=np.float32))
-        adv_all = (adv_all - adv_all.mean()) / (adv_all.std() + 1e-8)
+        # Floored, for the reason normalize_advantages documents. The group filter above drops
+        # only an exactly-degenerate group; a near-degenerate one survives it and would then be
+        # rescaled to unit spread here, which is the same amplification by another route.
+        adv_all = normalize_advantages(adv_all, advantage_std_floor)
 
         n = len(actions)
         clipped, blocked_total, batches = 0.0, 0.0, 0
@@ -202,12 +212,16 @@ def main() -> None:
     parser.add_argument("--threshold", type=float, default=0.05)
     parser.add_argument("--out", default=None)
     parser.add_argument("--report", default=None)
+    # Rollouts sample from the policy, so the seed is what makes one run differ from another on
+    # an identical configuration. Without it on the command line a comparison across methods
+    # cannot be separated from a comparison across noise.
+    parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
     result = train(args.worker, checkpoint=args.checkpoint, attacker=args.attacker, defender=args.defender,
                    advantage=args.advantage, trust_region=args.trust_region, iterations=args.iterations,
                    group_size=args.group_size, groups_per_iter=args.groups,
-                   divergence_threshold=args.threshold, out=args.out)
+                   divergence_threshold=args.threshold, seed=args.seed, out=args.out)
     if args.report:
         pathlib.Path(args.report).write_text(json.dumps(result, indent=2))
 
