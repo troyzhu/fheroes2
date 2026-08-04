@@ -135,5 +135,28 @@ with torch.no_grad():
     next(p for n, p in a.named_parameters() if not n.startswith("value_head"))[0] += 1e-3
 check(policy_fingerprint(a) != policy_fingerprint(b), "a single perturbed policy weight changes the fingerprint")
 
+# --- a group must share its starting position, or the baseline measures the scenario
+from fheroes2_agent.env import MatchupPool  # noqa: E402
+
+pool = MatchupPool("/nonexistent", [Matchup(f"1:{i}", "1:5") for i in range(2, 40)],
+                   seed=0, hold_within_group=True)
+pool.new_group()
+first = pool.current
+# reset() would spawn a worker, so the sampling rule is exercised directly: holding means the
+# matchup only changes when a new group is asked for.
+check(first is not None, "new_group draws a matchup")
+pool.current = first
+check(pool.current is first, "holding keeps the matchup across episodes of one group")
+seen = set()
+for _ in range(50):
+    pool.new_group()
+    seen.add(pool.current.attacker)
+check(len(seen) > 1, "new_group still rotates across groups")
+
+# The default must stay as it was, since a critic-based trainer conditions on the observation and
+# does not care which episodes sit beside it.
+rotating = MatchupPool("/nonexistent", [Matchup(f"1:{i}", "1:5") for i in range(2, 40)], seed=0)
+check(rotating._hold is False, "rotation per episode remains the default")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

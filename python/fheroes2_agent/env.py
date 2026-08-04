@@ -155,9 +155,21 @@ class MatchupPool:
     Training on a single matchup measures that matchup, not the policy. Rotating means the
     gradient comes from a distribution, which is what makes a reported number a statement about
     the generator rather than about one army pair.
+
+    A group-relative trainer needs more than rotation, and getting this wrong is silent. Leave-one-
+    out, GRPO and Dr. GRPO all ask how one episode compares with others started from the same
+    place, which is why GRPO on a language model samples several completions of one prompt. If
+    every episode in a group draws a different army pair, the baseline measures which matchup was
+    drawn rather than how the policy played, and the advantage is mostly scenario difficulty.
+
+    So the matchup is resampled on `new_group` rather than on `reset`. A trainer that never calls
+    `new_group` gets the old behaviour of one matchup per episode, which is correct for a method
+    whose baseline is a learned critic, since a critic conditions on the observation and does not
+    care which episodes sit beside it in the batch.
     """
 
-    def __init__(self, worker: str, matchups, side: str = "attacker", seed: int = 0, home: str = "/tmp"):
+    def __init__(self, worker: str, matchups, side: str = "attacker", seed: int = 0, home: str = "/tmp",
+                 hold_within_group: bool = False):
         import random
 
         self._worker = worker
@@ -166,12 +178,18 @@ class MatchupPool:
         self._rng = random.Random(seed)
         self._home = home
         self._env: BattleEnv | None = None
+        self._hold = hold_within_group
         self.side = side
         self.current = None
 
+    def new_group(self) -> None:
+        """Draw the matchup the next group of episodes will share."""
+        self.current = self._rng.choice(self._matchups)
+
     def reset(self):
         self.close()
-        self.current = self._rng.choice(self._matchups)
+        if not self._hold or self.current is None:
+            self.current = self._rng.choice(self._matchups)
         self._env = BattleEnv(self._worker, side=self._side, attacker=self.current.attacker,
                               defender=self.current.defender, home=self._home)
         return self._env.reset()

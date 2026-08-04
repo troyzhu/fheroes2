@@ -28,6 +28,17 @@ from .policy import BattlePolicy
 
 
 def collect_group(env: BattleEnv, model: BattlePolicy, k: int) -> list[dict]:
+    """Roll out k episodes that share a starting position.
+
+    Sharing is what makes a group baseline mean anything: every mode here compares an episode with
+    the others beside it, so if they start from different army pairs the comparison is between
+    scenarios rather than between ways of playing one. A `MatchupPool` honours this through
+    `new_group`; a plain `BattleEnv` is one matchup already and has no such method.
+    """
+    new_group = getattr(env, "new_group", None)
+    if new_group is not None:
+        new_group()
+
     episodes = []
     for _ in range(k):
         observation, mask = env.reset()

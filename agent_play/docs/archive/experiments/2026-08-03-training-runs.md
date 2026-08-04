@@ -57,6 +57,32 @@ Matchup: 6 Archers and 10 Peasants against 121 Peasants, calibrated. Same cloned
 
 At 32 episodes an iteration the standard error on a win rate is about 0.05, so nothing separates these. One seed only.
 
+### Advantage and trust region, ten seeds an arm
+
+2026-08-04, replacing the single-seed comparison above, which separated nothing. Same matchup, same cloned checkpoint, 25 iterations of 4 groups of 8, `--seed` now exposed on both trainers so a method comparison can be told apart from noise.
+
+| Advantage | Trust region | Last-five win rate | Spread | Worst run |
+|---|---|---|---|---|
+| Leave-one-out | ratio | $0.907 \pm 0.015$ | 0.048 | 0.844 |
+| Group-relative, studentized | ratio | $0.851 \pm 0.013$ | 0.042 | 0.794 |
+| Group-relative, unstudentized | ratio | $0.919 \pm 0.014$ | 0.045 | 0.844 |
+| Leave-one-out | divergence | $0.938 \pm 0.010$ | 0.030 | 0.881 |
+| Group-relative, unstudentized | divergence | $0.954 \pm 0.006$ | 0.018 | 0.919 |
+
+Paired by seed, one factor at a time:
+
+| Contrast | Effect | Standard errors |
+|---|---|---|
+| Dropping the studentization, ratio clip | $+0.068 \pm 0.021$ | 3.3 |
+| Divergence against ratio clip, Dr. GRPO advantage | $+0.036 \pm 0.014$ | 2.6 |
+| Divergence against ratio clip, leave-one-out | $+0.031 \pm 0.020$ | 1.5 |
+| Leave-one-out against studentized | $+0.056 \pm 0.025$ | 2.3 |
+| Dr. GRPO against leave-one-out, ratio clip | $+0.011 \pm 0.012$ | 0.9 |
+
+Two things separate and one does not. The studentization hurts, which is Dr. GRPO's own claim reproduced in a setting nothing like a language model. The divergence trust region helps, which is DPPO's. Whether the sample sits in its own baseline does not matter, which is what an $O(1/K)$ bias at $K = 8$ should look like.
+
+The best arm is Dr. GRPO's advantage under the divergence trust region, at $0.954 \pm 0.006$ with the tightest spread of the five. Both trainers still default to leave-one-out under the ratio clip, and this is one matchup at ten seeds, so the default is not being changed on it.
+
 ### Trust-region instrumentation
 
 On the Thunk matchup below, PPO's ratio clip fired on 7 to 14 percent of samples while total-variation distance exceeded its threshold on 22 to 40 percent of the same samples.

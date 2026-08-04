@@ -103,7 +103,10 @@ def main() -> None:
     result = train(args.worker, checkpoint=args.checkpoint, advantage=args.advantage,
                    trust_region=args.trust_region, iterations=args.iterations,
                    groups_per_iter=args.groups, group_size=args.group_size,
-                   seed=args.seed, env=MatchupPool(args.worker, trained, seed=args.seed),
+                   seed=args.seed,
+                   # Held within a group, or the leave-one-out baseline compares an episode with
+                   # episodes of other army pairs and measures scenario difficulty instead of play.
+                   env=MatchupPool(args.worker, trained, seed=args.seed, hold_within_group=True),
                    out=str(refined), quiet=True)
     print(f"trained: {result['initial_win_rate']:.3f} -> {result['final_win_rate']:.3f} on the rotating pool, "
           f"{result['seconds']}s", flush=True)
