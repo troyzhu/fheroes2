@@ -57,6 +57,7 @@ def train(
     holdout_fraction: float = 0.2,
     seed: int = 0,
     out: str | None = None,
+    model_kwargs: dict | None = None,
 ) -> dict:
     torch.manual_seed(seed)
     device = torch.device("cpu")  # small model, small data; MPS is slower here than it is worth
@@ -69,7 +70,9 @@ def train(
     train_obs, train_masks, train_actions = to_tensors(train_s, device)
     hold_obs, hold_masks, hold_actions = to_tensors(holdout_s, device)
 
-    model = BattlePolicy().to(device)
+    # Width overrides exist for capacity experiments; the default is the deployed size, and a
+    # checkpoint records no widths, so whoever loads one must pass the same kwargs.
+    model = BattlePolicy(**(model_kwargs or {})).to(device)
     print(f"policy has {parameter_count(model):,} parameters")
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)

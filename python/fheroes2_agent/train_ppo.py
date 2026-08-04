@@ -116,9 +116,12 @@ def train(
     quiet: bool = False,
     advantage_std_floor: float = 0.1,
     env: object | None = None,
+    model_kwargs: dict | None = None,
 ) -> dict:
     torch.manual_seed(seed)
-    model = BattlePolicy()
+    # Width overrides exist for capacity experiments. A checkpoint records no widths, so loading
+    # one trained at another size fails loudly on shape mismatch rather than silently.
+    model = BattlePolicy(**(model_kwargs or {}))
 
     started_from = "random initialization"
     if checkpoint:

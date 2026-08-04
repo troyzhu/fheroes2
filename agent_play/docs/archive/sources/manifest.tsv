@@ -43,3 +43,8 @@ griddly-rllib-intro.html	OK	44595	-	https://griddly.readthedocs.io/en/latest/rll
 minihack-observation-spaces.html	OK	31837	-	https://minihack.readthedocs.io/en/latest/getting-started/observation_spaces.html
 nle-revisited-blog.html	OK	41567	-	https://iclr-blogposts.github.io/2026/blog/2026/revisiting-the-nle/
 alphastar-unformatted.pdf	OK	2140290	-	https://storage.googleapis.com/deepmind-media/research/alphastar/AlphaStar_unformatted.pdf
+arxiv-2602.04879.pdf	OK	1995269	Rethinking the Trust Region in LLM Reinforcement Learning (DPPO)	https://arxiv.org/abs/2602.04879
+arxiv-2607.00152.pdf	OK	474208	GRPO, Dr. GRPO, and DAPO Are Three Operations on One Number: The Group-Standard-Deviation Identity	https://arxiv.org/abs/2607.00152
+arxiv-2503.20783.pdf	OK	1620055	Understanding R1-Zero-Like Training: A Critical Perspective	https://arxiv.org/abs/2503.20783
+arxiv-2006.05990.pdf	OK	3422099	What Matters In On-Policy Reinforcement Learning? A Large-Scale Empirical Study	https://arxiv.org/abs/2006.05990
+arxiv-2504.04395.pdf	OK	14189708	Human-Level Competitive Pokemon via Scalable Offline Reinforcement Learning with Transformers (Metamon)	https://arxiv.org/abs/2504.04395
