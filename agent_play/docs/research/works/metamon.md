@@ -9,7 +9,7 @@ urls:
   - https://arxiv.org/abs/2504.04395
   - https://github.com/UT-Austin-RPL/metamon
 tags: [reference, turn-based, offline-rl, imitation, self-play, prior-art]
-local: ["files/arxiv-2504.04395.pdf"]
+local: ["files/arxiv-2504.04395.pdf", "files/metamon-README.md", "files/poke-env-README.md", "files/arxiv-2012.01914.pdf"]
 ---
 
 # Metamon, offline RL on a turn-based battle ladder
@@ -33,6 +33,10 @@ Their sequence models earn their size from partial observability. This project's
 ## What does not transfer
 
 Pokémon has no board. The whole spatial half of this project's action space, movement and positioning on 99 cells, has no analogue there, so their flat move-choice action space says nothing about ours. Their scale, 200 million parameters and millions of battles, is calibrated to a decade of human data and a fanbase-sized opponent pool; nothing about this project's single-machine budget follows from it.
+
+## The neighbourhood, briefly
+
+Their environment layer is poke-env, the standard Pokémon Showdown battle library, vendored beside this note. The wider turn-based space is thinner than expected: DeepCrawl (Sestini, Kuhnle and Bagdanov, AIIDE 2019 workshop, arXiv 2012.01914) shipped policy-network agents in a playable mobile roguelike, which shows the deployment path at small scale, and beyond it the turn-based tactics literature is mostly older minimax-hybrid work with nothing at Metamon's level of evidence. The strong prior art for this project remains [[vcmi-gym]] on the wargame side and Metamon on the duel side.
 
 ## Related
 

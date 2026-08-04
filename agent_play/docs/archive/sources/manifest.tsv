@@ -48,3 +48,6 @@ arxiv-2607.00152.pdf	OK	474208	GRPO, Dr. GRPO, and DAPO Are Three Operations on 
 arxiv-2503.20783.pdf	OK	1620055	Understanding R1-Zero-Like Training: A Critical Perspective	https://arxiv.org/abs/2503.20783
 arxiv-2006.05990.pdf	OK	3422099	What Matters In On-Policy Reinforcement Learning? A Large-Scale Empirical Study	https://arxiv.org/abs/2006.05990
 arxiv-2504.04395.pdf	OK	14189708	Human-Level Competitive Pokemon via Scalable Offline Reinforcement Learning with Transformers (Metamon)	https://arxiv.org/abs/2504.04395
+metamon-README.md	OK	63115	Metamon repository README, datasets and baselines for Pokemon Showdown RL	https://raw.githubusercontent.com/UT-Austin-RPL/metamon/main/README.md
+poke-env-README.md	OK	4265	poke-env, the Pokemon Showdown battle environment library	https://raw.githubusercontent.com/hsahovic/poke-env/master/README.md
+arxiv-2012.01914.pdf	OK	2226235	DeepCrawl: Deep Reinforcement Learning for Turn-based Strategy Games	https://arxiv.org/abs/2012.01914

@@ -183,7 +183,7 @@ Every degenerate matchup measured a reward standard deviation of exactly 0.00; e
 
 Loaded through the engine's own map loader with `--dump-map`. 108 by 108, 13 heroes, 93 neutral stacks.
 
-Ten of thirteen hero armies and 66 of 93 neutral stacks are representable under `simple_v1`. The player's opening fight is not: Catarina starts with 17 Rangers and 6 Cavalries against 12 Genies, and Cavalry is wide while Genies fly.
+Ten of thirteen hero armies and 66 of 93 neutral stacks are representable under `simple_v1`. Catarina's opening fight is not, 17 Rangers and 6 Cavalries against 12 Genies, since Cavalry is wide and Genies fly. Calling that "the player's opening fight" was wrong: the fight the owner meant is the Barbarian starting hero Ta Arg-Majj, 16 Goblins and 5 Orcs against the neutral Peasant stack, which is fully representable and was discarded by the difficulty filter because the teacher loses it outright, along with all seven other fights that hero can reach. [[2026-08-04-flip-and-collapse#The Thunk opening fight, pinned down]] finally measures it.
 
 Most contested matchup found anywhere in this work: Corribus with 3 Crusaders and 2 Paladins against 22 Orc Chiefs, measuring 0.50 with a reward standard deviation of 1.26 over 28 decisions. Training it with a leave-one-out baseline and the divergence trust region, 25 iterations of 4 groups of 8, took it from **0.562 to 1.000** in 23.6 s.
 

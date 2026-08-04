@@ -61,7 +61,7 @@ arxiv() { # arxiv <id>  -> PDF + scraped title
 for id in 1708.04782 2105.13807 2006.14171 2011.06363 2006.13760 1912.06680 2206.02855 \
           2105.11674 1710.06542 2110.05038 2308.03526 2104.06890 2009.05643 1811.06447 \
           2410.17647 2104.03113 2305.19240 2607.06514 \
-          2602.04879 2607.00152 2503.20783 2006.05990 2504.04395; do
+          2602.04879 2607.00152 2503.20783 2006.05990 2504.04395 2012.01914; do
     arxiv "${id}"
 done
 
@@ -80,6 +80,8 @@ fetch "sample-factory-README.md"        "https://raw.githubusercontent.com/alex-
 fetch "lux-ai-2021-winner-README.md"    "https://raw.githubusercontent.com/IsaiahPressman/Kaggle_Lux_AI_2021/main/README.md"
 fetch "mmai-README.md"                  "https://raw.githubusercontent.com/vcmi-mods/mmai/vcmi-1.7/README.md"
 fetch "invalid-action-masking-README.md" "https://raw.githubusercontent.com/vwxyzjn/invalid-action-masking/master/README.md"
+fetch "metamon-README.md"               "https://raw.githubusercontent.com/UT-Austin-RPL/metamon/main/README.md"
+fetch "poke-env-README.md"              "https://raw.githubusercontent.com/hsahovic/poke-env/master/README.md"
 
 # ---- Web pages (HTML snapshots) --------------------------------------------
 fetch "vcmi-gym-blog.html"              "https://smanolloff.github.io/projects/vcmi-gym/"

@@ -85,6 +85,26 @@ The prediction holds at the extremes. The only matchup with terminal collapses i
 
 Solving a matchup drives episode outcomes toward identical, the raw advantage spread toward zero, and the unfloored normalization then rescales critic residue to unit size, on 40 to 87 percent of post-solve iterations across every matchup measured. Those unit-size noise steps random-walk the policy. Whether the walk ever exits the winning region depends on the region's width: matchups flat under half-scale parameter noise never dipped, and the narrowest matchup measured produced every terminal collapse on record. The floor does not prevent the knock-offs, whose rate is similar floored and unfloored on the vulnerable matchup; it shrinks the steps, and every floored dip recovered while both unfloored terminal collapses did not. Why the floored runs still dip at all is not answerable from the record, because those histories were stored as win rates alone before today's telemetry fix.
 
+## The Thunk opening fight, pinned down
+
+The owner has pointed at this fight three times, and every earlier pass lost it: once to a wrong hero, Catarina's unrepresentable Genie battle labelled "the player's opening fight", and once to the difficulty filter, which discarded every fight the actual starting hero can reach because the teacher loses them all. The fight is Ta Arg-Majj, 16 Goblins and 5 Orcs, against the neutral Peasant stack, rolled at 1,000 Peasants on the dumped world. All of it is `simple_v1`-representable. Counts randomize at load, so 1,000 is one roll rather than the map's fixed value.
+
+The question asked before running anything: is the fight winnable by better play, or hopeless by arithmetic? The clone at 0.887 teacher agreement stands in for teacher-level play on a count ladder.
+
+| Peasants | 100 | 110 | 115 | 120 | 125 to 1000 |
+|---|---|---|---|---|---|
+| Clone win rate | 1.000 | 0.958 | 0.875 | 0.000 | 0.000 |
+
+A cliff between 115 and 120, the same step function the mirror matchups showed. Training at the frontier tests whether learning can move it: 30 iterations at 115 Peasants, two seeds, both reaching 1.000 there.
+
+| Peasants | 110 | 115 | 120 | 125 | 140 | 200 | 1000 |
+|---|---|---|---|---|---|---|---|
+| Trained, both seeds | 1.00 | 1.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+
+The cliff does not move by a single Peasant. The arithmetic says why: the hero's whole army is about 98 hit points, one strike from a Peasant stack this size deals several times that, and grinding a thousand hit points with five Orcs outlasts the round limit, so no sequence of moves survives contact and no kiting finishes in time. The frontier at roughly 115 is set by damage arithmetic, and the rolled fight sits a factor of nine beyond it.
+
+So the opening fight is not a training problem, and that is the finding. The battle layer plays it as well as it can be played; what the campaign start actually requires is not fighting it with the starting army, which is a recruitment decision, and recruitment belongs to the adventure-map scope [[../../roadmap#Where the project is aimed]] records as phase 2. This is the first measured case of the roadmap's claim that battle tactics alone do not carry the campaign.
+
 ## Capacity, asked and measured
 
 Prompted by the owner asking whether the trust-region result reflected limited model capacity. Cloning at three widths on the same 45,380 decisions, then PPO from each clone on the same 90 training matchups, 40 iterations, three paired seeds, everything else identical.
