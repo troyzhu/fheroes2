@@ -107,10 +107,22 @@ Calibrated pool of 140 split 90 for training and 50 held out, everything else as
 | Groups spanning eight matchups | $+0.234 \pm 0.042$ | $+0.047 \pm 0.054$ | $0.514 \pm 0.047$ |
 | Groups sharing one matchup, seed 0 | $+0.191 \pm 0.041$ | $+0.261 \pm 0.051$ | $0.682 \pm 0.044$ |
 | Groups sharing one matchup, seed 1 | $+0.190 \pm 0.043$ | $+0.240 \pm 0.050$ | $0.708 \pm 0.043$ |
+| Groups sharing one matchup, seed 2 | $+0.211 \pm 0.037$ | $+0.239 \pm 0.051$ | $0.708 \pm 0.044$ |
 
-The first row was written up as a generalization gap of $+0.187 \pm 0.068$, 2.7 standard errors, a ratio near fivefold. It was an artifact. Comparing the trained policies directly avoids the before-measurement noise, since all three start from the same checkpoint: held-out win rate after training is 0.514 against 0.695, and the gap is gone.
+The first row was written up as a generalization gap of $+0.187 \pm 0.068$, 2.7 standard errors, a ratio near fivefold. It was an artifact. Comparing the trained policies directly avoids the before-measurement noise, since all four start from the same checkpoint: held-out win rate after training is 0.514 against 0.699, and the gap is gone.
 
-Four measurements of the same quantity, in order: $-0.208$ on 2 held-out matchups, $+0.104 \pm 0.126$ on 12, $+0.047 \pm 0.054$ on 50 with the defect, and $+0.25$ on 50 without it.
+Four measurements of the same quantity, in order: $-0.208$ on 2 held-out matchups, $+0.104 \pm 0.126$ on 12, $+0.047 \pm 0.054$ on 50 with the defect, and $+0.247$ on 50 without it.
+
+### Two error bars, one number, five times apart
+
+The three corrected seeds agree to 0.007, which invites a mistake worth recording. The held-out gain exceeds the training gain by $+0.049$, and that number carries two different errors depending on what is being claimed.
+
+| Error taken across | Difference | Standard errors | Question it answers |
+|---|---|---|---|
+| Seeds | $+0.049 \pm 0.012$ | 4.1 | Does the run repeat on these 90 and these 50 matchups |
+| Matchups | $+0.049 \pm 0.056$ | 0.9 | Would it hold on other matchups from the generator |
+
+Only the second bears on generalization, and by it there is no gap in either direction. The first is a statement about reproducibility, and quoting it would turn a null result into a reverse generalization gap at 4.1 standard errors using an error bar that answers a question nobody asked.
 
 ### The group that never shared a starting position
 

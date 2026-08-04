@@ -132,14 +132,17 @@ A calibrated pool of 140, split 90 for training and 50 held out, 40 iterations o
 | Configuration | Training gain | Held-out gain |
 |---|---|---|
 | Groups spanning eight matchups, defective | $+0.234$ | $+0.047$ |
-| Groups sharing one matchup, seed 0 | $+0.191 \pm 0.041$ | $+0.261 \pm 0.051$ |
-| Groups sharing one matchup, seed 1 | $+0.190 \pm 0.043$ | $+0.240 \pm 0.050$ |
+| Groups sharing one matchup, three seeds | $+0.198$ | $+0.247$ |
 
 The defect is in how the pool composed with a group-relative baseline. `MatchupPool` drew a new army pair on every reset and the trainer resets once per episode, so a group of eight was eight different battles. Every mode here compares an episode with the others beside it, which is why GRPO on a language model samples several completions of one prompt, and comparing one completion each of eight prompts measures which prompt was easy. The baseline was subtracting scenario difficulty rather than establishing a reference for play.
 
 That explains the shape of the defective run exactly. Fitting the training matchups still worked, because the useful signal survives averaging over a batch. Transfer did not, because the advantage carried mostly which matchup had been drawn, and that is information with nothing to transfer.
 
-With groups sharing a starting position the held-out win rate after training goes from 0.514 to 0.695, and the gap the earlier version of this section reported is gone. On both seeds the held-out gain is at least as large as the training gain, and the difference between them is within one standard error of zero.
+With groups sharing a starting position the held-out win rate after training goes from 0.514 to 0.699 across three seeds, and the gap the earlier version of this section reported is gone. On every seed the held-out gain is at least as large as the training gain.
+
+Which error to use decides what that last sentence means, and the two available differ by a factor of five. Across seeds the held-out gain exceeds the training gain by $+0.049 \pm 0.012$, which is 4.1 standard errors and would read as a reverse gap. Across matchups the same difference is $+0.049 \pm 0.056$, which is 0.9 standard errors and reads as nothing.
+
+The second is the one that bears on generalization. The across-seed error asks whether the measurement repeats on these particular 90 and 50 matchups, and it does, tightly. The across-matchup error asks whether it would hold on other matchups the generator produces, which is the actual question, and by it there is no gap in either direction. Quoting the tighter number would turn a null result into a discovery, using an error bar that answers a question nobody asked.
 
 The calibration holds at scale, which is worth recording separately: the pool targeted 0.5 and both halves measured within 0.05 of it against the checkpoint that calibrated them, on 24 evaluation episodes rather than the 8 used to probe.
 
