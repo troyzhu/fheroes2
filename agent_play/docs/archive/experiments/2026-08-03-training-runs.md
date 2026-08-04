@@ -79,9 +79,27 @@ Paired by seed, one factor at a time:
 | Leave-one-out against studentized | $+0.056 \pm 0.025$ | 2.3 |
 | Dr. GRPO against leave-one-out, ratio clip | $+0.011 \pm 0.012$ | 0.9 |
 
-Two things separate and one does not. The studentization hurts, which is Dr. GRPO's own claim reproduced in a setting nothing like a language model. The divergence trust region helps, which is DPPO's. Whether the sample sits in its own baseline does not matter, which is what an $O(1/K)$ bias at $K = 8$ should look like.
+Two things separate and one cannot. The studentization hurts, which is Dr. GRPO's own claim reproduced in a setting nothing like a language model. The divergence trust region helps, which is DPPO's. Leave-one-out against Dr. GRPO is not a measurable contrast at all, for a reason found only after running it: the two advantages are proportional by $K/(K-1)$ and batch normalization divides that constant straight back out, so they issue identical updates except where the advantage floor binds for one and not the other. The $+0.011 \pm 0.012$ in the table is floor behaviour, not a baseline effect.
 
-The best arm is Dr. GRPO's advantage under the divergence trust region, at $0.954 \pm 0.006$ with the tightest spread of the five. Both trainers still default to leave-one-out under the ratio clip, and this is one matchup at ten seeds, so the default is not being changed on it.
+The best arm is Dr. GRPO's advantage under the divergence trust region, at $0.954 \pm 0.006$ with the tightest spread of the five.
+
+### The same five arms on a pool, where none of it replicates
+
+Five seeds each over the 140-matchup pool with groups held within a matchup, 30 iterations of 4 groups of 8.
+
+| Advantage | Trust region | Last-five win rate | Spread | Paired against leave-one-out and ratio |
+|---|---|---|---|---|
+| Leave-one-out | ratio | $0.615 \pm 0.031$ | 0.068 | — |
+| Group-relative, studentized | ratio | $0.607 \pm 0.064$ | 0.143 | $-0.008 \pm 0.068$ |
+| Group-relative, unstudentized | ratio | $0.618 \pm 0.030$ | 0.067 | $+0.003 \pm 0.003$ |
+| Leave-one-out | divergence | $0.584 \pm 0.037$ | 0.082 | $-0.031 \pm 0.037$ |
+| Group-relative, unstudentized | divergence | $0.584 \pm 0.037$ | 0.082 | $-0.031 \pm 0.037$ |
+
+Nothing separates. The studentization penalty shrinks from $+0.068$ to $+0.011$ and stops being resolvable, and the divergence trust region flips from $+0.036$ to $-0.031$, which is the opposite sign at comparable magnitude. The two divergence rows are identical to three decimals in every column, which is the $K/(K-1)$ identity showing itself: on this pool the floor never binds differently between them, so the two arms are literally the same run.
+
+The one survivor is a variance effect rather than a mean one. Studentized GRPO's spread across seeds is 0.143 against 0.067 for the other ratio-clip arms, and its worst run is 0.362 against 0.550, which is what dividing each group by its own noisy spread should do.
+
+So the ranking measured on one matchup does not survive a distribution, and the defaults are not being changed. What a single matchup measures is that matchup.
 
 ### Trust-region instrumentation
 

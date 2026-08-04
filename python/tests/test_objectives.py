@@ -135,6 +135,36 @@ with torch.no_grad():
     next(p for n, p in a.named_parameters() if not n.startswith("value_head"))[0] += 1e-3
 check(policy_fingerprint(a) != policy_fingerprint(b), "a single perturbed policy weight changes the fingerprint")
 
+# --- leave-one-out and Dr. GRPO are the same algorithm once the batch is normalized
+returns = np.array([2.0, -1.0, 1.5, 0.0, -0.5, 1.0, 0.25, -1.5], dtype=np.float32)
+loo, dr = ob.group_advantages(returns, "loo"), ob.group_advantages(returns, "drgrpo")
+k = len(returns)
+check(np.allclose(loo, dr * k / (k - 1)), "leave-one-out is Dr. GRPO scaled by k/(k-1)")
+
+# Several groups, which is what a real batch holds. The scale is the same in every group, so the
+# whole batch is a uniform rescaling, and normalization divides it straight back out.
+rng = np.random.default_rng(0)
+groups = [rng.normal(size=8).astype(np.float32) for _ in range(4)]
+batch_loo = np.concatenate([ob.group_advantages(g, "loo") for g in groups])
+batch_dr = np.concatenate([ob.group_advantages(g, "drgrpo") for g in groups])
+check(np.allclose(ob.normalize_advantages(batch_loo, 0.1), ob.normalize_advantages(batch_dr, 0.1)),
+      "after batch normalization the two are identical, so the O(1/k) bias is absorbed")
+
+# The floor is the only thing that can separate them, because it stops the divisor tracking the
+# scale. This is why the two arms are not quite identical in the recorded experiments.
+tiny = [g * 0.01 for g in groups]
+floored_loo = ob.normalize_advantages(np.concatenate([ob.group_advantages(g, "loo") for g in tiny]), 0.1)
+floored_dr = ob.normalize_advantages(np.concatenate([ob.group_advantages(g, "drgrpo") for g in tiny]), 0.1)
+check(not np.allclose(floored_loo, floored_dr), "a binding floor is the one thing that separates them")
+
+# GRPO is genuinely different, because studentizing divides by the group's own spread rather than
+# by a constant, so it is not a uniform rescaling and normalization cannot absorb it.
+uneven = [np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 5.0], dtype=np.float32), groups[0]]
+batch_grpo = np.concatenate([ob.group_advantages(g, "grpo") for g in uneven])
+batch_dr2 = np.concatenate([ob.group_advantages(g, "drgrpo") for g in uneven])
+check(not np.allclose(ob.normalize_advantages(batch_grpo, 0.1), ob.normalize_advantages(batch_dr2, 0.1)),
+      "studentization survives normalization, so GRPO is a real third option")
+
 # --- a group must share its starting position, or the baseline measures the scenario
 from fheroes2_agent.env import MatchupPool  # noqa: E402
 

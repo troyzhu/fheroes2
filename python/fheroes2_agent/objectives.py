@@ -46,6 +46,13 @@ def group_advantages(returns: np.ndarray, mode: str) -> np.ndarray:
     if mode == "loo":
         # Excluding the sample keeps the baseline independent of its own actions, which is what
         # makes this exactly unbiased.
+        #
+        # It is also, in this pipeline, the same thing as `drgrpo`. Algebraically
+        # a_LOO = (k / (k - 1)) * a_DrGRPO elementwise, a constant that does not depend on the
+        # sample, and `normalize_advantages` divides the batch by its own spread, which scales by
+        # that same constant. So the two produce identical updates whenever the group size is
+        # fixed, and differ only when the advantage floor binds for one and not the other. The
+        # O(1/k) bias that separates them on paper is exactly what the normalization absorbs.
         return returns - (returns.sum() - returns) / (k - 1)
 
     if mode in ("grpo", "drgrpo"):
