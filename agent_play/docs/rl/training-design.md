@@ -264,6 +264,14 @@ They are indistinguishable. At 32 episodes an iteration the standard error on a 
 
 That is a useful negative result rather than a disappointment. It says the machinery is not the bottleneck, and the scenario distribution is, which is the same conclusion [[scenario-distribution]] reached from the variance side.
 
+### The two trust regions disagree about which updates are large
+
+The comparison above found the advantage estimators indistinguishable, and left the trust regions apparently so too. Instrumenting both on the same run says otherwise.
+
+On the Thunk matchup, PPO's clip fired on 7 to 14 percent of samples while the total-variation distance exceeded its threshold on 22 to 40 percent of the same samples. They are not flagging the same updates. That is the measurable form of the claim in [[../research/works/dppo-trust-region]] that the sampled ratio is a poor proxy for the divergence it stands in for, and it holds here despite the argument that the effect should be milder in a masked categorical of five to thirty actions than over a vocabulary.
+
+What this does not show is that either is better. Both runs converged, and separating them on outcome would need the many seeds the comparison above already called for. What it shows is that the quantities differ enough to be worth distinguishing, which is the premise the comparison rests on.
+
 ### Starting hyperparameters
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.

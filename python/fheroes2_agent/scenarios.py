@@ -151,13 +151,19 @@ def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, ta
 
     Returns the best matchup found and the scale that produced it.
     """
-    low, high = 0.25, 3.0
+    # Wide, because the band can sit well outside a naive guess: 17 Rangers beat 54 Skeletons
+    # every time, so a range topping out at 3x never reached the crossover. Bisection costs a
+    # logarithm, so widening it is nearly free.
+    low, high = 0.1, 20.0
     best = None
     for _ in range(steps):
         mid = (low + high) / 2
         candidate = Matchup(attacker, scale_army(defender, mid))
         result = measure(model, worker, candidate, episodes, side)
         result["scale"] = mid
+        # Strictly better only, so a tie keeps the earlier probe; with a step-function matchup
+        # every probe ties at distance 0.5 and the result is reported as out of band below rather
+        # than dressed up as a calibration.
         if best is None or abs(result["win_rate"] - target) < abs(best["win_rate"] - target):
             best = result
         if result["win_rate"] > target:
@@ -174,4 +180,8 @@ def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, ta
     confirmed = measure(model, worker, best["matchup"], episodes * 2, side)
     confirmed["scale"] = best["scale"]
     confirmed["search_win_rate"] = best["win_rate"]
+    # A matchup whose win rate is a step function has no scale inside the band, and saying so is
+    # more useful than returning the least-bad probe as though it were calibrated.
+    confirmed["calibrated"] = bool(confirmed["in_band"])
+    confirmed["search_range"] = (low, high)
     return confirmed

@@ -114,6 +114,24 @@ The prediction this page did not make, and the most important of the three. Spli
 
 At twelve evaluation episodes per matchup the standard error is around 0.14, so the regression is roughly one and a half standard errors and is suggestive rather than settled. The direction is what matters: with a pool this small there is nothing forcing a general policy, and reporting the training-matchup number alone would have been badly misleading. Any future result has to be quoted on matchups the policy never trained on, which is the held-out obligation this document already required for seeds and which turns out to bind at least as hard for matchups.
 
+## A real map, measured
+
+Synthetic matchups could be dismissed as an artefact of the sampler, so the same measurement was run on an actual scenario. `Thunk.mx2`, an expansion map, was loaded through the engine's own map loader and its contents dumped: thirteen heroes with their armies and skills, and ninety-three neutral stacks with exact creature types and counts.
+
+The picture is worse than the synthetic one, not better. Of sixty-eight hero-against-stack matchups sampled from the map and measured with the cloned policy, **two were inside the band**, three percent, against eight to ten percent for sampled matchups. Thirty-three were unwinnable and thirty-three trivial. The mean win rate was 0.496 with a median of 0.350, so the distribution is not centred badly, it is bimodal.
+
+That is the strongest form of the argument. A real map is not a source of contested battles; it is a source of battles that are already decided, with a couple of exceptions. Any training distribution has to be constructed, and the map is useful as a source of army compositions rather than of matchups.
+
+The two exceptions were worth having. Corribus, a hero carrying three Crusaders and two Paladins, against twenty-two Orc Chiefs measured 0.50 with a reward standard deviation of 1.26 over twenty-eight decisions, which is the most genuinely contested fight found anywhere in this work. Training on it took the policy from 0.562 to 1.000.
+
+### What the map cannot supply
+
+Two of the map's own constraints are worth recording, because they bound what any map-derived work can do while the scope is `creature_field_v1`.
+
+Ten of thirteen hero armies and sixty-six of ninety-three neutral stacks are representable. The rest contain wide or flying creatures, which the `simple_v1` allowlist excludes. The player's own opening fight is among the casualties: Catarina starts with seventeen Rangers and six Cavalries, and the nearest neutral stack is twelve Genies, so the Cavalry is wide and the Genies fly and the fight cannot be reproduced at all until Phase 1b.
+
+And no hero is present in a battle here. Catarina's attack of 2 and defence of 4 modify every damage roll in the real fight, and the profile is commander-free, so even a representable army is a different battle from the one on the map.
+
 ## What is decided and what is open
 
 Decided. The acceptance criterion for the generator, in [[../decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.

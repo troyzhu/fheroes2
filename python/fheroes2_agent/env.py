@@ -21,6 +21,10 @@ import numpy as np
 from .encoding import encode_mask, encode_observation
 
 
+class ScenarioRejected(RuntimeError):
+    """The worker refused the scenario, usually an army the allowlist or limits do not permit."""
+
+
 @dataclass
 class Step:
     observation: np.ndarray
@@ -45,6 +49,8 @@ class BattleEnv:
         if defender:
             self._cmd += ["--defender", defender]
         self._env = dict(os.environ, HOME=home)
+        self._attacker = attacker
+        self._defender = defender
         self._proc: subprocess.Popen | None = None
         self._pending: dict | None = None
         # Own hit points at the first decision, which is before any damage has been dealt, so it
@@ -60,13 +66,18 @@ class BattleEnv:
     def reset(self) -> tuple[np.ndarray, np.ndarray]:
         self.close()
         self._proc = subprocess.Popen(
-            self._cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            self._cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1, env=self._env,
         )
         while True:
             record = self._readline()
             if record is None:
-                raise RuntimeError("worker produced no decision before exiting")
+                # Surface the worker's own reason. Scenario validation rejects an army the
+                # allowlist or the count limits do not permit, and swallowing that turns a
+                # precise message into an unexplained crash mid-sweep.
+                detail = (self._proc.stderr.read() or "").strip().splitlines()
+                reason = detail[-1] if detail else "no diagnostic on stderr"
+                raise ScenarioRejected(f"{reason} (attacker={self._attacker}, defender={self._defender})")
             if record["record"] == "decision":
                 self._pending = record
                 mine = self.side == "attacker"
