@@ -14,6 +14,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `advantage_floor.py` | Does flooring the advantage-normalization divisor stop a converged run destroying itself? Reports dips and terminal collapses separately | about 11 min over 20 seeds |
 | `advantage_and_trust_region.py` | Do the advantage estimator and the trust region matter, on one matchup or on a pool, at which threshold? | about 15 min over 10 seeds |
 | `solved_region_width.py` | How fast does a solved policy's win rate degrade under parameter noise, matchup by matchup? | about 7 min over 6 matchups |
+| `capacity.py` | Does the network size bind, for cloning or for reinforcement learning? | about 12 min over 3 widths |
 
 ## Conventions
 

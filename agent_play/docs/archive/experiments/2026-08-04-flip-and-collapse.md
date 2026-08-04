@@ -85,7 +85,19 @@ The prediction holds at the extremes. The only matchup with terminal collapses i
 
 Solving a matchup drives episode outcomes toward identical, the raw advantage spread toward zero, and the unfloored normalization then rescales critic residue to unit size, on 40 to 87 percent of post-solve iterations across every matchup measured. Those unit-size noise steps random-walk the policy. Whether the walk ever exits the winning region depends on the region's width: matchups flat under half-scale parameter noise never dipped, and the narrowest matchup measured produced every terminal collapse on record. The floor does not prevent the knock-offs, whose rate is similar floored and unfloored on the vulnerable matchup; it shrinks the steps, and every floored dip recovered while both unfloored terminal collapses did not. Why the floored runs still dip at all is not answerable from the record, because those histories were stored as win rates alone before today's telemetry fix.
 
-## Sources consulted
+## Capacity, asked and measured
+
+Prompted by the owner asking whether the trust-region result reflected limited model capacity. Cloning at three widths on the same 45,380 decisions, then PPO from each clone on the same 90 training matchups, 40 iterations, three paired seeds, everything else identical.
+
+| Width | Parameters | Cloning agreement | Pool win rate |
+|---|---|---|---|
+| Half | 139,546 | 0.8699 | $0.615 \pm 0.010$ |
+| Deployed | 396,570 | 0.8873 | $0.644 \pm 0.019$ |
+| Double | 1,265,434 | 0.9013 | $0.602 \pm 0.013$ |
+
+Two answers. Cloning agreement rises monotonically with width, so the clone is data-limited rather than capacity-saturated, and the recorded reason for sizing the network down from 626k, a widening train-holdout loss gap, does not show up as an agreement cost even at triple that size. Reinforcement learning at this budget points the other way: the double model is worse than the deployed one by 0.042 at about 1.8 standard errors over three seeds, which is what more parameters on the same 32-episode batches should do, and no ceiling is in sight since every width was still climbing at cutoff.
+
+And nothing in the trust-region question was capacity to begin with: the flip reversed within a single model read at two horizons, and a capacity ceiling would bound both arms alike rather than reorder them.
 
 Bay and Yearick, arXiv 2607.00152, carried the identity behind the identical divergence arms as its Proposition 1 and is written up in [[../../research/works/group-std-identity]]. Its binary-reward bound on the group spread is what separates the LLM literature's difficulty-bias reading of studentization from the unbounded amplification measured here.
 

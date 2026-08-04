@@ -239,6 +239,8 @@ Splitting by episode rather than by decision matters more than it looks. Consecu
 
 Agreement is a ceiling rather than a target. The teacher plays both sides, so a perfect clone equals the teacher and does not beat it, and the minimum achievable loss is the teacher's conditional entropy given what the observation shows rather than zero. Held-out loss flattened near 0.38 while training loss continued to 0.28, which is the mild overfitting expected at this data scale and is why the network was sized down from 626k parameters to 393k.
 
+The size question was re-measured on 2026-08-04 with width as the only variable, and the loss-gap reasoning above does not survive it cleanly. Agreement rises monotonically with width, 0.870 at 140k parameters, 0.887 at 397k, 0.901 at 1.27M, so whatever the loss gap showed, tripling the size costs no held-out agreement and buys some. Reinforcement learning at a 40-iteration pool budget prefers the deployed size, with the 1.27M model worse by 0.042 at about 1.8 standard errors, which is the sample-efficiency price of more parameters on the same batches rather than a ceiling. So capacity binds cloning mildly from above and reinforcement learning not at all at current budgets. [[../archive/experiments/2026-08-04-flip-and-collapse#Capacity, asked and measured]] carries the run.
+
 The data came from replaying the five fixtures under 400 world seeds each. That varies the obstacle layout and the combat seed while holding the army matchup fixed, which is the separation [[scenario-distribution]] requires, and it produced 129 distinct teacher decision streams from the first 200 episodes, so the seeds do change the teacher's behaviour rather than merely its outcomes.
 
 ### Stage 3 measured, 2026-08-03
