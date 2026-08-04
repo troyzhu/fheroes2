@@ -105,6 +105,71 @@ Ten of thirteen hero armies and 66 of 93 neutral stacks are representable under 
 
 Most contested matchup found anywhere in this work: Corribus with 3 Crusaders and 2 Paladins against 22 Orc Chiefs, measuring 0.50 with a reward standard deviation of 1.26 over 28 decisions. Training it with a leave-one-out baseline and the divergence trust region, 25 iterations of 4 groups of 8, took it from **0.562 to 1.000** in 23.6 s.
 
+## Stage 2b, the critic pre-fitted on teacher play
+
+Built from the proposal in [[../../rl/training-design#Pre-fitting the critic on teacher play]]. The teacher plays both sides of every recorded battle, so each episode supplies positive targets for the winner's decisions and negative ones for the loser's, and the 2,000 episodes above yield 45,380 of each. Explained variance is $1 - \text{MSE}/\text{Var}$ on the same held-out 400 episodes the cloning result uses.
+
+| Variant | Explained variance | Teacher agreement | Trainable |
+|---|---|---|---|
+| Cloned, value head at initialization | $-3.061$ | 0.8873 | — |
+| Value head only, trunk frozen | $+0.835$ | 0.8873 | 193 |
+| End to end | $+0.946$ | 0.7012 | 396,570 |
+
+A negative explained variance means the untrained head is worse than predicting the mean, which it is: it emits near zero while returns average $+0.489$. The end-to-end fit buys $0.111$ more and costs $0.186$ of teacher agreement, because the trunk is shared and nothing in the value objective preserves the features the policy head reads.
+
+### What limits the fit
+
+The frozen value head is 193 parameters over a 192-wide trunk, so it is linear regression on the cloned policy's features. Both the data and the representation bind. One fixed held-out set of 400 episodes scores every cell, and gradient steps are equalized at 6,000 rather than epochs, or the small conditions would quietly get less optimization.
+
+| Trunk | 50 episodes | 200 | 800 | 1,600 |
+|---|---|---|---|---|
+| Cloned to 0.606 agreement | $+0.129$ | $+0.025$ | $+0.375$ | $+0.489$ |
+| Cloned to 0.887 agreement | $+0.278$ | $+0.252$ | $+0.563$ | $+0.841$ |
+
+At 1,600 episodes the two trunks differ by 0.35 on identical data, so no amount of extra data recovers what the representation discarded. The first attempt at this table reported the opposite, more data fitting worse, because each condition was scored on its own held-out split and the batches were never shuffled. The inversion is what exposed the design error.
+
+The gate's own 200-episode dataset reaches only $+0.109$ in 20 epochs, which is both factors binding at once rather than a weakness of the method.
+
+### Does it help reinforcement learning
+
+Twenty seeds per arm, paired so both arms share an action-sampling stream, on 6 Archers and 10 Peasants against 121 Peasants, 25 iterations of 32 episodes. Collapse means a run that reached 0.95 at some iteration and finished with a last-five mean below 0.5.
+
+| Arm | Last-five win rate | Spread | Solved | Collapsed |
+|---|---|---|---|---|
+| Cold critic | $0.901 \pm 0.039$ | 0.173 | 20/20 | 2/20 |
+| Pre-fitted critic | $0.951 \pm 0.006$ | 0.028 | 20/20 | 0/20 |
+
+The paired difference is $+0.050 \pm 0.040$, or 1.2 standard errors, which settles nothing. Both arms solve the matchup every time. The whole difference is two collapses in the cold arm, and 2 against 0 out of 20 is a one-sided Fisher exact $p = 0.244$. Rollout value loss starts at 12.177 against 2.099 and ends at 0.280 against 0.132, so the pre-fitted critic is informative from the first iteration rather than after roughly ten.
+
+Chasing those two collapses is what turned up the defect below, and the defect explains them better than the critic does.
+
+## The advantage-normalization collapse
+
+Instrumenting the collapsing seeds showed the mechanism. Advantage normalization divides a batch by its own spread. Once a matchup is solved every episode scores alike, the spread collapses, and the division rescales what remains, which is value-function error, up to unit variance.
+
+Cold critic, seed 1, the two iterations before it fell:
+
+| Iteration | Win rate | Reward spread | Raw advantage spread | Value loss |
+|---|---|---|---|---|
+| 20 | 1.000 | 0.0000 | 0.0219 | 0.0008 |
+| 21 | 1.000 | 0.0000 | 0.0195 | 0.0007 |
+| 22 | 0.188 | 0.8921 | 0.7840 | 2.5638 |
+
+A healthy raw spread on this matchup is 0.3 to 1.0, so dividing by 0.02 amplifies about fiftyfold, and four epochs of that drove a 1.000 win rate to 0.031 by iteration 23.
+
+Two repairs were tried. Dropping the batch when every episode scores alike, which is what `train_group` already did for its groups, and flooring the divisor so a degenerate batch produces a small update instead of a huge one.
+
+| Arm and seed | No guard | Drop the batch | Floor at 0.1 |
+|---|---|---|---|
+| Cold, seed 1 | 0.494 | 0.988 | 0.975 |
+| Cold, seed 9 | 0.319 | 0.269 | 0.994 |
+| Cold, seed 0, control | 0.931 | 0.931 | 0.938 |
+| Pre-fitted, seed 9 | 0.963 | 1.000 | 0.900 |
+
+Dropping fixes one collapse and makes the other worse. The trace explains why: at seed 9 the spread at iterations 17 to 20 is 0.013 to 0.018, small enough to amplify fiftyfold but far above a $10^{-6}$ threshold, so the drop never fires before the collapse. Afterwards the spread is exactly zero because the policy now loses every episode, the drop does fire, and it blocks every remaining update, freezing the run at 0.000. A guard meant to protect a winning policy traps a collapsed one instead.
+
+Flooring fixes both and leaves the control alone, so it is what both trainers now use.
+
 ## Defects found by running things
 
 Recorded because each was invisible to the tests that existed at the time.
@@ -115,6 +180,9 @@ Recorded because each was invisible to the tests that existed at the time.
 - The creature name table, hand-maintained, silently rejected every creature above id 20.
 - `build_worker.sh` relinks without recompiling the agent library, so a source change reported success while the binary was unchanged.
 - Byte-parsing the map produced 24,576 Genies, because monster counts are randomised during load rather than stored.
+- Advantage normalization divided by an unfloored spread, amplifying value-function error about fiftyfold once a matchup was solved and collapsing 2 of 20 runs. Both trainers carried it; only `train_group` had a partial guard, and that guard fires on the wrong side.
+- `build_pool` documented that it records which policy calibrated a pool. It did not, so a pool calibrated for one checkpoint could be reused with another and would silently be a pool of easy matchups. It now records a fingerprint of the weights.
+- The proposal for pre-fitting rested on value data being more plentiful than policy data. Both are read from the same 45,380 rows, so the asymmetry does not exist at that stage.
 
 ## Related
 

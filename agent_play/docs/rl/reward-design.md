@@ -77,9 +77,11 @@ What it does not buy is usefulness. A poor $\Phi$ is harmless and worthless: cor
 | $\Phi = $ own hit points minus foe hit points | The simplest strength estimate, and directly available | Ignores position entirely, so it says nothing about the half of the game that is movement |
 | $\Phi = $ value-weighted own force minus foe force | As above with creature costs | Same, plus the cost table question |
 | $\Phi = $ the engine's own `engine_strength` | The built-in AI's own evaluator, already computed | Only in the `full_v1` profile, so a policy shaped by it cannot be deployed on `observable_v1`, which is the asymmetry [[../decisions/0001-observation-profiles]] warns about |
-| $\Phi = V^{\pi^{*}}$, the fitted teacher value | Principled: shaping by a value function is the ideal case, since it makes the advantage the true one | Requires the critic pre-fitting in [[training-design]], and is only as good as that fit |
+| $\Phi = V^{\pi^{*}}$, the fitted teacher value | Principled: shaping by a value function is the ideal case, since it makes the advantage the true one | The fit now exists and explains 0.835 of held-out return variance, so the remaining question is whether shaping by it beats using it as a baseline |
 
-The last row is the interesting one. Potential-based shaping with $\Phi$ equal to the true value function makes every step's shaped reward equal to the advantage, which is the densest possible correct signal. Pre-fitting a critic on teacher play, which [[training-design]] already proposes for a different reason, is most of the work.
+The last row is the interesting one. Potential-based shaping with $\Phi$ equal to the true value function makes every step's shaped reward equal to the advantage, which is the densest possible correct signal. Pre-fitting a critic on teacher play, which [[training-design]] proposed for a different reason, is most of the work, and as of 2026-08-03 that fit exists and explains 0.835 of held-out return variance.
+
+What the fit does not settle is whether shaping by it is worth anything over using it as a baseline, which is what the critic already does. Both subtract the same quantity; shaping moves it inside the reward while a baseline keeps it outside. The measurement that would separate them has not been run.
 
 ## Two things that are not reward shape but are often mistaken for it
 

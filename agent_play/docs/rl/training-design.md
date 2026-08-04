@@ -169,11 +169,11 @@ Two integration details decide whether this works. The mask must be applied when
 
 ### Pre-fitting the critic on teacher play
 
-Owner proposal, 2026-08-03. Stage 1 trains a policy head and leaves the value head at initialization, which wastes something the setup gives away for free.
+Owner proposal, 2026-08-03, now built as `python/fheroes2_agent/train_critic.py` and measured below. Stage 1 trains a policy head and leaves the value head at initialization, which wastes something the setup gives away for free.
 
 The teacher plays both sides of every headless battle, so a rollout yields an observation sequence and a terminal outcome without any learner involved. Regressing a value head on the realized returns of those rollouts is Monte Carlo policy evaluation, a supervised problem, and it fits $V^{\pi^{*}}$, the value of the teacher's policy against a teacher opponent.
 
-The reason this is worth doing here rather than being a generic nicety is an asymmetry in data. The policy head is limited by how many teacher decisions have been recorded, currently 116, and getting more means recording more. The value head needs only observation and return pairs, and the environment produces those at roughly 4,600 episodes per second from a seed. Value data is effectively unlimited where policy data is not.
+The original argument for it was an asymmetry in data, and building it showed that argument to be wrong. The claim was that policy data is limited by how many teacher decisions have been recorded while value data is effectively unlimited. Both come from the same recorded rollouts: the 2,000 episodes below yield 45,380 teacher actions and 45,380 returns, the same rows read two ways, so there is no asymmetry to exploit at this stage. A genuine one appears only once stage 3 begins, since returns can then be computed from the learner's own rollouts while teacher labels cannot. What actually justifies pre-fitting is the measurement below rather than the argument that motivated it.
 
 It also removes a weakness at the moment it is most dangerous. Early stage-3 updates are worst when the critic is uninformative, because the advantage is then mostly noise, and that is exactly when the cloned policy's competence is most at risk of being destroyed. See [[rlhf-transfer#A reference policy this project does have, and an argument against using it]] for the other half of that problem.
 
@@ -189,6 +189,26 @@ The observation profile has to match the actor's. Fitting on `full_v1` while the
 
 Near the start of an episode the fitted value is dominated by the army matchup rather than by tactics, since two identical policies resolve an opening position mostly according to who has the stronger force. That is useful rather than a defect, because subtracting it removes scenario difficulty from the advantage, which is the same variance the leave-one-out baseline in [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] removes by sampling instead of by regression. The two are alternatives addressing one problem, and pre-fitting is the cheaper of them to try first. [[scenario-distribution#Three mechanisms, one target]] sets both beside difficulty filtering and shows all three removing the same variance term.
 
+#### What it measures
+
+Full numbers in [[../archive/experiments/2026-08-03-training-runs#Stage 2b, the critic pre-fitted on teacher play]]. On the 2,000 recorded episodes, explained variance on held-out battles moves from $-3.061$ to $+0.835$. The negative figure is not a formality: an untrained head emits near zero while returns average $+0.489$, so it is worse than predicting the mean, and PPO currently spends its first ten iterations with a critic that is actively misleading.
+
+The value head is frozen against the rest of the network, which was not obvious in advance. Fitting end to end reaches $+0.946$ and drags teacher agreement from 0.887 to 0.701, because the trunk is shared and nothing in the value objective preserves the features the policy head reads. That is catastrophic forgetting inside one training run, and it destroys the warm start stage 3 exists to protect.
+
+Freezing has a cost worth stating. A 193-parameter head over a 192-wide trunk is linear regression on the cloned policy's features, so the representation caps the fit: on identical data a trunk cloned to 0.606 agreement reaches $+0.489$ where one cloned to 0.887 reaches $+0.841$. Improving the clone improves the critic for free, and no quantity of value data substitutes for it.
+
+Whether this helps stage 3 is not settled. Over twenty paired seeds both arms solved the training matchup every time, and the difference in final win rate was $+0.050 \pm 0.040$. The pre-fitted arm avoided two collapses the cold arm suffered, but 2 against 0 out of 20 is $p = 0.244$, and the collapses turned out to have a cause of their own, described next.
+
+### An amplification in advantage normalization
+
+Found by chasing those two collapses, and unrelated to the critic. Advantage normalization divides a batch by its own spread so the step size does not depend on the reward scale. Once a matchup is solved every episode scores alike, the spread collapses toward zero, and the division rescales what is left, which is value-function error, up to unit variance.
+
+Measured on a calibrated matchup, a raw spread of 0.02 against a healthy 0.3 to 1.0, so the amplification reaches fiftyfold. Four epochs of it drove a policy from a 1.000 win rate to 0.031 within two iterations.
+
+The repair is a floor on the divisor rather than dropping the batch. Dropping is what `train_group` already did for a group whose returns are exactly equal, and it fails twice over: the spread that does the damage is small rather than zero, so the drop never fires before the collapse, and after the collapse the spread is exactly zero again because the policy now loses every episode, so the drop does fire and blocks the updates that would recover it. A floor keeps the sign and ranking of every advantage and turns a degenerate batch into a small update. Both trainers now share it.
+
+The same hazard sits inside GRPO's studentization, which divides each group by its own spread, and [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] already records that as the reason Dr. GRPO drops the term. That the identical failure appears in the batch normalization every variant applies afterwards was not noticed until it destroyed a run.
+
 ### Measured, 2026-08-03
 
 Stage 1 now exists and has been run. Numbers below are from `python/fheroes2_agent/train_bc.py` on 2,000 recorded episodes.
@@ -197,7 +217,7 @@ Stage 1 now exists and has been run. Numbers below are from `python/fheroes2_age
 |---|---|
 | Training decisions | 36,819, from 1,600 episodes |
 | Held-out decisions | 8,561, from 400 episodes, split by episode rather than by decision |
-| Parameters | 392,634 |
+| Parameters | 396,570, of which the value head is 193 |
 | Held-out teacher agreement | 0.887 |
 | Baseline, always the most common teacher action | 0.131 |
 | Baseline, uniform over the legal set | 0.079 |
