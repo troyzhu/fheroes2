@@ -114,7 +114,7 @@ The adventure map is everything outside a battle. A hero moves across a large ma
 
 An agent that plays the game needs both, and the battle agent is a component the adventure agent invokes rather than a smaller version of it.
 
-That claim now has a measured case. The Thunk map's opening fight, the starting Barbarian hero's army against the neutral Peasant stack, is winnable by tactics up to roughly 115 Peasants and lost at every count beyond, a cliff that reinforcement learning at the frontier does not move by a single Peasant, while the stack as rolled holds 1,000. The fight is not a training problem; deciding not to fight it with the starting army is a recruitment decision, which is exactly the adventure-map scope. [[archive/experiments/2026-08-04-flip-and-collapse#The Thunk opening fight, pinned down]] carries the measurement.
+The Thunk map's opening fight is the standing acceptance test for how faithful the battle environment is to the real game, and it has exposed two gaps: the scenario schema carries no hero commander stats, and Champions are wide and outside `simple_v1`, so the fight cannot yet be posed as the game poses it. Whether it is winnable is an open measurement blocked on those two work items, not a conclusion. [[archive/experiments/2026-08-04-flip-and-collapse#The Thunk opening fight, pinned down]] carries what can be measured today.
 
 ## Why the battle came first
 

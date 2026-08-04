@@ -87,23 +87,20 @@ Solving a matchup drives episode outcomes toward identical, the raw advantage sp
 
 ## The Thunk opening fight, pinned down
 
-The owner has pointed at this fight three times, and every earlier pass lost it: once to a wrong hero, Catarina's unrepresentable Genie battle labelled "the player's opening fight", and once to the difficulty filter, which discarded every fight the actual starting hero can reach because the teacher loses them all. The fight is Ta Arg-Majj, 16 Goblins and 5 Orcs, against the neutral Peasant stack, rolled at 1,000 Peasants on the dumped world. All of it is `simple_v1`-representable. Counts randomize at load, so 1,000 is one roll rather than the map's fixed value.
+The owner has now corrected this fight three times, and each correction exposed a different defect in how the map data was read. The first identification, Catarina's Genie battle, was the wrong hero. The second, Ta Arg-Majj's Goblins against 1,000 Peasants, was a proximity-pairing artifact, and a full measurement of that matchup, a cliff at 115 Peasants that frontier training moves by zero, stands as a result about that matchup while its "the opening fight is a recruitment problem" conclusion is retracted with it. The third pass started from the owner's description and a clean dump, and everything in the description verifies.
 
-The question asked before running anything: is the fight winnable by better play, or hopeless by arithmetic? The clone at 0.887 teacher agreement stands in for teacher-level play on a count ladder.
+The fight: Corribus, the Blue player's hero at (95,45), attack 13 and defense 12 as dumped, army 1 Crusader, 1 Crusader, 1 Crusader, 2 Paladins, 2 Champions, against the 1,000-Peasant stack two tiles away at (95,43). The owner recalls attack 14 and defense 9, a discrepancy left open, plausibly a map revision or in-game leveling. A neutral stack fights split into `Rand(3..5)` sub-stacks as evenly as possible, `Army::ArrangeForBattle` in `army.cpp`, which is the owner's 334/333/333. Two earlier passes lost pieces of this: the extraction filter silently dropped the Champions because they are wide, and a peasant search matched nothing because the dump prints plural names.
 
-| Peasants | 100 | 110 | 115 | 120 | 125 to 1000 |
-|---|---|---|---|---|---|
-| Clone win rate | 1.000 | 0.958 | 0.875 | 0.000 | 0.000 |
+Two of the fight's load-bearing elements are outside the current environment: hero commander stats, which the scenario schema simply does not carry, and Champions, which are wide and outside `simple_v1`. Both are now tracked as work items with this fight as the acceptance test. What can be measured today is the army minus Champions with no commander, and it already reshapes the picture.
 
-A cliff between 115 and 120, the same step function the mirror matchups showed. Training at the frontier tests whether learning can move it: 30 iterations at 115 Peasants, two seeds, both reaching 1.000 there.
-
-| Peasants | 110 | 115 | 120 | 125 | 140 | 200 | 1000 |
+| Peasants | 100 | 200 | 300 | 400 | 500 | 700 | 1000 |
 |---|---|---|---|---|---|---|---|
-| Trained, both seeds | 1.00 | 1.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Against one stack | 1.000 | 0.562 | 0.125 | 0.625 | 0.000 | 0.000 | 0.000 |
+| Against the three-way split | 1.000 | 1.000 | 0.938 | 0.562 | 0.062 | 0.000 | 0.000 |
 
-The cliff does not move by a single Peasant. The arithmetic says why: the hero's whole army is about 98 hit points, one strike from a Peasant stack this size deals several times that, and grinding a thousand hit points with five Orcs outlasts the round limit, so no sequence of moves survives contact and no kiting finishes in time. The frontier at roughly 115 is set by damage arithmetic, and the rolled fight sits a factor of nine beyond it.
+The split helps the attacker at every count, opposite to a first guess: three stacks striking for a third each is what single-Crusader bait stacks are for. And unlike the Goblin cliff, this frontier is a slope, which means tactics matter here. Training 30 iterations at the 400 frontier lifts 400 from 0.562 to 0.833 and opens 450 to 0.292 while 500 stays shut at 0.042, so learning moves this frontier where it moved the Goblin one not at all.
 
-So the opening fight is not a training problem, and that is the finding. The battle layer plays it as well as it can be played; what the campaign start actually requires is not fighting it with the starting army, which is a recruitment decision, and recruitment belongs to the adventure-map scope [[../../roadmap#Where the project is aimed]] records as phase 2. This is the first measured case of the roadmap's claim that battle tactics alone do not carry the campaign.
+The real fight remains open, and honestly so: at 1,000 the commander-less, Champion-less approximation is 0.000, and the factor the missing pieces must supply is what defense 12 against Peasant attack 1 and two more fast bodies are worth, which is exactly what the commander work item exists to measure. Until then the winnability of the actual opening fight is an unanswered question, not a conclusion in either direction.
 
 ## Capacity, asked and measured
 
