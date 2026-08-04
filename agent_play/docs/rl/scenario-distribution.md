@@ -123,9 +123,26 @@ Repeating it on a calibrated pool of forty-five, split thirty-three for training
 
 The improvement on trained matchups is unambiguous. The held-out change is positive and indistinguishable from zero, which is a weaker claim than it looks but a much stronger one than the earlier run supported: whatever else is true, the policy is not degrading on matchups it never saw.
 
-Errors here are across matchups rather than across episodes, because the claim is about the pool. Held-out spread is wide, about 0.39 across twelve matchups, so resolving a change of 0.1 to two standard errors would need roughly fifty held-out matchups. That is affordable now that the generator produces them at three seconds each, and it is the obvious next measurement rather than a conclusion.
+Errors here are across matchups rather than across episodes, because the claim is about the pool. Held-out spread is wide, about 0.39 across twelve matchups, so resolving a change of 0.1 to two standard errors needs roughly fifty held-out matchups. That measurement has since been made.
 
-The lesson is about method rather than about reinforcement learning. A two-matchup holdout cannot support a claim in either direction, and the earlier write-up hedged the number without declining to draw a picture from it.
+### At the size the previous entry asked for
+
+A calibrated pool of 140, split 90 for training and 50 held out, 40 iterations of 4 groups of 8, leave-one-out advantage under the ratio clip, 24 evaluation episodes per matchup.
+
+| | Before | After | Change |
+|---|---|---|---|
+| Training matchups, 90 | $0.459 \pm 0.021$ | $0.694 \pm 0.036$ | $+0.234 \pm 0.042$, 5.6 standard errors |
+| Held-out matchups, 50 | $0.467 \pm 0.026$ | $0.514 \pm 0.047$ | $+0.047 \pm 0.054$, 0.9 standard errors |
+
+Neither column is the answer. The held-out gain is still not separable from zero, and running it at the size that was supposed to settle the question did not settle it, because the estimate shrank from $+0.104$ to $+0.047$ as fast as the error did.
+
+The comparison between the two columns is separable. The training gain exceeds the held-out gain by $+0.187 \pm 0.068$, which is 2.7 standard errors, a ratio near fivefold. The two matchup sets are disjoint so their errors combine independently, and the sets are not confounded with difficulty: before training they measured 0.459 and 0.467, agreeing to 0.007.
+
+So there is a real generalization gap, and it is not the regression the first attempt claimed. Training improves what it trains on by roughly five times what it transfers, and the transfer itself is small enough that this pool and this budget cannot show it is nonzero. What the earlier entries could not do was tell those two statements apart.
+
+The calibration also holds at scale, which is worth recording separately: the pool targeted 0.5 and both halves measured within 0.04 of it against the checkpoint that calibrated them, on 24 evaluation episodes rather than the 8 used to probe.
+
+The lesson is about method rather than about reinforcement learning. A two-matchup holdout cannot support a claim in either direction, and the earlier write-up hedged the number without declining to draw a picture from it. The lesson from the larger run is different and easy to miss: a quantity too small to resolve may still be large enough to matter, and the difference of two such quantities can be resolvable when neither is.
 
 ## The generator, built and measured
 

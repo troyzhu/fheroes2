@@ -72,6 +72,19 @@ Calibrated pool of 45 split 33 for training and 12 held out, 40 iterations of 4 
 
 76 s total including both evaluations.
 
+### Generalization, at the size the smaller run asked for
+
+Calibrated pool of 140 split 90 for training and 50 held out, everything else as above. 8 minutes including both evaluations.
+
+| | Before | After | Change |
+|---|---|---|---|
+| Training, 90 | $0.459 \pm 0.021$ | $0.694 \pm 0.036$ | $+0.234 \pm 0.042$ (5.6 SE) |
+| Held out, 50 | $0.467 \pm 0.026$ | $0.514 \pm 0.047$ | $+0.047 \pm 0.054$ (0.9 SE) |
+
+The held-out gain is still not separable from zero. The difference between the two gains is: $+0.187 \pm 0.068$, 2.7 standard errors, a ratio near fivefold. Before training the two halves measured within 0.007 of each other, so the split is not confounded with difficulty, and both sat within 0.04 of the 0.5 the pool targeted, which is the calibration holding at 24 evaluation episodes against the 8 used to probe.
+
+Three measurements of the same quantity, in order: $-0.208$ on 2 held-out matchups, $+0.104 \pm 0.126$ on 12, $+0.047 \pm 0.054$ on 50.
+
 ### Generalization, first attempt, superseded
 
 Pool of in-band matchups split 5 for training and 2 held out, 30 iterations of 32 episodes. Its apparent held-out regression did not survive a larger pool and should not be cited.

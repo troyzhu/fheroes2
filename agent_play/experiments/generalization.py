@@ -88,14 +88,14 @@ def main() -> None:
     # Split by position rather than at random. The pool is generated from a seeded sampler, so its
     # order is already arbitrary, and a fixed split makes the experiment reproducible.
     held, trained = matchups[: args.holdout], matchups[args.holdout :]
-    print(f"{len(matchups)} calibrated matchups: {len(trained)} for training, {len(held)} held out")
+    print(f"{len(matchups)} calibrated matchups: {len(trained)} for training, {len(held)} held out", flush=True)
 
     started = time.time()
     before = {"training": evaluate(model, args.worker, trained, args.eval_episodes),
               "held_out": evaluate(model, args.worker, held, args.eval_episodes)}
     print(f"before: training {before['training']['mean']:.3f} +- {before['training']['stderr']:.3f}, "
           f"held out {before['held_out']['mean']:.3f} +- {before['held_out']['stderr']:.3f} "
-          f"({time.time() - started:.0f}s)")
+          f"({time.time() - started:.0f}s)", flush=True)
 
     # train() returns a report and closes the environment it was given; the refined weights come
     # back only through --out, so the destination is chosen here rather than left implicit.
@@ -106,7 +106,7 @@ def main() -> None:
                    seed=args.seed, env=MatchupPool(args.worker, trained, seed=args.seed),
                    out=str(refined), quiet=True)
     print(f"trained: {result['initial_win_rate']:.3f} -> {result['final_win_rate']:.3f} on the rotating pool, "
-          f"{result['seconds']}s")
+          f"{result['seconds']}s", flush=True)
     trained_model = load(str(refined))
 
     after = {"training": evaluate(trained_model, args.worker, trained, args.eval_episodes),
