@@ -108,29 +108,24 @@ The consequence for the generator is concrete. Rejection sampling is the wrong m
 
 Every degenerate matchup measured a reward standard deviation of exactly 0.00, and every in-band one measured between 1.0 and 1.3. That is the same fact the identity predicts, since equal returns across a group make every advantage zero, and it is a better filter in practice than the win rate: it needs no threshold, it is what the gradient actually depends on, and a matchup that produces zero variance can be discarded after a handful of episodes.
 
-### Training across matchups overfits at this scale
+### Training across matchups, first attempt and then properly
 
-The prediction this page did not make, and the most important of the three. Splitting a pool of in-band matchups into five for training and two held out, PPO improved the training matchups by 0.267 win rate and made the held-out ones **worse** by 0.208. The policy specialized rather than generalized.
+The first attempt at this said PPO overfits, and it was wrong. It is recorded here with its correction because the error is instructive.
 
-At twelve evaluation episodes per matchup the standard error is around 0.14, so the regression is roughly one and a half standard errors and is suggestive rather than settled. The direction is what matters: with a pool this small there is nothing forcing a general policy, and reporting the training-matchup number alone would have been badly misleading. Any future result has to be quoted on matchups the policy never trained on, which is the held-out obligation this document already required for seeds and which turns out to bind at least as hard for matchups.
+Splitting a pool of five in-band matchups into three for training and two held out, PPO improved the training matchups by 0.267 win rate and appeared to make the held-out ones worse by 0.208. With two held-out matchups the standard error is around 0.14, so that was 1.5 standard errors and was reported as suggestive rather than settled. It should have carried less weight than it did.
 
-## A real map, measured
+Repeating it on a calibrated pool of forty-five, split thirty-three for training and twelve held out, with twenty-four evaluation episodes per matchup:
 
-Synthetic matchups could be dismissed as an artefact of the sampler, so the same measurement was run on an actual scenario. `Thunk.mx2`, an expansion map, was loaded through the engine's own map loader and its contents dumped: thirteen heroes with their armies and skills, and ninety-three neutral stacks with exact creature types and counts.
+| | Before | After | Change |
+|---|---|---|---|
+| Training matchups | $0.473 \pm 0.034$ | $0.785 \pm 0.056$ | $+0.312 \pm 0.066$, 4.7 standard errors |
+| Held-out matchups | $0.542 \pm 0.058$ | $0.646 \pm 0.112$ | $+0.104 \pm 0.126$, 0.8 standard errors |
 
-The picture is worse than the synthetic one, not better. Of sixty-eight hero-against-stack matchups sampled from the map and measured with the cloned policy, **two were inside the band**, three percent, against eight to ten percent for sampled matchups. Thirty-three were unwinnable and thirty-three trivial. The mean win rate was 0.496 with a median of 0.350, so the distribution is not centred badly, it is bimodal.
+The improvement on trained matchups is unambiguous. The held-out change is positive and indistinguishable from zero, which is a weaker claim than it looks but a much stronger one than the earlier run supported: whatever else is true, the policy is not degrading on matchups it never saw.
 
-That is the strongest form of the argument. A real map is not a source of contested battles; it is a source of battles that are already decided, with a couple of exceptions. Any training distribution has to be constructed, and the map is useful as a source of army compositions rather than of matchups.
+Errors here are across matchups rather than across episodes, because the claim is about the pool. Held-out spread is wide, about 0.39 across twelve matchups, so resolving a change of 0.1 to two standard errors would need roughly fifty held-out matchups. That is affordable now that the generator produces them at three seconds each, and it is the obvious next measurement rather than a conclusion.
 
-The two exceptions were worth having. Corribus, a hero carrying three Crusaders and two Paladins, against twenty-two Orc Chiefs measured 0.50 with a reward standard deviation of 1.26 over twenty-eight decisions, which is the most genuinely contested fight found anywhere in this work. Training on it took the policy from 0.562 to 1.000.
-
-### What the map cannot supply
-
-Two of the map's own constraints are worth recording, because they bound what any map-derived work can do while the scope is `creature_field_v1`.
-
-Ten of thirteen hero armies and sixty-six of ninety-three neutral stacks are representable. The rest contain wide or flying creatures, which the `simple_v1` allowlist excludes. The player's own opening fight is among the casualties: Catarina starts with seventeen Rangers and six Cavalries, and the nearest neutral stack is twelve Genies, so the Cavalry is wide and the Genies fly and the fight cannot be reproduced at all until Phase 1b.
-
-And no hero is present in a battle here. Catarina's attack of 2 and defence of 4 modify every damage roll in the real fight, and the profile is commander-free, so even a representable army is a different battle from the one on the map.
+The lesson is about method rather than about reinforcement learning. A two-matchup holdout cannot support a claim in either direction, and the earlier write-up hedged the number without declining to draw a picture from it.
 
 ## The generator, built and measured
 
