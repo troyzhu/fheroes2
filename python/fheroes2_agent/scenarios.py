@@ -102,6 +102,61 @@ def _side(rng: random.Random, total_hit_points: float, max_stacks: int) -> str:
     return ",".join(parts)
 
 
+def load_wide_roster() -> list[tuple[int, int, bool]]:
+    """Every wide_v1 creature as (id, hit points, is shooter), from the capability audit."""
+    import json
+    import pathlib
+
+    path = pathlib.Path(__file__).parent / "data" / "monster_capabilities_v1.json"
+    records = json.loads(path.read_text())
+    roster = [(r["monster_id"], int(r["hit_points"]), bool(r["is_archer"]))
+              for r in records if r["wide_v1_supported"]]
+    roster.sort()
+    return roster
+
+
+def _side_from(rng: random.Random, roster, total_hit_points: float, max_stacks: int) -> str:
+    stacks = rng.randint(1, max_stacks)
+    share = total_hit_points / stacks
+    parts = []
+    for _ in range(stacks):
+        monster, hp, _ = rng.choice(roster)
+        parts.append(f"{monster}:{max(1, min(500, int(round(share / hp))))}")
+    return ",".join(parts)
+
+
+def sample_diverse_matchup(rng: random.Random) -> Matchup:
+    """One matchup over the whole wide_v1 bestiary, with commanders and count regimes.
+
+    Three regimes, each an archetype the narrow sampler lacked: the proven small-stack skirmish,
+    a five-stack battle, and elite-against-horde, the Thunk opening fight's shape, with the horde
+    split into three near-equal stacks the way the engine splits a neutral stack. Commanders land
+    on a coin flip per side with map-hero-like stats, because real maps always have one.
+    """
+    roster = load_wide_roster()
+    cheap = [entry for entry in roster if entry[1] <= 5]
+    regime = rng.choices(("skirmish", "battle", "horde"), weights=(4, 4, 2))[0]
+    if regime == "skirmish":
+        strength = rng.choice([15, 20, 25, 30, 40])
+        attacker = _side_from(rng, roster, strength, 3)
+        defender = _side_from(rng, roster, strength * rng.uniform(0.85, 1.15), 3)
+    elif regime == "battle":
+        strength = rng.choice([60, 90, 120, 150])
+        attacker = _side_from(rng, roster, strength, 5)
+        defender = _side_from(rng, roster, strength * rng.uniform(0.85, 1.15), 5)
+    else:
+        attacker = _side_from(rng, roster, rng.choice([80, 120, 160]), 4)
+        monster, hp, _ = rng.choice(cheap)
+        total = rng.randint(60, 900) // max(hp, 1)
+        a = total // 3 + (1 if total % 3 else 0)
+        defender = f"{monster}:{a},{monster}:{total // 3},{monster}:{max(1, total - a - total // 3)}"
+    heroes = {}
+    for side in ("attacker_hero", "defender_hero"):
+        if rng.random() < 0.5:
+            heroes[side] = f"{rng.randint(0, 25)}:{rng.randint(0, 20)}"
+    return Matchup(attacker, defender, allow_wide=True, **heroes)
+
+
 def sample_matchups(n: int, seed: int = 0, max_stacks: int = 3) -> list[Matchup]:
     """Sample matchups likely to carry gradient.
 
@@ -187,7 +242,9 @@ def scale_army(spec: str, factor: float) -> str:
 
 
 def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, target: float = 0.5,
-              episodes: int = 12, steps: int = 7, side: str = "attacker") -> dict:
+              episodes: int = 12, steps: int = 7, side: str = "attacker",
+              attacker_hero: str | None = None, defender_hero: str | None = None,
+              allow_wide: bool = False) -> dict:
     """Find the defender scale that puts a matchup at the target win rate.
 
     This is the mechanism a usable generator needs. Rejection sampling puts about one matchup in
@@ -205,7 +262,8 @@ def calibrate(model: BattlePolicy, worker: str, attacker: str, defender: str, ta
     best = None
     for _ in range(steps):
         mid = (low + high) / 2
-        candidate = Matchup(attacker, scale_army(defender, mid))
+        candidate = Matchup(attacker, scale_army(defender, mid),
+                            attacker_hero=attacker_hero, defender_hero=defender_hero, allow_wide=allow_wide)
         result = measure(model, worker, candidate, episodes, side)
         result["scale"] = mid
         # Strictly better only, so a tie keeps the earlier probe; with a step-function matchup
@@ -263,6 +321,7 @@ def build_pool(
     max_attempts: int | None = None,
     side: str = "attacker",
     progress: bool = False,
+    sampler=None,
 ) -> dict:
     """Calibrate compositions until `target_size` of them sit inside the band.
 
@@ -278,24 +337,40 @@ def build_pool(
 
     while len(pool) < target_size and tried < attempts:
         tried += 1
-        attacker = sample_composition(rng)
-        defender = sample_composition(rng)
+        if sampler is not None:
+            drawn = sampler(rng)
+            attacker, defender = drawn.attacker, drawn.defender
+            extras = {"attacker_hero": drawn.attacker_hero, "defender_hero": drawn.defender_hero,
+                      "allow_wide": drawn.allow_wide}
+        else:
+            attacker = sample_composition(rng)
+            defender = sample_composition(rng)
+            extras = {}
         try:
-            result = calibrate(model, worker, attacker, defender, target=target, episodes=episodes, side=side)
+            result = calibrate(model, worker, attacker, defender, target=target, episodes=episodes, side=side,
+                               **extras)
         except Exception:
             # A composition the scenario schema rejects is not a calibration failure; skip it.
             continue
         if not result["calibrated"]:
             continue
         calibrated += 1
-        pool.append({
+        entry = {
             "attacker": result["matchup"].attacker,
             "defender": result["matchup"].defender,
             "win_rate": result["win_rate"],
             "reward_std": result["reward_std"],
             "mean_length": result["mean_length"],
             "scale": result["scale"],
-        })
+        }
+        # Heroes and the wide flag are part of the matchup's identity when a sampler supplied
+        # them, and a pool that dropped them would rebuild different battles than it measured.
+        matchup = result["matchup"]
+        if matchup.attacker_hero or matchup.defender_hero or matchup.allow_wide:
+            entry["attacker_hero"] = matchup.attacker_hero
+            entry["defender_hero"] = matchup.defender_hero
+            entry["allow_wide"] = matchup.allow_wide
+        pool.append(entry)
         if progress:
             print(f"  {len(pool):3d}/{target_size}  win {result['win_rate']:.2f}  std {result['reward_std']:.2f}  "
                   f"{result['mean_length']:.0f} dec  (tried {tried})")
@@ -313,4 +388,6 @@ def build_pool(
 
 
 def pool_matchups(pool: dict) -> list[Matchup]:
-    return [Matchup(m["attacker"], m["defender"]) for m in pool["matchups"]]
+    return [Matchup(m["attacker"], m["defender"], attacker_hero=m.get("attacker_hero"),
+                    defender_hero=m.get("defender_hero"), allow_wide=bool(m.get("allow_wide", False)))
+            for m in pool["matchups"]]

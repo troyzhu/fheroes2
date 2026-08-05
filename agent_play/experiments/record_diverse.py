@@ -32,54 +32,19 @@ import time
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
-
-def load_wide_roster() -> tuple[list[tuple[int, int, bool]], list[tuple[int, int, bool]]]:
-    """(wide_v1 roster, the cheap-creature subset for hordes), from the capability audit."""
-    path = pathlib.Path(__file__).resolve().parents[2] / "python" / "fheroes2_agent" / "data" / "monster_capabilities_v1.json"
-    records = json.loads(path.read_text())
-    roster = [(r["monster_id"], int(r["hit_points"]), bool(r["is_archer"]))
-              for r in records if r["wide_v1_supported"]]
-    roster.sort()
-    cheap = [entry for entry in roster if entry[1] <= 5]
-    return roster, cheap
+from fheroes2_agent.scenarios import load_wide_roster, sample_diverse_matchup  # noqa: E402
 
 
-def sample_side(rng: random.Random, roster, total_hp: float, max_stacks: int) -> str:
-    stacks = rng.randint(1, max_stacks)
-    share = total_hp / stacks
-    parts = []
-    for _ in range(stacks):
-        monster, hp, _ = rng.choice(roster)
-        parts.append(f"{monster}:{max(1, min(500, int(round(share / hp))))}")
-    return ",".join(parts)
-
-
-def sample_matchup(rng: random.Random, roster, cheap) -> dict:
-    regime = rng.choices(("skirmish", "battle", "horde"), weights=(4, 4, 2))[0]
-    if regime == "skirmish":
-        strength = rng.choice([15, 20, 25, 30, 40])
-        ratio = rng.uniform(0.85, 1.15)
-        attacker = sample_side(rng, roster, strength, 3)
-        defender = sample_side(rng, roster, strength * ratio, 3)
-    elif regime == "battle":
-        strength = rng.choice([60, 90, 120, 150])
-        ratio = rng.uniform(0.85, 1.15)
-        attacker = sample_side(rng, roster, strength, 5)
-        defender = sample_side(rng, roster, strength * ratio, 5)
-    else:
-        # Elite against horde, the opening-fight archetype. The horde is one cheap creature split
-        # into three near-equal stacks, the way Army::ArrangeForBattle splits a neutral stack.
-        attacker = sample_side(rng, roster, rng.choice([80, 120, 160]), 4)
-        monster, hp, _ = rng.choice(cheap)
-        total = rng.randint(60, 900) // max(hp, 1)
-        a = total // 3 + (1 if total % 3 else 0)
-        defender = f"{monster}:{a},{monster}:{total // 3},{monster}:{max(1, total - a - total // 3)}"
-    spec = {"regime": regime, "attacker": attacker, "defender": defender}
-    # Commanders on a coin flip per side, with map-hero-like stats. The dumped Thunk heroes span
-    # attack 1 to 30 and defense 0 to 27.
-    for side in ("attacker", "defender"):
-        if rng.random() < 0.5:
-            spec[f"{side}_hero"] = f"{rng.randint(0, 25)}:{rng.randint(0, 20)}"
+def sample_matchup(rng: random.Random) -> dict:
+    """The shared diverse sampler, reshaped into the recorder's spec dict."""
+    m = sample_diverse_matchup(rng)
+    horde = m.defender.count(":") == 3 - 1 and len({p.split(":")[0] for p in m.defender.split(",")}) == 1
+    spec = {"regime": "horde" if horde else ("battle" if len(m.attacker.split(",")) > 3 or len(m.defender.split(",")) > 3 else "skirmish"),
+            "attacker": m.attacker, "defender": m.defender}
+    if m.attacker_hero:
+        spec["attacker_hero"] = m.attacker_hero
+    if m.defender_hero:
+        spec["defender_hero"] = m.defender_hero
     return spec
 
 
@@ -95,15 +60,15 @@ def main() -> None:
 
     out = pathlib.Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    roster, cheap = load_wide_roster()
-    print(f"{len(roster)} creatures in the wide roster, {len(cheap)} cheap enough for hordes", flush=True)
+    roster = load_wide_roster()
+    print(f"{len(roster)} creatures in the wide roster", flush=True)
 
     rng = random.Random(args.seed)
     sampled, failures = [], 0
     started = time.time()
 
     for index in range(args.matchups):
-        spec = sample_matchup(rng, roster, cheap)
+        spec = sample_matchup(rng)
         sub = out / f"m{index:04d}"
         sub.mkdir(exist_ok=True)
         cmd = [args.worker, "--runs", "1", "--seeds", str(args.seeds), "--allow-wide",

@@ -157,17 +157,22 @@ def train_eval(rows_train, rows_test, variant: str, epochs: int, seed: int = 0) 
     to, tm, ta = tensors(rows_train)
     ho, hm, ha = tensors(rows_test)
 
-    # The architecture reads its widths from the encoding module, so a variant with a different
-    # slot width needs the constants patched for the constructor call and restored after.
-    saved = (enc.SLOT_FEATURES, enc.OBSERVATION_SIZE)
-    enc_patch = sf, enc.SLOT_COUNT * sf + enc.GLOBAL_FEATURES
+    # The architecture reads its slot width from a module global at construction AND at every
+    # forward pass, where it slices the observation. The patch therefore has to hold for the
+    # whole of training and evaluation, not just the constructor; restoring it early sliced a
+    # wide variant's tensors back to the narrow width, which is the shape error the first run of
+    # this script died on.
     import fheroes2_agent.policy as pol
-    pol.SLOT_FEATURES, enc.SLOT_FEATURES = sf, sf
+    saved = pol.SLOT_FEATURES
+    pol.SLOT_FEATURES = sf
     try:
-        model = BattlePolicy()
+        return _train_eval_inner(to, tm, ta, ho, hm, ha, variant, epochs)
     finally:
-        pol.SLOT_FEATURES, enc.SLOT_FEATURES = saved[0], saved[0]
+        pol.SLOT_FEATURES = saved
 
+
+def _train_eval_inner(to, tm, ta, ho, hm, ha, variant, epochs) -> dict:
+    model = BattlePolicy()
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-2)
     best = 0.0
     for _ in range(epochs):

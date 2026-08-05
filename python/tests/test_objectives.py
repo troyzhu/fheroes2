@@ -177,6 +177,28 @@ check(all(_caps[i]["simple_v1_supported"] for i, _, _ in ROSTER), "every roster 
 check(all(hp == _caps[i]["hit_points"] and hp > 0 for i, hp, _ in ROSTER), "hit points come from the engine audit")
 check(all(shooter == _caps[i]["is_archer"] for i, _, shooter in ROSTER), "shooter flags come from the engine audit")
 
+# --- the diverse sampler and the pool round-trip
+from fheroes2_agent.scenarios import load_wide_roster, sample_diverse_matchup, pool_matchups as _pm  # noqa: E402
+
+wide_roster = load_wide_roster()
+check(len(wide_roster) >= 45, "the wide roster covers the wide_v1 allowlist", f"{len(wide_roster)} creatures")
+rngd = random.Random(3)
+drawn = [sample_diverse_matchup(rngd) for _ in range(40)]
+check(all(m.allow_wide for m in drawn), "diverse matchups opt into wide units")
+check(any(m.attacker_hero for m in drawn) and any(m.attacker_hero is None for m in drawn),
+      "commanders land on some sides and not others")
+check(sample_diverse_matchup(random.Random(9)) == sample_diverse_matchup(random.Random(9)),
+      "diverse sampling is reproducible from its seed")
+
+saved_pool = {"matchups": [
+    {"attacker": "1:5", "defender": "1:6"},
+    {"attacker": "9:2,1:10", "defender": "1:300", "attacker_hero": "13:12", "defender_hero": None, "allow_wide": True},
+]}
+ms = _pm(saved_pool)
+check(ms[0].attacker_hero is None and not ms[0].allow_wide, "a plain pool entry stays plain")
+check(ms[1].attacker_hero == "13:12" and ms[1].allow_wide,
+      "heroes and the wide flag survive the pool round-trip")
+
 # --- a group must share its starting position, or the baseline measures the scenario
 from fheroes2_agent.env import MatchupPool  # noqa: E402
 
