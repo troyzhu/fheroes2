@@ -1526,6 +1526,10 @@ namespace fheroes2
             return;
         }
 
+        if ( _renderObserver ) {
+            _renderObserver( *this );
+        }
+
         if ( _cursor->isVisible() && _cursor->isSoftwareEmulation() && !_cursor->_image.empty() ) {
             const Sprite & cursorImage = _cursor->_image;
             Rect cursorROI( cursorImage.x(), cursorImage.y(), cursorImage.width(), cursorImage.height() );

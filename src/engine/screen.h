@@ -244,6 +244,16 @@ namespace fheroes2
             _postprocessing = postprocessing;
         }
 
+        // A render observer, invoked once per render() call with the fully composed frame before
+        // it is pushed to the backend. Null by default and never set by the game itself; external
+        // tools set it to capture frames (currently the agent replay renderer).
+        using RenderObserver = std::function<void( const Display & )>;
+
+        void setRenderObserver( RenderObserver observer )
+        {
+            _renderObserver = std::move( observer );
+        }
+
         // For 8-bit mode we return a pointer to direct surface which we draw on screen
         uint8_t * image() override;
         const uint8_t * image() const override;
@@ -267,6 +277,7 @@ namespace fheroes2
         std::unique_ptr<Cursor> _cursor;
         PreRenderProcessing _preprocessing{ nullptr };
         PostRenderProcessing _postprocessing{ nullptr };
+        RenderObserver _renderObserver{ nullptr };
 
         uint8_t * _renderSurface{ nullptr };
 

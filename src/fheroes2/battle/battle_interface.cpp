@@ -1010,6 +1010,12 @@ Battle::OpponentSprite::OpponentSprite( const fheroes2::Rect & area, HeroBase * 
     case Race::NECR:
         _heroIcnId = isCaptain ? ICN::CMBTCAPN : ICN::CMBTHRON;
         break;
+    case Race::NONE:
+        // Agent scenario commanders (src/fheroes2/agent/agent_commander.h) carry stats but no
+        // faction. They only reach the battle interface through the replay tool; draw them with
+        // the Knight captain art rather than aborting the render.
+        _heroIcnId = ICN::CMBTCAPK;
+        break;
     default:
         // Did you add a new faction? Add the logic here.
         assert( 0 );

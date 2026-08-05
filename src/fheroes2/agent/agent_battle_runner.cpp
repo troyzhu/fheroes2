@@ -250,7 +250,7 @@ const char * fheroes2::agent::terminationName( const Termination termination )
 }
 
 fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & scenario, EpisodeRecording * recording /* = nullptr */,
-                                                             Battle::DecisionController * controller /* = nullptr */ )
+                                                             Battle::DecisionController * controller /* = nullptr */, const bool showInterface /* = false */ )
 {
     assert( validateScenario( scenario ).empty() );
 
@@ -311,7 +311,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
         CompositeController composite( controller, observer );
         Battle::DecisionController * hook = ( controller != nullptr ) ? &composite : observer;
 
-        Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, false, randomGenerator, hook );
+        Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, showInterface, randomGenerator, hook );
 
         // The built-in AI carries a stalemate breaker: after MAX_TURNS_WITHOUT_DEATHS turns in
         // which nothing died, it forces the attacking hero to retreat, and asserts that a

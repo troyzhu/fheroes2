@@ -1,0 +1,3 @@
+# Build outputs of build_replay.sh.
+*.o
+fheroes2_agent_replay

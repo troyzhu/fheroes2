@@ -101,5 +101,11 @@ namespace fheroes2::agent
     // Passing one alongside a recording still records every decision, including the ones the
     // controller made, so an externally driven episode is auditable the same way a teacher
     // episode is.
-    EpisodeOutcome runEpisode( const Scenario & scenario, EpisodeRecording * recording = nullptr, Battle::DecisionController * controller = nullptr );
+    //
+    // `showInterface` constructs the arena with the game's own battle Interface so the episode
+    // renders and animates. The caller owns the prerequisites the interface assumes (display,
+    // assets and palette initialized, as the replay tool does); the default keeps every
+    // existing caller byte-identical, headless, and free of them.
+    EpisodeOutcome runEpisode( const Scenario & scenario, EpisodeRecording * recording = nullptr, Battle::DecisionController * controller = nullptr,
+                               bool showInterface = false );
 }
