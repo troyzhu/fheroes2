@@ -10,15 +10,17 @@ tags: [concept, index, moc, agent-env]
 
 These are reference material rather than a course. Read the one covering whatever you are about to touch.
 
-| Primer | Answers | Read before | Length |
+| Primer | Answers | Read before | Code |
 |---|---|---|---|
-| [[determinism-seeds-and-digests]] | Which seeds control a battle, what gets hashed, why every refactor is accepted on a digest | Touching `Rand::` or `computeBattleSeed` | about 5 min |
-| [[battle-turn-dispatch]] | How rounds and unit turns advance, where an agent may decide, why control is inverted | Editing `battle_arena.cpp` or the decision hook | about 5 min |
-| [[legal-actions-and-masking]] | Why masking, how the 793-slot space is laid out, why mask and candidates share one enumeration | Working on the action space or a policy head | about 7 min |
-| [[observation-design]] | Entities against planes, `full_v1` against `observable_v1`, why never pixels, the MDP rule | Implementing observation serialization | about 7 min |
-| [[command-encoding-and-snapshots]] | Why `Battle::Command` reads backwards, how to snapshot one safely, canonical keys | Reading or logging engine commands | about 4 min |
-| [[teacher-coverage-and-behavior-cloning]] | Who the teacher is, why coverage proves completeness, the cloning ladder | Working on demonstrations or training | about 6 min |
-| [[replay-rendering]] | How a recorded episode replays through the real battle interface, and why the video is provably the same battle | Rendering or auditing recorded episodes | about 4 min |
+| [[determinism-seeds-and-digests]] | Which seeds control a battle, what gets hashed, why every refactor is accepted on a digest | Touching `Rand::` or `computeBattleSeed` | `battle_seed.{h,cpp}`, `agent_digest.{h,cpp}` |
+| [[battle-turn-dispatch]] | How rounds and unit turns advance, where an agent may decide, why control is inverted | Editing `battle_arena.cpp` or the decision hook | `battle_arena.cpp`, `battle_decision_controller.h` |
+| [[legal-actions-and-masking]] | Why masking, how the 793-slot space is laid out, why mask and candidates share one enumeration | Working on the action space or a policy head | `agent_action_space.{h,cpp}`, `battle_action_validation.{h,cpp}` |
+| [[observation-design]] | Entities against planes, `full_v1` against `observable_v1`, why never pixels, the MDP rule | Implementing observation serialization | `agent_observation.{h,cpp}`, `python/fheroes2_agent/encoding.py` |
+| [[command-encoding-and-snapshots]] | Why `Battle::Command` reads backwards, how to snapshot one safely, canonical keys | Reading or logging engine commands | `agent_command_snapshot.{h,cpp}` |
+| [[teacher-coverage-and-behavior-cloning]] | Who the teacher is, why coverage proves completeness, the cloning ladder | Working on demonstrations or training | recorder in `agent_battle_runner.cpp`, `python/fheroes2_agent/train_bc.py` |
+| [[replay-rendering]] | How a recorded episode replays through the real battle interface, and why the video is provably the same battle | Rendering or auditing recorded episodes | `src/agent_replay/`, `agent_play/experiments/{capture,render}_replay.py` |
+
+Engine-side paths are relative to `src/fheroes2/battle/` or `src/fheroes2/agent/`; [[inventory]] maps every component to its tests. Unlabeled prose in these primers describes this project, and evidence from any other system names its source and links its note under `research/works/` at first use, the same rule [[../rl/README|the learning side]] states.
 
 Each follows the same shape: motivation, the idea in one sentence, an intuition drawn from machine learning, the mechanism, a comparison against the alternatives that were rejected, key terms, and a closing section naming the boundary of the claim.
 

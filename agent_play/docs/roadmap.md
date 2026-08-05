@@ -146,7 +146,7 @@ Observability inverts. The battle is effectively fully observed. The adventure m
 
 The horizon lengthens by orders of magnitude. A battle is 5 to 40 decisions. A campaign map is thousands of turns of decisions whose consequences arrive much later, which is a credit-assignment problem the battle never poses.
 
-The action space stops being enumerable in the same way. Movement targets, building choices, recruitment quantities, and trade decisions produce a large and structurally heterogeneous space, closer to StarCraft's than to the current 793 slots.
+The action space stops being enumerable in the same way. Movement targets, building choices, recruitment quantities, and trade decisions produce a large and structurally heterogeneous space, closer to StarCraft's than to the current [[decisions/0002-action-space|793 slots]].
 
 The reward stops being obvious. A battle has a natural terminal signal in winning. A campaign has resource curves, map control, army growth, and eventual victory, on wildly different timescales. See [[decisions/0005-training-and-reward]].
 

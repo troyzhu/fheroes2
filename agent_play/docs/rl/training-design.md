@@ -22,7 +22,7 @@ Techniques named here are defined in [[rl-methods]], which derives the chain fro
 
 ## The learning problem
 
-A policy maps an observation to a distribution over the 793 canonical actions, of which typically five to thirty are legal. Two different objectives fit that same network in sequence. Imitation fits it to reproduce a teacher's choices, which is a supervised classification problem. Reinforcement learning then fits it to maximize return, which is not.
+A policy maps an observation to a distribution over the 793 canonical actions (one skip, 99 move targets and 99 ranged targets for the board's $11 \times 9 = 99$ cells, and $99 \cdot 6 = 594$ melee cell-direction pairs; [[../decisions/0002-action-space]] fixes the layout), of which typically five to thirty are legal. Two different objectives fit that same network in sequence. Imitation fits it to reproduce a teacher's choices, which is a supervised classification problem. Reinforcement learning then fits it to maximize return, which is not.
 
 The teacher is the engine's own `AI::BattlePlanner`, described in [[../implementation/teacher-coverage-and-behavior-cloning]]. It plays both sides of every headless battle, so demonstration data costs only the time to run episodes.
 
@@ -61,7 +61,7 @@ The plane tensor, when enabled, goes through a small convolutional stack of two 
 
 A shared trunk of one or two layers of 256 units produces the representation. From it, a linear head emits 793 logits, and a second linear head emits a scalar value estimate used only in stage 3.
 
-Total parameters land around 200,000 to 500,000. For comparison, the microRTS agent that reached state of the art in this genre used a network of similar order, and the entity-transformer work that matched a vision baseline on Procgen did so with roughly fifty times fewer parameters than the baseline.
+Total parameters land around 200,000 to 500,000. For comparison, the [[../research/works/microrts-py|microRTS agent]] that reached state of the art in this genre used a network of similar order, and the [[../research/works/entity-based-rl|entity-transformer work]] that matched a vision baseline on Procgen did so with roughly fifty times fewer parameters than the baseline.
 
 ### As built, 2026-08-05
 
@@ -277,7 +277,7 @@ A band therefore needs matchups where variance is large relative to the mean, or
 
 The implementation followed the design documents, which were themselves derived from the evidence sweeps. Going back to the primary work notes afterwards found one real omission and two pieces of context that change how the numbers above should be read.
 
-What the corpus had already settled and the implementation followed. A flat masked action space rather than a factorized one, since vcmi-gym's factorized variant failed to converge while its flat masked space shipped. Masking applied at both sampling and log-probability recomputation, with a large negative constant rather than an infinity. Padded entity slots rather than tokenized entity lists, which [[../research/works/entity-based-rl]] records as the choice for a first version with transformers as the upgrade path. A single-file implementation rather than a framework, which is what the one shipped comparable system used. And exposure rather than removal for morale and luck, which is where [[../decisions/0001-observation-profiles]] deliberately departs from vcmi-gym, so both appear in the observation.
+What the corpus had already settled and the implementation followed. A flat masked action space rather than a factorized one, since [[../research/works/vcmi-gym|vcmi-gym]]'s factorized variant failed to converge while its flat masked space shipped. Masking applied at both sampling and log-probability recomputation, with a large negative constant rather than an infinity. Padded entity slots rather than tokenized entity lists, which [[../research/works/entity-based-rl]] records as the choice for a first version with transformers as the upgrade path. A single-file implementation rather than a framework, which is what the one shipped comparable system used. And exposure rather than removal for morale and luck, which is where [[../decisions/0001-observation-profiles]] deliberately departs from vcmi-gym, so both appear in the observation.
 
 The omission. The `obs_encoding_v1` feature vector had no creature identity at all, leaving the policy to infer type from attack, defense, speed and the ability flags. [[../research/works/vcmi-gym]] encodes categories explicitly as one-hot with a NULL for empty slots, which is the practice this should have followed from the start. `obs_encoding_v2` adds a one-hot over the 41 monsters the `simple_v1` allowlist supports, widening an observation from 224 to 634.
 

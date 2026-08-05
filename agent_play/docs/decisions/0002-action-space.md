@@ -29,11 +29,11 @@ Spec §10 defines legal actions as an engine-enumerated, per-decision list of ca
 
 The verified literature is unanimous on a different interface for the learning side:
 
-- Every verified codebase exposes a fixed discrete action space plus a boolean legal mask (vcmi-gym: flat `Discrete(2312)` over the 165-hex board, verified 2-1; MicroRTS: per-cell factorized components, verified 3-0). No verified project consumes variable-length candidate lists directly.
-- Legal-action masking over a fixed space is provably a valid policy gradient (Huang & Ontañón, FLAIRS 2022) and empirically decisive (unmasked full-game microRTS PPO: 0.0 cumulative win rate; fully masked: 0.82–0.91; penalties collapse as the space grows). Verified 3-0.
+- Every verified codebase exposes a fixed discrete action space plus a boolean legal mask ([[../research/works/vcmi-gym|vcmi-gym]]: flat `Discrete(2312)` over the 165-hex board, verified 2-1; [[../research/works/gym-microrts|MicroRTS]]: per-cell factorized components, verified 3-0). No verified project consumes variable-length candidate lists directly.
+- Legal-action masking over a fixed space is provably a valid policy gradient ([[../research/works/invalid-action-masking|Huang & Ontañón, FLAIRS 2022]]) and empirically decisive (unmasked full-game microRTS PPO: 0.0 cumulative win rate; fully masked: 0.82–0.91; penalties collapse as the space grows). Verified 3-0.
 - Standard tooling assumes fixed spaces. CleanRL's `CategoricalMasked` is a masked categorical distribution in a single-file PPO reference implementation, and sb3-contrib's `MaskablePPO` is the Stable-Baselines3 contributed variant that accepts a legality mask. Both are described in [[../implementation/legal-actions-and-masking#Comparison with alternatives]].
 - vcmi-gym's factorized multi-head variant failed to converge; its flat-masked space shipped.
-- AlphaStar-style pointer selection over an enumerated candidate set is the architectural home of our current design, viable later, heavyweight now. Verified 3-0.
+- [[../research/works/alphastar|AlphaStar]]-style pointer selection over an enumerated candidate set is the architectural home of our current design, viable later, heavyweight now. Verified 3-0.
 
 Meanwhile the candidate list itself remains valuable: it carries semantic metadata for the protocol, teacher-action matching (§10.6), debugging, and any future pointer-network head. And the engine-side enumeration through shared non-mutating resolvers (§10.2) remains the top project risk regardless of representation, this ADR changes the *interface*, not that work.
 

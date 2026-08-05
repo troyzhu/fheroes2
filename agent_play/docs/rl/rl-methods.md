@@ -283,7 +283,7 @@ The practical reading is that shaping should either be potential-based or be tre
 
 Attention computes a weighted combination of a set of items where the weights depend on the items, which is what makes it the natural encoder for a variable-length collection of units. A transformer stacks self-attention so that every entity's representation can depend on every other, capturing interactions such as threat and blocking directly.
 
-Scatter connections are the bridge between entity and spatial representations used in AlphaStar. Per-entity embeddings are written into a spatial grid at each entity's location, so a convolutional encoder sees entity-derived features in place rather than only terrain.
+Scatter connections are the bridge between entity and spatial representations used in [[../research/works/alphastar|AlphaStar]]. Per-entity embeddings are written into a spatial grid at each entity's location, so a convolutional encoder sees entity-derived features in place rather than only terrain.
 
 A pointer network selects an element of a variable-length input set by attending over it, which is how a policy can choose among candidates whose number changes between states, and is the architectural home of a candidate-list action interface.
 

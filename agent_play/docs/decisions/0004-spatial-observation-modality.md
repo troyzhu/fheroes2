@@ -27,8 +27,8 @@ tags: [adr, observation, modality, agent-env]
 
 The owner proposed giving the agent a small, coarse, pixel-style minimap plus auxiliary structured information, as a complementary observation mode. The verified literature answer (24/25 claims confirmed): the instinct is right, the pixels are not —
 
-- SC2LE/PySC2's "minimap" is a synthetic semantic rasterization of game state (typed categorical/scalar planes at configurable resolution), never captured render output; DeepMind's stated rationale is that agents shouldn't burn capacity reading numbers out of pixels.
-- Griddly ships a non-pixel VECTOR observer next to three pixel renderers over one game state: final RL performance is consistent across representations in its 150-experiment baseline, and the vector observer is ~14× faster than rendering.
+- [[../research/works/sc2le|SC2LE]]/[[../research/works/pysc2|PySC2]]'s "minimap" is a synthetic semantic rasterization of game state (typed categorical/scalar planes at configurable resolution), never captured render output; DeepMind's stated rationale is that agents shouldn't burn capacity reading numbers out of pixels.
+- [[../research/works/griddly|Griddly]] ships a non-pixel VECTOR observer next to three pixel renderers over one game state: final RL performance is consistent across representations in its 150-experiment baseline, and the vector observer is ~14× faster than rendering.
 - AlphaStar's spatial encoder consumes semantic planes, and its scatter connections write each unit's learned embedding into the grid cell that unit occupies, so the two modalities coexist and fuse rather than competing. See [[../research/works/alphastar]].
 - Our headless core loads zero game assets (Phase 0's headline result). A true rendered minimap would reintroduce the display/AGG dependencies the whole architecture exists to avoid.
 

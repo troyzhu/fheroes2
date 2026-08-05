@@ -59,7 +59,7 @@ Stated as a Markov decision process, which [[rl/rl-and-the-battle-domain]] devel
 |---|---|
 | State $s$ | The battle position: which stacks stand where, with what counts, hit points, and shots remaining. |
 | Observation $o$ | A serialization of $s$: padded entity records, optionally an `11 × 9 × C` plane tensor, filtered by an observability profile. |
-| Action $a$ | What the active stack does. One slot of a fixed 793-wide discrete space, with a per-state legality mask. |
+| Action $a$ | What the active stack does. One slot of a fixed 793-wide discrete space, with a per-state legality mask; the count derives from the board under [[#Project terms]]. |
 | Transition $P(s' \mid s, a)$ | The fheroes2 engine. Stochastic through damage, morale, and luck rolls, but seeded, so a fixed seed makes an episode reproducible. |
 | Reward $R$ | Deliberately undefined in Phase 1a. The terminal outcome (winner, surviving force) is recorded; the objective is chosen later. |
 | Episode | One battle, from arena construction to a terminal state or round truncation. |

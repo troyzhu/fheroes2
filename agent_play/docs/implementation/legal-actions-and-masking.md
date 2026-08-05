@@ -49,7 +49,7 @@ The constant is written $-\infty$ in the mathematics and $-10^{8}$ in code. A li
 
 Apply the mask when sampling and again when recomputing log-probabilities for the update. If the stored behavior log-probabilities are masked and the recomputed ones are not, then at $\theta = \theta_{\text{old}}$ the ratio $\rho_t(\theta)$ is below one instead of equal to one. The clipping window is centered on the wrong point and the surrogate stops being a first-order approximation of the objective. PPO-clip carries no KL term for this to affect, and the KL that implementations report is a diagnostic.
 
-One controlled ablation is available. In full-game microRTS, PPO with no mask reached a cumulative win rate of 0.0, masking only the action type reached 0.32, and full per-component masking reached 0.82 to 0.91.
+One controlled ablation is available, from [[../research/works/invalid-action-masking|Huang and Ontañón's microRTS study]]. In full-game microRTS, PPO with no mask reached a cumulative win rate of 0.0, masking only the action type reached 0.32, and full per-component masking reached 0.82 to 0.91.
 
 **Our layout.** The index is a pure function of board geometry and the action taxonomy, so it is stable across states, episodes, and machines.
 
@@ -98,7 +98,7 @@ With at most five enemy stacks the RANGED block can hold at most five legal slot
 | Fixed space plus mask (ours) | one softmax of fixed width | CleanRL `CategoricalMasked`, sb3-contrib `MaskablePPO` | 0.82–0.91 win rate in microRTS ablations | Discrete spaces up to roughly $10^3$–$10^4$ slots |
 | Variable-length candidate list | width changes per state | none standard | no verified codebase consumes one | Never as the learner interface; useful as metadata |
 | Factorized (composed) heads | several independent softmaxes | supported, more wiring | reduces $10^7$ joint actions to about 300 logits | When the flat space would be combinatorially large |
-| Pointer network over candidates | attention over a candidate set | bespoke | AlphaStar's supervised ablation credits it | Very large or genuinely unbounded candidate sets |
+| Pointer network over candidates | attention over a candidate set | bespoke | [[../research/works/alphastar|AlphaStar]]'s supervised ablation credits it | Very large or genuinely unbounded candidate sets |
 | Penalize illegal actions | unconstrained | trivial | collapses on larger maps | Never for legality |
 
 At 793 slots the flat masked space is small enough that factorization buys nothing. If the space later grows by spells crossed with targets and parameters, factorize into masked components rather than flattening the cross product. The candidate list we keep alongside the mask is what makes an eventual pointer head a drop-in rather than a rewrite.
