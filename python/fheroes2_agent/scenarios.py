@@ -83,6 +83,8 @@ class Matchup:
     # every earlier measurement used.
     attacker_hero: str | None = None
     defender_hero: str | None = None
+    # Admits wide (two-cell) walkers, the wide_v1 profile.
+    allow_wide: bool = False
 
     def label(self) -> str:
         return f"{self.attacker} vs {self.defender}"
@@ -128,7 +130,8 @@ def sample_matchups(n: int, seed: int = 0, max_stacks: int = 3) -> list[Matchup]
 def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 16, side: str = "attacker") -> dict:
     """Win rate and mean reward for one matchup, which is what makes difficulty a number."""
     env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
-                    attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero)
+                    attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
+                    allow_wide=matchup.allow_wide)
     wins, rewards, lengths = [], [], []
     try:
         for _ in range(episodes):

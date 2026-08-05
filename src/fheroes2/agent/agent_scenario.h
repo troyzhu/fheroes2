@@ -85,6 +85,9 @@ namespace fheroes2::agent
         SideSpec defender;
         CommanderSpec attackerCommander;
         CommanderSpec defenderCommander;
+        // Admits wide (two-cell) walkers on either side, the wide_v1 profile. Off by default,
+        // which keeps every existing scenario and its golden digests bit-identical.
+        bool allowWideUnits{ false };
     };
 
     // Returns an empty string when the scenario is valid, otherwise a human-readable reason for

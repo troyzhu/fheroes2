@@ -137,6 +137,35 @@ Two answers. Cloning agreement rises monotonically with width, so the clone is d
 
 And nothing in the trust-region question was capacity to begin with: the flip reversed within a single model read at two horizons, and a capacity ceiling would bound both arms alike rather than reorder them.
 
+## Wide units, and the complete fight
+
+The last missing piece was the two Champions, excluded because they are wide. The exclusion turned out to be prudence rather than a gap: the melee enumeration already targets both cells of a wide defender, moves come from the engine's own pathfinder, and the open question, melee from a wide attacker, was adjudicated by teacher coverage rather than argued. Over 120 recorded episodes spanning Champions, Cavalry and Paladins on both sides, 1,238 of 1,238 teacher decisions resolved to an enumerated candidate and matched it, 526 of them taken by wide units. The `wide_v1` profile, opt-in and digest-inert when off, admits two-cell walkers and nothing else.
+
+One known limitation, recorded rather than hidden: `obs_encoding_v2` carries the wide flag but not the tail cell, so a policy sees a wide unit's head and knows it is wide without seeing its orientation. The masks are engine-exact regardless; only policy quality is at stake, and the results below say it was not decisive here.
+
+With the full army the fight could finally be posed as the game poses it, and a four-stage curriculum closes it. Stages at 850, 950 and 985 Peasants, then a final stage on the real fight itself, which stage 3 had brought inside the training band. Single seed per stage, 30 iterations each.
+
+| Policy | 850 | 950 | 985 | 1000, the real fight |
+|---|---|---|---|---|
+| Clone, full army and commander | 0.125 | — | — | 0.000 |
+| Stage 2 | 0.83 | 1.00 | — | 0.021 |
+| Stage 3, trained at 985 | — | 0.75 | 0.65 | 0.438 |
+| Stage 4, trained at 1000 | — | — | — | 0.891, 64 episodes |
+
+The summary across the whole hunt, every configuration measured at the rolled fight, 334 and 333 and 333 Peasants:
+
+| Configuration | Win rate at the real fight |
+|---|---|
+| No commander, no Champions, clone or curriculum | 0.000 |
+| Commander, no Champions, two-stage curriculum | 0.167 |
+| Full army and commander, clone | 0.000 |
+| Full army, three-stage curriculum | 0.438 |
+| Full army, fourth stage on the fight itself | 0.891 |
+
+Everything the owner's correction insisted on was load-bearing: the split, the commander, the Champions. The environment now poses the fight faithfully up to the dumped stats, and the one-in-nine-hundred long shot every earlier pass reported was a measurement of missing features, not of the fight.
+
+## Sources consulted
+
 Bay and Yearick, arXiv 2607.00152, carried the identity behind the identical divergence arms as its Proposition 1 and is written up in [[../../research/works/group-std-identity]]. Its binary-reward bound on the group spread is what separates the LLM literature's difficulty-bias reading of studentization from the unbounded amplification measured here.
 
 Liu et al., arXiv 2503.20783, the Dr. GRPO paper, names the question-level difficulty bias that studentization induces, which is the group-level face of the same division.

@@ -41,7 +41,8 @@ class BattleEnv:
 
     def __init__(self, worker: str, fixture: str = "m1_tiny_melee", side: str = "attacker", seeds: int = 1, home: str = "/tmp",
                  attacker: str | None = None, defender: str | None = None,
-                 attacker_hero: str | None = None, defender_hero: str | None = None):
+                 attacker_hero: str | None = None, defender_hero: str | None = None,
+                 allow_wide: bool = False):
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
         # Army overrides, "monsterId:count,...". These are the difficulty control: a matchup is
         # only worth training on when the policy neither always wins nor always loses it.
@@ -55,6 +56,8 @@ class BattleEnv:
             self._cmd += ["--attacker-hero", attacker_hero]
         if defender_hero:
             self._cmd += ["--defender-hero", defender_hero]
+        if allow_wide:
+            self._cmd += ["--allow-wide"]
         self._env = dict(os.environ, HOME=home)
         self._attacker = attacker
         self._defender = defender
@@ -200,7 +203,8 @@ class MatchupPool:
         self._env = BattleEnv(self._worker, side=self._side, attacker=self.current.attacker,
                               defender=self.current.defender, home=self._home,
                               attacker_hero=getattr(self.current, "attacker_hero", None),
-                              defender_hero=getattr(self.current, "defender_hero", None))
+                              defender_hero=getattr(self.current, "defender_hero", None),
+                              allow_wide=getattr(self.current, "allow_wide", False))
         return self._env.reset()
 
     def step(self, action: int) -> Step:

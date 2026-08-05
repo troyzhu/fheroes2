@@ -123,6 +123,8 @@ int main( int argc, char ** argv )
     // faithful reproduction of a map fight needs these.
     std::string attackerHeroSpec;
     std::string defenderHeroSpec;
+    // Admits wide (two-cell) walkers, the wide_v1 profile. Off by default.
+    bool allowWideUnits = false;
     // Dump a map's starting heroes and neutral stacks, so a real scenario can be reproduced as a
     // fixture instead of guessed at. Uses the engine's own loader, because monster counts are
     // computed during load rather than stored verbatim.
@@ -168,6 +170,9 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--defender-hero" ) == 0 ) {
             defenderHeroSpec = next( "--defender-hero" );
         }
+        else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
+            allowWideUnits = true;
+        }
         else if ( std::strcmp( argv[i], "--dump-map" ) == 0 ) {
             dumpMapPath = next( "--dump-map" );
         }
@@ -194,7 +199,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -314,6 +319,7 @@ int main( int argc, char ** argv )
                 std::fprintf( stderr, "cannot parse --defender-hero %s\n", defenderHeroSpec.c_str() );
                 return 2;
             }
+            variant.allowWideUnits = allowWideUnits;
             if ( s > 0 ) {
                 variant.worldSeed = scenario.worldSeed + static_cast<uint32_t>( s );
                 variant.scenarioId = scenario.scenarioId + "-seed" + std::to_string( s );

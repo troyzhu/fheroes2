@@ -34,7 +34,7 @@ namespace
 
     static_assert( fheroes2::agent::scenarioSlotCount == Army::maximumTroopCount, "Scenario slot count must match the engine army slot count" );
 
-    std::string validateSide( const std::string & scenarioId, const char * sideName, const SideSpec & side )
+    std::string validateSide( const std::string & scenarioId, const char * sideName, const SideSpec & side, const bool allowWide )
     {
         size_t liveSlots = 0;
 
@@ -51,11 +51,14 @@ namespace
                 return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " has invalid monster id "
                        + std::to_string( stack.monsterId );
             }
-            // Profile gate (spec 11.1): only creatures whose action space simple_v1 fully
-            // covers may appear on either side.
-            if ( !capability.simpleV1Supported ) {
-                return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " monster " + capability.name
-                       + " is not supported by simple_v1 (" + capability.reason + ")";
+            // Profile gate (spec 11.1): only creatures whose action space the scenario's
+            // profile fully covers may appear on either side. simple_v1 is the default;
+            // allowWideUnits relaxes it to wide_v1, which admits two-cell walkers and nothing
+            // else.
+            const bool supported = capability.simpleV1Supported || ( allowWide && capability.wideV1Supported );
+            if ( !supported ) {
+                return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " monster " + capability.name + " is not supported by "
+                       + ( allowWide ? "wide_v1" : "simple_v1" ) + " (" + capability.reason + ")";
             }
             if ( stack.count > scenarioMaxStackCount ) {
                 return "scenario '" + scenarioId + "': " + sideName + " slot " + std::to_string( i ) + " count " + std::to_string( stack.count )
@@ -91,11 +94,11 @@ std::string fheroes2::agent::validateScenario( const Scenario & scenario )
         return "scenario '" + scenario.scenarioId + "': max rounds " + std::to_string( scenario.maxRounds ) + " is outside [1, 10000]";
     }
 
-    std::string sideError = validateSide( scenario.scenarioId, "attacker", scenario.attacker );
+    std::string sideError = validateSide( scenario.scenarioId, "attacker", scenario.attacker, scenario.allowWideUnits );
     if ( !sideError.empty() ) {
         return sideError;
     }
-    sideError = validateSide( scenario.scenarioId, "defender", scenario.defender );
+    sideError = validateSide( scenario.scenarioId, "defender", scenario.defender, scenario.allowWideUnits );
     if ( !sideError.empty() ) {
         return sideError;
     }

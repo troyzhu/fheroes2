@@ -73,6 +73,8 @@ fheroes2::agent::MonsterCapability fheroes2::agent::auditMonster( const int mons
         record.reason = record.isShooter ? "single-cell walking shooter" : "single-cell walking melee";
     }
 
+    record.wideV1Supported = record.isValid && !record.isFlying && !record.hasTwoCellMeleeAttack && !record.hasAllAdjacentMeleeAttack && !record.hasAreaShot;
+
     return record;
 }
 
@@ -121,6 +123,7 @@ bool fheroes2::agent::writeCapabilityAudit( const std::string & filePath )
             << ", \"is_double_cell_attack\": " << boolText( r.hasTwoCellMeleeAttack ) //
             << ", \"has_area_or_multi_target_attack\": " << boolText( r.hasAllAdjacentMeleeAttack || r.hasAreaShot ) //
             << ", \"simple_v1_supported\": " << boolText( r.simpleV1Supported ) //
+            << ", \"wide_v1_supported\": " << boolText( r.wideV1Supported ) //
             << ", \"hit_points\": " << r.hitPoints //
             << ", \"reason\": \"" << r.reason << "\"}" //
             << ( i + 1 < records.size() ? ",\n" : "\n" );

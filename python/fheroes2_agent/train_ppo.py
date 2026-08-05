@@ -105,6 +105,7 @@ def train(
     defender: str | None = None,
     attacker_hero: str | None = None,
     defender_hero: str | None = None,
+    allow_wide: bool = False,
     iterations: int = 20,
     episodes_per_iter: int = 32,
     epochs: int = 4,
@@ -140,7 +141,7 @@ def train(
     # result about one matchup into a result about a distribution. Matches `train_group`.
     if env is None:
         env = BattleEnv(worker, fixture=fixture, side=side, attacker=attacker, defender=defender,
-                        attacker_hero=attacker_hero, defender_hero=defender_hero)
+                        attacker_hero=attacker_hero, defender_hero=defender_hero, allow_wide=allow_wide)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     baseline = collect(env, model, episodes_per_iter)

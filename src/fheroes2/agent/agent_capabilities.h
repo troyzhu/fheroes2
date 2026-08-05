@@ -42,6 +42,11 @@ namespace fheroes2::agent
         bool hasAllAdjacentMeleeAttack{ false };
         bool hasAreaShot{ false };
         bool simpleV1Supported{ false };
+        // simple_v1 relaxed on exactly one axis: wide (two-cell) walkers are admitted, flyers
+        // and special targeting stay out. The Thunk opening fight's Champions are the acceptance
+        // case, and the enumeration risk this opens, melee from a wide attacker, is adjudicated
+        // by teacher coverage rather than assumed either way.
+        bool wideV1Supported{ false };
         // Engine hit points per creature, so a sampler can size stacks of different creatures to
         // comparable strength without a hand-maintained table, which is the defect class the
         // audit exists to prevent.
