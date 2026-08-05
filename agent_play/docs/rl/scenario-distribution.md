@@ -166,6 +166,10 @@ Open, and now with the analysis attached. Which of the three mechanisms is used,
 
 Not yet investigated. Whether the difficulty band should be measured against the teacher, which is stable and cheap, or against the current policy, which is the quantity the identity actually refers to but which drifts during training and makes the filter a moving target that could interact badly with the update.
 
+## The samplers, three generations
+
+The generator has been rebuilt twice since the narrow seven-creature sampler, each time on a measurement. The wide-roster sampler drew every `simple_v1` creature by hit-point share and calibrated at 19 to 26 percent depending on regimes and heroes. The value-budget sampler from the owner-supplied guide, [[../research/works/generalized-battle-agent-guide]], prices stacks by the engine's own creature strength, allocates a log-uniform budget by Dirichlet shares, and draws the enemy budget from a mixture concentrated near parity; head to head it reached the band in a third fewer attempts, 31.4 against 23.8 percent at about 1.8 standard errors, with less calibration rescue. It is the recommended sampler for new pools, with the predecessors kept so recorded pools stay reproducible.
+
 ## Related
 
 - [[../decisions/0005-training-and-reward]], where the reward and the initial-state distribution are decided and deferred.

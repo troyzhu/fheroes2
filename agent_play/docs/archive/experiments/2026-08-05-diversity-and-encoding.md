@@ -83,4 +83,15 @@ Clone v4, diverse data at v3, walks the Corribus ladder better than the old clon
 
 The diverse pool builder, sampling commanders and wide creatures through the shared sampler, calibrated 120 matchups at a 26.0 percent hit rate against v4, better than the narrow roster's 22.5 and the wide-roster-without-heroes 19.3, so calibration gets easier as the distribution gets more like the real game, not harder. The accepted pool holds 99 mixed-army matchups and 21 hordes, 91 of 120 with a commander on at least one side, fingerprint-stamped to v4.
 
+## The owner-supplied guide, and the sampler it improved
+
+Mid-push the owner supplied a design guide for this exact problem, vendored with a digest at [[../../research/works/generalized-battle-agent-guide]]. Its value-budget sampler, counts priced by engine creature strength with Dirichlet stack allocation and a near-one budget-ratio mixture, went head to head against the hit-point sampler: same clone, same target of sixty calibrated matchups.
+
+| Sampler | Band hit rate | Mean $\lvert\log \text{scale}\rvert$ | Attempts |
+|---|---|---|---|
+| Hit-point shares | 23.8% | 0.902 | 252 |
+| Value budget | 31.4% | 0.861 | 191 |
+
+A third fewer attempts per accepted matchup and less calibration rescue, about 1.8 standard errors on the hit rate, so directionally consistent on both metrics and principled in mechanism, strength pricing what hit points miss, rather than statistically overwhelming. `sample_budget_matchup` becomes the recommended sampler for new pools; the older samplers stay for reproducing recorded ones.
+
 The capstone run is a null worth stating plainly. Generalization on this pool, 70 training and 50 held-out matchups, 40 iterations from clone v4: training gain $+0.173 \pm 0.039$, held-out gain $+0.007 \pm 0.046$. The transfer that was separable on the creature-diverse pool, $+0.153$ at 2.7 standard errors, vanishes on the commander-and-horde-diverse one. One seed, and a smaller training split than the earlier run, so the shape is a finding and the magnitude is not settled; what it says either way is that generalization gets harder as the distribution gets more like the real game, and the levers it points at are bigger training pools, longer budgets, and the pooling-against-concatenation architecture axis, not the encoding.
