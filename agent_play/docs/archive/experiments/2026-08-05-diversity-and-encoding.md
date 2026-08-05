@@ -25,4 +25,27 @@ The architecture. The shared slot encoder concatenates in uid order rather than 
 
 Record diverse demonstrations first, because every later measurement needs them: sampled `wide_v1` armies across three count regimes, skirmish, battle and elite-against-horde, with commanders on a coin flip per side. Then clone at v2 unchanged, stratified by creature and by count, against the old clone. Then ablate encodings on the same data with the same architecture, including a count-extrapolation split, train on stacks up to 200 and test above, which is the direct test of the owner's question about numbers. Only a decisive ablation justifies an encoding version bump and its decision record.
 
-PENDING_RESULTS
+## Recording at scale, and what it caught
+
+The recorder samples `wide_v1` armies over three regimes with commanders on a coin flip per side. The first full run, 400 matchups and 11,921 episodes, reported 71 failures, and diagnosing them found three distinct defects, none of them in the sampled matchups.
+
+The wide-attacker melee gap. 993 of 191,993 decisions, 0.52 percent, resolved to a canonical action the enumeration never offered, and every one had a wide active unit, 674 attacking in place and 319 on the move. The engine accepts a melee strike when either cell of the attack position is adjacent to the target; the enumeration inverted only the head case. The 1,238-decision coverage run that admitted wide units had simply lacked exposure at that rate. Fixed by proposing the in-place and tail-landing destinations too, with the canonical index following the resolved geometry; single-cell attackers produce exactly the original proposals and the m3 goldens hold.
+
+The stalemate abort. The built-in AI forces the attacking hero to retreat after 50 turns without deaths and asserts a retreat-capable commander exists, which a scenario captain is not and a commander-less army lacks entirely. A latent abort since Milestone 1, unreachable until diverse armies of few high-hit-point stacks danced long enough. The runner now ends such episodes first as a Stalemate truncation, bootstrapped like the round limit.
+
+The verdict blindness. The recorder kept stderr alone while the worker's coverage verdict goes to stdout, so 68 coverage-incomplete runs looked like inexplicable failures with benign diagnostics. The recorder now stores the verdict line per matchup and fails on INCOMPLETE explicitly.
+
+The re-record with all three fixes: 12,000 episodes over 400 matchups, zero failures, every verdict complete.
+
+## The clones, cross-evaluated
+
+Clone v3 trains on the diverse data at the unchanged encoding and architecture, 25 epochs, and each clone is evaluated on both held-out sets, split by episode.
+
+| Clone | Narrow held-out, 8,561 decisions | Diverse held-out, 38,864 |
+|---|---|---|
+| v2, three creatures | 0.8873 | 0.2868 |
+| v3, whole bestiary | 0.3914 | 0.8650 |
+
+The number that matters is 0.2868. The clone that anchored every calibration, every critic fit and every reinforcement-learning start agrees with the teacher on twenty-nine percent of decisions once the battle leaves its three creatures, which quantifies exactly how much the earlier confidence rested on a narrow anchor. The asymmetry runs both ways, v3 at 0.39 on the fixture distribution, so neither dominates and the fixture set is structurally special rather than a subset; a mixed-data clone is the obvious follow-up, measured rather than assumed.
+
+PENDING_ABLATION

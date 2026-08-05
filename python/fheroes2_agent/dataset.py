@@ -105,7 +105,8 @@ def load_episode(path: pathlib.Path, gamma: float = 0.99) -> tuple[list[np.ndarr
 
 def load_dir(root: str | pathlib.Path) -> Samples:
     root = pathlib.Path(root)
-    files = sorted(root.glob("*.jsonl"))
+    # Recursive, because recorders that sample many matchups write one subdirectory per matchup.
+    files = sorted(root.rglob("*.jsonl"))
     if not files:
         raise FileNotFoundError(f"no .jsonl episodes under {root}")
 
