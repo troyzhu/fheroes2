@@ -48,4 +48,31 @@ Clone v3 trains on the diverse data at the unchanged encoding and architecture, 
 
 The number that matters is 0.2868. The clone that anchored every calibration, every critic fit and every reinforcement-learning start agrees with the teacher on twenty-nine percent of decisions once the battle leaves its three creatures, which quantifies exactly how much the earlier confidence rested on a narrow anchor. The asymmetry runs both ways, v3 at 0.39 on the fixture distribution, so neither dominates and the fixture set is structurally special rather than a subset; a mixed-data clone is the obvious follow-up, measured rather than assumed.
 
-PENDING_ABLATION
+## The ablation, and the split that lied first
+
+Four variants, same data, same architecture, same budget: v2 unchanged, log-scaled counts and hit points, log-scaled with the one-hot extended to `wide_v1` plus a tail cell, and log-scaled with the one-hot removed. The first harness run died on a shape mismatch of its own making, the width patch restored too early, recorded here because the fix explains the machinery.
+
+The episode split came back flat, everything between 0.849 and 0.861, and it was measuring the wrong thing. Twelve thousand episodes come from four hundred matchups, thirty episodes each, and an episode-level split puts siblings of every matchup on both sides. The honest matchup-level split lands near 0.52, not 0.86, which also recontextualizes every earlier agreement number in this project: the fixture-era 0.887 was within-matchup generalization across seeds, never across matchups.
+
+| Split | v2 | v2log | v2log_wid | v2log_noid |
+|---|---|---|---|---|
+| Episode, leaky | 0.8560 | 0.8490 | 0.8609 | 0.8569 |
+| Matchup, honest, seed 0 | 0.5082 | 0.5105 | 0.5017 | 0.5214 |
+
+The first count-extrapolation attempt had two defects of its own: it confounded count with regime, large-count decisions being almost all horde episodes, and the recorder's horde totals capped at 900 hit points, so no stack exceeded 300 and the test set above that line was empty. A horde-only supplement recorded to 3,000 total hit points, stacks to 1,000, fixed the range, 3,000 episodes, zero failures, coverage complete, which also certifies the wide-melee enumeration at full scale.
+
+## The clean extrapolation, and the seed checks
+
+Within the horde regime alone, trained on stacks of at most 300, tested on the supplement:
+
+| Variant | Control, same range | 301 to 600 | Above 600 |
+|---|---|---|---|
+| v2 | 0.4424 | 0.3573 | 0.2431 |
+| v2log | 0.4763 | 0.3905 | 0.3008 |
+| v2log_noid | 0.4821 | 0.3913 | 0.3047 |
+
+Two contrasts then went to three training seeds each, because a single-seed ranking had already misled once today. Cross-matchup, in range: v2 $0.5208 \pm 0.0091$ against v2log_noid $0.5256 \pm 0.0027$, a paired $+0.005 \pm 0.007$, nothing, and the first cross-matchup ranking was substantially seed luck. Above 600 creatures: v2 $0.2394 \pm 0.0019$ against $0.3033 \pm 0.0019$, a gap of 24 standard errors, real beyond argument.
+
+So the encoding does not matter where counts stay in range and matters decisively where they leave it, which is the real-map regime. [[../../decisions/0006-encoding-count-scaling]] accepts exactly the log scaling and nothing else; the one-hot's removal, never worse and never decisively better, stays open, and so does the tail cell. Clone v4 retrains at v3 on the diverse data, 0.8606 on the leaky split for continuity with earlier numbers, and the honest cross-matchup figure near 0.52 is the one later work should quote.
+
+What no encoding fixes: the best variant still falls from 0.48 in range to 0.30 at high counts. Count generalization is an open problem of the model, not the features, and the architecture axis noted in the audit, pooling against concatenation, is the natural next suspect.

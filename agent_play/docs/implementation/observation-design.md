@@ -88,3 +88,7 @@ It does not settle whether a convolutional network over planes beats an entity t
 - [[legal-actions-and-masking]] — the action side of the same interface.
 - [[determinism-seeds-and-digests]] — why the digest ignores profiles.
 - `agent_play/docs/references/report-spatial-observations.md` — the verified evidence behind the pixel decision.
+
+## The v3 revision, measured in
+
+`obs_encoding_v3` log-scales counts and hit points and changes nothing else. [[../decisions/0006-encoding-count-scaling]] is the record.

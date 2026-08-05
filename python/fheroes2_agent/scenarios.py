@@ -125,7 +125,8 @@ def _side_from(rng: random.Random, roster, total_hit_points: float, max_stacks: 
     return ",".join(parts)
 
 
-def sample_diverse_matchup(rng: random.Random) -> Matchup:
+def sample_diverse_matchup(rng: random.Random, horde_total_range: tuple[int, int] = (60, 900),
+                           horde_only: bool = False) -> Matchup:
     """One matchup over the whole wide_v1 bestiary, with commanders and count regimes.
 
     Three regimes, each an archetype the narrow sampler lacked: the proven small-stack skirmish,
@@ -135,7 +136,7 @@ def sample_diverse_matchup(rng: random.Random) -> Matchup:
     """
     roster = load_wide_roster()
     cheap = [entry for entry in roster if entry[1] <= 5]
-    regime = rng.choices(("skirmish", "battle", "horde"), weights=(4, 4, 2))[0]
+    regime = "horde" if horde_only else rng.choices(("skirmish", "battle", "horde"), weights=(4, 4, 2))[0]
     if regime == "skirmish":
         strength = rng.choice([15, 20, 25, 30, 40])
         attacker = _side_from(rng, roster, strength, 3)
@@ -147,7 +148,7 @@ def sample_diverse_matchup(rng: random.Random) -> Matchup:
     else:
         attacker = _side_from(rng, roster, rng.choice([80, 120, 160]), 4)
         monster, hp, _ = rng.choice(cheap)
-        total = rng.randint(60, 900) // max(hp, 1)
+        total = rng.randint(*horde_total_range) // max(hp, 1)
         a = total // 3 + (1 if total % 3 else 0)
         defender = f"{monster}:{a},{monster}:{total // 3},{monster}:{max(1, total - a - total // 3)}"
     heroes = {}

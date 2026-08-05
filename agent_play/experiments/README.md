@@ -15,6 +15,8 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `advantage_and_trust_region.py` | Do the advantage estimator and the trust region matter, on one matchup or on a pool, at which threshold? | about 15 min over 10 seeds |
 | `solved_region_width.py` | How fast does a solved policy's win rate degrade under parameter noise, matchup by matchup? | about 7 min over 6 matchups |
 | `capacity.py` | Does the network size bind, for cloning or for reinforcement learning? | about 12 min over 3 widths |
+| `record_diverse.py` | Record teacher demonstrations over the whole bestiary: three count regimes, commanders, wide units, coverage-audited | about 25 min for 12,000 episodes |
+| `encoding_ablation.py` | Which encoding earns its features, on an episode split and a count-extrapolation split | about 1 h over 4 variants |
 
 ## Conventions
 

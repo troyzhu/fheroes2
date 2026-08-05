@@ -20,6 +20,7 @@ Every file here is dated, machine-pinned, or commit-pinned, which means every fi
 | `research-runs/2026-07-29-spatial-observations.md` | The same, for the spatial-observation question | Same |
 | `experiments/2026-08-03-training-runs.md` | Every training and measurement run from the day the learning side was built, with configurations and numbers | Conclusions live in [[../rl/training-design|training-design]] and [[../rl/scenario-distribution|scenario-distribution]]; this is the raw record and includes runs later superseded |
 | `experiments/2026-08-04-flip-and-collapse.md` | The resolution of the trust-region flip and the collapse-condition hunt, with registered predictions and the runs that decided them | Same; conclusions live in [[../rl/training-design|training-design]] |
+| `experiments/2026-08-05-diversity-and-encoding.md` | The diversity push: diverse demonstrations, the clone cross-evaluation, the leaky split, and the count-extrapolation evidence behind ADR 0006 | Conclusions live in [[../decisions/0006-encoding-count-scaling|ADR 0006]] and [[../implementation/observation-design|observation-design]] |
 | `sources/` | 43 fetched third-party PDFs, HTML snapshots, and vendored READMEs, plus `manifest.tsv` and `fetch_references.sh` | Third-party material, unmodified |
 
 The reading path starts at [[../README|the tree README]].

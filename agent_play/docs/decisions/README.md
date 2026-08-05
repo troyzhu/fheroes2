@@ -18,6 +18,7 @@ Every record follows the same shape. A sub-problem section says exactly which qu
 | [[0003-config-management]] | Versioned YAML configuration with strict schemas; every artifact embeds its resolved configuration, that configuration's hash, and the commit | spec §11, §15 | 2026-07-27 | No, binds Milestone 4. `configs/` does not exist yet |
 | [[0004-spatial-observation-modality]] | An optional semantic `planes_v1` modality; rendered pixels permanently excluded from the training environment | spec §12 | 2026-07-29 | No, plane emitter lands at Milestone 4 |
 | [[0005-training-and-reward]] | Imitation first, then masked PPO against an opponent mixture. Reward deliberately open, with candidates and choice criteria fixed | spec §17, §21 | algorithm 2026-07-30, reward open | No, and no learner exists here by design |
+| [[0006-encoding-count-scaling]] | Counts and hit points log-scaled in the observation encoding; invisible in range, worth 24 standard errors under count extrapolation, which is the real-map regime | amends 0001 in one constant | 2026-08-05 | Yes, `obs_encoding_v3`, clone retrained |
 
 Four of the five are not yet built, which is expected rather than a lapse: only 0002 belongs to a finished milestone. The column exists so that a reader never has to guess whether a record describes the code or describes an intention, which was a real ambiguity before 2026-07-31.
 

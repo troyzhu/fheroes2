@@ -82,6 +82,17 @@ try:
 except ValueError:
     check(True, "an out-of-range action index raises")
 
+# --- count scaling is logarithmic, the v3 change, pinned by its motivating property
+cf = encoding.FEATURE_NAMES.index("count")
+def count_feature(n):
+    v = encoding.encode_observation(obs([stack(1, "attacker", 0, count=n, initial_count=n, active=True)]))
+    return float(v[cf])
+check(abs(count_feature(1000) - 1.0) < 0.01, "the schema-typical maximum encodes near one")
+check(count_feature(1) - 0.0 > count_feature(1000) - count_feature(900),
+      "one creature against none differs more than nine hundred against a thousand")
+check(count_feature(5) - count_feature(1) > count_feature(1000) - count_feature(900),
+      "small-count differences outweigh large-count differences, which is tactical salience")
+
 # --- dataset loading, including the illegal-label guard
 with tempfile.TemporaryDirectory() as tmp:
     root = pathlib.Path(tmp)

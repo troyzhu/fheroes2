@@ -35,11 +35,14 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 from fheroes2_agent.scenarios import load_wide_roster, sample_diverse_matchup  # noqa: E402
 
 
-def sample_matchup(rng: random.Random) -> dict:
+def sample_matchup(rng: random.Random, horde_total_range=(60, 900), horde_only=False) -> dict:
     """The shared diverse sampler, reshaped into the recorder's spec dict."""
-    m = sample_diverse_matchup(rng)
-    horde = m.defender.count(":") == 3 - 1 and len({p.split(":")[0] for p in m.defender.split(",")}) == 1
-    spec = {"regime": "horde" if horde else ("battle" if len(m.attacker.split(",")) > 3 or len(m.defender.split(",")) > 3 else "skirmish"),
+    m = sample_diverse_matchup(rng, horde_total_range=horde_total_range, horde_only=horde_only)
+    # A horde defender is three stacks of one creature. The first version of this label counted
+    # colons instead of stacks and misfiled every horde, which only the manifest noticed.
+    parts = m.defender.split(",")
+    horde = len(parts) == 3 and len({p.split(":")[0] for p in parts}) == 1
+    spec = {"regime": "horde" if horde else ("battle" if len(m.attacker.split(",")) > 3 or len(parts) > 3 else "skirmish"),
             "attacker": m.attacker, "defender": m.defender}
     if m.attacker_hero:
         spec["attacker_hero"] = m.attacker_hero
@@ -56,6 +59,8 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, default=6)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--manifest", default=None, help="where to record what was sampled")
+    parser.add_argument("--horde-only", action="store_true")
+    parser.add_argument("--horde-max", type=int, default=900, help="upper bound of the horde total hit points")
     args = parser.parse_args()
 
     out = pathlib.Path(args.out_dir)
@@ -68,7 +73,7 @@ def main() -> None:
     started = time.time()
 
     for index in range(args.matchups):
-        spec = sample_matchup(rng)
+        spec = sample_matchup(rng, horde_total_range=(60, args.horde_max), horde_only=args.horde_only)
         sub = out / f"m{index:04d}"
         sub.mkdir(exist_ok=True)
         cmd = [args.worker, "--runs", "1", "--seeds", str(args.seeds), "--allow-wide",
