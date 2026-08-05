@@ -155,30 +155,64 @@ namespace
                 }
 
                 const int32_t attackFromCell = Battle::Board::GetIndexDirection( targetCell, reflectDir );
-                const int32_t dst = ( attackFromCell == activeUnit.GetHeadIndex() ) ? -1 : attackFromCell;
 
-                const std::optional<Battle::ResolvedAttack> resolved = Battle::resolveAttackCommand( &activeUnit, &enemy, dst, targetCell, static_cast<int>( dir ) );
-                if ( !resolved ) {
-                    continue;
+                // Destinations that can realize a strike from attackFromCell. The engine accepts
+                // an attack when either cell of the attack position is adjacent to the target
+                // (calculateAttackTarget checks head and tail alike), so for a wide attacker the
+                // strike cell may be covered by the head after a move to it, by the tail after a
+                // move to a horizontal neighbour, or by either cell in place. The single-cell
+                // inverse used here originally missed the tail realizations, which teacher
+                // coverage over diverse armies exposed at 993 of 191,993 decisions, every one of
+                // them a wide attacker.
+                std::array<int32_t, 4> destinations{};
+                size_t destinationCount = 0;
+                if ( attackFromCell == activeUnit.GetHeadIndex() || ( activeUnit.isWide() && attackFromCell == activeUnit.GetTailIndex() ) ) {
+                    destinations[destinationCount++] = -1;
+                }
+                destinations[destinationCount++] = attackFromCell;
+                if ( activeUnit.isWide() ) {
+                    for ( const Battle::CellDirection side : { Battle::CellDirection::LEFT, Battle::CellDirection::RIGHT } ) {
+                        if ( Battle::Board::isValidDirection( attackFromCell, side ) ) {
+                            destinations[destinationCount++] = Battle::Board::GetIndexDirection( attackFromCell, side );
+                        }
+                    }
                 }
 
-                assert( resolved->targetCell == targetCell && resolved->direction == dir );
+                for ( size_t d = 0; d < destinationCount; ++d ) {
+                    const int32_t dst = destinations[d];
+                    if ( dst == activeUnit.GetHeadIndex() ) {
+                        // The engine forbids moving onto one's own head cell; the in-place form
+                        // is the dst of -1 already proposed.
+                        continue;
+                    }
 
-                const int dirIdx = fheroes2::agent::meleeDirectionIndex( dir );
-                assert( dirIdx >= 0 );
+                    const std::optional<Battle::ResolvedAttack> resolved = Battle::resolveAttackCommand( &activeUnit, &enemy, dst, targetCell, static_cast<int>( dir ) );
+                    if ( !resolved ) {
+                        continue;
+                    }
 
-                ActionCandidate candidate;
-                candidate.canonicalIndex
-                    = fheroes2::agent::actionMeleeBase + static_cast<uint32_t>( targetCell ) * 6 + static_cast<uint32_t>( dirIdx );
-                candidate.type = CandidateType::MeleeAttack;
-                candidate.defenderUid = enemy.GetUID();
-                candidate.moveCell = dst;
-                candidate.targetCell = targetCell;
-                candidate.direction = static_cast<int32_t>( dir );
-                candidate.resolvedTargetCell = resolved->targetCell;
-                candidate.resolvedDirection = resolved->direction;
-                candidate.canonicalKey = makeKey( candidate );
-                addCandidate( set, std::move( candidate ) );
+                    // The canonical index follows the resolved pair, not the proposed one,
+                    // because the resolved pair is what executing the command will do. For the
+                    // head-realized proposals the two coincide; a tail realization may resolve
+                    // to the geometry the engine actually derives.
+                    const int dirIdx = fheroes2::agent::meleeDirectionIndex( resolved->direction );
+                    if ( dirIdx < 0 ) {
+                        continue;
+                    }
+
+                    ActionCandidate candidate;
+                    candidate.canonicalIndex
+                        = fheroes2::agent::actionMeleeBase + static_cast<uint32_t>( resolved->targetCell ) * 6 + static_cast<uint32_t>( dirIdx );
+                    candidate.type = CandidateType::MeleeAttack;
+                    candidate.defenderUid = enemy.GetUID();
+                    candidate.moveCell = dst;
+                    candidate.targetCell = targetCell;
+                    candidate.direction = static_cast<int32_t>( dir );
+                    candidate.resolvedTargetCell = resolved->targetCell;
+                    candidate.resolvedDirection = resolved->direction;
+                    candidate.canonicalKey = makeKey( candidate );
+                    addCandidate( set, std::move( candidate ) );
+                }
             }
         }
     }

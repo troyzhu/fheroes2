@@ -41,6 +41,7 @@ namespace fheroes2::agent
         Defeat,      // the defender won
         EngineDraw,  // the engine reported no winner (e.g. mutual elimination)
         RoundLimit,  // truncated by Scenario::maxRounds while the battle was still valid
+        Stalemate,   // truncated because no unit died for many consecutive rounds, see the runner
     };
 
     const char * terminationName( const Termination termination );

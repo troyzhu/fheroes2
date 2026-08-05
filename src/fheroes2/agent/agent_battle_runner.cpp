@@ -241,6 +241,8 @@ const char * fheroes2::agent::terminationName( const Termination termination )
         return "engine_draw";
     case Termination::RoundLimit:
         return "round_limit";
+    case Termination::Stalemate:
+        return "stalemate";
     default:
         assert( 0 );
         return "unknown";
@@ -311,9 +313,30 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
 
         Battle::Arena arena( attackingArmy, defendingArmy, scenario.tileIndex, false, randomGenerator, hook );
 
+        // The built-in AI carries a stalemate breaker: after MAX_TURNS_WITHOUT_DEATHS turns in
+        // which nothing died, it forces the attacking hero to retreat, and asserts that a
+        // retreat-capable commander exists. Scenario commanders are captains, which cannot
+        // retreat, and commander-less armies have no commander at all, so either way that path
+        // aborts the process. The runner therefore stops first: the same no-deaths condition,
+        // measured per round, with a margin below the AI's 50-turn window. Diverse armies of
+        // few high-hit-point stacks reach this state a few times per thousand battles; the
+        // fixture suites never did, which is why it stayed latent until diversity arrived.
+        constexpr int32_t stalemateRounds = 40;
+        int32_t roundsWithoutDeaths = 0;
+        uint32_t deadUnits = 0;
+        bool stalemate = false;
+
         while ( arena.BattleValid() && outcome.rounds < scenario.maxRounds ) {
             arena.Turns();
             ++outcome.rounds;
+
+            const uint32_t nowDead = arena.getAttackingForce().getTotalNumberOfDeadUnits() + arena.getDefendingForce().getTotalNumberOfDeadUnits();
+            roundsWithoutDeaths = ( nowDead == deadUnits ) ? roundsWithoutDeaths + 1 : 0;
+            deadUnits = nowDead;
+            if ( roundsWithoutDeaths >= stalemateRounds ) {
+                stalemate = true;
+                break;
+            }
         }
 
         const bool truncated = arena.BattleValid();
@@ -323,7 +346,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
         outcome.defenderResult = result.defender;
 
         if ( truncated ) {
-            outcome.termination = Termination::RoundLimit;
+            outcome.termination = stalemate ? Termination::Stalemate : Termination::RoundLimit;
         }
         else if ( ( outcome.attackerResult & Battle::RESULT_WINS ) != 0 ) {
             outcome.termination = Termination::Victory;

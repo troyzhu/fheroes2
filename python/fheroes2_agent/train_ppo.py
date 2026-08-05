@@ -156,7 +156,10 @@ def train(
 
     for iteration in range(iterations):
         batch = collect(env, model, episodes_per_iter)
-        truncated = np.array([o["termination"] == "round_limit" for o in batch["outcomes"]])
+        # Both truncation reasons mean the battle still had a future when it was cut off, so
+        # both bootstrap. Stalemate is the runner stopping before the engine AI's no-deaths
+        # retreat path, whose assert a headless battle cannot satisfy.
+        truncated = np.array([o["termination"] in ("round_limit", "stalemate") for o in batch["outcomes"]])
         # Expand per-episode truncation onto the step that ended each episode.
         step_truncated = np.zeros_like(batch["dones"])
         step_truncated[np.flatnonzero(batch["dones"])] = truncated
