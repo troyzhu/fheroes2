@@ -50,7 +50,13 @@ the writing contract at `~/.claude/plugins/marketplaces/troyzhu/docs/WRITING_STY
 bold budgets, banned constructions, no question headings, paragraphs under 160 words, and no
 hard-wrapped prose, since this vault is one paragraph per line) and resolves every wikilink
 including its heading anchor, which is what catches the silent breakage a file rename or a section
-retitle causes.
+retitle causes. In whole-tree mode it also checks facts, because status prose rotted silently
+three times in one day: moc READMEs must index every sibling page, `<!-- verify -->` blocks
+(same grammar as `verify_memory.sh`) are checked so status sentences can declare their
+invalidators, backticked `src/` and `python/` paths must exist outside `archive/`, and every
+engine file changed relative to `master` must be named in `inventory.md`'s engine-source ledger.
+When you write a sentence about what is or is not built, add its invalidator to the nearest
+verify block; never write a document count in prose.
 
 Scope note: everything built so far is the **battle** environment. `agent_play/docs/roadmap.md`
 records the wider goal, including the adventure-map agent covering movement, recruitment, and town

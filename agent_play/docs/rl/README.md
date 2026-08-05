@@ -9,7 +9,7 @@ tags: [agent-env, rl, index]
 
 Everything about training a policy. The environment itself is documented under `implementation/`, and the two are kept apart because they change for different reasons: the environment by milestone, this side by evidence. Much of this side is now implemented under `python/fheroes2_agent/` and gated by `verify_agent.sh`; each page says which of its own content exists, and [[../implementation/inventory]] is the per-component list.
 
-Six documents, in the order they are worth reading. The code column names where each page's subject is implemented, so a claim can be inspected rather than trusted; pages without a column entry are conceptual.
+The documents, in the order they are worth reading. The code column names where each page's subject is implemented, so a claim can be inspected rather than trusted; pages without a column entry are conceptual.
 
 | Document | What it answers | Read when | Code |
 |---|---|---|---|
@@ -40,3 +40,10 @@ Decisions live in `decisions/`, not here. [[../decisions/0005-training-and-rewar
 - [[../roadmap]], what comes after battles.
 - [[../implementation/README]], the environment these methods would train against.
 - [[../research/findings]], the evidence base.
+
+<!-- verify
+# Invalidators for the implemented-status sentence at the top of this file.
+exists  python/fheroes2_agent/train_ppo.py
+exists  agent_play/verify_agent.sh
+-->
+

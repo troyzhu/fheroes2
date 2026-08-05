@@ -22,6 +22,7 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/metamon]] | paper | 2025 | primary | Top-10% human ladder play in Pokémon Showdown with no search: imitation from reconstructed replays, then offline RL past the demonstrator, then offline self-play fine-tuning; standardized beginner-to-expert opponent suite | [[../rl/training-design]], opponent mixture |
 | [[works/generalized-battle-agent-guide]] | report | 2026 | primary | Owner-supplied design for this exact problem: value-budget sampling, structured ability records, candidate effect summaries, lexicographic objective, scenario-family splits | sampler adopted, abilities tracked |
 | [[works/sc2le]] | paper | 2017 | primary | Feature layers as synthetic semantic rasterizations, never RGB; structured tensors alongside planes | ADR 0004 |
+| [[works/pysc2]] | project | 2017 | primary | The shipped observer for SC2LE: independently toggleable observation modalities behind one API | ADR 0001, ADR 0004 |
 | [[works/alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
 | [[works/griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |
 | [[works/microrts-py]] | codebase | 2021–25 | primary | `CategoricalMasked` reference implementation; `partial_obs` flag; TrueSkill league evaluation | ADR 0001, evaluation |

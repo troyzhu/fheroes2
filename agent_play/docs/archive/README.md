@@ -23,6 +23,6 @@ Every file here is dated, machine-pinned, or commit-pinned, which means every fi
 | `experiments/2026-08-05-diversity-and-encoding.md` | The diversity push: diverse demonstrations, the clone cross-evaluation, the leaky split, and the count-extrapolation evidence behind ADR 0006 | Conclusions live in [[../decisions/0006-encoding-count-scaling|ADR 0006]] and [[../implementation/observation-design|observation-design]] |
 | `experiments/2026-08-05-real-engine-replay.md` | Rendering recorded episodes through the game's own battle interface, with the digest verification and the two defects it surfaced | Mechanism lives in [[../implementation/replay-rendering|replay-rendering]] |
 | `experiments/files/` | Raw run artifacts a log depends on and no script can regenerate, currently the three replay recordings behind the 2026-08-05 videos | Meaningful only through the log that cites them |
-| `sources/` | 43 fetched third-party PDFs, HTML snapshots, and vendored READMEs, plus `manifest.tsv` and `fetch_references.sh` | Third-party material, unmodified |
+| `sources/` | Fetched third-party PDFs, HTML snapshots, and vendored READMEs; `manifest.tsv` is the authoritative list and `fetch_references.sh` reproduces it | Third-party material, unmodified |
 
 The reading path starts at [[../README|the tree README]].

@@ -22,7 +22,7 @@ Evidence from other systems follows the same rule as the rest of the tree: the s
 | [[0005-training-and-reward]] | Imitation first, then masked PPO against an opponent mixture. Reward deliberately open, with candidates and choice criteria fixed | spec §17, §21 | algorithm 2026-07-30, reward open | Partly: cloning, critic pre-fitting and masked PPO exist (`python/fheroes2_agent/`, `verify_agent.sh`); DAgger and every reward candidate but the margin-weighted terminal one remain open |
 | [[0006-encoding-count-scaling]] | Counts and hit points log-scaled in the observation encoding; invisible in range, worth 24 standard errors under count extrapolation, which is the real-map regime | amends 0001 in one constant | 2026-08-05 | Yes, `obs_encoding_v3`, clone retrained |
 
-Two records are fully built, two partly, and two not at all, and the column is the per-record ground truth. It exists so that a reader never has to guess whether a record describes the code or describes an intention, which was a real ambiguity before 2026-07-31; [[../implementation/inventory]] carries the component-level detail behind every "built" claim.
+The Built column is the per-record ground truth, and the declared claims at the bottom of this file make the documentation gate fail when reality moves past a cell. It exists so that a reader never has to guess whether a record describes the code or describes an intention, which was a real ambiguity before 2026-07-31; [[../implementation/inventory]] carries the component-level detail behind every "built" claim.
 
 Records 0001 and 0004 together define the observation interface, and 0002 defines the action interface. Read those three before implementing the protocol. Records 0003 and 0005 bind from the training milestones onward, and 0005 is the one to read for how a policy will actually be trained and what it will be rewarded for.
 
@@ -30,4 +30,15 @@ Records 0001 and 0004 together define the observation interface, and 0002 define
 
 - [[../README|Tree README]], the routing table.
 - [[../implementation/README|Implementation]], how the decided mechanisms actually work.
+
+<!-- verify
+# Invalidators for the Built column. When one fails, reality moved: update the cell, then the claim.
+exists  src/fheroes2/agent/agent_action_space.h
+exists  src/fheroes2/agent/agent_observation.h
+exists  python/fheroes2_agent/train_ppo.py
+absent  configs
+absent  python/fheroes2_agent/train_dagger.py
+grep    python/fheroes2_agent/encoding.py :: obs_encoding_v3
+-->
+
 - [[../research/findings|Research findings]], the evidence these records rest on.

@@ -15,7 +15,7 @@
    ./agent_play/verify_m2.sh                # 8 passed  — decision hook, passive logging
    ./agent_play/verify_m3.sh                # 9 passed  — legal actions, teacher coverage
    ./agent_play/verify_agent.sh             # 11 passed — cloning, critic, PPO
-   ./agent_play/lint_docs.sh                # 50 files clean
+   ./agent_play/lint_docs.sh                # all files clean, facts checked
    ```
 
 3. Review the commits in order, each is self-contained:
@@ -104,7 +104,7 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | M2 exit: null-controller inertness + deterministic passive logs | `verify_m2.sh` | `8 passed, 0 failed` |
 | M3 exit: 100 % teacher coverage + candidates everywhere + digest inertness of enumeration | `verify_m3.sh` | `9 passed, 0 failed`, `teacher_coverage=complete` |
 | Training: cloning, critic fit with the policy frozen, external control, PPO closing the loop | `verify_agent.sh` | `11 passed, 0 failed` |
-| Documentation: writing contract and wikilink resolution | `lint_docs.sh` | `50 files clean` |
+| Documentation: writing contract, wikilink resolution, and fact checks (declared claims, index completeness, code paths, the engine-surface ledger) | `lint_docs.sh` | `… files clean, facts checked` |
 | Cross-machine | (M3 MacBook baseline) | same seed + digest, reproduced |
 | Build-type invariance | Debug `-O0` vs Release `-O3` | identical digests, verified |
 | Sanitizers | `FHEROES2_WITH_ASAN=1` build + suite | 0 reports (1 900 spike episodes + full M1 suite) |

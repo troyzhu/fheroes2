@@ -6,7 +6,7 @@ related_concepts: ["[[../overview]]", "[[../rl/rl-and-the-battle-domain]]"]
 tags: [concept, index, moc, agent-env]
 ---
 
-> **What this note is.** Seven deep dives on the mechanisms this project actually implements. They assume the vocabulary of [[../rl/rl-and-the-battle-domain]], which explains reinforcement learning and the Heroes battle domain from scratch, and they assume no C++.
+> **What this note is.** Deep dives on the mechanisms this project actually implements, one per built mechanism. They assume the vocabulary of [[../rl/rl-and-the-battle-domain]], which explains reinforcement learning and the Heroes battle domain from scratch, and they assume no C++.
 
 These are reference material rather than a course. Read the one covering whatever you are about to touch.
 

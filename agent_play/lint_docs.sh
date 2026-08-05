@@ -1,18 +1,31 @@
 #!/usr/bin/env bash
 # Documentation gate for agent_play/docs.
 #
-# Two checks, both of which have caught real defects in this tree before:
+# Per-file checks, all of which have caught real defects in this tree before:
 #   1. The WRITING_STYLE contract (~/.claude/plugins/marketplaces/troyzhu/docs/WRITING_STYLE.md)
 #   2. Wikilink resolution, since Obsidian links break silently on GitHub
 #
+# Tree-level fact checks, added after status prose went stale silently three times in one day
+# (an index omitting its own sibling, "nothing here is implemented yet" surviving the training
+# stack, a Built column claiming no learner exists). Form checks cannot catch a sentence whose
+# facts moved, so facts are checked directly:
+#   3. Index completeness: a moc README must mention every markdown sibling it indexes
+#   4. Declared claims: any page may carry a verify block (exists/absent/grep, the same grammar
+#      as verify_memory.sh), and status prose that can rot is expected to declare one, so the
+#      moment reality flips, this gate fails instead of a reader being misled
+#   5. Code paths: backticked src/ and python/ paths in non-archive pages must exist
+#   6. Engine-surface completeness: every file changed under src/ relative to master must be
+#      named in the inventory's engine-source ledger, so an unledgered engine touch cannot land
+#
 # Usage: agent_play/lint_docs.sh [file ...]     (no args lints the whole tree)
-# Exits non-zero on any breach.
+# Fact checks run only in whole-tree mode. Exits non-zero on any breach.
 
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCS="$HERE/docs"
 
+FACTS=0
 if [ "$#" -gt 0 ]; then
     FILES=("$@")
 else
@@ -20,16 +33,19 @@ else
     IFS=$'\n' read -r -d '' -a FILES < <(
         find "$DOCS" -name '*.md' -not -path '*/archive/sources/*' | sort && printf '\0'
     )
+    FACTS=1
 fi
 
-python3 - "${FILES[@]}" <<'PY'
+FACTS="$FACTS" DOCS="$DOCS" python3 - "${FILES[@]}" <<'PY'
+import os
 import pathlib
 import re
+import subprocess
 import sys
 
-DOCS = pathlib.Path(__file__).resolve().parent / "docs" if False else None
+DOCS = pathlib.Path(os.environ["DOCS"]).resolve()
+REPO = DOCS.parent.parent
 files = [pathlib.Path(a).resolve() for a in sys.argv[1:]]
-root = pathlib.Path(__file__).resolve()
 
 BANNED = re.compile(
     r"not just [^,]+, but|isn't just|more than just|here's (the thing|why|how)|"
@@ -90,7 +106,7 @@ def paragraphs(text):
             if s == "$$" or not s.endswith("$$"):
                 in_block = True
             continue
-        if not s or s.startswith(("|", "#", "-", ">", "$", "---")):
+        if not s or s.startswith(("|", "#", "-", ">", "$", "---", "<!--")):
             continue
         if re.match(r"^\d+[.)]\s", s):  # ordered list
             continue
@@ -177,9 +193,98 @@ for f in files:
         rows.append(f"  ok    {name}")
 
 print("\n".join(rows))
+
+facts = []
+if os.environ.get("FACTS") == "1":
+    def rel(p):
+        return str(p.relative_to(DOCS.parent.parent))
+
+    # 3. Index completeness. A moc README indexes its own directory; the mapping below adds the
+    # subdirectories whose files a parent README indexes. Mentioning the file's stem anywhere in
+    # the README counts, so tables of backticked paths satisfy it as well as wikilinks.
+    indexed_dirs = {DOCS / "research" / "works": DOCS / "research" / "README.md"}
+    for readme in sorted(DOCS.rglob("README.md")):
+        head = readme.read_text(encoding="utf-8")[:400]
+        if "type: moc" in head:
+            indexed_dirs.setdefault(readme.parent, readme)
+    for directory, readme in sorted(indexed_dirs.items()):
+        if "sources" in directory.parts:
+            continue
+        text = readme.read_text(encoding="utf-8")
+        for page in sorted(directory.glob("*.md")):
+            if page == readme:
+                continue
+            if page.stem not in text:
+                facts.append(f"{rel(readme)}: does not index sibling {page.name}")
+
+    # 4. Declared claims, the verify_memory.sh grammar.
+    DECL = re.compile(r"<!--\s*verify\s*\n(.*?)-->", re.S)
+    for f in files:
+        for block in DECL.findall(f.read_text(encoding="utf-8")):
+            for line in block.splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                verb, _, rest = line.partition(" ")
+                rest = rest.strip()
+                if verb == "exists":
+                    if not (REPO / rest).exists():
+                        facts.append(f"{rel(f)}: exists {rest} -> missing")
+                elif verb == "absent":
+                    if (REPO / rest).exists():
+                        facts.append(f"{rel(f)}: absent {rest} -> now present, update the claim's page")
+                elif verb == "grep":
+                    target, _, needle = rest.partition("::")
+                    target, needle = target.strip(), needle.strip()
+                    p = REPO / target
+                    if not p.exists():
+                        facts.append(f"{rel(f)}: grep {target} -> file missing")
+                    elif needle not in p.read_text(encoding="utf-8", errors="replace"):
+                        facts.append(f"{rel(f)}: grep {target} :: {needle!r} -> not found")
+                else:
+                    facts.append(f"{rel(f)}: unknown verify verb {verb!r}")
+
+    # 5. Backticked code paths must exist. Archive pages are dated provenance and may name what
+    # has since been deleted, so they are exempt. The prefixes are this repository's actual
+    # layout, so a path inside another project's tree (src/Griddly/...) is not claimed.
+    CODE_PATH = re.compile(r"`((?:src/(?:fheroes2|engine|agent_\w+|dist|thirdparty)|python)/[A-Za-z0-9_./-]+)`")
+    for f in files:
+        if "archive" in f.parts:
+            continue
+        text = f.read_text(encoding="utf-8")
+        for path in sorted(set(CODE_PATH.findall(text))):
+            if not (REPO / path.rstrip("/")).exists():
+                facts.append(f"{rel(f)}: names `{path}`, which does not exist")
+
+    # 6. Engine-surface completeness. Every file changed under src/ relative to master must be
+    # matched in the inventory's ledger section, by path, by directory, or by stem (which is how
+    # a brace form like screen.{h,cpp} matches screen.h). An unledgered engine touch fails here.
+    inventory = DOCS / "implementation" / "inventory.md"
+    section = re.search(r"## Engine-source surface.*?(?=\n## )", inventory.read_text(encoding="utf-8"), re.S)
+    diff = subprocess.run(["git", "-C", str(REPO), "diff", "master", "--name-only", "--", "src/"],
+                          capture_output=True, text=True)
+    if section is None:
+        facts.append("inventory.md: engine-source surface section not found")
+    elif diff.returncode != 0:
+        print("  note  engine-surface check skipped, git diff against master failed")
+    else:
+        ledger = section.group(0)
+        for changed in sorted(filter(None, diff.stdout.splitlines())):
+            p = pathlib.PurePosixPath(changed)
+            # A directory reference counts only when the ledger names the directory itself,
+            # not when the directory is merely the prefix of some other file's full path.
+            named = (changed in ledger) or (p.stem + "." in ledger) \
+                or re.search(re.escape(str(p.parent) + "/") + r"(?![A-Za-z0-9_])", ledger)
+            if not named:
+                facts.append(f"inventory.md: engine change {changed} is not in the ledger")
+
 print()
-if failed:
+if facts:
+    for x in facts:
+        print("  FACT  " + x)
+    print()
+if failed or facts:
     print("lint_docs: BREACHES FOUND")
     sys.exit(1)
-print(f"lint_docs: {len(files)} files clean")
+print(f"lint_docs: {len(files)} files clean, facts checked")
 PY
