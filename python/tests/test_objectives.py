@@ -165,6 +165,18 @@ batch_dr2 = np.concatenate([ob.group_advantages(g, "drgrpo") for g in uneven])
 check(not np.allclose(ob.normalize_advantages(batch_grpo, 0.1), ob.normalize_advantages(batch_dr2, 0.1)),
       "studentization survives normalization, so GRPO is a real third option")
 
+# --- the sampling roster is derived from the audit, not hand-listed
+from fheroes2_agent.scenarios import ROSTER  # noqa: E402
+import json as _json  # noqa: E402
+import pathlib as _pathlib  # noqa: E402
+
+_caps = {c["monster_id"]: c for c in _json.loads(
+    (_pathlib.Path(__file__).resolve().parents[1] / "fheroes2_agent" / "data" / "monster_capabilities_v1.json").read_text())}
+check(len(ROSTER) >= 30, "the roster covers the audit's allowlist, not one faction", f"{len(ROSTER)} creatures")
+check(all(_caps[i]["simple_v1_supported"] for i, _, _ in ROSTER), "every roster entry is simple_v1 supported")
+check(all(hp == _caps[i]["hit_points"] and hp > 0 for i, hp, _ in ROSTER), "hit points come from the engine audit")
+check(all(shooter == _caps[i]["is_archer"] for i, _, shooter in ROSTER), "shooter flags come from the engine audit")
+
 # --- a group must share its starting position, or the baseline measures the scenario
 from fheroes2_agent.env import MatchupPool  # noqa: E402
 

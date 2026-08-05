@@ -42,6 +42,7 @@ fheroes2::agent::MonsterCapability fheroes2::agent::auditMonster( const int mons
     const MonsterData & data = getMonsterData( monsterId );
     const std::vector<MonsterAbility> & abilities = data.battleStats.abilities;
 
+    record.hitPoints = monster.GetHitPoints();
     record.isWide = monster.isWide();
     record.isFlying = monster.isFlying();
     record.isShooter = ( data.battleStats.shots > 0 );
@@ -120,6 +121,7 @@ bool fheroes2::agent::writeCapabilityAudit( const std::string & filePath )
             << ", \"is_double_cell_attack\": " << boolText( r.hasTwoCellMeleeAttack ) //
             << ", \"has_area_or_multi_target_attack\": " << boolText( r.hasAllAdjacentMeleeAttack || r.hasAreaShot ) //
             << ", \"simple_v1_supported\": " << boolText( r.simpleV1Supported ) //
+            << ", \"hit_points\": " << r.hitPoints //
             << ", \"reason\": \"" << r.reason << "\"}" //
             << ( i + 1 < records.size() ? ",\n" : "\n" );
     }

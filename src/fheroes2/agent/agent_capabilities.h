@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -41,6 +42,10 @@ namespace fheroes2::agent
         bool hasAllAdjacentMeleeAttack{ false };
         bool hasAreaShot{ false };
         bool simpleV1Supported{ false };
+        // Engine hit points per creature, so a sampler can size stacks of different creatures to
+        // comparable strength without a hand-maintained table, which is the defect class the
+        // audit exists to prevent.
+        uint32_t hitPoints{ 0 };
         std::string reason;
     };
 

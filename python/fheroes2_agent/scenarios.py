@@ -51,17 +51,28 @@ def policy_fingerprint(model: BattlePolicy) -> str:
         digest.update(tensor.detach().cpu().numpy().tobytes())
     return digest.hexdigest()[:16]
 
-# Monster ids from the simple_v1 allowlist: single-cell, walking or shooting, ordinary targeting.
-# Values are (id, hit points, is shooter), used only to keep sampled armies roughly comparable.
-ROSTER = [
-    (1, 1, False),   # Peasant
-    (2, 10, True),   # Archer
-    (3, 10, True),   # Ranger
-    (4, 15, False),  # Pikeman
-    (5, 20, False),  # Veteran Pikeman
-    (6, 25, False),  # Swordsman
-    (7, 30, False),  # Master Swordsman
-]
+def _load_roster() -> list[tuple[int, int, bool]]:
+    """The sampling roster, derived from the engine's own capability audit.
+
+    Every `simple_v1`-supported creature, as (id, hit points, is shooter). This was a hand-listed
+    seven-creature table once, the whole Knight line and nothing else, which quietly narrowed
+    every synthetic pool to one faction's basic troops. Hand-maintained creature tables are the
+    defect class the audit exists to prevent, and the name table made the same mistake before it.
+    """
+    import json
+    import pathlib
+
+    path = pathlib.Path(__file__).parent / "data" / "monster_capabilities_v1.json"
+    records = json.loads(path.read_text())
+    roster = [(r["monster_id"], int(r["hit_points"]), bool(r["is_archer"]))
+              for r in records if r["simple_v1_supported"]]
+    roster.sort()
+    if len(roster) < 30:
+        raise RuntimeError(f"capability audit lists only {len(roster)} simple_v1 creatures; regenerate it")
+    return roster
+
+
+ROSTER = _load_roster()
 
 
 @dataclass(frozen=True)
