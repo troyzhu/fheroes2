@@ -64,9 +64,12 @@ through PPO and giving a verdict on each alternative.
 Quick orientation: Phase 0 and Milestones 1 through 3 are complete and verified on the target
 Apple M2 Mac mini, and the training work ran ahead of Milestones 4 through 6 rather than after
 them. Engine changes are deliberately small: two verbatim lifts (`battle_seed.{h,cpp}`,
-`battle_action_validation.{h,cpp}`), one optional hook (`battle_decision_controller.h`), and the
-entry-point-free library under `src/fheroes2/agent/` that both build systems compile into the
-normal executable without behavior change. Verify with:
+`battle_action_validation.{h,cpp}`), one optional hook (`battle_decision_controller.h`), one
+opt-in render seam for replay videos (a null-by-default render observer on the display, a
+defaulted `showInterface` on the runner, a `Race::NONE` art case in `battle_interface.cpp`; see
+`agent_play/docs/implementation/replay-rendering.md`), and the entry-point-free library under
+`src/fheroes2/agent/` that both build systems compile into the normal executable without
+behavior change. Verify with:
 
 ```bash
 make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh \

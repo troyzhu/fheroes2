@@ -92,3 +92,5 @@ It does not settle whether a convolutional network over planes beats an entity t
 ## The v3 revision, measured in
 
 `obs_encoding_v3` log-scales counts and hit points and changes nothing else. [[../decisions/0006-encoding-count-scaling]] is the record.
+
+The concrete tensor as of v3 is 634 wide, ten slots of 63 named per-stack features (presence and side flags, counts and hit points, the six stat fields, position, the four ability flags, and a 41-way creature one-hot) plus four globals. `FEATURE_NAMES` in `python/fheroes2_agent/encoding.py` is deliberately the single authoritative layout, named so an encoded row reads back by a human; the widths here are quoted from it rather than owned, and [[../rl/training-design#As built, 2026-08-05|training-design]] carries the network that consumes it.

@@ -18,6 +18,8 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `record_diverse.py` | Record teacher demonstrations over the whole bestiary: three count regimes, commanders, wide units, coverage-audited | about 25 min for 12,000 episodes |
 | `encoding_ablation.py` | Which encoding earns its features, on an episode split and a count-extrapolation split | about 1 h over 4 variants |
 | `thunk_validation.py` | The real opening fight as a standing validation ladder, run against any checkpoints after any change | about 2 min per checkpoint |
+| `capture_replay.py` | Record one policy episode as a frame-by-frame replay JSON, encoded per the checkpoint's stamped version, retrying for a wanted outcome | seconds per episode |
+| `render_replay.py` | Replay a recording through the real engine: headless verification, rendered capture, digest equality, ffmpeg assembly at true animation timing | about 2 min per episode, opens a game window |
 
 ## Conventions
 

@@ -6,7 +6,7 @@ related_concepts: ["[[../overview]]", "[[../rl/rl-and-the-battle-domain]]"]
 tags: [concept, index, moc, agent-env]
 ---
 
-> **What this note is.** Six deep dives on the mechanisms this project actually implements. They assume the vocabulary of [[../rl/rl-and-the-battle-domain]], which explains reinforcement learning and the Heroes battle domain from scratch, and they assume no C++.
+> **What this note is.** Seven deep dives on the mechanisms this project actually implements. They assume the vocabulary of [[../rl/rl-and-the-battle-domain]], which explains reinforcement learning and the Heroes battle domain from scratch, and they assume no C++.
 
 These are reference material rather than a course. Read the one covering whatever you are about to touch.
 
@@ -18,6 +18,7 @@ These are reference material rather than a course. Read the one covering whateve
 | [[observation-design]] | Entities against planes, `full_v1` against `observable_v1`, why never pixels, the MDP rule | Implementing observation serialization | about 7 min |
 | [[command-encoding-and-snapshots]] | Why `Battle::Command` reads backwards, how to snapshot one safely, canonical keys | Reading or logging engine commands | about 4 min |
 | [[teacher-coverage-and-behavior-cloning]] | Who the teacher is, why coverage proves completeness, the cloning ladder | Working on demonstrations or training | about 6 min |
+| [[replay-rendering]] | How a recorded episode replays through the real battle interface, and why the video is provably the same battle | Rendering or auditing recorded episodes | about 4 min |
 
 Each follows the same shape: motivation, the idea in one sentence, an intuition drawn from machine learning, the mechanism, a comparison against the alternatives that were rejected, key terms, and a closing section naming the boundary of the claim.
 

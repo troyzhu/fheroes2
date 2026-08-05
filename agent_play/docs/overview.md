@@ -290,7 +290,7 @@ Full evidence, with a 25-row assumption table, is in `local_source_audit.md`.
 
 Measured throughput is about 4,600 episodes/s on the Apple M2 target machine for the tiny-melee fixture with no protocol layer attached, at 12 MB resident memory, scaling linearly to four worker processes. The learner, not the environment, will be the bottleneck.
 
-The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook (`DecisionController`), and the additive `src/fheroes2/agent/` library. Enumerate them with `git diff master --stat -- src/`.
+The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook (`DecisionController`), one opt-in render seam for replays (a null-by-default render observer on the display, a defaulted interface flag on the runner, and a raceless-captain art case, see [[implementation/replay-rendering]]), and the additive `src/fheroes2/agent/` library. Enumerate them with `git diff master --stat -- src/`.
 
 ## Build and verify
 
@@ -322,6 +322,7 @@ Useful extras:
 ./src/agent_worker/fheroes2_agent_worker --runs 1 --audit-coverage     # coverage report
 ./src/agent_worker/fheroes2_agent_worker --runs 1 --trajectory-dir OUT # teacher trajectories
 ./src/agent_worker/fheroes2_agent_worker --capability-audit caps.json  # regenerate the audit
+./agent_play/experiments/render_replay.py REPLAY.json OUT.mp4          # recorded episode -> real-engine video
 FHEROES2_WITH_ASAN=1 make -C src/dist -j8 && FHEROES2_WITH_ASAN=1 ./agent_play/spike/build_spike.sh
 ```
 

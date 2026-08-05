@@ -1,6 +1,6 @@
 # Implementation report — `agent-env` branch
 
-> Review-oriented inventory of everything implemented on this branch, as of 2026-08-03. Covers `b16e6f698..d57d8987b`, the Phase 0 baseline through the training work. The spec (§6.1) calls for this file; it will grow per milestone.
+> Review-oriented inventory of everything implemented on this branch, as of 2026-08-05. Covers `b16e6f698` (the Phase 0 baseline) through the training, diversity, and replay-rendering work. The spec (§6.1) calls for this file; it will grow per milestone.
 
 ## How to review this branch in ~20 minutes
 
@@ -52,6 +52,10 @@ Everything the branch changes under `src/` (enumerate: `git diff master --stat -
 - `src/fheroes2/battle/battle_action_validation.{h,cpp}` + `battle_action.cpp` (Milestone 3), the `checkParameters` lambdas of `ApplyAction{Move,Attack,Skip}` and the anonymous-namespace helpers (`calculateAttackTarget`, `calculateAttackDirection`, `checkMoveParams`→`isMoveDestinationValid`) moved verbatim into a shared module; `ApplyActionX` now gates through `isMoveCommandValid`/`isSkipCommandValid`/ `resolveAttackCommand` (the latter returns the resolved target/direction the lambda used to discard). `ERROR_LOG`/`assert` stay at the call sites. Proof of inertness: all golden digests byte-identical across Phase 0 / M1 / M2 / M3 gates.
 - `src/fheroes2/agent/` (18 files), entry-point-free library, compiled into the normal executable by both build systems (spec §6.1 sanctions this) but unreachable from game code: no game translation unit includes an `agent_*` header. Launch smoke tests of both binaries pass. The two added since Milestone 3 are `agent_observation.{h,cpp}`, which serializes the per-decision board, and `agent_external_controller.{h,cpp}`, which blocks on a callback so a Python policy can answer a decision.
 - `src/agent_worker/`, worker `main.cpp` + build script; outside both source globs, cannot affect the game.
+- `src/engine/screen.{h,cpp}` (replay rendering, 2026-08-05), a generic render observer on `Display`: a null-by-default `std::function` member, a setter, and a three-line invocation at the top of `render`. Nothing agent-specific lives in the engine; the frame-dump logic sits in the replay tool, which is the only caller of the setter. The normal game never sets it. Proof of inertness: all gate digests unchanged after the addition.
+- `src/fheroes2/battle/battle_interface.cpp` (replay rendering, 2026-08-05), one added `case Race::NONE` in `OpponentSprite` drawing the Knight captain art for scenario commanders, which carry no faction. Rendering-path only; no real game hero has `Race::NONE`, so the previous behavior there was `assert( 0 )`.
+- `src/fheroes2/agent/agent_battle_runner.{h,cpp}` (replay rendering, 2026-08-05), a defaulted `showInterface` parameter on `runEpisode`, forwarded to the arena constructor flag that has always existed. Default `false` keeps every existing caller byte-identical; digest equality between headless and rendered replays proves the interface perturbs nothing.
+- `src/agent_replay/`, replay tool `main.cpp` + build script; outside both source globs, cannot affect the game.
 
 Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 
@@ -87,6 +91,8 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | `python/fheroes2_agent/{objectives,env,scenarios,render,watch}.py` | Advantage estimators and trust regions, the Gym-shaped environment and matchup pool, calibrated scenario generation, and a battle viewer | ADR 0005 | `test_objectives.py` (28), `test_ppo.py` (27) |
 | `agent_play/verify_agent.sh` | Training gate: 11 checks, unit tests, recording, sample consistency, cloning against trivial baselines, critic fit with the policy frozen, external control, PPO closing the loop, encoding stamp | ADR 0005 | self |
 | `agent_play/experiments/` | Measurements too slow for a gate: generalization on a calibrated pool, critic pre-fitting, the advantage floor | — | results in [[../archive/experiments/2026-08-03-training-runs]] |
+| `src/agent_replay/main.cpp` + `build_replay.sh` | `fheroes2_agent_replay`: exact re-execution of a recorded episode, headless or through the real battle interface; prints the terminal record with the state digest | — | five-part exactness check per replay, [[replay-rendering]] |
+| `agent_play/experiments/{capture_replay,render_replay}.py` | Record a policy episode as replay JSON; render a recording to video with digest verification and manifest-true timing | — | digest equality headless against rendered, per run |
 
 ## Verification matrix (all green as of `d57d8987b` on the M2 mini)
 
