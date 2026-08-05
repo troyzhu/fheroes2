@@ -51,6 +51,10 @@ namespace fheroes2::agent
         // comparable strength without a hand-maintained table, which is the defect class the
         // audit exists to prevent.
         uint32_t hitPoints{ 0 };
+        // The engine's own scalar worth of one creature, Monster::GetMonsterStrength with base
+        // stats. A sampler pricing stacks by this rather than by hit points weighs damage and
+        // abilities the way the game itself does.
+        double strength{ 0.0 };
         std::string reason;
     };
 

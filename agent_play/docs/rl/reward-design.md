@@ -85,6 +85,12 @@ The last row is the interesting one. Potential-based shaping with $\Phi$ equal t
 
 What the fit does not settle is whether shaping by it is worth anything over using it as a baseline, which is what the critic already does. Both subtract the same quantity; shaping moves it inside the reward while a baseline keeps it outside. The measurement that would separate them has not been run.
 
+## The lexicographic alternative, from the owner-supplied guide
+
+Every candidate above scalarizes winning and losses into one number, and the guide vendored beside [[../research/works/generalized-battle-agent-guide]] argues the scalarization itself is the hazard: with $R = \mathbf{1}\{\text{win}\} - \lambda \cdot \text{losses}$, a large $\lambda$ prefers a low-casualty defeat to a costly necessary win, and no single $\lambda$ is right across matchups. Its alternative is lexicographic, maximize win probability first, then minimize conditional losses among actions within a tolerance of the best, served by two value heads, $V_{\text{win}}$ and $V_{\text{loss}}$, with the tolerance calibrated on held-out games.
+
+The margin-weighted reward this project runs is a mild scalarization, the $\pm 1$ dominating a survival term bounded by one, so a pyrrhic win at 1.1 always beats a cheap loss at $-0.4$ and the guide's pathology cannot invert an outcome here. What the lexicographic form would add is cleaner priority once losses matter strategically, at the price of a second head and an inference-time rule. It joins the candidate table as documented rather than measured; the criteria in [[../decisions/0005-training-and-reward]] still decide.
+
 ## Two things that are not reward shape but are often mistaken for it
 
 The discount. $\gamma$ belongs to the objective alongside the reward, and with a terminal-only signal it controls how much a long battle is penalized relative to a short one. At $\gamma = 1$ a win is worth the same however long it took. This is a modelling choice being made implicitly by a default.

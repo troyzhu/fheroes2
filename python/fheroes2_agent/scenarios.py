@@ -125,6 +125,62 @@ def _side_from(rng: random.Random, roster, total_hit_points: float, max_stacks: 
     return ",".join(parts)
 
 
+def load_valued_roster() -> list[tuple[int, float]]:
+    """Every wide_v1 creature as (id, engine strength), from the capability audit.
+
+    Strength is Monster::GetMonsterStrength at base stats, the engine's own scalar worth of one
+    creature. It prices what hit points miss: a Ranger and an Archer share ten hit points and
+    differ by two thirds in strength, because the double shot is worth something.
+    """
+    import json
+    import pathlib
+
+    path = pathlib.Path(__file__).parent / "data" / "monster_capabilities_v1.json"
+    records = json.loads(path.read_text())
+    roster = [(r["monster_id"], float(r["strength"])) for r in records if r["wide_v1_supported"]]
+    roster.sort()
+    return roster
+
+
+def sample_budget_matchup(rng: random.Random, budget_range: tuple[float, float] = (15.0, 900.0),
+                          max_stacks: int = 5, alpha: float = 1.0,
+                          close_weight: float = 0.8, sigma_close: float = 0.12,
+                          sigma_wide: float = 0.6) -> Matchup:
+    """One matchup by army-value budget, the owner-supplied guide's sampling scheme.
+
+    Each side draws a total budget log-uniformly, splits it over its stacks by a Dirichlet draw,
+    and prices each stack's count by the creature's engine strength rather than its hit points.
+    The enemy budget is the attacker's times a ratio drawn from a mixture concentrated near one,
+    so most battles are close and some are lopsided on purpose. Uneven Dirichlet shares are the
+    point: the hit-point sampler produced near-equal stacks, and real armies are not.
+    """
+    import math
+
+    roster = load_valued_roster()
+
+    def side(budget: float) -> str:
+        stacks = rng.randint(1, max_stacks)
+        weights = [rng.gammavariate(alpha, 1.0) for _ in range(stacks)]
+        total = sum(weights)
+        parts = []
+        for w in weights:
+            monster, strength = rng.choice(roster)
+            count = max(1, min(500, int(round(budget * (w / total) / max(strength, 0.1)))))
+            parts.append(f"{monster}:{count}")
+        return ",".join(parts)
+
+    low, high = budget_range
+    budget = math.exp(rng.uniform(math.log(low), math.log(high)))
+    sigma = sigma_close if rng.random() < close_weight else sigma_wide
+    ratio = math.exp(rng.gauss(0.0, sigma))
+
+    heroes = {}
+    for key in ("attacker_hero", "defender_hero"):
+        if rng.random() < 0.5:
+            heroes[key] = f"{rng.randint(0, 25)}:{rng.randint(0, 20)}"
+    return Matchup(side(budget), side(budget * ratio), allow_wide=True, **heroes)
+
+
 def sample_diverse_matchup(rng: random.Random, horde_total_range: tuple[int, int] = (60, 900),
                            horde_only: bool = False) -> Matchup:
     """One matchup over the whole wide_v1 bestiary, with commanders and count regimes.

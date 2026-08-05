@@ -199,6 +199,20 @@ check(ms[0].attacker_hero is None and not ms[0].allow_wide, "a plain pool entry 
 check(ms[1].attacker_hero == "13:12" and ms[1].allow_wide,
       "heroes and the wide flag survive the pool round-trip")
 
+# --- the budget sampler prices stacks by engine strength
+from fheroes2_agent.scenarios import load_valued_roster, sample_budget_matchup  # noqa: E402
+
+valued = dict(load_valued_roster())
+check(len(valued) >= 45 and all(v > 0 for v in valued.values()), "every wide_v1 creature carries a strength")
+bm = [sample_budget_matchup(random.Random(s)) for s in range(30)]
+check(sample_budget_matchup(random.Random(4)) == sample_budget_matchup(random.Random(4)),
+      "budget sampling is reproducible from its seed")
+check(all(int(part.split(":")[1]) >= 1 for m in bm for side in (m.attacker, m.defender) for part in side.split(",")),
+      "every budget-priced stack holds at least one creature")
+stack_counts = [len(m.attacker.split(",")) for m in bm]
+check(min(stack_counts) == 1 and max(stack_counts) == 5, "stack counts span one to five",
+      f"{min(stack_counts)}..{max(stack_counts)}")
+
 # --- a group must share its starting position, or the baseline measures the scenario
 from fheroes2_agent.env import MatchupPool  # noqa: E402
 

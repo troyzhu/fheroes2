@@ -51,3 +51,4 @@ arxiv-2504.04395.pdf	OK	14189708	Human-Level Competitive Pokemon via Scalable Of
 metamon-README.md	OK	63115	Metamon repository README, datasets and baselines for Pokemon Showdown RL	https://raw.githubusercontent.com/UT-Austin-RPL/metamon/main/README.md
 poke-env-README.md	OK	4265	poke-env, the Pokemon Showdown battle environment library	https://raw.githubusercontent.com/hsahovic/poke-env/master/README.md
 arxiv-2012.01914.pdf	OK	2226235	DeepCrawl: Deep Reinforcement Learning for Turn-based Strategy Games	https://arxiv.org/abs/2012.01914
+generalized-battle-agent-guide.md	OK	49644	Owner-supplied design guide: generalized battle agent for fheroes2 (entity state, structured abilities, candidate scoring, budget sampling)	user-upload 2026-08-05

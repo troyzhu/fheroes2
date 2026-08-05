@@ -43,6 +43,7 @@ fheroes2::agent::MonsterCapability fheroes2::agent::auditMonster( const int mons
     const std::vector<MonsterAbility> & abilities = data.battleStats.abilities;
 
     record.hitPoints = monster.GetHitPoints();
+    record.strength = monster.GetMonsterStrength();
     record.isWide = monster.isWide();
     record.isFlying = monster.isFlying();
     record.isShooter = ( data.battleStats.shots > 0 );
@@ -125,6 +126,7 @@ bool fheroes2::agent::writeCapabilityAudit( const std::string & filePath )
             << ", \"simple_v1_supported\": " << boolText( r.simpleV1Supported ) //
             << ", \"wide_v1_supported\": " << boolText( r.wideV1Supported ) //
             << ", \"hit_points\": " << r.hitPoints //
+            << ", \"strength\": " << r.strength //
             << ", \"reason\": \"" << r.reason << "\"}" //
             << ( i + 1 < records.size() ? ",\n" : "\n" );
     }

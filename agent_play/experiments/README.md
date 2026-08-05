@@ -17,6 +17,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `capacity.py` | Does the network size bind, for cloning or for reinforcement learning? | about 12 min over 3 widths |
 | `record_diverse.py` | Record teacher demonstrations over the whole bestiary: three count regimes, commanders, wide units, coverage-audited | about 25 min for 12,000 episodes |
 | `encoding_ablation.py` | Which encoding earns its features, on an episode split and a count-extrapolation split | about 1 h over 4 variants |
+| `thunk_validation.py` | The real opening fight as a standing validation ladder, run against any checkpoints after any change | about 2 min per checkpoint |
 
 ## Conventions
 
