@@ -86,6 +86,25 @@ namespace
         }
         return slot > 0;
     }
+
+    // "13:12" -> commander with attack 13 and defense 12. Range checking stays in
+    // validateScenario, which is the single place scenario rules live.
+    bool parseHeroSpec( const std::string & text, fheroes2::agent::CommanderSpec & commander )
+    {
+        const size_t colon = text.find( ':' );
+        if ( colon == std::string::npos ) {
+            return false;
+        }
+        try {
+            commander.attack = std::stoi( text.substr( 0, colon ) );
+            commander.defense = std::stoi( text.substr( colon + 1 ) );
+        }
+        catch ( ... ) {
+            return false;
+        }
+        commander.present = true;
+        return true;
+    }
 }
 
 int main( int argc, char ** argv )
@@ -99,6 +118,11 @@ int main( int argc, char ** argv )
     // whose effect is measured as a win rate rather than asserted from army sizes.
     std::string attackerSpec;
     std::string defenderSpec;
+    // Hero commander stats, "attack:defense". Empty means no commander, which is the historical
+    // behaviour and what every golden digest was recorded under. Real maps always have one, so a
+    // faithful reproduction of a map fight needs these.
+    std::string attackerHeroSpec;
+    std::string defenderHeroSpec;
     // Dump a map's starting heroes and neutral stacks, so a real scenario can be reproduced as a
     // fixture instead of guessed at. Uses the engine's own loader, because monster counts are
     // computed during load rather than stored verbatim.
@@ -138,6 +162,12 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--defender" ) == 0 ) {
             defenderSpec = next( "--defender" );
         }
+        else if ( std::strcmp( argv[i], "--attacker-hero" ) == 0 ) {
+            attackerHeroSpec = next( "--attacker-hero" );
+        }
+        else if ( std::strcmp( argv[i], "--defender-hero" ) == 0 ) {
+            defenderHeroSpec = next( "--defender-hero" );
+        }
         else if ( std::strcmp( argv[i], "--dump-map" ) == 0 ) {
             dumpMapPath = next( "--dump-map" );
         }
@@ -164,7 +194,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -274,6 +304,14 @@ int main( int argc, char ** argv )
             }
             if ( !defenderSpec.empty() && !parseSideSpec( defenderSpec, variant.defender ) ) {
                 std::fprintf( stderr, "cannot parse --defender %s\n", defenderSpec.c_str() );
+                return 2;
+            }
+            if ( !attackerHeroSpec.empty() && !parseHeroSpec( attackerHeroSpec, variant.attackerCommander ) ) {
+                std::fprintf( stderr, "cannot parse --attacker-hero %s\n", attackerHeroSpec.c_str() );
+                return 2;
+            }
+            if ( !defenderHeroSpec.empty() && !parseHeroSpec( defenderHeroSpec, variant.defenderCommander ) ) {
+                std::fprintf( stderr, "cannot parse --defender-hero %s\n", defenderHeroSpec.c_str() );
                 return 2;
             }
             if ( s > 0 ) {

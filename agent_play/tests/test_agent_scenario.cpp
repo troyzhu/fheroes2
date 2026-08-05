@@ -103,6 +103,28 @@ int main()
         s.defender.slots[4] = { Monster::PEASANT, fheroes2::agent::scenarioMaxStackCount + 1 };
         check( !validateScenario( s ).empty(), "count above the safety maximum is rejected" );
     }
+    {
+        Scenario s = validBase();
+        s.attackerCommander = { true, 13, 12 };
+        check( validateScenario( s ).empty(), "a commander with sane stats is accepted" );
+    }
+    {
+        Scenario s = validBase();
+        s.defenderCommander = { true, -1, 5 };
+        check( !validateScenario( s ).empty(), "a commander with negative attack is rejected" );
+    }
+    {
+        Scenario s = validBase();
+        s.attackerCommander = { true, 0, fheroes2::agent::scenarioMaxCommanderStat + 1 };
+        check( !validateScenario( s ).empty(), "a commander stat above the cap is rejected" );
+    }
+    {
+        // Stats without the flag mean a caller forgot to mark the commander present, and the
+        // battle would silently run without the stats they specified.
+        Scenario s = validBase();
+        s.attackerCommander = { false, 13, 12 };
+        check( !validateScenario( s ).empty(), "commander stats without the present flag are rejected" );
+    }
 
     std::printf( "%d passed, %d failed\n", passed, failed );
     return ( failed == 0 ) ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -100,6 +100,31 @@ std::string fheroes2::agent::validateScenario( const Scenario & scenario )
         return sideError;
     }
 
+    const auto validateCommander = [&scenario]( const char * side, const CommanderSpec & commander ) -> std::string {
+        if ( !commander.present ) {
+            // An absent commander must carry no stats, or a caller has set stats and forgotten
+            // the flag, which would silently run the battle without them.
+            if ( commander.attack != 0 || commander.defense != 0 ) {
+                return "scenario '" + scenario.scenarioId + "': " + side + " commander stats set but commander not marked present";
+            }
+            return {};
+        }
+        if ( commander.attack < 0 || commander.attack > scenarioMaxCommanderStat || commander.defense < 0 || commander.defense > scenarioMaxCommanderStat ) {
+            return "scenario '" + scenario.scenarioId + "': " + side + " commander stats (" + std::to_string( commander.attack ) + ", "
+                   + std::to_string( commander.defense ) + ") are outside [0, " + std::to_string( scenarioMaxCommanderStat ) + "]";
+        }
+        return {};
+    };
+
+    std::string commanderError = validateCommander( "attacker", scenario.attackerCommander );
+    if ( !commanderError.empty() ) {
+        return commanderError;
+    }
+    commanderError = validateCommander( "defender", scenario.defenderCommander );
+    if ( !commanderError.empty() ) {
+        return commanderError;
+    }
+
     return {};
 }
 

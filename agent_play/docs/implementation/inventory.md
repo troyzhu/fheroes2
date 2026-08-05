@@ -60,7 +60,7 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | Path | Purpose | Spec § | Tested by |
 |---|---|---|---|
 | `src/fheroes2/battle/battle_seed.{h,cpp}` | One combat-seed implementation for engine + agent; trajectory-compatibility contract | §7.3 | `test_battle_seed` (14 checks, 4 golden values); digest invariance |
-| `src/fheroes2/agent/agent_scenario.{h,cpp}` | C++ scenario struct, §11.1-subset validation, 5-fixture M1 suite | §11 | `test_agent_scenario` (11 checks) |
+| `src/fheroes2/agent/agent_scenario.{h,cpp}` | C++ scenario struct, §11.1-subset validation, optional per-side commanders, 5-fixture M1 suite | §11 | `test_agent_scenario` (15 checks) |
 | `src/fheroes2/agent/agent_digest.{h,cpp}` | `DigestWriter` (LE fixed-width, length-prefixed) + self-contained SHA-256 | §12.5 | `test_agent_digest` (11 checks incl. FIPS vectors, 1M-byte input) |
 | `src/fheroes2/agent/agent_battle_runner.{h,cpp}` | Headless AI-vs-AI episode lifecycle; terminal state read pre-destruction; canonical digest `agent_terminal_v1` | §7.2, §8 | `verify_m1.sh` ten-run + cross-process checks |
 | `src/agent_worker/main.cpp` + `build_worker.sh` | `fheroes2_agent_worker` CLI (`--runs/--fixture/--list/--quiet`); JSONL protocol replaces it at M4 | §6.1 | `verify_m1.sh` |
@@ -78,7 +78,8 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | `agent_play/docs/references/report-rl-approaches.md` | Adversarially verified literature consolidation (23 sources) | — | citations + verification votes inline |
 | `agent_play/docs/decisions/000{1,2,3}-*.md` | Accepted ADRs: observation profiles; action space; config management | amend §10, §12 | — |
 | `src/fheroes2/agent/agent_observation.{h,cpp}` | Per-decision board serialization: every stack's identity, position, strength and flags, sorted by uid, plus whose turn it is | §12, ADR 0001 `full_v1` | `test_agent_observation` (19 checks) + `check_bc_samples.py` |
-| `src/fheroes2/agent/agent_external_controller.{h,cpp}` | Blocking decision callback so an outside policy answers a turn; controllable side, rejection and end-of-input both fall back to skip | §5.4 | `test_protocol.py` (15 checks) |
+| `src/fheroes2/agent/agent_external_controller.{h,cpp}` | Blocking decision callback so an outside policy answers a turn; controllable side, rejection and end-of-input both fall back to skip | §5.4 | `test_protocol.py` (19 checks) |
+| `src/fheroes2/agent/agent_commander.h` | Minimal `HeroBase` carrying commander attack and defense into a scenario battle; captain type so retreat and surrender stay closed; AI control so the headless loop never stalls | §11 extension | `test_agent_scenario` validation + `test_protocol.py` stat-flow checks + golden digests unchanged when absent |
 | `src/agent_worker/main.cpp` flags `--protocol`, `--side`, `--attacker`, `--defender`, `--dump-map` | Line protocol for external control, army overrides, and reading a real map through the engine's own loader | §13 subset | `test_protocol.py`, `verify_agent.sh` |
 | `python/fheroes2_agent/{encoding,dataset,policy}.py` | 634-wide observation encoding, episode-split loader with discounted returns, 396,570-parameter masked policy | ADR 0001, 0002 | `test_encoding.py` (32), `test_policy.py` (11) |
 | `python/fheroes2_agent/train_{bc,critic,ppo,rloo,group}.py` | Stage 1 cloning, stage 2b critic pre-fitting, stage 3 PPO, and the group-relative trainer covering leave-one-out, GRPO and Dr. GRPO under either trust region | ADR 0005 | `verify_agent.sh` |

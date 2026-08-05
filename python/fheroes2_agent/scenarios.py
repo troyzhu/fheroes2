@@ -68,6 +68,10 @@ ROSTER = [
 class Matchup:
     attacker: str
     defender: str
+    # Optional hero commanders, "attack:defense". None preserves the commander-less behaviour
+    # every earlier measurement used.
+    attacker_hero: str | None = None
+    defender_hero: str | None = None
 
     def label(self) -> str:
         return f"{self.attacker} vs {self.defender}"
@@ -112,7 +116,8 @@ def sample_matchups(n: int, seed: int = 0, max_stacks: int = 3) -> list[Matchup]
 @torch.no_grad()
 def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 16, side: str = "attacker") -> dict:
     """Win rate and mean reward for one matchup, which is what makes difficulty a number."""
-    env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender)
+    env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
+                    attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero)
     wins, rewards, lengths = [], [], []
     try:
         for _ in range(episodes):

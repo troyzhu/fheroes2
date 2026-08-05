@@ -114,7 +114,7 @@ The adventure map is everything outside a battle. A hero moves across a large ma
 
 An agent that plays the game needs both, and the battle agent is a component the adventure agent invokes rather than a smaller version of it.
 
-The Thunk map's opening fight is the standing acceptance test for how faithful the battle environment is to the real game, and it has exposed two gaps: the scenario schema carries no hero commander stats, and Champions are wide and outside `simple_v1`, so the fight cannot yet be posed as the game poses it. Whether it is winnable is an open measurement blocked on those two work items, not a conclusion. [[archive/experiments/2026-08-04-flip-and-collapse#The Thunk opening fight, pinned down]] carries what can be measured today.
+The Thunk map's opening fight is the standing acceptance test for how faithful the battle environment is to the real game, and it exposed two gaps. Hero commander stats are now supported, and attaching Corribus's moved the fight's winnable frontier from roughly 450 Peasants to roughly 800 on stats alone; a two-stage curriculum from there wins the real 1,000-Peasant fight about one time in six with the two Champions still missing. The remaining gap is wide creatures, which is what keeps the Champions out. [[archive/experiments/2026-08-04-flip-and-collapse#The commander closes the gap]] carries the measurements.
 
 ## Why the battle came first
 

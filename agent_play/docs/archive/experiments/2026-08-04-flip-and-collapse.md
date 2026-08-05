@@ -100,7 +100,28 @@ Two of the fight's load-bearing elements are outside the current environment: he
 
 The split helps the attacker at every count, opposite to a first guess: three stacks striking for a third each is what single-Crusader bait stacks are for. And unlike the Goblin cliff, this frontier is a slope, which means tactics matter here. Training 30 iterations at the 400 frontier lifts 400 from 0.562 to 0.833 and opens 450 to 0.292 while 500 stays shut at 0.042, so learning moves this frontier where it moved the Goblin one not at all.
 
-The real fight remains open, and honestly so: at 1,000 the commander-less, Champion-less approximation is 0.000, and the factor the missing pieces must supply is what defense 12 against Peasant attack 1 and two more fast bodies are worth, which is exactly what the commander work item exists to measure. Until then the winnability of the actual opening fight is an unanswered question, not a conclusion in either direction.
+The real fight remains open at this point in the log: at 1,000 the commander-less, Champion-less approximation is 0.000, and the factor the missing pieces must supply is what defense 12 against Peasant attack 1 and two more fast bodies are worth. The commander work item was built the same evening, and the next section carries what it measured.
+
+## The commander closes the gap
+
+Hero commander support landed as `agent_commander.h`, a minimal `HeroBase` carrying primary stats and nothing else, attached through `Army::SetCommander` when a scenario asks for one. Absent commanders leave every code path untouched, which the milestone gates' golden digests prove, and the protocol test pins the stat flow exactly: with a 30:20 commander every Peasant on that side observes attack 31 and defense 21 while the other side stays at 1 and 1.
+
+With Corribus's dumped stats attached, the same army against the same splits:
+
+| Peasants | 400 | 500 | 700 | 850 | 1000 |
+|---|---|---|---|---|---|
+| No commander | 0.562 | 0.062 | 0.000 | — | 0.000 |
+| Commander 13:12 | 1.000 | 1.000 | 0.667 | 0.167 | 0.000 |
+
+The frontier moves from roughly 450 to roughly 800 on stats alone, and 850 lands inside the training band. Two curriculum stages from there, 30 iterations each, single seed:
+
+| Stage | Trained at | 700 | 850 | 900 | 950 | 1000 |
+|---|---|---|---|---|---|---|
+| Clone | — | 0.667 | 0.167 | — | 0.000 | 0.000 |
+| 1 | 850 | 1.000 | 1.000 | 0.292 | 0.000 | 0.000 |
+| 2 | 950 | 0.292 | 0.625 | 0.583 | 0.542 | **0.167** |
+
+So the actual opening fight, still missing its two Champions, is won about one time in six by a curriculum-trained policy, from exactly zero at every earlier attempt. The fight is a training problem after all, and what it was gated on was the environment's missing commander, not the arithmetic. Two honest limits: one seed, 24 evaluation episodes, so 0.167 carries an error near 0.08; and stage 2 forgets the easier rungs, 700 falling from 1.000 to 0.292, which is the standard argument for training on a mixture of rungs rather than a ladder of single ones. The Champions stay tracked as the wide-creature work item, and closing them should only raise these numbers.
 
 ## Capacity, asked and measured
 

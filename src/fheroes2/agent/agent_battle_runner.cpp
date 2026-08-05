@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "agent_action_space.h"
+#include "agent_commander.h"
 #include "agent_observation.h"
 #include "agent_command_snapshot.h"
 #include "agent_digest.h"
@@ -281,6 +282,21 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     fillArmy( attackingArmy, PlayerColor::BLUE, scenario.attacker );
     Army defendingArmy;
     fillArmy( defendingArmy, PlayerColor::RED, scenario.defender );
+
+    // Commanders, when the scenario asks for them. Declared at function scope because the armies
+    // hold raw pointers to them for the arena's whole lifetime. When absent nothing is attached
+    // and every code path is byte-identical to before commanders existed, which the milestone
+    // gates' golden digests prove on every run.
+    std::optional<ScenarioCommander> attackerCommander;
+    if ( scenario.attackerCommander.present ) {
+        attackerCommander.emplace( attackingArmy, PlayerColor::BLUE, scenario.attackerCommander.attack, scenario.attackerCommander.defense );
+        attackingArmy.SetCommander( &*attackerCommander );
+    }
+    std::optional<ScenarioCommander> defenderCommander;
+    if ( scenario.defenderCommander.present ) {
+        defenderCommander.emplace( defendingArmy, PlayerColor::RED, scenario.defenderCommander.attack, scenario.defenderCommander.defense );
+        defendingArmy.SetCommander( &*defenderCommander );
+    }
 
     outcome.combatSeed = Battle::computeBattleSeed( scenario.tileIndex, outcome.mapSeed, attackingArmy, defendingArmy );
 

@@ -54,6 +54,21 @@ namespace fheroes2::agent
         std::array<StackSpec, scenarioSlotCount> slots{};
     };
 
+    // Optional per-side hero commander. Real maps always have one, and every battle unit's
+    // effective attack and defense include the commander's stats, so a commander-less scenario
+    // understates both sides. Absent by default, which keeps every existing scenario and its
+    // digests bit-identical.
+    struct CommanderSpec
+    {
+        bool present{ false };
+        int attack{ 0 };
+        int defense{ 0 };
+    };
+
+    // Upper bound for a commander stat. The strongest map hero seen so far carries attack 30;
+    // the cap leaves headroom without admitting nonsense.
+    inline constexpr int scenarioMaxCommanderStat{ 99 };
+
     // A fixed creature-only field battle on the 2 x 2 Battle Only world: the C++ counterpart of
     // scenario schema v1 (agent spec, section 11) restricted to what Milestone 1 needs. JSON
     // parsing arrives with the protocol worker; until then scenarios are constructed in code.
@@ -68,6 +83,8 @@ namespace fheroes2::agent
         int32_t maxRounds{ 100 };
         SideSpec attacker;
         SideSpec defender;
+        CommanderSpec attackerCommander;
+        CommanderSpec defenderCommander;
     };
 
     // Returns an empty string when the scenario is valid, otherwise a human-readable reason for
