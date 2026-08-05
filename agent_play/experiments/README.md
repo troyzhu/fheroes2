@@ -40,3 +40,5 @@ The verification gates relink `src/agent_worker/fheroes2_agent_worker`, and a ru
 
 Either wait, or copy the binary somewhere else and pass that path, since every script takes it as an argument for exactly this reason.
 
+The copy must be private to the run, not shared. A pool build died silently when the "pinned" copy it was spawning per episode was itself overwritten by a fresh pin for a different experiment. One binary copy per concurrently running experiment, named for it.
+

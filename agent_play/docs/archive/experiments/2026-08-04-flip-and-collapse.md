@@ -164,6 +164,19 @@ The summary across the whole hunt, every configuration measured at the rolled fi
 
 Everything the owner's correction insisted on was load-bearing: the split, the commander, the Champions. The environment now poses the fight faithfully up to the dumped stats, and the one-in-nine-hundred long shot every earlier pass reported was a measurement of missing features, not of the fight.
 
+## The wide roster, and generalization over the whole bestiary
+
+With hit points in the audit, the sampling roster went from seven hand-listed Knight-line creatures to the audit's 41, and a fresh 140-matchup pool calibrated over it at a 19.3 percent hit rate, against 22.5 on the narrow roster, so calibration is roughly as effective on the full bestiary as on one faction. Every one of the 41 creatures appears somewhere in the pool. The first build of this pool died silently when the worker copy it spawned per episode was overwritten by a pin for a different experiment, the recorded rebuild hazard hit from a new angle; the rule is now one private binary copy per concurrently running experiment.
+
+The pool enables a measurement nothing earlier could make. The clone's training data contains three creature types, so a generalization run here exercises the creature-identity encoding on units the policy has never seen. Same protocol as the corrected runs, 90 training and 50 held out, 40 iterations, groups sharing a matchup, one seed:
+
+| | Before | After | Change |
+|---|---|---|---|
+| Training matchups, 90 | $0.493 \pm 0.022$ | $0.732 \pm 0.032$ | $+0.239 \pm 0.039$, 6.2 SE |
+| Held-out matchups, 50 | $0.492 \pm 0.028$ | $0.646 \pm 0.049$ | $+0.153 \pm 0.056$, 2.7 SE |
+
+The held-out gain clears two standard errors on its own, the first time transfer has been separable from zero rather than inferred from the absence of a gap, and it happens on matchups built from creatures the policy met only through their stat lines and the one-hot the encoding carries. The training-minus-held-out difference is $+0.086 \pm 0.068$, not established either way at one seed, where the narrow-roster runs showed none; whether diversity opens a real gap is the obvious next measurement, not a conclusion.
+
 ## Sources consulted
 
 Bay and Yearick, arXiv 2607.00152, carried the identity behind the identical divergence arms as its Proposition 1 and is written up in [[../../research/works/group-std-identity]]. Its binary-reward bound on the group spread is what separates the LLM literature's difficulty-bias reading of studentization from the unbounded amplification measured here.
