@@ -54,6 +54,8 @@ Everything here pays out during the episode. The reason to want it is credit ass
 
 The reason to distrust it is that it teaches the proxy. A reward for damage dealt will trade a stack to deal damage when retreating was correct, and no amount of tuning removes that, because the agent is correctly optimizing what it was given.
 
+The owner's 2026-08-06 critique states the credit-assignment cost of the terminal family exactly: a trajectory-level advantage, which is what the group-relative estimators spread over every decision, upweights a bad action that later good actions redeemed and downweights a good action inside a lost game, so the policy never receives the per-decision signal that would correct the bad action itself. The in-stack remedies, in the order the evidence ranks them: search labels are per-decision credit by construction, each action judged by its own rollouts, which is part of why the search round beat trajectory-smeared PPO on-pool; advantage-weighted one-step training on teacher states keeps the behavior value inside its valid distribution ([[../research/works/one-step-offline-rl]], [[../research/works/alphastar-unplugged]]); and potential-based shaping with the fitted critic stays formally safe but inherits the critic's measured off-distribution optimism ([[training-design#The behavior value, measured where it would be spent]]).
+
 | Candidate | Form | Failure it invites |
 |---|---|---|
 | Damage dealt | $+\lambda \cdot \text{damage inflicted}$ | Suicidal attacks, since damage inflicted is paid immediately and the loss arrives at the end |
