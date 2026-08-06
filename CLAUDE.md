@@ -19,11 +19,13 @@ holds the literature, and `archive/` holds dated logs and raw runs, which are pr
 than a reading path.
 
 **`rl/` used to be entirely unimplemented and no longer is, so check before claiming either way.**
-As of 2026-08-03 stage 1 cloning, stage 2b critic pre-fitting and stage 3 reinforcement learning are
-built under `python/fheroes2_agent/` and gated by `verify_agent.sh`, along with the calibrated
-scenario generator. Still unbuilt: stage 2 DAgger, every reward candidate but the margin-weighted
-terminal one, the `observable_v1` profile and `planes_v1`. Each page under `rl/` says which of its
-own content exists; `implementation/inventory.md` is the per-component list.
+As of 2026-08-05 all four stages exist: stage 1 cloning, stage 2 DAgger (first round measured,
+`dagger_iteration.py`), stage 2b critic pre-fitting and stage 3 reinforcement learning, built
+under `python/fheroes2_agent/` plus `agent_play/experiments/` and gated by `verify_agent.sh`,
+along with the calibrated scenario generator. Still unbuilt: every reward candidate except the
+margin-weighted terminal one and the opt-in difficulty weighting, the `observable_v1` profile
+and `planes_v1`. Each page under `rl/` says which of its own content exists;
+`implementation/inventory.md` is the per-component list.
 
 **Notation is not a free choice.** `agent_play/docs/overview.md`'s Notation section is the contract, and the tree is
 self-contained: no page depends on a file outside this repository. The symbols match the owner's

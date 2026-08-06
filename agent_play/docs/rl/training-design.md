@@ -159,6 +159,10 @@ DAgger requires querying the teacher at arbitrary states the student produced, a
 
 The mechanism is in place: `--probe-teacher` on the worker emits `teacher_action` per decision through `ExternalDecisionController`'s probe of the planner's public `queryUnitTurn`. Two scope limits. The verdict covers the current scenario space, where commanders carry no spellbook, so the spell-planning path never runs and would need re-verification before spellcasting heroes enter. And the probed planner is the same agent that plays the opponent, so DAgger labels inherit every teacher blind spot that cloning already inherits.
 
+### The first round, measured 2026-08-05
+
+`dagger_iteration.py` ran the stage the same day the probe landed: clone v4 played its 40 training matchups over four battlefields, the planner labeled all 22,750 student-reached decisions, and the clone retrained on the aggregate corpus of 267,345 samples. Judged on student-reached play over battlefields, the training pool moved $+0.094 \pm 0.036$ paired per matchup against clone v4 and the held-out pool $+0.058 \pm 0.053$, and the Thunk ladder, the standing validation no sampler drew, went from 1.000 / 0.917 / 0.250 / 0.000 to 1.000 / 1.000 / 0.917 / 0.667 across its rungs. One supervised round recovered most of what the four-stage reinforcement-learning curriculum reached on that fight, while the same day's PPO runs from the same clone transferred nothing held-out. [[../archive/experiments/2026-08-05-dagger-and-battlefield-transfer]] carries the runs, including the matched teacher-data control that separates relabeling from data volume.
+
 ## Stage 3, masked PPO
 
 ### The objective
