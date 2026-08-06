@@ -88,13 +88,19 @@ class BattleEnv:
                  attacker: str | None = None, defender: str | None = None,
                  attacker_hero: str | None = None, defender_hero: str | None = None,
                  allow_wide: bool = False, probe_teacher: bool = False,
-                 reward_weighting: str = "none", reward_margin: str = "hit_points"):
+                 reward_weighting: str = "none", reward_margin: str = "hit_points",
+                 seed_offset: int = 0):
         if reward_weighting not in ("none", "difficulty"):
             raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
         if reward_margin not in ("hit_points", "strength"):
             raise ValueError(f"unknown reward_margin {reward_margin!r}")
         self._reward_margin = reward_margin
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
+        # Which battlefield variant the seed cycle starts at. A search side-environment given
+        # the same offset replays the live environment's battlefield, which is what makes
+        # battlefield-varied search labels possible without a sync protocol.
+        if seed_offset:
+            self._cmd += ["--seed-offset", str(seed_offset)]
         # DAgger relabeling: each decision record then carries "teacher_action", the planner's
         # own choice at the same state, when it resolves inside simple_v1.
         if probe_teacher:

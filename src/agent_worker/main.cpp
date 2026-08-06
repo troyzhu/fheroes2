@@ -131,6 +131,10 @@ int main( int argc, char ** argv )
     std::string dumpMapPath;
     // Number of world seeds per fixture. Each seed is a different battle from the same armies.
     int seedCount = 1;
+    // First seed index of the run, so two processes can agree on which battlefield variant they
+    // are playing: a search side-environment replays the live environment's battlefield only if
+    // both start their cycle at the same offset.
+    int seedOffset = 0;
     std::string onlyFixture;
     std::string trajectoryDir;
     std::string capabilityAuditPath;
@@ -154,6 +158,9 @@ int main( int argc, char ** argv )
         }
         else if ( std::strcmp( argv[i], "--seeds" ) == 0 ) {
             seedCount = std::atoi( next( "--seeds" ) );
+        }
+        else if ( std::strcmp( argv[i], "--seed-offset" ) == 0 ) {
+            seedOffset = std::atoi( next( "--seed-offset" ) );
         }
         else if ( std::strcmp( argv[i], "--protocol" ) == 0 ) {
             protocolMode = true;
@@ -326,9 +333,10 @@ int main( int argc, char ** argv )
                 return 2;
             }
             variant.allowWideUnits = allowWideUnits;
-            if ( s > 0 ) {
-                variant.worldSeed = scenario.worldSeed + static_cast<uint32_t>( s );
-                variant.scenarioId = scenario.scenarioId + "-seed" + std::to_string( s );
+            const int seedIndex = seedOffset + s;
+            if ( seedIndex > 0 ) {
+                variant.worldSeed = scenario.worldSeed + static_cast<uint32_t>( seedIndex );
+                variant.scenarioId = scenario.scenarioId + "-seed" + std::to_string( seedIndex );
             }
             scenarios.push_back( variant );
         }

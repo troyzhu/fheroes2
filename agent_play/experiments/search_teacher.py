@@ -53,13 +53,15 @@ SHARE2_EVALS = POOL.parent / "dagger_share2.json"
 
 def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: pathlib.Path,
                     episodes: int, simulations: int, c_puct: float, side: str = "attacker",
-                    min_win_fraction: float = 0.0) -> tuple[int, int]:
+                    min_win_fraction: float = 0.0, seed_offset: int = 0) -> tuple[int, int]:
     """Returns (decisions, wins) actually written; (0, wins) when the win filter drops the
     matchup, since labels from fights search cannot win teach the least-bad line of a lost
-    position, which the credit measurement showed is exactly the poison."""
+    position, which the credit measurement showed is exactly the poison. A nonzero seed offset
+    moves the matchup onto another battlefield variant, applied identically to the live and the
+    search environments so simulations still replay the battlefield being played."""
     kwargs = dict(attacker=entry["attacker"], defender=entry["defender"],
                   attacker_hero=entry.get("attacker_hero"), defender_hero=entry.get("defender_hero"),
-                  allow_wide=bool(entry.get("allow_wide")), side=side)
+                  allow_wide=bool(entry.get("allow_wide")), side=side, seed_offset=seed_offset)
     env = BattleEnv(worker, **kwargs)
     sim = BattleEnv(worker, **kwargs)
     decisions = 0
@@ -116,6 +118,10 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=8, help="episodes per sampled matchup")
     parser.add_argument("--min-win", type=float, default=0.5,
                         help="fresh mode: drop matchups where search wins less than this fraction")
+    parser.add_argument("--vary-battlefields", action="store_true",
+                        help="fresh mode: place each matchup on its own battlefield variant via --seed-offset, "
+                             "applied identically to live and search environments (needs a worker built after "
+                             "2026-08-06)")
     args = parser.parse_args()
 
     model = BattlePolicy()
@@ -143,7 +149,8 @@ def main() -> None:
                 decisions, wins = collect_matchup(args.worker, model, entry,
                                                   out_root / f"shard{args.shard}_matchup_{index:03d}",
                                                   args.episodes, args.simulations, args.c_puct,
-                                                  side=args.side, min_win_fraction=args.min_win)
+                                                  side=args.side, min_win_fraction=args.min_win,
+                                                  seed_offset=(args.shard * 100 + index) % 16 if args.vary_battlefields else 0)
             except Exception as error:  # a rejected scenario is data, not a crash
                 manifest.append(entry | {"kept": False, "error": str(error)[:120]})
                 continue

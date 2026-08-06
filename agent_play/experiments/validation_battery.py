@@ -84,7 +84,19 @@ def build_suites(fresh_count: int) -> dict[str, list[Matchup]]:
     # 6. The standing ladder, untouched by every training set, plus rungs beyond the real fight.
     suites["thunk_ladder"] = [Matchup(THUNK_ARMY, thunk_split(total), attacker_hero=THUNK_HERO, allow_wide=True)
                               for total in (500, 700, 850, 1000)]
+
+    # 7. Side coverage: the held-out pool commanded from the defender's chair, and mirror armies
+    # from both chairs, since the side-swap measurements showed play quality is side-dependent.
+    suites["held_out_as_defender"] = list(suites["held_out_pool"])
+    mirrors = ["9:2,11:2,6:12,1:30", "62:3,30:6,15:10", "13:3,48:12,12:20", "10:4,7:8", "28:3,40:8,2:15", "51:4,50:4,12:16"]
+    suites["mirrors_attacker"] = [Matchup(a, a, attacker_hero="10:10", defender_hero="10:10", allow_wide=True)
+                                  for a in mirrors]
+    suites["mirrors_defender"] = list(suites["mirrors_attacker"])
     return suites
+
+
+# Which side each suite is played from; attacker unless listed.
+SUITE_SIDE = {"held_out_as_defender": "defender", "mirrors_defender": "defender"}
 
 
 def main() -> None:
@@ -109,7 +121,8 @@ def main() -> None:
         model.eval()
         report["results"][name] = {}
         for suite, matchups in suites.items():
-            rates = [measure(model, args.worker, m, episodes=args.episodes, seeds=args.eval_seeds)["win_rate"]
+            side = SUITE_SIDE.get(suite, "attacker")
+            rates = [measure(model, args.worker, m, episodes=args.episodes, seeds=args.eval_seeds, side=side)["win_rate"]
                      for m in matchups]
             report["results"][name][suite] = rates
             print(f"{name:24s} {suite:18s} mean {np.mean(rates):.3f}  " +
