@@ -68,7 +68,7 @@ void fheroes2::agent::ExternalDecisionController::chooseActions( Battle::Arena &
         return;
     }
 
-    const Observation observation = captureObservation( arena, currentUnit );
+    const Observation observation = captureObservation( arena, currentUnit, _observeObstacles );
 
     _lastTeacherProbe.reset();
     if ( _probeTeacher ) {

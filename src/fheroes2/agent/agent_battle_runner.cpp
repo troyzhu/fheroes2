@@ -116,13 +116,14 @@ namespace
                 // commands are applied. Together with the legal set above and the teacher's
                 // canonical index, this is one complete behaviour-cloning sample; recording the
                 // action alone, as this did before, gives only a label with no input.
-                observations.push_back( fheroes2::agent::captureObservation( arena, currentUnit ) );
+                observations.push_back( fheroes2::agent::captureObservation( arena, currentUnit, observeObstacles ) );
             }
 
             decisions.push_back( std::move( record ) );
         }
 
         bool auditCoverage{ false };
+        bool observeObstacles{ false };
         std::vector<DecisionRecord> decisions;
         std::vector<fheroes2::agent::DecisionCoverage> coverage;
         std::vector<fheroes2::agent::Observation> observations;
@@ -271,6 +272,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     PassiveTeacherRecorder recorder;
     if ( recording != nullptr ) {
         recorder.auditCoverage = recording->auditTeacherCoverage;
+        recorder.observeObstacles = scenario.observeObstacles;
     }
 
     EpisodeOutcome outcome;

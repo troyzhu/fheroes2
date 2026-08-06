@@ -21,9 +21,12 @@
 #include "agent_observation.h"
 
 #include <algorithm>
+#include <cassert>
 #include <string>
 
 #include "battle_arena.h"
+#include "battle_board.h"
+#include "battle_cell.h"
 #include "battle_army.h"
 #include "battle_troop.h"
 
@@ -80,12 +83,24 @@ namespace
     }
 }
 
-fheroes2::agent::Observation fheroes2::agent::captureObservation( const Battle::Arena & arena, const Battle::Unit & currentUnit )
+fheroes2::agent::Observation fheroes2::agent::captureObservation( const Battle::Arena & arena, const Battle::Unit & currentUnit, const bool includeObstacles /* = false */ )
 {
     Observation observation;
     observation.engineDecisionIndex = arena.GetEngineDecisionIndex();
     observation.round = arena.GetTurnNumber();
     observation.activeUid = currentUnit.GetUID();
+
+    if ( includeObstacles ) {
+        const Battle::Board * board = Battle::Arena::GetBoard();
+        assert( board != nullptr );
+
+        observation.obstacleCells.reserve( board->size() );
+        for ( const Battle::Cell & cell : *board ) {
+            // An object on the cell is exactly what blocks movement through it; units are
+            // reported through the entity list, never here.
+            observation.obstacleCells.push_back( cell.GetObject() != 0 ? 1 : 0 );
+        }
+    }
 
     collectSide( arena.getAttackingForce(), true, observation.activeUid, observation.units );
     collectSide( arena.getDefendingForce(), false, observation.activeUid, observation.units );
@@ -143,6 +158,21 @@ std::string fheroes2::agent::observationToJson( const Observation & observation 
         appendBool( json, "hand_fighting", unit.isHandFighting );
         json += '}';
     }
-    json += "]}";
+    json += "]";
+
+    if ( !observation.obstacleCells.empty() ) {
+        // Appended after the units so every byte before this field is identical with the flag
+        // off, which is what the golden transcripts of the milestone gates compare.
+        json += ",\"obstacles\":[";
+        for ( size_t i = 0; i < observation.obstacleCells.size(); ++i ) {
+            if ( i != 0 ) {
+                json += ',';
+            }
+            json += observation.obstacleCells[i] != 0 ? '1' : '0';
+        }
+        json += ']';
+    }
+
+    json += '}';
     return json;
 }

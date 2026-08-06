@@ -131,6 +131,9 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=8, help="episodes per sampled matchup")
     parser.add_argument("--min-win", type=float, default=0.5,
                         help="fresh mode: drop matchups where search wins less than this fraction")
+    parser.add_argument("--record-candidates", action="store_true",
+                        help="write per-candidate search values, visits, and the prior onto every "
+                             "decision record, the soft-distillation dataset")
     parser.add_argument("--vary-battlefields", action="store_true",
                         help="fresh mode: place each matchup on its own battlefield variant via --seed-offset, "
                              "applied identically to live and search environments (needs a worker built after "
@@ -163,7 +166,8 @@ def main() -> None:
                                                   out_root / f"shard{args.shard}_matchup_{index:03d}",
                                                   args.episodes, args.simulations, args.c_puct,
                                                   side=args.side, min_win_fraction=args.min_win,
-                                                  seed_offset=(args.shard * 100 + index) % 16 if args.vary_battlefields else 0)
+                                                  seed_offset=(args.shard * 100 + index) % 16 if args.vary_battlefields else 0,
+                                                  record_candidates=args.record_candidates)
             except Exception as error:  # a rejected scenario is data, not a crash
                 manifest.append(entry | {"kept": False, "error": str(error)[:120]})
                 continue
@@ -187,7 +191,8 @@ def main() -> None:
                 continue
             episodes = args.hard_episodes if index in hard else args.easy_episodes
             decisions, wins = collect_matchup(args.worker, model, entry, out_root / f"matchup_{index:03d}",
-                                              episodes, args.simulations, args.c_puct)
+                                              episodes, args.simulations, args.c_puct,
+                                              record_candidates=args.record_candidates)
             total_decisions += decisions
             total_wins += wins
             total_eps += episodes

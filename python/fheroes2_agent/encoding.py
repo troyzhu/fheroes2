@@ -184,3 +184,52 @@ def describe(vector: np.ndarray) -> str:
     g = SLOT_COUNT * SLOT_FEATURES
     lines.append(", ".join(f"{name}={vector[g + i]:.3g}" for i, name in enumerate(GLOBAL_FEATURE_NAMES)))
     return "\n".join(lines)
+
+
+# --- planes_v1, ADR 0004's spatial modality ---------------------------------------------------
+#
+# The engine emits only what the entity list cannot carry, the obstacle layer; every other
+# committed channel is rasterized here from the same units the slot encoding reads, so the two
+# modalities share one source of truth. Layout is channels-first for a convolution,
+# (channel, row, column) over the engine's own 11-wide row-offset hex indexing, cell = row * 11
+# + column, exactly Battle::Board's.
+
+BOARD_WIDTH = 11
+BOARD_HEIGHT = 9
+PLANE_CHANNELS = (
+    "attacker_occupancy",
+    "defender_occupancy",
+    "count_fraction",
+    "hit_points",
+    "speed",
+    "shooter",
+    "obstacle",
+)
+
+
+def encode_planes(observation: dict) -> np.ndarray:
+    """The planes_v1 tensor for one observation, shape (7, 9, 11).
+
+    Unit channels write at head and tail cells. Hit points scale by log1p against 1000 per ADR
+    0006's measured convention, counts as the surviving fraction, speed against the game's cap
+    of 10. The obstacle channel needs an observation recorded with the worker's --planes flag;
+    without one it stays zero, which callers must treat as "unknown", not "open ground".
+    """
+    planes = np.zeros((len(PLANE_CHANNELS), BOARD_HEIGHT, BOARD_WIDTH), dtype=np.float32)
+    for unit in observation["units"]:
+        cells = [unit["head_cell"]]
+        if unit.get("tail_cell", -1) is not None and unit.get("tail_cell", -1) >= 0:
+            cells.append(unit["tail_cell"])
+        for cell in cells:
+            if cell < 0 or cell >= BOARD_WIDTH * BOARD_HEIGHT:
+                continue
+            row, column = divmod(cell, BOARD_WIDTH)
+            planes[0 if unit["side"] == "attacker" else 1, row, column] = 1.0
+            planes[2, row, column] = unit["count"] / max(unit["initial_count"], 1)
+            planes[3, row, column] = np.log1p(unit["hit_points"]) / np.log1p(1000.0)
+            planes[4, row, column] = unit["speed"] / 10.0
+            planes[5, row, column] = 1.0 if (unit["archer"] and unit["shots"] > 0) else 0.0
+    for index, blocked in enumerate(observation.get("obstacles", ())):
+        row, column = divmod(index, BOARD_WIDTH)
+        planes[6, row, column] = float(blocked)
+    return planes

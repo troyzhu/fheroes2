@@ -81,6 +81,9 @@ namespace fheroes2::agent
         int32_t tileIndex{ 1 };
         uint32_t worldSeed{ 0 };
         int32_t maxRounds{ 100 };
+        // ADR 0004's planes_v1 obstacle layer on every serialized observation, off by default
+        // so all existing transcripts and digests stay byte-identical.
+        bool observeObstacles{ false };
         SideSpec attacker;
         SideSpec defender;
         CommanderSpec attackerCommander;

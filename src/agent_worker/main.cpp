@@ -143,6 +143,7 @@ int main( int argc, char ** argv )
     // Protocol mode only: ask the built-in planner for its own choice at every controlled
     // decision and emit it as "teacher_action", the DAgger relabeling query.
     bool probeTeacher = false;
+    bool observePlanes = false;
 
     for ( int i = 1; i < argc; ++i ) {
         const auto next = [&]( const char * name ) -> const char * {
@@ -167,6 +168,11 @@ int main( int argc, char ** argv )
         }
         else if ( std::strcmp( argv[i], "--probe-teacher" ) == 0 ) {
             probeTeacher = true;
+        }
+        else if ( std::strcmp( argv[i], "--planes" ) == 0 ) {
+            // ADR 0004's planes_v1: the obstacle layer joins every serialized observation, in
+            // protocol decisions and in recorded trajectories alike.
+            observePlanes = true;
         }
         else if ( std::strcmp( argv[i], "--side" ) == 0 ) {
             controlledSide = next( "--side" );
@@ -212,7 +218,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--probe-teacher] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--probe-teacher] [--planes] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -316,6 +322,7 @@ int main( int argc, char ** argv )
         // property of the matchup, estimated over seeds.
         for ( int s = 0; s < seedCount; ++s ) {
             fheroes2::agent::Scenario variant = scenario;
+            variant.observeObstacles = observePlanes;
             if ( !attackerSpec.empty() && !parseSideSpec( attackerSpec, variant.attacker ) ) {
                 std::fprintf( stderr, "cannot parse --attacker %s\n", attackerSpec.c_str() );
                 return 2;
@@ -412,6 +419,9 @@ int main( int argc, char ** argv )
             };
 
             fheroes2::agent::ExternalDecisionController controller( side, decide );
+            if ( observePlanes ) {
+                controller.enableObstacleObservation();
+            }
             if ( probeTeacher ) {
                 controller.enableTeacherProbe();
                 probeSource = &controller;

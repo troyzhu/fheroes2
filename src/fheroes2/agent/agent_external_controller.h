@@ -60,6 +60,12 @@ namespace fheroes2::agent
             // Intentionally empty.
         }
 
+        // ADR 0004's planes_v1 obstacle layer on every observation this controller emits.
+        void enableObstacleObservation()
+        {
+            _observeObstacles = true;
+        }
+
         bool handlesDecision( const Battle::Arena & arena, const Battle::Unit & currentUnit ) const override;
 
         void chooseActions( Battle::Arena & arena, const Battle::Unit & currentUnit, Battle::Actions & output ) override;
@@ -124,6 +130,7 @@ namespace fheroes2::agent
         uint32_t _rejected{ 0 };
         bool _finished{ false };
         bool _probeTeacher{ false };
+        bool _observeObstacles{ false };
         std::optional<uint32_t> _lastTeacherProbe;
         uint32_t _probesResolved{ 0 };
         uint32_t _probesOutsideSchema{ 0 };

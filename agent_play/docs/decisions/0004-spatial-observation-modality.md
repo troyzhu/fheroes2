@@ -10,7 +10,7 @@ tags: [adr, observation, modality, agent-env]
 # ADR 0004 — Semantic spatial-plane observation modality; true pixel rendering rejected
 
 - Status: accepted 2026-07-29, plane emitter lands with Milestone 4
-- Implementation: not built. No occurrence of `planes_v1` or `observation_modalities` exists in `src/fheroes2/agent/` or `python/` as of 2026-07-31.
+- Implementation: the engine half and the tensor builder landed 2026-08-06; the consuming network has not. The worker's `--planes` flag adds an `obstacles` layer to every serialized observation (`agent_observation.{h,cpp}`, off by default and byte-identical when off, verified against stripped transcripts), and `encode_planes` in `python/fheroes2_agent/encoding.py` rasterizes the committed channels from the units plus that layer, (7, 9, 11) channels-first in the engine's own cell indexing. Everything except the obstacle layer derives from the entity list, so the engine emits only what entities cannot carry. The convolutional fusion arm and its ablation remain unbuilt.
 - Evidence: user proposal 2026-07-29 (a coarse minimap view for the agent); [[../archive/research-runs/2026-07-29-spatial-observations]], 24 of 25 claims confirmed; [[../research/works/pysc2]], [[../research/works/griddly]], [[../research/works/alphastar]]
 - Extends: [[0001-observation-profiles]], orthogonally. A profile says what may be seen, a modality says how it is shaped.
 - Mechanism detail: [[../implementation/observation-design]]; encoder consequences in [[../rl/training-design]]

@@ -75,12 +75,21 @@ namespace fheroes2::agent
         // Living stacks only (agent spec section 12.3), both sides, sorted by uid so the
         // serialization is a function of state alone and not of engine container order.
         std::vector<ObservedUnit> units;
+        // ADR 0004's planes_v1, engine half. Of the committed channel list, everything except
+        // the board itself is derivable from the units above (occupancy, count and hit-point
+        // fractions, speed, shooter), so the engine emits only what entities cannot carry: one
+        // flag per board cell, 99 in Battle::Board's own row-offset hex indexing, nonzero where
+        // an obstacle blocks the cell. Empty unless requested, and the serialization omits the
+        // field entirely then, which keeps every existing consumer byte-identical.
+        std::vector<uint8_t> obstacleCells;
     };
 
     // Captures the board at the exact pre-application state a decision is taken in. Consumes no
     // combat randomness and mutates nothing, so recording an episode leaves its digests
     // unchanged (asserted by the golden digests in verify_m2.sh and verify_m3.sh).
-    Observation captureObservation( const Battle::Arena & arena, const Battle::Unit & currentUnit );
+    // includeObstacles adds the planes_v1 obstacle layer above; the default keeps the
+    // observation exactly as every caller before ADR 0004's implementation received it.
+    Observation captureObservation( const Battle::Arena & arena, const Battle::Unit & currentUnit, const bool includeObstacles = false );
 
     // One line of JSON, field order fixed, so identical states produce identical bytes.
     std::string observationToJson( const Observation & observation );
