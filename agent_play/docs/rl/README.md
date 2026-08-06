@@ -18,6 +18,7 @@ The documents, in the order they are worth reading. The code column names where 
 | [[training-design]] | How a policy is actually fitted. Architecture, the loss at each stage, hyperparameter tables, and the alternatives at every choice | Before training anything | `python/fheroes2_agent/{policy,train_bc,train_critic,train_ppo,train_rloo,train_group}.py` |
 | [[reward-design]] | The reward space: the implemented candidate, both families, shaping, and how a change would be chosen | Before touching what the agent is asked to optimize | reward assembly in `python/fheroes2_agent/env.py` |
 | [[scenario-distribution]] | Why the army matchup dominates outcomes, and what training and evaluation do about it | Before defining a scenario generator or reporting a win rate | `python/fheroes2_agent/scenarios.py` |
+| [[value-estimation-lab]] | Every value estimator fitted here, what each measured, and the literature concept each measurement grounds | Studying value methods, or before fitting the next estimator | probes vendored under the archive's 2026-08-06 run reports |
 | [[rlhf-transfer]] | What the language-model reinforcement-learning literature contributes here, and what it does not | When a technique from that world looks applicable | group baselines and trust regions in `python/fheroes2_agent/objectives.py` |
 
 ## What is ours and what is precedent
@@ -26,7 +27,7 @@ Unlabeled prose in this tree describes this project. Evidence from any other sys
 
 ## How they fit together
 
-[[rl-and-the-battle-domain]] fixes the vocabulary and places the problem. [[rl-methods]] is the reference the others link into rather than restating, so a technique is defined once. [[training-design]] applies those techniques to this network and this teacher, and [[reward-design]] carries the one choice that decides what is being optimized. [[scenario-distribution]] concerns the data the whole thing trains on, which turns out to dominate both the gradient and any reported number. [[rlhf-transfer]] is a survey of one adjacent literature, kept separate because most of it does not apply and saying so is the useful part.
+[[rl-and-the-battle-domain]] fixes the vocabulary and places the problem. [[rl-methods]] is the reference the others link into rather than restating, so a technique is defined once. [[training-design]] applies those techniques to this network and this teacher, and [[reward-design]] carries the one choice that decides what is being optimized. [[scenario-distribution]] concerns the data the whole thing trains on, which turns out to dominate both the gradient and any reported number. [[rlhf-transfer]] is a survey of one adjacent literature, kept separate because most of it does not apply and saying so is the useful part. [[value-estimation-lab]] is the owner-requested study record of the value thread, every estimator beside the concept its failure or success demonstrates.
 
 Symbols are fixed in [[../overview#Notation]], which also records which topics this tree carries itself and which it assumes from the owner's existing study notes.
 
