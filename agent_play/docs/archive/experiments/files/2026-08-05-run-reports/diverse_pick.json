@@ -1,0 +1,1 @@
+{"attacker": "42:1,48:9,13:4,12:12", "defender": "51:3,50:3,12:19,7:1", "win_rate": 0.25, "reward_std": 0.9456308981503205, "mean_length": 20.75, "scale": 1.34375, "attacker_hero": "4:2", "defender_hero": null, "allow_wide": true}

@@ -1,0 +1,1434 @@
+{
+  "summary": [
+    {
+      "advantage": "loo",
+      "trust_region": "divergence",
+      "n": 5,
+      "mean": 0.66,
+      "stdev": 0.04647748110644553,
+      "stderr": 0.020785361435394868,
+      "worst": 0.6
+    }
+  ],
+  "runs": [
+    {
+      "advantage": "loo",
+      "trust_region": "divergence",
+      "seed": 0,
+      "threshold": 0.2,
+      "initial": 0.3125,
+      "final5": 0.71875,
+      "best": 1.0,
+      "history": [
+        {
+          "iteration": 0,
+          "win_rate": 0.3125,
+          "steps": 359,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.22926664352417,
+          "clip_fraction": 0.10610399092547596,
+          "shifted_fraction": 0.06276073260232806
+        },
+        {
+          "iteration": 1,
+          "win_rate": 0.5625,
+          "steps": 332,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0011793375015259,
+          "clip_fraction": 0.09292763192206621,
+          "shifted_fraction": 0.008660567458719015
+        },
+        {
+          "iteration": 2,
+          "win_rate": 0.28125,
+          "steps": 359,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.2167565822601318,
+          "clip_fraction": 0.07445103977806866,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 3,
+          "win_rate": 0.3125,
+          "steps": 530,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1642659902572632,
+          "clip_fraction": 0.17191117070615292,
+          "shifted_fraction": 0.06514033613105615
+        },
+        {
+          "iteration": 4,
+          "win_rate": 0.375,
+          "steps": 257,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.1587976217269897,
+          "clip_fraction": 0.03515625,
+          "shifted_fraction": 0.00390625
+        },
+        {
+          "iteration": 5,
+          "win_rate": 0.5,
+          "steps": 595,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.151383876800537,
+          "clip_fraction": 0.11329693843921025,
+          "shifted_fraction": 0.0191547442227602
+        },
+        {
+          "iteration": 6,
+          "win_rate": 0.46875,
+          "steps": 196,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.234614610671997,
+          "clip_fraction": 0.04209183622151613,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 7,
+          "win_rate": 0.34375,
+          "steps": 382,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1078829765319824,
+          "clip_fraction": 0.033544147037900984,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 8,
+          "win_rate": 0.71875,
+          "steps": 598,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.168192744255066,
+          "clip_fraction": 0.22786458395421505,
+          "shifted_fraction": 0.13046572264283895
+        },
+        {
+          "iteration": 9,
+          "win_rate": 0.5625,
+          "steps": 425,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1740548610687256,
+          "clip_fraction": 0.062416211469098926,
+          "shifted_fraction": 0.007633367087692022
+        },
+        {
+          "iteration": 10,
+          "win_rate": 0.53125,
+          "steps": 249,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.222028374671936,
+          "clip_fraction": 0.01004016026854515,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 11,
+          "win_rate": 0.78125,
+          "steps": 432,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8449234366416931,
+          "clip_fraction": 0.07009055279195309,
+          "shifted_fraction": 0.008611505851149559
+        },
+        {
+          "iteration": 12,
+          "win_rate": 0.6875,
+          "steps": 520,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0505414009094238,
+          "clip_fraction": 0.15592447916666666,
+          "shifted_fraction": 0.0283203125
+        },
+        {
+          "iteration": 13,
+          "win_rate": 0.65625,
+          "steps": 515,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.237593650817871,
+          "clip_fraction": 0.08333333333333333,
+          "shifted_fraction": 0.042643229166666664
+        },
+        {
+          "iteration": 14,
+          "win_rate": 0.625,
+          "steps": 178,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.2246966361999512,
+          "clip_fraction": 0.018258427269756794,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 15,
+          "win_rate": 0.40625,
+          "steps": 527,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8013399243354797,
+          "clip_fraction": 0.16423611342906952,
+          "shifted_fraction": 0.05473090335726738
+        },
+        {
+          "iteration": 16,
+          "win_rate": 0.5,
+          "steps": 221,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.053660281002521515,
+          "clip_fraction": 0.03167420905083418,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 17,
+          "win_rate": 0.46875,
+          "steps": 271,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.120827078819275,
+          "clip_fraction": 0.08417969010770321,
+          "shifted_fraction": 0.018098958767950535
+        },
+        {
+          "iteration": 18,
+          "win_rate": 0.28125,
+          "steps": 381,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0430452823638916,
+          "clip_fraction": 0.07039062585681677,
+          "shifted_fraction": 0.021347655914723873
+        },
+        {
+          "iteration": 19,
+          "win_rate": 0.65625,
+          "steps": 496,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9461177587509155,
+          "clip_fraction": 0.13154296856373549,
+          "shifted_fraction": 0.01871744799427688
+        },
+        {
+          "iteration": 20,
+          "win_rate": 0.46875,
+          "steps": 39,
+          "degenerate_groups": 3,
+          "raw_advantage_std": 0.7360898852348328,
+          "clip_fraction": 0.012820512987673283,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 21,
+          "win_rate": 0.4375,
+          "steps": 277,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9058034420013428,
+          "clip_fraction": 0.08833240531384945,
+          "shifted_fraction": 0.009858631063252687
+        },
+        {
+          "iteration": 22,
+          "win_rate": 0.71875,
+          "steps": 282,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.6728441119194031,
+          "clip_fraction": 0.16019381303340197,
+          "shifted_fraction": 0.04447115492075682
+        },
+        {
+          "iteration": 23,
+          "win_rate": 0.90625,
+          "steps": 363,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.6566452980041504,
+          "clip_fraction": 0.07974043488502502,
+          "shifted_fraction": 0.017646575579419732
+        },
+        {
+          "iteration": 24,
+          "win_rate": 0.6875,
+          "steps": 203,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.5176652073860168,
+          "clip_fraction": 0.002463054144755006,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 25,
+          "win_rate": 0.65625,
+          "steps": 408,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0416256189346313,
+          "clip_fraction": 0.11171361058950424,
+          "shifted_fraction": 0.03798314183950424
+        },
+        {
+          "iteration": 26,
+          "win_rate": 0.75,
+          "steps": 271,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.09909246861934662,
+          "clip_fraction": 0.18255208618938923,
+          "shifted_fraction": 0.026399740017950535
+        },
+        {
+          "iteration": 27,
+          "win_rate": 0.4375,
+          "steps": 168,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1465208530426025,
+          "clip_fraction": 0.03125000046566129,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 28,
+          "win_rate": 0.75,
+          "steps": 397,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.074980616569519,
+          "clip_fraction": 0.08058718452230096,
+          "shifted_fraction": 0.0349865632597357
+        },
+        {
+          "iteration": 29,
+          "win_rate": 1.0,
+          "steps": 180,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.0603366456925869,
+          "clip_fraction": 0.01805555634200573,
+          "shifted_fraction": 0.0
+        }
+      ],
+      "degenerate_groups": 23
+    },
+    {
+      "advantage": "loo",
+      "trust_region": "divergence",
+      "seed": 1,
+      "threshold": 0.2,
+      "initial": 0.40625,
+      "final5": 0.6,
+      "best": 0.84375,
+      "history": [
+        {
+          "iteration": 0,
+          "win_rate": 0.40625,
+          "steps": 522,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1783552169799805,
+          "clip_fraction": 0.1799479170391957,
+          "shifted_fraction": 0.06471354266007741
+        },
+        {
+          "iteration": 1,
+          "win_rate": 0.375,
+          "steps": 616,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.2157524824142456,
+          "clip_fraction": 0.15291967274000248,
+          "shifted_fraction": 0.04687500015522043
+        },
+        {
+          "iteration": 2,
+          "win_rate": 0.5,
+          "steps": 505,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0084364414215088,
+          "clip_fraction": 0.06058609392493963,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 3,
+          "win_rate": 0.28125,
+          "steps": 332,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.158921718597412,
+          "clip_fraction": 0.08028371771797538,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 4,
+          "win_rate": 0.4375,
+          "steps": 384,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1836800575256348,
+          "clip_fraction": 0.06591796875,
+          "shifted_fraction": 0.0009765625
+        },
+        {
+          "iteration": 5,
+          "win_rate": 0.5625,
+          "steps": 632,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9668921828269958,
+          "clip_fraction": 0.09776475715140502,
+          "shifted_fraction": 0.0053385416977107525
+        },
+        {
+          "iteration": 6,
+          "win_rate": 0.15625,
+          "steps": 167,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.2205766439437866,
+          "clip_fraction": 0.05688622873276472,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 7,
+          "win_rate": 0.59375,
+          "steps": 283,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.109494924545288,
+          "clip_fraction": 0.04756221082061529,
+          "shifted_fraction": 0.00634765625
+        },
+        {
+          "iteration": 8,
+          "win_rate": 0.3125,
+          "steps": 696,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1933401823043823,
+          "clip_fraction": 0.2195425743702799,
+          "shifted_fraction": 0.02282891795039177
+        },
+        {
+          "iteration": 9,
+          "win_rate": 0.71875,
+          "steps": 428,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.053484320640564,
+          "clip_fraction": 0.06321538798511028,
+          "shifted_fraction": 0.008016896899789572
+        },
+        {
+          "iteration": 10,
+          "win_rate": 0.71875,
+          "steps": 279,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9916380643844604,
+          "clip_fraction": 0.12296195654198527,
+          "shifted_fraction": 0.03804347664117813
+        },
+        {
+          "iteration": 11,
+          "win_rate": 0.4375,
+          "steps": 470,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9739217758178711,
+          "clip_fraction": 0.07914719451218843,
+          "shifted_fraction": 0.016277562477625906
+        },
+        {
+          "iteration": 12,
+          "win_rate": 0.25,
+          "steps": 228,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.3157051801681519,
+          "clip_fraction": 0.03728070203214884,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 13,
+          "win_rate": 0.28125,
+          "steps": 288,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.2642158269882202,
+          "clip_fraction": 0.15966796875,
+          "shifted_fraction": 0.06787109375
+        },
+        {
+          "iteration": 14,
+          "win_rate": 0.46875,
+          "steps": 306,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1093260049819946,
+          "clip_fraction": 0.07076171925291419,
+          "shifted_fraction": 0.007499999832361937
+        },
+        {
+          "iteration": 15,
+          "win_rate": 0.375,
+          "steps": 408,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9984920024871826,
+          "clip_fraction": 0.09102590358816087,
+          "shifted_fraction": 0.0029553864151239395
+        },
+        {
+          "iteration": 16,
+          "win_rate": 0.40625,
+          "steps": 372,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0277215242385864,
+          "clip_fraction": 0.09334590705111623,
+          "shifted_fraction": 0.01193763455376029
+        },
+        {
+          "iteration": 17,
+          "win_rate": 0.21875,
+          "steps": 336,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.136317253112793,
+          "clip_fraction": 0.07578124944120646,
+          "shifted_fraction": 0.012988281319849193
+        },
+        {
+          "iteration": 18,
+          "win_rate": 0.84375,
+          "steps": 623,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0926955938339233,
+          "clip_fraction": 0.13921440858393908,
+          "shifted_fraction": 0.032167909666895866
+        },
+        {
+          "iteration": 19,
+          "win_rate": 0.46875,
+          "steps": 339,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.2215077877044678,
+          "clip_fraction": 0.04867516830563545,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 20,
+          "win_rate": 0.65625,
+          "steps": 546,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9592146277427673,
+          "clip_fraction": 0.1395143998476366,
+          "shifted_fraction": 0.044826133797566094
+        },
+        {
+          "iteration": 21,
+          "win_rate": 0.375,
+          "steps": 251,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.1124204397201538,
+          "clip_fraction": 0.017928287386894226,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 22,
+          "win_rate": 0.84375,
+          "steps": 428,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8279081583023071,
+          "clip_fraction": 0.05635674064978957,
+          "shifted_fraction": 0.004122002283111215
+        },
+        {
+          "iteration": 23,
+          "win_rate": 0.59375,
+          "steps": 344,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9657880663871765,
+          "clip_fraction": 0.08766868058592081,
+          "shifted_fraction": 0.02814275585114956
+        },
+        {
+          "iteration": 24,
+          "win_rate": 0.65625,
+          "steps": 487,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.998419463634491,
+          "clip_fraction": 0.10563362622633576,
+          "shifted_fraction": 0.014570228173397481
+        },
+        {
+          "iteration": 25,
+          "win_rate": 0.5625,
+          "steps": 537,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.2526285648345947,
+          "clip_fraction": 0.08420572864512603,
+          "shifted_fraction": 0.027499999850988388
+        },
+        {
+          "iteration": 26,
+          "win_rate": 0.59375,
+          "steps": 433,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0869220495224,
+          "clip_fraction": 0.07725878292694688,
+          "shifted_fraction": 0.009285619715228677
+        },
+        {
+          "iteration": 27,
+          "win_rate": 0.59375,
+          "steps": 328,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0260969400405884,
+          "clip_fraction": 0.12429470755159855,
+          "shifted_fraction": 0.019748263992369175
+        },
+        {
+          "iteration": 28,
+          "win_rate": 0.625,
+          "steps": 412,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0575144290924072,
+          "clip_fraction": 0.061485877726227045,
+          "shifted_fraction": 0.00453225162345916
+        },
+        {
+          "iteration": 29,
+          "win_rate": 0.625,
+          "steps": 393,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8212065100669861,
+          "clip_fraction": 0.06846629781648517,
+          "shifted_fraction": 0.007555885007604957
+        }
+      ],
+      "degenerate_groups": 15
+    },
+    {
+      "advantage": "loo",
+      "trust_region": "divergence",
+      "seed": 2,
+      "threshold": 0.2,
+      "initial": 0.65625,
+      "final5": 0.63125,
+      "best": 0.9375,
+      "history": [
+        {
+          "iteration": 0,
+          "win_rate": 0.65625,
+          "steps": 579,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.154984951019287,
+          "clip_fraction": 0.22617867689890167,
+          "shifted_fraction": 0.08453824720345438
+        },
+        {
+          "iteration": 1,
+          "win_rate": 0.5,
+          "steps": 431,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0129344463348389,
+          "clip_fraction": 0.06268694158643484,
+          "shifted_fraction": 0.004810267826542258
+        },
+        {
+          "iteration": 2,
+          "win_rate": 0.46875,
+          "steps": 458,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1993592977523804,
+          "clip_fraction": 0.06206489773467183,
+          "shifted_fraction": 0.005796526907943189
+        },
+        {
+          "iteration": 3,
+          "win_rate": 0.625,
+          "steps": 365,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0752698183059692,
+          "clip_fraction": 0.055059310514479876,
+          "shifted_fraction": 0.017009209841489792
+        },
+        {
+          "iteration": 4,
+          "win_rate": 0.46875,
+          "steps": 547,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.077122688293457,
+          "clip_fraction": 0.10936570043365161,
+          "shifted_fraction": 0.013653273849437634
+        },
+        {
+          "iteration": 5,
+          "win_rate": 0.375,
+          "steps": 337,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.100348949432373,
+          "clip_fraction": 0.05113691184669733,
+          "shifted_fraction": 0.0030080536380410194
+        },
+        {
+          "iteration": 6,
+          "win_rate": 0.4375,
+          "steps": 489,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0803581476211548,
+          "clip_fraction": 0.10696083772927523,
+          "shifted_fraction": 0.03112845402210951
+        },
+        {
+          "iteration": 7,
+          "win_rate": 0.4375,
+          "steps": 512,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9291002750396729,
+          "clip_fraction": 0.08349609375,
+          "shifted_fraction": 0.00390625
+        },
+        {
+          "iteration": 8,
+          "win_rate": 0.75,
+          "steps": 271,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.7652663588523865,
+          "clip_fraction": 0.09488932508975267,
+          "shifted_fraction": 0.015657552517950535
+        },
+        {
+          "iteration": 9,
+          "win_rate": 0.59375,
+          "steps": 337,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1314623355865479,
+          "clip_fraction": 0.1046971445903182,
+          "shifted_fraction": 0.024221161380410194
+        },
+        {
+          "iteration": 10,
+          "win_rate": 0.65625,
+          "steps": 457,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0604538917541504,
+          "clip_fraction": 0.06234452687203884,
+          "shifted_fraction": 0.007771202479489148
+        },
+        {
+          "iteration": 11,
+          "win_rate": 0.84375,
+          "steps": 440,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.805419385433197,
+          "clip_fraction": 0.13465947599615902,
+          "shifted_fraction": 0.04231063276529312
+        },
+        {
+          "iteration": 12,
+          "win_rate": 0.59375,
+          "steps": 407,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1397221088409424,
+          "clip_fraction": 0.08000698499381542,
+          "shifted_fraction": 0.015793149475939572
+        },
+        {
+          "iteration": 13,
+          "win_rate": 0.8125,
+          "steps": 416,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.88871830701828,
+          "clip_fraction": 0.07607421930879354,
+          "shifted_fraction": 0.025097656063735485
+        },
+        {
+          "iteration": 14,
+          "win_rate": 0.34375,
+          "steps": 212,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.9459850192070007,
+          "clip_fraction": 0.009433962404727936,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 15,
+          "win_rate": 0.4375,
+          "steps": 113,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.689626932144165,
+          "clip_fraction": 0.006637168116867542,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 16,
+          "win_rate": 0.6875,
+          "steps": 256,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0350501537322998,
+          "clip_fraction": 0.0078125,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 17,
+          "win_rate": 0.59375,
+          "steps": 575,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0976632833480835,
+          "clip_fraction": 0.14895936862255135,
+          "shifted_fraction": 0.0535714291036129
+        },
+        {
+          "iteration": 18,
+          "win_rate": 0.875,
+          "steps": 524,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.6517832279205322,
+          "clip_fraction": 0.16644965360562006,
+          "shifted_fraction": 0.08452691013614337
+        },
+        {
+          "iteration": 19,
+          "win_rate": 0.75,
+          "steps": 62,
+          "degenerate_groups": 3,
+          "raw_advantage_std": 0.05047501251101494,
+          "clip_fraction": 0.052419353276491165,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 20,
+          "win_rate": 0.875,
+          "steps": 352,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.5775231719017029,
+          "clip_fraction": 0.08821614505723119,
+          "shifted_fraction": 0.02278645837213844
+        },
+        {
+          "iteration": 21,
+          "win_rate": 0.5,
+          "steps": 76,
+          "degenerate_groups": 3,
+          "raw_advantage_std": 0.14156240224838257,
+          "clip_fraction": 0.03947368450462818,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 22,
+          "win_rate": 0.71875,
+          "steps": 407,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9093051552772522,
+          "clip_fraction": 0.04256131057627499,
+          "shifted_fraction": 0.011314543895423412
+        },
+        {
+          "iteration": 23,
+          "win_rate": 0.65625,
+          "steps": 300,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8967005014419556,
+          "clip_fraction": 0.10102983098477125,
+          "shifted_fraction": 0.024058949202299118
+        },
+        {
+          "iteration": 24,
+          "win_rate": 0.46875,
+          "steps": 465,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9862554669380188,
+          "clip_fraction": 0.06617028557229787,
+          "shifted_fraction": 0.01021652587223798
+        },
+        {
+          "iteration": 25,
+          "win_rate": 0.9375,
+          "steps": 251,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8848086595535278,
+          "clip_fraction": 0.03187251091003418,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 26,
+          "win_rate": 0.78125,
+          "steps": 486,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.7237451076507568,
+          "clip_fraction": 0.0759256100282073,
+          "shifted_fraction": 0.02291949698701501
+        },
+        {
+          "iteration": 27,
+          "win_rate": 0.375,
+          "steps": 232,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0345544815063477,
+          "clip_fraction": 0.009698276175186038,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 28,
+          "win_rate": 0.40625,
+          "steps": 279,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8798986077308655,
+          "clip_fraction": 0.06288213329389691,
+          "shifted_fraction": 0.015752377919852734
+        },
+        {
+          "iteration": 29,
+          "win_rate": 0.65625,
+          "steps": 380,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0844007730484009,
+          "clip_fraction": 0.09554561506956816,
+          "shifted_fraction": 0.033502393402159214
+        }
+      ],
+      "degenerate_groups": 15
+    },
+    {
+      "advantage": "loo",
+      "trust_region": "divergence",
+      "seed": 3,
+      "threshold": 0.2,
+      "initial": 0.5,
+      "final5": 0.6625,
+      "best": 0.84375,
+      "history": [
+        {
+          "iteration": 0,
+          "win_rate": 0.5,
+          "steps": 393,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.2248787879943848,
+          "clip_fraction": 0.1653954724315554,
+          "shifted_fraction": 0.0847221442963928
+        },
+        {
+          "iteration": 1,
+          "win_rate": 0.59375,
+          "steps": 827,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1820690631866455,
+          "clip_fraction": 0.32490565348416567,
+          "shifted_fraction": 0.16193558019585907
+        },
+        {
+          "iteration": 2,
+          "win_rate": 0.46875,
+          "steps": 601,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1339390277862549,
+          "clip_fraction": 0.09519107018907864,
+          "shifted_fraction": 0.011762640749414762
+        },
+        {
+          "iteration": 3,
+          "win_rate": 0.53125,
+          "steps": 673,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1625226736068726,
+          "clip_fraction": 0.09503388746331136,
+          "shifted_fraction": 0.019482724989453953
+        },
+        {
+          "iteration": 4,
+          "win_rate": 0.125,
+          "steps": 339,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.1346935033798218,
+          "clip_fraction": 0.11997599713504314,
+          "shifted_fraction": 0.00146484375
+        },
+        {
+          "iteration": 5,
+          "win_rate": 0.84375,
+          "steps": 559,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8361262083053589,
+          "clip_fraction": 0.17494320745269457,
+          "shifted_fraction": 0.0597988689939181
+        },
+        {
+          "iteration": 6,
+          "win_rate": 0.4375,
+          "steps": 515,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.159380555152893,
+          "clip_fraction": 0.1499565988779068,
+          "shifted_fraction": 0.041666666666666664
+        },
+        {
+          "iteration": 7,
+          "win_rate": 0.46875,
+          "steps": 451,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8029284477233887,
+          "clip_fraction": 0.08482071431353688,
+          "shifted_fraction": 0.006928585935384035
+        },
+        {
+          "iteration": 8,
+          "win_rate": 0.4375,
+          "steps": 347,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9868248701095581,
+          "clip_fraction": 0.1043526791036129,
+          "shifted_fraction": 0.025943295564502478
+        },
+        {
+          "iteration": 9,
+          "win_rate": 0.25,
+          "steps": 321,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8909341096878052,
+          "clip_fraction": 0.09681490529328585,
+          "shifted_fraction": 0.005310997599735856
+        },
+        {
+          "iteration": 10,
+          "win_rate": 0.5625,
+          "steps": 458,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0889148712158203,
+          "clip_fraction": 0.0539236543700099,
+          "shifted_fraction": 0.013807240407913923
+        },
+        {
+          "iteration": 11,
+          "win_rate": 0.75,
+          "steps": 563,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0176455974578857,
+          "clip_fraction": 0.09977532845611374,
+          "shifted_fraction": 0.003267973971863588
+        },
+        {
+          "iteration": 12,
+          "win_rate": 0.5,
+          "steps": 433,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.097276210784912,
+          "clip_fraction": 0.05777167156338692,
+          "shifted_fraction": 0.0014124293811619282
+        },
+        {
+          "iteration": 13,
+          "win_rate": 0.59375,
+          "steps": 454,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1288541555404663,
+          "clip_fraction": 0.10673137428238988,
+          "shifted_fraction": 0.018628669204190373
+        },
+        {
+          "iteration": 14,
+          "win_rate": 0.625,
+          "steps": 477,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.191910743713379,
+          "clip_fraction": 0.08922290662303567,
+          "shifted_fraction": 0.005090497899800539
+        },
+        {
+          "iteration": 15,
+          "win_rate": 0.40625,
+          "steps": 413,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.134592056274414,
+          "clip_fraction": 0.08153674937784672,
+          "shifted_fraction": 0.009787395596504211
+        },
+        {
+          "iteration": 16,
+          "win_rate": 0.5,
+          "steps": 492,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1976470947265625,
+          "clip_fraction": 0.07150423713028431,
+          "shifted_fraction": 0.010874602710828185
+        },
+        {
+          "iteration": 17,
+          "win_rate": 0.59375,
+          "steps": 372,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8528472781181335,
+          "clip_fraction": 0.09322804352268577,
+          "shifted_fraction": 0.022898707073181868
+        },
+        {
+          "iteration": 18,
+          "win_rate": 0.71875,
+          "steps": 264,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1478843688964844,
+          "clip_fraction": 0.056640625,
+          "shifted_fraction": 0.02294921875
+        },
+        {
+          "iteration": 19,
+          "win_rate": 0.625,
+          "steps": 625,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1199716329574585,
+          "clip_fraction": 0.09494837808112304,
+          "shifted_fraction": 0.026427682489156723
+        },
+        {
+          "iteration": 20,
+          "win_rate": 0.5625,
+          "steps": 477,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9698163270950317,
+          "clip_fraction": 0.1265974109992385,
+          "shifted_fraction": 0.02786517282947898
+        },
+        {
+          "iteration": 21,
+          "win_rate": 0.3125,
+          "steps": 169,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.501349687576294,
+          "clip_fraction": 0.03994082938879728,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 22,
+          "win_rate": 0.59375,
+          "steps": 563,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8873277306556702,
+          "clip_fraction": 0.13528262994562587,
+          "shifted_fraction": 0.02446512474368016
+        },
+        {
+          "iteration": 23,
+          "win_rate": 0.59375,
+          "steps": 200,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.7677261829376221,
+          "clip_fraction": 0.021249999292194843,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 24,
+          "win_rate": 0.78125,
+          "steps": 253,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1540942192077637,
+          "clip_fraction": 0.010869565419852734,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 25,
+          "win_rate": 0.6875,
+          "steps": 398,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8312962055206299,
+          "clip_fraction": 0.05884132953360677,
+          "shifted_fraction": 0.00957994069904089
+        },
+        {
+          "iteration": 26,
+          "win_rate": 0.40625,
+          "steps": 263,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1687158346176147,
+          "clip_fraction": 0.04861886240541935,
+          "shifted_fraction": 0.0048828125
+        },
+        {
+          "iteration": 27,
+          "win_rate": 0.78125,
+          "steps": 237,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1724634170532227,
+          "clip_fraction": 0.027426160406321287,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 28,
+          "win_rate": 0.6875,
+          "steps": 185,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.8429476618766785,
+          "clip_fraction": 0.06756756827235222,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 29,
+          "win_rate": 0.75,
+          "steps": 303,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0961345434188843,
+          "clip_fraction": 0.14511303044855595,
+          "shifted_fraction": 0.07809383259154856
+        }
+      ],
+      "degenerate_groups": 19
+    },
+    {
+      "advantage": "loo",
+      "trust_region": "divergence",
+      "seed": 4,
+      "threshold": 0.2,
+      "initial": 0.40625,
+      "final5": 0.6875,
+      "best": 0.9375,
+      "history": [
+        {
+          "iteration": 0,
+          "win_rate": 0.40625,
+          "steps": 413,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.2509207725524902,
+          "clip_fraction": 0.17187188751995564,
+          "shifted_fraction": 0.06317177601158619
+        },
+        {
+          "iteration": 1,
+          "win_rate": 0.375,
+          "steps": 511,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1475086212158203,
+          "clip_fraction": 0.1101217856630683,
+          "shifted_fraction": 0.00881395535543561
+        },
+        {
+          "iteration": 2,
+          "win_rate": 0.3125,
+          "steps": 389,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.2147464752197266,
+          "clip_fraction": 0.08446898404508829,
+          "shifted_fraction": 0.012401609448716044
+        },
+        {
+          "iteration": 3,
+          "win_rate": 0.40625,
+          "steps": 288,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1484389305114746,
+          "clip_fraction": 0.10400390625,
+          "shifted_fraction": 0.01220703125
+        },
+        {
+          "iteration": 4,
+          "win_rate": 0.5,
+          "steps": 595,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0215989351272583,
+          "clip_fraction": 0.16185837176938853,
+          "shifted_fraction": 0.04221573782463869
+        },
+        {
+          "iteration": 5,
+          "win_rate": 0.375,
+          "steps": 432,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.0926251411437988,
+          "clip_fraction": 0.057395242154598236,
+          "shifted_fraction": 0.02041903417557478
+        },
+        {
+          "iteration": 6,
+          "win_rate": 0.5625,
+          "steps": 479,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.268520474433899,
+          "clip_fraction": 0.09357920964248478,
+          "shifted_fraction": 0.013218627427704632
+        },
+        {
+          "iteration": 7,
+          "win_rate": 0.5625,
+          "steps": 163,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.965648353099823,
+          "clip_fraction": 0.01380368135869503,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 8,
+          "win_rate": 0.3125,
+          "steps": 268,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1902225017547607,
+          "clip_fraction": 0.11083984468132257,
+          "shifted_fraction": 0.023600260727107525
+        },
+        {
+          "iteration": 9,
+          "win_rate": 0.3125,
+          "steps": 555,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1462938785552979,
+          "clip_fraction": 0.06786730947593848,
+          "shifted_fraction": 0.023687318277855713
+        },
+        {
+          "iteration": 10,
+          "win_rate": 0.28125,
+          "steps": 373,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1946412324905396,
+          "clip_fraction": 0.11485460167750716,
+          "shifted_fraction": 0.045844185166060925
+        },
+        {
+          "iteration": 11,
+          "win_rate": 0.34375,
+          "steps": 323,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.0610586404800415,
+          "clip_fraction": 0.06709858891554177,
+          "shifted_fraction": 0.02176131051965058
+        },
+        {
+          "iteration": 12,
+          "win_rate": 0.46875,
+          "steps": 511,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 1.1395961046218872,
+          "clip_fraction": 0.2109279278665781,
+          "shifted_fraction": 0.055801930371671915
+        },
+        {
+          "iteration": 13,
+          "win_rate": 0.8125,
+          "steps": 405,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.7097174525260925,
+          "clip_fraction": 0.040566668030805886,
+          "shifted_fraction": 0.0016778523568063974
+        },
+        {
+          "iteration": 14,
+          "win_rate": 0.6875,
+          "steps": 527,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.9411342144012451,
+          "clip_fraction": 0.026063368345300358,
+          "shifted_fraction": 0.0026041666666666665
+        },
+        {
+          "iteration": 15,
+          "win_rate": 0.6875,
+          "steps": 443,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.078536868095398,
+          "clip_fraction": 0.089068244677037,
+          "shifted_fraction": 0.006992605049163103
+        },
+        {
+          "iteration": 16,
+          "win_rate": 0.375,
+          "steps": 474,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 1.1362648010253906,
+          "clip_fraction": 0.07964807841926813,
+          "shifted_fraction": 0.01732726488262415
+        },
+        {
+          "iteration": 17,
+          "win_rate": 0.53125,
+          "steps": 282,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.7318528294563293,
+          "clip_fraction": 0.15760216489434242,
+          "shifted_fraction": 0.02321213996037841
+        },
+        {
+          "iteration": 18,
+          "win_rate": 0.28125,
+          "steps": 161,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 1.2130277156829834,
+          "clip_fraction": 0.031055900268256664,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 19,
+          "win_rate": 0.375,
+          "steps": 200,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.8656600713729858,
+          "clip_fraction": 0.020000000717118382,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 20,
+          "win_rate": 0.78125,
+          "steps": 402,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.8635765910148621,
+          "clip_fraction": 0.06928911618888378,
+          "shifted_fraction": 0.017604880034923553
+        },
+        {
+          "iteration": 21,
+          "win_rate": 0.90625,
+          "steps": 444,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.6986006498336792,
+          "clip_fraction": 0.06019365042448044,
+          "shifted_fraction": 0.01725606736727059
+        },
+        {
+          "iteration": 22,
+          "win_rate": 0.53125,
+          "steps": 345,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9148570895195007,
+          "clip_fraction": 0.07448209216818213,
+          "shifted_fraction": 0.008119733072817326
+        },
+        {
+          "iteration": 23,
+          "win_rate": 0.4375,
+          "steps": 228,
+          "degenerate_groups": 2,
+          "raw_advantage_std": 0.8240507245063782,
+          "clip_fraction": 0.017543859779834747,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 24,
+          "win_rate": 0.9375,
+          "steps": 423,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.6543010473251343,
+          "clip_fraction": 0.0740462439134717,
+          "shifted_fraction": 0.01233568019233644
+        },
+        {
+          "iteration": 25,
+          "win_rate": 0.78125,
+          "steps": 429,
+          "degenerate_groups": 0,
+          "raw_advantage_std": 0.43260127305984497,
+          "clip_fraction": 0.07557916268706322,
+          "shifted_fraction": 0.023728210479021072
+        },
+        {
+          "iteration": 26,
+          "win_rate": 0.71875,
+          "steps": 387,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.4700668156147003,
+          "clip_fraction": 0.020194715878460556,
+          "shifted_fraction": 0.0
+        },
+        {
+          "iteration": 27,
+          "win_rate": 0.59375,
+          "steps": 271,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9340392351150513,
+          "clip_fraction": 0.07093099039047956,
+          "shifted_fraction": 0.008333333767950535
+        },
+        {
+          "iteration": 28,
+          "win_rate": 0.84375,
+          "steps": 345,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9947091937065125,
+          "clip_fraction": 0.10757549107074738,
+          "shifted_fraction": 0.03413031157106161
+        },
+        {
+          "iteration": 29,
+          "win_rate": 0.5,
+          "steps": 225,
+          "degenerate_groups": 1,
+          "raw_advantage_std": 0.9728212356567383,
+          "clip_fraction": 0.023333334363996983,
+          "shifted_fraction": 0.0
+        }
+      ],
+      "degenerate_groups": 19
+    }
+  ],
+  "matchup": {
+    "attacker": null,
+    "defender": null,
+    "pool": "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/pool140.json"
+  },
+  "iterations": 30,
+  "groups": 4,
+  "group_size": 8,
+  "seconds": 133.3
+}

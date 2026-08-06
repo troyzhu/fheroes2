@@ -1,0 +1,52 @@
+{
+  "results": {
+    "episode_split": [
+      {
+        "variant": "v2",
+        "agreement": 0.8560364347468093,
+        "parameters": 396570
+      },
+      {
+        "variant": "v2log",
+        "agreement": 0.8489862083161795,
+        "parameters": 396570
+      },
+      {
+        "variant": "v2log_wid",
+        "agreement": 0.8608738163853438,
+        "parameters": 397530
+      },
+      {
+        "variant": "v2log_noid",
+        "agreement": 0.8568598188554961,
+        "parameters": 392634
+      }
+    ],
+    "count_extrapolation": [
+      {
+        "variant": "v2",
+        "agreement": 0.36930523917995445,
+        "parameters": 396570
+      },
+      {
+        "variant": "v2log",
+        "agreement": 0.34880410022779046,
+        "parameters": 396570
+      },
+      {
+        "variant": "v2log_wid",
+        "agreement": 0.34766514806378135,
+        "parameters": 397530
+      },
+      {
+        "variant": "v2log_noid",
+        "agreement": 0.3559225512528474,
+        "parameters": 392634
+      }
+    ]
+  },
+  "epochs": 15,
+  "count_split": 200,
+  "decisions": 202437,
+  "seconds": 325.1
+}

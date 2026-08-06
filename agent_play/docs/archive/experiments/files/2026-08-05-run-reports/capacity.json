@@ -1,0 +1,55 @@
+{
+  "sizes": [
+    {
+      "size": "deployed",
+      "model_kwargs": {},
+      "parameters": 396570,
+      "bc_agreement": 0.8872795234201611,
+      "pool_final5": [
+        0.63125,
+        0.68125,
+        0.61875
+      ],
+      "pool_mean": 0.64375,
+      "pool_stderr": 0.01909406539564934
+    },
+    {
+      "size": "half",
+      "model_kwargs": {
+        "slot_hidden": 48,
+        "trunk_hidden": 96,
+        "global_hidden": 16
+      },
+      "parameters": 139546,
+      "bc_agreement": 0.869875014601098,
+      "pool_final5": [
+        0.59375,
+        0.625,
+        0.625
+      ],
+      "pool_mean": 0.6145833333333334,
+      "pool_stderr": 0.010416666666666666
+    },
+    {
+      "size": "double",
+      "model_kwargs": {
+        "slot_hidden": 192,
+        "trunk_hidden": 384,
+        "global_hidden": 64
+      },
+      "parameters": 1265434,
+      "bc_agreement": 0.9012965775026281,
+      "pool_final5": [
+        0.58125,
+        0.6,
+        0.625
+      ],
+      "pool_mean": 0.6020833333333333,
+      "pool_stderr": 0.012672421938121282
+    }
+  ],
+  "epochs": 25,
+  "iterations": 40,
+  "training_matchups": 90,
+  "seconds": 486.9
+}

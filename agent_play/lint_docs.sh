@@ -217,6 +217,14 @@ if os.environ.get("FACTS") == "1":
             if page.stem not in text:
                 facts.append(f"{rel(readme)}: does not index sibling {page.name}")
 
+    # 3b. Experiment scripts must be indexed in their README, so a script cannot silently fall
+    # out of the record the way the first generation of scripts fell out of a temp directory.
+    exp = DOCS.parent / "experiments"
+    exp_readme = (exp / "README.md").read_text(encoding="utf-8") if (exp / "README.md").exists() else ""
+    for script in sorted(exp.glob("*.py")):
+        if script.name not in exp_readme:
+            facts.append(f"experiments/README.md: does not index script {script.name}")
+
     # 4. Declared claims, the verify_memory.sh grammar.
     DECL = re.compile(r"<!--\s*verify\s*\n(.*?)-->", re.S)
     for f in files:

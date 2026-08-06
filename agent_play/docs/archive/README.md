@@ -22,7 +22,7 @@ Every file here is dated, machine-pinned, or commit-pinned, which means every fi
 | `experiments/2026-08-04-flip-and-collapse.md` | The resolution of the trust-region flip and the collapse-condition hunt, with registered predictions and the runs that decided them | Same; conclusions live in [[../rl/training-design|training-design]] |
 | `experiments/2026-08-05-diversity-and-encoding.md` | The diversity push: diverse demonstrations, the clone cross-evaluation, the leaky split, and the count-extrapolation evidence behind ADR 0006 | Conclusions live in [[../decisions/0006-encoding-count-scaling|ADR 0006]] and [[../implementation/observation-design|observation-design]] |
 | `experiments/2026-08-05-real-engine-replay.md` | Rendering recorded episodes through the game's own battle interface, with the digest verification and the two defects it surfaced | Mechanism lives in [[../implementation/replay-rendering|replay-rendering]] |
-| `experiments/files/` | Raw run artifacts a log depends on and no script can regenerate, currently the three replay recordings behind the 2026-08-05 videos | Meaningful only through the log that cites them |
+| `experiments/files/` | Raw run artifacts a log depends on: replay recordings, dated run-report and recording-manifest snapshots, and the anchor checkpoints pools and recordings are calibrated against | Meaningful only through the logs that cite them; datasets re-record from their manifests |
 | `sources/` | Fetched third-party PDFs, HTML snapshots, and vendored READMEs; `manifest.tsv` is the authoritative list and `fetch_references.sh` reproduces it | Third-party material, unmodified |
 
 The reading path starts at [[../README|the tree README]].

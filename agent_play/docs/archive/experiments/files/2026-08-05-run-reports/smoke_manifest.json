@@ -1,0 +1,50 @@
+{
+ "matchups": [
+  {
+   "regime": "horde",
+   "attacker": "17:2",
+   "defender": "48:47,48:46,48:46",
+   "attacker_hero": "25:9",
+   "episodes": 10
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,66:1",
+   "defender": "50:1",
+   "episodes": 10
+  },
+  {
+   "regime": "battle",
+   "attacker": "59:4",
+   "defender": "40:2,46:1,7:1",
+   "attacker_hero": "10:19",
+   "episodes": 10
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "17:1,4:1,46:1",
+   "defender": "6:2",
+   "defender_hero": "25:20",
+   "episodes": 10
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "16:1,64:1",
+   "defender": "63:1,5:1",
+   "attacker_hero": "18:7",
+   "defender_hero": "4:17",
+   "episodes": 10
+  },
+  {
+   "regime": "battle",
+   "attacker": "41:1,7:1,22:1,46:1,19:1",
+   "defender": "46:1",
+   "attacker_hero": "17:6",
+   "episodes": 10
+  }
+ ],
+ "seeds": 2,
+ "sampler_seed": 0,
+ "failures": 0,
+ "seconds": 0.2
+}
