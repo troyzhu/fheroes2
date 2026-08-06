@@ -1,0 +1,691 @@
+{
+  "reinforced_bad": 1,
+  "reinforced_total": 74,
+  "punished_good": 61,
+  "punished_total": 68,
+  "bad_regret": 0.5,
+  "good_regret": 0.1,
+  "simulations": 32,
+  "decisions": [
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.022727272727272707,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.07855983772819508
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.610344827586207,
+      "regret": 0.42221601749732424
+    },
+    {
+      "advantage": 1.610344827586207,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.610344827586207,
+      "regret": 0.04462917350848361
+    },
+    {
+      "advantage": 1.610344827586207,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.610344827586207,
+      "regret": 0.1227011494252872
+    },
+    {
+      "advantage": 1.610344827586207,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.14444096133751305
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.07118999323867503
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.696551724137931,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.050082101806239177
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.046752873563219
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.0
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.016091954022988908
+    },
+    {
+      "advantage": 1.6597701149425288,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.0,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.276
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.3104
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.837062801932367
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.05966666666666676
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": 0.16799999999999993,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.3002051282051281
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.11051012145748951
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.07999999999999985,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 1.5866133333333332
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.040000000000000036,
+      "regret": 2.220446049250313e-16
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.21393548387096728
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.17777777777777737
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.44033333333333347
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 1.8744
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0688235294117645
+    },
+    {
+      "advantage": -0.11999999999999988,
+      "regret": 0.0
+    }
+  ]
+}

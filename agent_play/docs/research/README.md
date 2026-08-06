@@ -29,6 +29,7 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/one-step-offline-rl]] | paper | 2021 | primary | One improvement step against the behavior value beats iterating, because iteration queries the value off-data | improvement-step discipline |
 | [[works/bcq-extrapolation]] | paper | 2019 | primary | Extrapolation error: value estimates queried off-data, then maximized into | the critic calibration result |
 | [[works/double-q-overestimation]] | paper | 2016 | primary | Max-operator overestimation in bootstrapped values, absent from our MC-fitted critic, acquired the moment anything bootstraps | value-estimation boundary |
+| [[works/gae]] | paper | 2016 | primary | The bias-variance dial of credit assignment; its low-bias end pays in value accuracy our critic does not have off-distribution | credit-assignment measurement |
 | [[works/alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
 | [[works/griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |
 | [[works/microrts-py]] | codebase | 2021–25 | primary | `CategoricalMasked` reference implementation; `partial_obs` flag; TrueSkill league evaluation | ADR 0001, evaluation |

@@ -40,12 +40,18 @@
 //        [--speed 1..10] [--attacker id:count,...] [--defender id:count,...]
 //        [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide]
 //        [--side attacker|defender|both]
+//
+// Play mode (a person battles a checkpoint): --play attacker|defender names the HUMAN side,
+// implies --render, and replaces --actions with the worker's line protocol on stdio, so a
+// Python wrapper (agent_play/experiments/play_vs.py) answers the other side's decisions from a
+// checkpoint while the human plays through the game's own battle interface.
 
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
@@ -178,6 +184,7 @@ int main( int argc, char ** argv )
     std::string defenderHeroSpec;
     std::string controlledSide = "attacker";
     std::string framesDir;
+    std::string playSide;
     bool allowWideUnits = false;
     bool render = false;
     int battleSpeed = 10;
@@ -224,6 +231,10 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--render" ) == 0 ) {
             render = true;
         }
+        else if ( std::strcmp( argv[i], "--play" ) == 0 ) {
+            playSide = value( "--play" );
+            render = true;
+        }
         else {
             std::fprintf( stderr,
                           "usage: fheroes2_agent_replay --actions FILE [--render] [--frames-dir DIR] [--fixture ID]\n"
@@ -239,14 +250,21 @@ int main( int argc, char ** argv )
         return 2;
     }
 
-    if ( actionsPath.empty() ) {
-        std::fprintf( stderr, "--actions is required\n" );
+    if ( !playSide.empty() && playSide != "attacker" && playSide != "defender" ) {
+        std::fprintf( stderr, "--play must be attacker or defender\n" );
         return 2;
     }
-    const std::optional<std::vector<uint32_t>> actions = readActions( actionsPath );
-    if ( !actions.has_value() || actions->empty() ) {
-        std::fprintf( stderr, "cannot read actions from %s\n", actionsPath.c_str() );
+    if ( actionsPath.empty() && playSide.empty() ) {
+        std::fprintf( stderr, "--actions is required (or --play for a live game)\n" );
         return 2;
+    }
+    std::optional<std::vector<uint32_t>> actions;
+    if ( !actionsPath.empty() ) {
+        actions = readActions( actionsPath );
+        if ( !actions.has_value() || actions->empty() ) {
+            std::fprintf( stderr, "cannot read actions from %s\n", actionsPath.c_str() );
+            return 2;
+        }
     }
 
     fheroes2::agent::ControlledSide side = fheroes2::agent::ControlledSide::Attacker;
@@ -334,6 +352,12 @@ int main( int argc, char ** argv )
         fheroes2::setGamePalette( AGG::getDataFromAggFile( "KB.PAL", false ) );
         display.changePalette( nullptr, true );
 
+        // Audio stays uninitialized, so engine sound calls no-op; the volumes are zeroed as well
+        // so no future code path can make a rendered replay audible. A render window on someone's
+        // desk must be silent.
+        conf.SetSoundVolume( 0 );
+        conf.SetMusicVolume( 0 );
+
         conf.setGameLanguage( conf.getGameLanguage() );
         Game::Init();
 
@@ -345,18 +369,48 @@ int main( int argc, char ** argv )
     conf.SetBattleSpeed( battleSpeed );
 
     size_t nextAction = 0;
-    const auto decide = [&actions, &nextAction]( const fheroes2::agent::Observation & /* observation */,
-                                                 const fheroes2::agent::ActionSet & /* set */ ) -> std::optional<uint32_t> {
-        if ( nextAction >= actions->size() ) {
-            // Past the end of the recording: the live battle asked for more decisions than the
-            // recorded one had, which is divergence. Decline, so the controller unwinds.
-            return std::nullopt;
-        }
-        return ( *actions )[nextAction++];
-    };
+    fheroes2::agent::ExternalDecisionController::DecideFn decide;
+    fheroes2::agent::HumanSide humanSide = fheroes2::agent::HumanSide::None;
+    if ( playSide.empty() ) {
+        decide = [&actions, &nextAction]( const fheroes2::agent::Observation & /* observation */,
+                                          const fheroes2::agent::ActionSet & /* set */ ) -> std::optional<uint32_t> {
+            if ( nextAction >= actions->size() ) {
+                // Past the end of the recording: the live battle asked for more decisions than
+                // the recorded one had, which is divergence. Decline, so the controller unwinds.
+                return std::nullopt;
+            }
+            return ( *actions )[nextAction++];
+        };
+    }
+    else {
+        // Play mode: the human takes playSide through the interface, the controller takes the
+        // other side, and its decisions travel the worker's line protocol on stdio so a Python
+        // wrapper can answer them from a checkpoint.
+        humanSide = ( playSide == "attacker" ) ? fheroes2::agent::HumanSide::Attacker : fheroes2::agent::HumanSide::Defender;
+        side = ( playSide == "attacker" ) ? fheroes2::agent::ControlledSide::Defender : fheroes2::agent::ControlledSide::Attacker;
+        decide = []( const fheroes2::agent::Observation & observation,
+                     const fheroes2::agent::ActionSet & set ) -> std::optional<uint32_t> {
+            std::printf( "{\"record\":\"decision\",\"observation\":%s,\"legal_actions\":[", fheroes2::agent::observationToJson( observation ).c_str() );
+            for ( size_t i = 0; i < set.candidates.size(); ++i ) {
+                std::printf( "%s%u", ( i == 0 ) ? "" : ",", set.candidates[i].canonicalIndex );
+            }
+            std::printf( "]}\n" );
+            std::fflush( stdout );
+            std::string line;
+            if ( !std::getline( std::cin, line ) ) {
+                return std::nullopt;
+            }
+            try {
+                return static_cast<uint32_t>( std::stoul( line ) );
+            }
+            catch ( ... ) {
+                return std::nullopt;
+            }
+        };
+    }
 
     fheroes2::agent::ExternalDecisionController controller( side, decide );
-    const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, nullptr, &controller, render );
+    const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, nullptr, &controller, render, humanSide );
 
     if ( render ) {
         // The game's DisplayInitializer destructor does exactly this, and in this order: the
@@ -367,13 +421,15 @@ int main( int argc, char ** argv )
         fheroes2::Display::instance().release();
     }
 
-    const bool exact = ( controller.rejectedSelections() == 0 ) && !controller.isFinished() && ( nextAction == actions->size() );
+    const bool exact = playSide.empty() && ( controller.rejectedSelections() == 0 ) && !controller.isFinished()
+                       && ( nextAction == actions->size() );
     std::printf( "{\"record\":\"replay_terminal\",\"scenario_id\":\"%s\",\"termination\":\"%s\",\"rounds\":%d"
                  ",\"actions_recorded\":%zu,\"actions_used\":%zu,\"decisions_seen\":%u,\"rejected\":%u,\"exact\":%s"
                  ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
                  ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
                  ",\"state_digest\":\"%s\"}\n",
-                 scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds, actions->size(), nextAction,
+                 scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds,
+                 actions.has_value() ? actions->size() : static_cast<size_t>( 0 ), nextAction,
                  controller.decisionsSeen(), controller.rejectedSelections(), exact ? "true" : "false", outcome.attacker.liveStacks, outcome.attacker.liveCreatures,
                  outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints, outcome.stateDigest.c_str() );
     std::fflush( stdout );

@@ -263,7 +263,8 @@ const char * fheroes2::agent::terminationName( const Termination termination )
 }
 
 fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & scenario, EpisodeRecording * recording /* = nullptr */,
-                                                             Battle::DecisionController * controller /* = nullptr */, const bool showInterface /* = false */ )
+                                                             Battle::DecisionController * controller /* = nullptr */, const bool showInterface /* = false */,
+                                                             const HumanSide humanSide /* = HumanSide::None */ )
 {
     assert( validateScenario( scenario ).empty() );
 
@@ -288,9 +289,9 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     world.InitKingdoms();
 
     Players::SetPlayerRace( PlayerColor::BLUE, Race::KNGT );
-    Players::SetPlayerControl( PlayerColor::BLUE, CONTROL_AI );
+    Players::SetPlayerControl( PlayerColor::BLUE, ( humanSide == HumanSide::Attacker ) ? CONTROL_HUMAN : CONTROL_AI );
     Players::SetPlayerRace( PlayerColor::RED, Race::KNGT );
-    Players::SetPlayerControl( PlayerColor::RED, CONTROL_AI );
+    Players::SetPlayerControl( PlayerColor::RED, ( humanSide == HumanSide::Defender ) ? CONTROL_HUMAN : CONTROL_AI );
 
     // Fresh armies per episode; both engine-AI controlled (agent spec, sections 8.2 and 8.3).
     Army attackingArmy;

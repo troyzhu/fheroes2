@@ -111,10 +111,21 @@ namespace fheroes2::agent
     // controller made, so an externally driven episode is auditable the same way a teacher
     // episode is.
     //
+    // Which side, if any, a human plays through the battle interface. Only meaningful with
+    // showInterface; the interface routes that side's unit turns to its own input loop.
+    enum class HumanSide : uint8_t
+    {
+        None,
+        Attacker,
+        Defender,
+    };
+
     // `showInterface` constructs the arena with the game's own battle Interface so the episode
     // renders and animates. The caller owns the prerequisites the interface assumes (display,
     // assets and palette initialized, as the replay tool does); the default keeps every
-    // existing caller byte-identical, headless, and free of them.
+    // existing caller byte-identical, headless, and free of them. `humanSide` hands one side's
+    // turns to the interface's human input; the built-in AI or the given controller keeps the
+    // rest, which is what lets a person battle a checkpoint.
     EpisodeOutcome runEpisode( const Scenario & scenario, EpisodeRecording * recording = nullptr, Battle::DecisionController * controller = nullptr,
-                               bool showInterface = false );
+                               bool showInterface = false, HumanSide humanSide = HumanSide::None );
 }
