@@ -244,6 +244,16 @@ All of this is premature until a policy exists that is worth playing against, wh
 
 Population-based training runs many configurations at once and periodically copies the weights and perturbs the hyperparameters of the better performers into the worse. It tunes on a schedule rather than to a fixed value, which suits reinforcement learning where the best learning rate early differs from the best learning rate late. The comparable shipped system used it. It is worth considering only once a single run trains reliably.
 
+### Two families, and the rule against mixing them
+
+Everything this project trains falls into one of two families, and they are easy to confuse because both produce a `BattlePolicy` checkpoint that plays battles.
+
+The value-based family estimates $V$ and uses it: the critic fitted on recorded returns, PPO's GAE baseline, and any search leaf evaluator. Its correctness question is whether the value is accurate on the distribution it will be queried on, which is why [[training-design#The behavior value, measured where it would be spent]] reports explained variance per distribution rather than a single number.
+
+The value-free family replaces $V$ with a baseline built from siblings of the same start: leave-one-out, GRPO and Dr. GRPO, derived and shown identical up to a constant in [[rlhf-transfer]]. Its correctness question is whether the group is a real group, which is why `MatchupPool` holds the matchup within a group and why a per-episode rotation breaks it silently.
+
+The rule is that a run belongs to exactly one family and reports as that family. A value-free run handed a fitted critic as its baseline is a value-based run wearing the wrong name, and the two families' error bars answer different questions, so their numbers do not belong in one column without saying which is which. `python/fheroes2_agent/README.md` carries the same separation at the module level, including which trainers implement which family and where shared code deliberately lives.
+
 ### Anchored fine-tuning, a destination constraint
 
 PPO's clip and the divergence trust region both constrain $\pi_\theta$ against the previous iterate, and the previous iterate re-centers every update. That is a step-size constraint with a KL interpretation, and it bounds nothing about the endpoint: per-step divergences do not telescope, so over many iterations the policy can walk arbitrarily far from where it started while every individual step stays inside the clip. The anchored form adds a penalty $\beta \, D_{\mathrm{KL}}(\pi_\theta \,\|\, \pi_{\text{ref}})$ against a fixed reference, the language-model fine-tuning pattern where $\pi_{\text{ref}}$ is the supervised checkpoint, and the two constraints are complements rather than substitutes, one governing the step and the other the destination.
