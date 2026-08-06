@@ -245,16 +245,20 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
 
     With seeds above one the episodes rotate over that many battlefield variants, so the number
     is about the matchup rather than about one obstacle layout."""
+    # A planes-built policy declares itself on the model; the env then asks the worker for the
+    # obstacle layer and the loop feeds the tensor beside the flat vector.
+    wants_planes = bool(getattr(model, "planes", False))
     env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
                     attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
-                    allow_wide=matchup.allow_wide, seeds=seeds)
+                    allow_wide=matchup.allow_wide, seeds=seeds, planes=wants_planes)
     wins, rewards, lengths = [], [], []
     try:
         for _ in range(episodes):
             observation, mask = env.reset()
             steps = 0
             while True:
-                logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0))
+                plane_arg = (torch.from_numpy(env.last_planes).unsqueeze(0),) if wants_planes else ()
+                logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0), *plane_arg)
                 action = int(torch.distributions.Categorical(logits=logits).sample())
                 step = env.step(action)
                 steps += 1

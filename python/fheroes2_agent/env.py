@@ -19,7 +19,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .encoding import encode_mask, encode_observation
+from .encoding import encode_mask, encode_observation, encode_planes
 
 _STRENGTH: dict[int, float] | None = None
 
@@ -89,7 +89,7 @@ class BattleEnv:
                  attacker_hero: str | None = None, defender_hero: str | None = None,
                  allow_wide: bool = False, probe_teacher: bool = False,
                  reward_weighting: str = "none", reward_margin: str = "hit_points",
-                 seed_offset: int = 0):
+                 seed_offset: int = 0, planes: bool = False):
         if reward_weighting not in ("none", "difficulty"):
             raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
         if reward_margin not in ("hit_points", "strength"):
@@ -105,6 +105,12 @@ class BattleEnv:
         # own choice at the same state, when it resolves inside simple_v1.
         if probe_teacher:
             self._cmd += ["--probe-teacher"]
+        # ADR 0004's planes_v1: the worker appends the obstacle layer to every observation and
+        # the env keeps the rasterized tensor of the latest state in `last_planes`, so callers
+        # that feed a planes-built policy read it beside the flat vector without an API break.
+        self._planes = planes
+        if planes:
+            self._cmd += ["--planes"]
         # Army overrides, "monsterId:count,...". These are the difficulty control: a matchup is
         # only worth training on when the policy neither always wins nor always loses it.
         if attacker:
@@ -124,6 +130,8 @@ class BattleEnv:
         self._defender = defender
         self._proc: subprocess.Popen | None = None
         self._pending: dict | None = None
+        # planes_v1 tensor of the latest presented state, None unless planes=True.
+        self.last_planes = None
         # Own hit points at the first decision, which is before any damage has been dealt, so it
         # is the starting force. The terminal record carries no initial totals.
         self._own_initial_hp: float = 0.0
@@ -174,6 +182,7 @@ class BattleEnv:
                 self.scenario_id = record.get("scenario_id")
             elif record["record"] == "decision":
                 self._pending = record
+                self.last_planes = encode_planes(record["observation"]) if self._planes else None
                 mine = self.side == "attacker"
                 self._own_initial_hp = float(
                     sum(u["hit_points"] for u in record["observation"]["units"] if (u["side"] == "attacker") == mine)
@@ -193,6 +202,7 @@ class BattleEnv:
 
         if record["record"] == "decision":
             self._pending = record
+            self.last_planes = encode_planes(record["observation"]) if self._planes else None
             return Step(encode_observation(record["observation"]), encode_mask(record["legal_actions"]), 0.0, False)
 
         # Terminal. The reward is defined here rather than in the environment, per ADR 0005,

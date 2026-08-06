@@ -62,11 +62,12 @@ def load_policy(state_dict: dict) -> "BattlePolicy":
     table ships as a buffer, so its presence is the self-describing marker; widths are read off
     the slot encoder's first layer."""
     ability = "ability_table" in state_dict
+    planes = "plane_conv.0.weight" in state_dict
     slot_hidden = state_dict["slot_encoder.0.weight"].shape[0]
     trunk_hidden = state_dict["trunk.0.weight"].shape[0]
     global_hidden = state_dict["global_encoder.0.weight"].shape[0]
     model = BattlePolicy(slot_hidden=slot_hidden, trunk_hidden=trunk_hidden,
-                         global_hidden=global_hidden, ability_features=ability)
+                         global_hidden=global_hidden, ability_features=ability, planes=planes)
     model.load_state_dict(state_dict)
     return model
 
@@ -77,7 +78,7 @@ class BattlePolicy(nn.Module):
     # At 128 and 256 the model held 626k parameters against roughly 37k training decisions, which
     # is the memorization regime training-design.md warns about; 96 and 192 give 393k.
     def __init__(self, slot_hidden: int = 96, trunk_hidden: int = 192, global_hidden: int = 32,
-                 ability_features: bool = False) -> None:
+                 ability_features: bool = False, planes: bool = False) -> None:
         super().__init__()
         # Optional architectural inductive bias: each slot's input is extended by its creature's
         # fixed ability profile, computed inside the model from the one-hot the observation
@@ -96,8 +97,24 @@ class BattlePolicy(nn.Module):
             nn.ReLU(),
         )
         self.global_encoder = nn.Sequential(nn.Linear(GLOBAL_FEATURES, global_hidden), nn.ReLU())
+        # The planes_v1 fusion arm of ADR 0004: a small convolution over the (7, 9, 11) tensor,
+        # no downsampling at this board size, squeezed to a fixed width so the trunk grows by a
+        # bounded amount. Absent unless requested, and load_policy infers it from the state dict.
+        self.planes = planes
+        plane_width = 0
+        if planes:
+            from .encoding import BOARD_HEIGHT, BOARD_WIDTH, PLANE_CHANNELS
+
+            self.plane_conv = nn.Sequential(
+                nn.Conv2d(len(PLANE_CHANNELS), 32, kernel_size=3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(32, 32, kernel_size=3, padding=1),
+                nn.ReLU(),
+            )
+            plane_width = 128
+            self.plane_fc = nn.Sequential(nn.Linear(32 * BOARD_HEIGHT * BOARD_WIDTH, plane_width), nn.ReLU())
         self.trunk = nn.Sequential(
-            nn.Linear(SLOT_COUNT * slot_hidden + global_hidden, trunk_hidden),
+            nn.Linear(SLOT_COUNT * slot_hidden + global_hidden + plane_width, trunk_hidden),
             nn.ReLU(),
             nn.Linear(trunk_hidden, trunk_hidden),
             nn.ReLU(),
@@ -105,7 +122,7 @@ class BattlePolicy(nn.Module):
         self.policy_head = nn.Linear(trunk_hidden, ACTION_SPACE_SIZE)
         self.value_head = nn.Linear(trunk_hidden, 1)
 
-    def features(self, observations: torch.Tensor) -> torch.Tensor:
+    def features(self, observations: torch.Tensor, planes: torch.Tensor | None = None) -> torch.Tensor:
         batch = observations.shape[0]
         slots = observations[:, : SLOT_COUNT * SLOT_FEATURES].view(batch, SLOT_COUNT, SLOT_FEATURES)
         globals_ = observations[:, SLOT_COUNT * SLOT_FEATURES :]
@@ -121,12 +138,17 @@ class BattlePolicy(nn.Module):
         present = slots[:, :, :1]
         encoded = encoded * present
 
-        joined = torch.cat([encoded.flatten(1), self.global_encoder(globals_)], dim=1)
-        return self.trunk(joined)
+        parts = [encoded.flatten(1), self.global_encoder(globals_)]
+        if self.planes:
+            if planes is None:
+                raise ValueError("this policy was built with planes=True and needs the tensor per sample")
+            parts.append(self.plane_fc(self.plane_conv(planes).flatten(1)))
+        return self.trunk(torch.cat(parts, dim=1))
 
-    def forward(self, observations: torch.Tensor, masks: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, observations: torch.Tensor, masks: torch.Tensor,
+                planes: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor]:
         """Returns masked logits and the value estimate."""
-        hidden = self.features(observations)
+        hidden = self.features(observations, planes)
         logits = self.policy_head(hidden)
         logits = logits.masked_fill(~masks, MASK_FILL)
         return logits, self.value_head(hidden).squeeze(-1)
