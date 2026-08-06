@@ -103,6 +103,25 @@ The second targeted round aimed at struggle instead: the fifteen training matchu
 
 That reading is checkable, and checking it produced the evening's terminal finding. The teacher's own attacker win rates on the 40 training matchups, computed from the control recordings, correlate with the sweet-spot clone's at 0.815, and the intended relabeling band, teacher wins at least half while the student wins at most 0.4, is empty, zero of forty matchups. The student has converged to the teacher's difficulty profile on this pool. What remains unlearnable by imitation is what the teacher cannot do either, which is why round one from the drift-rich weak clone paid enormously and every targeted round from the strong one paid nothing: DAgger exhausted its own target by succeeding.
 
+## The search-taught round, and the report card
+
+The owner set the goal, a sufficiently good agent validated three ways, and the search-as-teacher round ran end to end: 560 episodes played by root-PUCT across the 40 training matchups, hard band deepest, six shards in parallel, 12,485 labels with 508 of 560 collection episodes won. Distilled at double weight into the sweet-spot recipe, the clone posts the best on-pool number of the day, 0.622, and the battery below tells the rest honestly.
+
+`validation_battery.py` measures every checkpoint over battlefields on the three owner-fixed surfaces: matchups sampled fresh from the generator with a seed nothing trained or calibrated on, the held-out pool, three out-of-distribution stress suites, and the Thunk ladder no training ever touched.
+
+| Suite | Clone v4 | share2 | search-taught |
+|---|---|---|---|
+| Fresh sampled, 24 | 0.399 | 0.394 | 0.391 |
+| Held-out pool, 20 | 0.421 | 0.567 | 0.448 |
+| Stress, hordes to 3,000 | 0.158 | 0.200 | 0.175 |
+| Stress, wide-only armies | 0.444 | 0.389 | 0.431 |
+| Stress, commander extremes | 0.979 | 0.969 | 0.958 |
+| Thunk ladder | 0.573 | 0.875 | 0.719 |
+
+Three verdicts. `policy_share2` is the agent: it leads every surface that separates policies at all, held-out by 0.12 to 0.15, the Thunk ladder at 1.000 / 1.000 / 0.958 / 0.542 with the full fight now won more often than lost, and the horde stress. The search-taught distillation regressed its parent off-pool, held-out 0.448 against 0.567 and the ladder 0.719 against 0.875, the evening's law once more: labels concentrated on the training matchups buy on-pool play with off-pool generality, and the searched labels, twelve thousand decisions on those same forty matchups, are no exception even at teacher grade. The improvement operator itself remains a different tier, the probe's $+0.79$ stands, so search earns its keep as a wrapper at decision time, half a second per move where quality matters, not yet as distilled weights.
+
+The stress suites name the walls precisely. Commander extremes are no weakness at all, 0.96 to 0.98 everywhere, so the stat encoding generalizes past the sampled range. Wide-only armies sit mid-hard and undifferentiated. Hordes beyond 1,000 are a cliff for every checkpoint, zeros across the Thunk-army rungs at 1,500 through 3,000, the count-extrapolation limit ADR 0006 measured in features now measured in behavior. And the fresh raw distribution reads near 0.40 identically for all three, because uncalibrated draws include matchups no policy wins, which is the band-empty finding restated from the sampler's side.
+
 ## Where this leaves the training program
 
 Every point of transferable progress today came from supervised data design, none from reinforcement learning. The day-final ranking on held-out play over battlefields: the equal-weight combination at 0.552, DAgger round two at 0.490 with the best hard ladder, DAgger round one at 0.487 with the best extreme rung, everything PPO produced at or below 0.492 and paid for out of its anchor. The shape after the corrected arms is that teacher-state data generalizes teacher coverage, student-state relabeling repairs student drift, the two combine into the best pool generalist so far, and mixture weight decides which signal survives where their states overlap, with the extreme-horde rung the visible casualty and iteration non-monotone.
