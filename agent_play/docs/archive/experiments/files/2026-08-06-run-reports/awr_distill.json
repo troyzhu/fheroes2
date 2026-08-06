@@ -1,0 +1,24 @@
+{
+  "roots": [
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_diverse",
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_dagger",
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_dagger",
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_gen1",
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_gen1"
+  ],
+  "beta": 1.0,
+  "seed": 0,
+  "weighted": {
+    "epoch": 24,
+    "agreement": 0.863430998041535
+  },
+  "plain": {
+    "epoch": 24,
+    "agreement": 0.8696554264993892
+  },
+  "weight_spread": [
+    0.12348444759845734,
+    6.738257884979248
+  ],
+  "seconds": 180.0
+}
