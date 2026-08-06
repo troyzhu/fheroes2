@@ -23,6 +23,12 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/generalized-battle-agent-guide]] | report | 2026 | primary | Owner-supplied design for this exact problem: value-budget sampling, structured ability records, candidate effect summaries, lexicographic objective, scenario-family splits | sampler adopted, abilities tracked |
 | [[works/sc2le]] | paper | 2017 | primary | Feature layers as synthetic semantic rasterizations, never RGB; structured tensors alongside planes | ADR 0004 |
 | [[works/pysc2]] | project | 2017 | primary | The shipped observer for SC2LE: independently toggleable observation modalities behind one API | ADR 0001, ADR 0004 |
+| [[works/alphastar-unplugged]] | paper | 2023 | primary | One-step improvement against the behavior value is the recipe that works offline at scale; MCTS at training time collapses, at inference improves | training program after the 2026-08-05 review |
+| [[works/uct]] | paper | 2006 | primary | The UCB variant of Monte-Carlo planning: bandit selection per node, rollout values, anytime convergence | search probe |
+| [[works/alphazero]] | paper | 2017 | primary | PUCT search as the improvement operator, distilled back each iteration with a re-grounded value | search-as-teacher design |
+| [[works/one-step-offline-rl]] | paper | 2021 | primary | One improvement step against the behavior value beats iterating, because iteration queries the value off-data | improvement-step discipline |
+| [[works/bcq-extrapolation]] | paper | 2019 | primary | Extrapolation error: value estimates queried off-data, then maximized into | the critic calibration result |
+| [[works/double-q-overestimation]] | paper | 2016 | primary | Max-operator overestimation in bootstrapped values, absent from our MC-fitted critic, acquired the moment anything bootstraps | value-estimation boundary |
 | [[works/alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
 | [[works/griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |
 | [[works/microrts-py]] | codebase | 2021–25 | primary | `CategoricalMasked` reference implementation; `partial_obs` flag; TrueSkill league evaluation | ADR 0001, evaluation |

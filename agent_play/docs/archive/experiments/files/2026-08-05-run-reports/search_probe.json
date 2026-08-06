@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "label": "thunk_1000",
+      "policy": 0.5,
+      "search": 1.0,
+      "searched_decisions": 187
+    },
+    {
+      "label": "pool_10",
+      "policy": 0.08333333333333333,
+      "search": 1.0,
+      "searched_decisions": 98
+    },
+    {
+      "label": "pool_37",
+      "policy": 0.0,
+      "search": 0.75,
+      "searched_decisions": 162
+    },
+    {
+      "label": "pool_24",
+      "policy": 0.0,
+      "search": 1.0,
+      "searched_decisions": 143
+    }
+  ],
+  "simulations": 32,
+  "episodes": 12,
+  "c_puct": 1.5,
+  "checkpoint": "policy_share2.pt",
+  "seconds": 340.3
+}

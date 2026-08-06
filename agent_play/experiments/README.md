@@ -26,6 +26,8 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `generalization_battlefields.py` | Does training over rotated battlefields transfer better, judged by evaluation over battlefields? Also re-grounds every transfer number on seed-spread evaluation | about 75 min over 3 paired seeds |
 | `dagger_iteration.py` | One DAgger round: student-played states relabeled by the planner probe, clone retrained on the aggregate, judged on pool win rate over battlefields | about 10 min at 1,000 collected episodes |
 | `ppo_from_strongest.py` | Does PPO still earn anything from a strong supervised anchor, or erode it? Paired against the anchor's vendored evaluation | about 35 min over 3 seeds |
+| `critic_calibration.py` | Where does the behavior value actually work? Explained variance and bias on teacher holdout against student-played states | about 8 min including the refit |
+| `search_probe.py` | Does root-PUCT with rollout values lift play on the matchups the policy loses? | about 15 min at 32 simulations |
 
 ## Conventions
 

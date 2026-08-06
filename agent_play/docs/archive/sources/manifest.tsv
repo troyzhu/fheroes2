@@ -52,3 +52,8 @@ metamon-README.md	OK	63115	Metamon repository README, datasets and baselines for
 poke-env-README.md	OK	4265	poke-env, the Pokemon Showdown battle environment library	https://raw.githubusercontent.com/hsahovic/poke-env/master/README.md
 arxiv-2012.01914.pdf	OK	2226235	DeepCrawl: Deep Reinforcement Learning for Turn-based Strategy Games	https://arxiv.org/abs/2012.01914
 generalized-battle-agent-guide.md	OK	49644	Owner-supplied design guide: generalized battle agent for fheroes2 (entity state, structured abilities, candidate scoring, budget sampling)	user-upload 2026-08-05
+arxiv-1712.01815.pdf	OK	636527	Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm	https://arxiv.org/abs/1712.01815
+arxiv-2106.08909.pdf	OK	15777357	Offline RL Without Off-Policy Evaluation	https://arxiv.org/abs/2106.08909
+arxiv-1812.02900.pdf	OK	2239587	Off-Policy Deep Reinforcement Learning without Exploration	https://arxiv.org/abs/1812.02900
+arxiv-1509.06461.pdf	OK	789062	Deep Reinforcement Learning with Double Q-learning	https://arxiv.org/abs/1509.06461
+uct-kocsis-szepesvari-2006.pdf	OK	335549	Bandit based Monte-Carlo Planning (UCT), Kocsis and Szepesvari, ECML 2006	http://ggp.stanford.edu/readings/uct.pdf

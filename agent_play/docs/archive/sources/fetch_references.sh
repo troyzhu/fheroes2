@@ -65,6 +65,14 @@ for id in 1708.04782 2105.13807 2006.14171 2011.06363 2006.13760 1912.06680 2206
     arxiv "${id}"
 done
 
+# ---- arXiv papers (2026-08-05 evening review: anchoring, value, search) ----
+for id in 1712.01815 2106.08909 1812.02900 1509.06461; do
+    arxiv "${id}"
+done
+
+# UCT (Kocsis & Szepesvari, ECML 2006) predates arXiv posting; Stanford GGP mirror.
+fetch "uct-kocsis-szepesvari-2006.pdf"  "http://ggp.stanford.edu/readings/uct.pdf"
+
 # ---- GitHub raw files (small, canonical content) ---------------------------
 fetch "pysc2-environment.md"            "https://raw.githubusercontent.com/google-deepmind/pysc2/master/docs/environment.md"
 fetch "pysc2-README.md"                 "https://raw.githubusercontent.com/google-deepmind/pysc2/master/README.md"
