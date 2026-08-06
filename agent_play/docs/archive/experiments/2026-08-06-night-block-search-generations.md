@@ -108,3 +108,17 @@ Tabula rasa, because AlphaZero needs no demonstrations and the question is wheth
 What the agent cannot see, because the owner's tactic depends on it. Each stack contributes counts, current and top hit points, the six stat fields, position, ability flags and identity, for both sides, so remaining hit points are fully observable. The board is not, and the precise statement matters because the owner corrected a sloppier one.
 
 Obstacles are not unseen so much as unrepresented: the observation carries no passability, geometry, reachability or threat features, and the only trace of the board's shape is which of the acting stack's own moves the mask permits this turn. So the policy has a one-step, own-side view of where it may go and no representation at all of where the enemy may go, which is exactly what a plan that forces a stack to walk around an obstacle would need. A plan that forces an enemy stack to walk around terrain is therefore not expressible in what the policy sees, which makes [[../../decisions/0004-spatial-observation-modality]]'s `planes_v1` the first prerequisite for the owner's line rather than a nice-to-have.
+
+## The symmetry test the owner asked for
+
+The mirror suite gives both sides the same army and asks which chair wins, which measures the game's own bias and the policy's together. The owner's sharper test holds the agent's army fixed and swaps only the chair: command that army as attacker, then command the same army as defender while the built-in AI attacks with the opposing one. A policy without side bias, in a game without side bias, posts the same number twice, and running the identical pair with the engine on both sides supplies the game's contribution rather than assuming it.
+
+| Commander | As attacker | As defender | Gap | Excess over the engine's own |
+|---|---|---|---|---|
+| Built-in AI | 0.708 | 0.637 | $+0.071 \pm 0.066$ | reference |
+| share2 | 0.650 | 0.600 | $+0.050 \pm 0.052$ | $-0.021 \pm 0.062$ |
+| Generation 1 | 0.537 | 0.633 | $-0.096 \pm 0.085$ | $-0.167 \pm 0.092$ |
+
+Three readings, and the third is the one worth keeping. The game is close to side-neutral on these ten matchups, the engine's own gap being $+0.071 \pm 0.066$, so a policy gap is mostly the policy's own. share2 is essentially symmetric, its excess over the engine sitting at $-0.021 \pm 0.062$. And generation one, the night's champion on the flagship ladder, is the least symmetric of the three: it plays these matchups better from the defender's chair than the attacker's, an excess of $-0.167 \pm 0.092$ against the engine, which is about 1.8 standard errors and therefore suggestive rather than settled.
+
+That is a defect the battery could not see, because every suite except the mirrors fixes the chair, and it fits the night's collection history: generation one's labels came half from each side, but its predecessors' did not, and the ladder it wins is an attacker-side fight. The recorded consequence is that side symmetry joins the battery as a first-class column rather than living in a side experiment, and that any future champion is checked for it before adoption, since a policy that is strong on one flagship fight and asymmetric elsewhere is not obviously the better agent.
