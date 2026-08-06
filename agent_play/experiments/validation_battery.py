@@ -116,8 +116,8 @@ def main() -> None:
 
     for path in args.checkpoints:
         name = pathlib.Path(path).name
-        model = BattlePolicy()
-        model.load_state_dict(torch.load(path, map_location="cpu", weights_only=True)["state_dict"])
+        from fheroes2_agent.policy import load_policy
+        model = load_policy(torch.load(path, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         report["results"][name] = {}
         for suite, matchups in suites.items():

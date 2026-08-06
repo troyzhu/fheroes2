@@ -32,6 +32,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `validation_battery.py` | The report card: fresh generator samples, held-out pool, OOD stress suites, and the Thunk ladder, per checkpoint over battlefields | about 40 s per checkpoint |
 | `credit_assignment.py` | How often does trajectory-level credit mis-sign a decision, judged by search rollout values? The critique's two error rates, measured | about 2 min at 32 simulations |
 | `play_vs.py` | Battle a checkpoint yourself: you command one side in the real battle window, the policy answers the other over the line protocol | interactive, needs a display |
+| `ability_ablation.py` | Do explicit per-creature ability features earn their place, paired on one corpus and judged by the battery? | about 25 min for both arms |
 
 ## Conventions
 
