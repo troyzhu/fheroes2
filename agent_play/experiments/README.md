@@ -35,6 +35,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `ability_ablation.py` | Do explicit per-creature ability features earn their place, paired on one corpus and judged by the battery? | about 25 min for both arms |
 | `builtin_ai_baseline.py` | The engine's own AI on every validation suite: the baseline a player recognizes, and the bar the policies must clear | about 70 s for all suites |
 | `search_value.py` | Can a value network replace rollouts at search leaves, and is it calibrated where it would be used? | about 10 min including the fit |
+| `symmetry_gap.py` | Does the same army win as often from the other chair, and how much of any gap is the game rather than the policy? | about 6 min over 10 matchups |
 | `tabula_rasa_pilot.py` | Could search bootstrap a policy from random initialization, with no demonstrations at all? Rounds of search play, distil, evaluate on a fixed matchup set | about 20 min for three rounds |
 
 ## Conventions
