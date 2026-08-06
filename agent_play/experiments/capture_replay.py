@@ -53,13 +53,24 @@ def frame_of(raw: dict, action: int | None, caption: str | None) -> dict:
     return {"round": raw["round"], "units": units, "action": action, "caption": caption}
 
 
-def capture(worker: str, checkpoint: str, **env_kwargs) -> dict:
+def load_model(checkpoint: str):
     state = torch.load(checkpoint, map_location="cpu", weights_only=True)
     model = BattlePolicy()
     model.load_state_dict(state["state_dict"])
     model.eval()
     version = state.get("encoding_version", "obs_encoding_v2")
-    encode = encode_v2 if version == "obs_encoding_v2" else enc.encode_observation
+    return model, (encode_v2 if version == "obs_encoding_v2" else enc.encode_observation), version
+
+
+def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None, **env_kwargs) -> dict:
+    """One policy per side when a defender checkpoint is given: the worker runs side=both and
+    each decision routes to the model owning the active side, which is what lets two checkpoints
+    fight each other on the record."""
+    attacker_model, attacker_encode, version = load_model(checkpoint)
+    defender_model, defender_encode, defender_version = (attacker_model, attacker_encode, version)
+    if defender_checkpoint is not None:
+        defender_model, defender_encode, defender_version = load_model(defender_checkpoint)
+        env_kwargs["side"] = "both"
 
     env = BattleEnv(worker, **env_kwargs)
     frames = []
@@ -69,6 +80,9 @@ def capture(worker: str, checkpoint: str, **env_kwargs) -> dict:
             raw = env._pending
             observation = raw["observation"]
             mask = enc.encode_mask(raw["legal_actions"])
+            attacker_turn = bool(observation.get("active_is_attacker"))
+            model, encode = (attacker_model, attacker_encode) if attacker_turn or defender_checkpoint is None \
+                else (defender_model, defender_encode)
             with torch.no_grad():
                 logits, _ = model(torch.from_numpy(encode(observation)).unsqueeze(0),
                                   torch.from_numpy(mask).unsqueeze(0))
@@ -77,7 +91,7 @@ def capture(worker: str, checkpoint: str, **env_kwargs) -> dict:
             step = env.step(action)
             if step.done:
                 return {"frames": frames, "termination": step.info["termination"],
-                        "encoding": version, "reward": step.reward}
+                        "encoding": version, "defender_encoding": defender_version, "reward": step.reward}
     finally:
         env.close()
 
@@ -92,6 +106,8 @@ def main() -> None:
     parser.add_argument("--defender-hero", default=None)
     parser.add_argument("--allow-wide", action="store_true")
     parser.add_argument("--side", default="attacker")
+    parser.add_argument("--defender-checkpoint", default=None,
+                        help="a second policy controlling the defender, so two checkpoints battle each other")
     parser.add_argument("--want", default="any", choices=("victory", "defeat", "any"),
                         help="retry until an episode ends this way, so a replay shows what the win rate says")
     parser.add_argument("--tries", type=int, default=6)
@@ -105,11 +121,14 @@ def main() -> None:
                   allow_wide=args.allow_wide)
     replay = None
     for attempt in range(args.tries):
-        candidate = capture(args.worker, args.checkpoint, **kwargs)
+        candidate = capture(args.worker, args.checkpoint, defender_checkpoint=args.defender_checkpoint, **kwargs)
         replay = candidate
         if args.want == "any" or candidate["termination"] == args.want:
             break
     replay["checkpoint"] = pathlib.Path(args.checkpoint).name
+    if args.defender_checkpoint:
+        replay["defender_checkpoint"] = pathlib.Path(args.defender_checkpoint).name
+        replay["side"] = "both"
     replay["fixture"] = "m1_tiny_melee"  # BattleEnv default; the worker derives the world seed from it
     replay["attacker"] = args.attacker
     replay["defender"] = args.defender

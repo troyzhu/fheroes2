@@ -88,9 +88,12 @@ class BattleEnv:
                  attacker: str | None = None, defender: str | None = None,
                  attacker_hero: str | None = None, defender_hero: str | None = None,
                  allow_wide: bool = False, probe_teacher: bool = False,
-                 reward_weighting: str = "none"):
+                 reward_weighting: str = "none", reward_margin: str = "hit_points"):
         if reward_weighting not in ("none", "difficulty"):
             raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
+        if reward_margin not in ("hit_points", "strength"):
+            raise ValueError(f"unknown reward_margin {reward_margin!r}")
+        self._reward_margin = reward_margin
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
         # DAgger relabeling: each decision record then carries "teacher_action", the planner's
         # own choice at the same state, when it resolves inside simple_v1.
@@ -188,7 +191,10 @@ class BattleEnv:
 
         # Terminal. The reward is defined here rather than in the environment, per ADR 0005,
         # which keeps the objective a training-configuration choice rather than engine behaviour.
-        reward = terminal_reward(record, self.side, self._own_initial_hp)
+        if self._reward_margin == "strength":
+            reward = terminal_reward_strength(record, self.side)
+        else:
+            reward = terminal_reward(record, self.side, self._own_initial_hp)
         if self._reward_weighting == "difficulty":
             reward = apply_difficulty(reward, self._difficulty)
         step = Step(
@@ -239,6 +245,18 @@ def terminal_reward(record: dict, side: str, own_initial_hit_points: float) -> f
     """
     own = "attacker" if side == "attacker" else "defender"
     survived = record[own]["hit_points"] / own_initial_hit_points if own_initial_hit_points > 0 else 0.0
+    won = record["termination"] == ("victory" if side == "attacker" else "defeat")
+    return (1.0 if won else -1.0) + survived
+
+
+def terminal_reward_strength(record: dict, side: str) -> float:
+    """The strength-margin variant, owner-directed 2026-08-05: survival priced by engine
+    creature strength rather than hit points, so losing a Champion costs what a Champion is
+    worth and a win with cheap losses outscores the same win paid for in cavalry. Both totals
+    are engine-computed in the terminal record; commander bonuses are not priced in."""
+    own = record["attacker" if side == "attacker" else "defender"]
+    initial = float(own.get("initial_strength", 0.0))
+    survived = float(own.get("strength", 0.0)) / initial if initial > 0 else 0.0
     won = record["termination"] == ("victory" if side == "attacker" else "defeat")
     return (1.0 if won else -1.0) + survived
 

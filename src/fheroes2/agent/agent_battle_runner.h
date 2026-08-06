@@ -64,6 +64,11 @@ namespace fheroes2::agent
         uint32_t liveStacks{ 0 };
         uint32_t liveCreatures{ 0 };
         uint32_t hitPoints{ 0 };
+        // Engine strength of the surviving force, sum over live stacks of per-creature
+        // Monster::GetMonsterStrength() times count: the same pricing the value-budget sampler
+        // and the difficulty weight use, so losing a Champion costs what a Champion is worth
+        // rather than what its hit points weigh. Commander bonuses are not priced in.
+        double strength{ 0.0 };
     };
 
     struct EpisodeOutcome
@@ -74,6 +79,10 @@ namespace fheroes2::agent
         int32_t rounds{ 0 };
         uint32_t attackerResult{ 0 };
         uint32_t defenderResult{ 0 };
+        // Starting-force strength per side, computed before the first round from the filled
+        // armies, so a strength-weighted survival margin has its denominator engine-computed.
+        double attackerInitialStrength{ 0.0 };
+        double defenderInitialStrength{ 0.0 };
         Termination termination{ Termination::EngineDraw };
         SideSummary attacker;
         SideSummary defender;

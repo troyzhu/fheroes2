@@ -418,12 +418,13 @@ int main( int argc, char ** argv )
             const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, &recording, &controller );
 
             std::printf( "{\"record\":\"terminal\",\"scenario_id\":\"%s\",\"termination\":\"%s\",\"rounds\":%d"
-                         ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
-                         ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
+                         ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u,\"strength\":%.3f,\"initial_strength\":%.3f}"
+                         ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u,\"strength\":%.3f,\"initial_strength\":%.3f}"
                          ",\"decisions_seen\":%u,\"decisions_answered\":%u,\"rejected\":%u,\"client_closed\":%s",
                          scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds, outcome.attacker.liveStacks,
-                         outcome.attacker.liveCreatures, outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures,
-                         outcome.defender.hitPoints, controller.decisionsSeen(), controller.decisionsAnswered(), controller.rejectedSelections(),
+                         outcome.attacker.liveCreatures, outcome.attacker.hitPoints, outcome.attacker.strength, outcome.attackerInitialStrength,
+                         outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints, outcome.defender.strength,
+                         outcome.defenderInitialStrength, controller.decisionsSeen(), controller.decisionsAnswered(), controller.rejectedSelections(),
                          controller.isFinished() ? "true" : "false" );
             if ( probeTeacher ) {
                 std::printf( ",\"probes_resolved\":%u,\"probes_outside\":%u", controller.probesResolved(), controller.probesOutsideSchema() );

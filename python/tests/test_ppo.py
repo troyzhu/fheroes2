@@ -139,5 +139,24 @@ check(abs(apply_difficulty(-1.0, 2.0) - (-0.5)) < 1e-9, "a hard loss is forgiven
 check(abs(apply_difficulty(1.5, 0.5) - 0.75) < 1e-9, "an easy win is damped")
 check(abs(apply_difficulty(-1.0, 0.5) - (-2.0)) < 1e-9, "an easy loss is punished harder")
 
+# Strength margin: survival priced by engine strength, so a win keeping the valuable stack
+# outscores the same win keeping the same hit points in chaff.
+from fheroes2_agent.env import terminal_reward_strength  # noqa: E402
+
+def _terminal(strength, initial, termination="victory"):
+    return {"termination": termination,
+            "attacker": {"strength": strength, "initial_strength": initial},
+            "defender": {"strength": 0.0, "initial_strength": 50.0}}
+
+check(abs(terminal_reward_strength(_terminal(80.0, 100.0), "attacker") - 1.8) < 1e-9,
+      "a win keeping 80 percent of force strength scores 1.8")
+check(abs(terminal_reward_strength(_terminal(5.0, 100.0), "attacker") - 1.05) < 1e-9,
+      "a pyrrhic win keeping cheap survivors scores barely above 1")
+check(abs(terminal_reward_strength(_terminal(0.0, 100.0, "defeat"), "attacker") - (-1.0)) < 1e-9,
+      "a rout scores -1")
+check(terminal_reward_strength(_terminal(60.0, 100.0), "attacker")
+      > terminal_reward_strength(_terminal(30.0, 100.0), "attacker"),
+      "keeping the stronger half of the army strictly outscores keeping the weaker half")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

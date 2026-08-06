@@ -198,8 +198,21 @@ namespace
                 ++summary.liveStacks;
                 summary.liveCreatures += state.count;
                 summary.hitPoints += state.hitPoints;
+                summary.strength += Monster( state.monsterId ).GetMonsterStrength() * state.count;
             }
         }
+    }
+
+    double armyStrength( const Army & army )
+    {
+        double total = 0.0;
+        for ( size_t i = 0; i < army.Size(); ++i ) {
+            const Troop * troop = army.GetTroop( i );
+            if ( troop != nullptr && troop->isValid() ) {
+                total += Monster( troop->GetID() ).GetMonsterStrength() * troop->GetCount();
+            }
+        }
+        return total;
     }
 
     std::string computeStateDigest( const EpisodeOutcome & outcome )
@@ -299,6 +312,9 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
         defenderCommander.emplace( defendingArmy, PlayerColor::RED, scenario.defenderCommander.attack, scenario.defenderCommander.defense );
         defendingArmy.SetCommander( &*defenderCommander );
     }
+
+    outcome.attackerInitialStrength = armyStrength( attackingArmy );
+    outcome.defenderInitialStrength = armyStrength( defendingArmy );
 
     outcome.combatSeed = Battle::computeBattleSeed( scenario.tileIndex, outcome.mapSeed, attackingArmy, defendingArmy );
 
