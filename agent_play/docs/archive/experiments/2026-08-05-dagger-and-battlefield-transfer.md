@@ -83,6 +83,18 @@ Iteration is not monotone. Round two recovered the extreme regime its parent had
 
 The day's last question was whether reinforcement learning still earns anything once the supervised levers have done their work. Three PPO seeds from the combination clone on the same pool, same 40 iterations, everything evaluated over battlefields against the anchor's own vendored evaluation (`ppo_from_strongest.py`): the training pool moved $-0.003 \pm 0.030$, nothing, where the same recipe from clone v4 had gained about $+0.14$; and the held-out pool moved $-0.060 \pm 0.016$, a resolved degradation at 3.7 standard errors. From a weak anchor, PPO converts headroom into on-pool gains that do not transfer; from a strong anchor there is no headroom left at this budget and the same optimization erodes the transfer the supervised pipeline built, which is the in-domain face of the over-optimization pattern [[../../rl/rlhf-transfer]] describes from the language-model literature, arriving here without any proxy reward involved.
 
+## The relabeling share, swept
+
+The ranked next step ran the same evening: the equal-weight combination corpus with the round-one relabelings duplicated to two and four times their natural weight, everything else identical.
+
+| Relabel share | Training pool | Held-out pool | Thunk 850 | Thunk 1000 |
+|---|---|---|---|---|
+| $\times 1$ (the combination) | 0.592 | 0.552 | 0.917 | 0.083 |
+| $\times 2$ | 0.574 | 0.542 | 1.000 | 0.500 |
+| $\times 4$ | 0.589 | 0.496 | 1.000 | 0.583 |
+
+The extreme rung climbs monotonically with the share while the held-out pool holds flat at double weight (paired $-0.010 \pm 0.045$ against the combination) and pays at quadruple ($-0.056 \pm 0.036$). Double weight is the sweet spot at this corpus: `policy_share2` keeps the day's best-tier held-out number and a 1.000 / 1.000 / 1.000 / 0.500 ladder, the best all-round checkpoint produced today. Mixture weight is a real, cheap, monotone-then-costly dial, and one supervised recipe now holds most of both regimes at once.
+
 ## Where this leaves the training program
 
 Every point of transferable progress today came from supervised data design, none from reinforcement learning. The day-final ranking on held-out play over battlefields: the equal-weight combination at 0.552, DAgger round two at 0.490 with the best hard ladder, DAgger round one at 0.487 with the best extreme rung, everything PPO produced at or below 0.492 and paid for out of its anchor. The shape after the corrected arms is that teacher-state data generalizes teacher coverage, student-state relabeling repairs student drift, the two combine into the best pool generalist so far, and mixture weight decides which signal survives where their states overlap, with the extreme-horde rung the visible casualty and iteration non-monotone.

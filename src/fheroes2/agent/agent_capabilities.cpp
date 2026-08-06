@@ -126,7 +126,28 @@ bool fheroes2::agent::writeCapabilityAudit( const std::string & filePath )
             << ", \"simple_v1_supported\": " << boolText( r.simpleV1Supported ) //
             << ", \"wide_v1_supported\": " << boolText( r.wideV1Supported ) //
             << ", \"hit_points\": " << r.hitPoints //
-            << ", \"strength\": " << r.strength //
+            << ", \"strength\": " << r.strength;
+
+        // The raw engine ability and weakness records, exported without interpretation: the
+        // engine stays the authority on rules, and the learner receives categorical type ids
+        // with their typed payloads rather than names (the guide's layer-1 representation;
+        // agent_play/docs/research/works/generalized-battle-agent-guide.md). `value` is
+        // type-dependent, a spell id for some types and a magnitude for others, which is
+        // exactly why the layer-2 semantic adapter is a separate, later step.
+        const MonsterData & data = getMonsterData( r.monsterId );
+        out << ", \"abilities\": [";
+        for ( size_t k = 0; k < data.battleStats.abilities.size(); ++k ) {
+            const MonsterAbility & ability = data.battleStats.abilities[k];
+            out << ( k == 0 ? "" : ", " ) << "{\"type_id\": " << static_cast<int>( ability.type ) //
+                << ", \"percentage\": " << ability.percentage << ", \"value\": " << ability.value << '}';
+        }
+        out << "], \"weaknesses\": [";
+        for ( size_t k = 0; k < data.battleStats.weaknesses.size(); ++k ) {
+            const MonsterWeakness & weakness = data.battleStats.weaknesses[k];
+            out << ( k == 0 ? "" : ", " ) << "{\"type_id\": " << static_cast<int>( weakness.type ) //
+                << ", \"percentage\": " << weakness.percentage << ", \"value\": " << weakness.value << '}';
+        }
+        out << "]" //
             << ", \"reason\": \"" << r.reason << "\"}" //
             << ( i + 1 < records.size() ? ",\n" : "\n" );
     }
