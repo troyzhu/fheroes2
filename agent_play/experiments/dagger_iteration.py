@@ -103,6 +103,8 @@ def main() -> None:
     parser.add_argument("--matchup-file", default=None,
                         help="collection matchups from this manifest instead of the budget pool; "
                              "evaluation always stays on the budget pool for comparability")
+    parser.add_argument("--collection-allow-wide", action="store_true",
+                        help="for manifests recorded under wide_v1 that predate the allow_wide field")
     parser.add_argument("--matchups", type=int, default=40)
     parser.add_argument("--episodes-per-matchup", type=int, default=25)
     parser.add_argument("--battlefields", type=int, default=4)
@@ -119,7 +121,10 @@ def main() -> None:
     held_set = [as_matchup(e) for e in entries[40:60]]
     if args.matchup_file:
         collection_entries = json.loads(pathlib.Path(args.matchup_file).read_text())["matchups"]
-        collection_set = [as_matchup(e) for e in collection_entries[: args.matchups]]
+        collection_set = [Matchup(e["attacker"], e["defender"], attacker_hero=e.get("attacker_hero"),
+                                  defender_hero=e.get("defender_hero"),
+                                  allow_wide=bool(e.get("allow_wide", args.collection_allow_wide)))
+                          for e in collection_entries[: args.matchups]]
     else:
         collection_set = [as_matchup(e) for e in entries[: args.matchups]]
 
