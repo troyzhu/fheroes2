@@ -48,6 +48,8 @@ A group-relative trainer needs every episode in a group to start from the same p
 
 Store the full per-iteration history in every report, never just the headline metric. The first versions of two scripts here kept win rates alone and threw away the clip fractions, shifted fractions and advantage spreads the trainers had already computed, which made the next day's questions unanswerable from the record and forced reruns.
 
+Cloning rolls carry seed noise of about a tenth of win rate on the hardest validation rungs, measured on 2026-08-06 by replicating the champion recipe across seeds, so a single-roll comparison on one rung resolves nothing there. Judge arms on many suites moving coherently, and gate any adoption on a multi-seed battery.
+
 Comparisons at a fixed iteration budget are statements about that budget. The divergence trust region read as worse than the ratio clip at 30 iterations on the pool and better at 60, on runs whose first 30 iterations were bit-identical; where feasible, settle a comparison by continuing the same runs rather than by rerunning them, since determinism makes the continuation free of re-run variance.
 
 Results belong in `../docs/archive/experiments/`, which is provenance. Conclusions belong in `../docs/rl/`. Decisions belong in `../docs/decisions/`, and only once the evidence supports one.

@@ -63,7 +63,13 @@ No strict dominator exists, and the sharpest stable discriminator is the ladder'
 
 With label scaling saturated, the block's last experiment opened the recorded architectural path: each slot's input extended by its creature's fixed ability profile (`ability_features` on the policy, the capability audit's layer-1 records applied to the one-hot inside the model, 1,056 extra parameters, no observation change). The paired single-seed ablation on the champion corpus is a clean axis trade, not a win: wide-only 0.486 against 0.431, mirrors and defender suites up several points, hordes 0.200 against 0.158, and the Thunk ladder collapsed to 0.667 with the top rung at 0.083. The inductive bias helps exactly where ability profiles bind and spends exactly the capacity the extreme-horde behavior lived in, so it does not ship, and the honest note is one seed.
 
-The arm also replicated the champion for free: its plain arm re-rolls generation one's recipe under a different data order and lands at 0.906 on the ladder and 0.487 held-out, so the champion is a property of the recipe rather than of one training roll.
+The arm also replicated the champion for free: its plain arm re-rolls generation one's recipe under a different data order and lands at 0.906 on the ladder and 0.487 held-out, which at the time read as recipe robustness. The deliberate replication that closed the block corrects that reading.
+
+## The seed replication, and what it takes back
+
+Three fresh seeds of the champion recipe, batteried beside the original in one paired run, end the block on its most honest note. Top rungs: the original at 0.542 in this read (its own four reads span 0.542 to 0.792), the re-rolls at 0.500, 0.333 and 0.333; held-out 0.498 to 0.542 throughout. The recipe's expected top rung is therefore near 0.43 with seed noise around 0.10, overlapping share2's 0.42-to-0.54 band, so the recipe-level claim that generation one beats share2 on the ladder is not established; the artifact `policy_gen1` remains the best single checkpoint measured, repeatedly, but part of its crown was a favorable training roll.
+
+What survives at full strength: every checkpoint since the DAgger era towers over clone v4 (ladder 0.77-plus against 0.573, held-out 0.50-plus against 0.385), and the plateau law rests on many arms moving coherently across suites rather than on any single rung. The block's methodological deliverable is that single-roll comparisons at the flagship rung carry a tenth of seed noise, so future arms gate on multi-seed batteries, a convention now recorded in the experiments README.
 
 ## The deep-label arm, and the plateau confirmed
 
