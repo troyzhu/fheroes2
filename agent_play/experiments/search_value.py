@@ -73,6 +73,8 @@ def value_leaf_search(sim: BattleEnv, policy, value_model, prefix: list[int], ob
     actions = list(prior)
     if len(actions) == 1:
         return actions[0], 0
+    if not actions:
+        return 0, 0
     budget = min(simulations, len(actions))
     ranked = sorted(actions, key=lambda a: -prior[a])[:budget]
     scores = {}
@@ -85,6 +87,11 @@ def value_leaf_search(sim: BattleEnv, policy, value_model, prefix: list[int], ob
             if step.done:
                 break
             obs, msk = step.observation, step.mask
+        if sim._pending is None:
+            # The prefix ended the battle in the side-environment, which the seed pinning should
+            # prevent; score nothing rather than crash, and the caller's outcome comes from the
+            # live environment either way.
+            continue
         step = sim.step(action)
         steps += 1
         if step.done:
@@ -106,13 +113,18 @@ def value_leaf_search(sim: BattleEnv, policy, value_model, prefix: list[int], ob
 def play(worker: str, policy, value_model, episodes: int, simulations: int, matchup: dict | None = None,
          seeds: int = 1) -> dict:
     spec = dict(matchup) if matchup else dict(THUNK)
-    spec["seeds"] = seeds
-    env = BattleEnv(worker, **spec)
-    sim = BattleEnv(worker, **spec)
+    env = BattleEnv(worker, **spec, seeds=seeds)
+    sim = None
     wins, surv, steps, seconds = [], [], 0, time.time()
     try:
-        for _ in range(episodes):
+        for episode in range(episodes):
             obs, mask = env.reset()
+            # The side-environment must replay the exact battlefield variant the live episode is
+            # on, or prefix replay silently diverges; seed_offset pins it, which is the purpose
+            # it was built for. One worker per episode is ~100 ms.
+            if sim is not None:
+                sim.close()
+            sim = BattleEnv(worker, **spec, seeds=1, seed_offset=episode % max(seeds, 1))
             prefix: list[int] = []
             while True:
                 action, spent = value_leaf_search(sim, policy, value_model, prefix, obs, mask, simulations)
@@ -128,7 +140,8 @@ def play(worker: str, policy, value_model, episodes: int, simulations: int, matc
                 obs, mask = step.observation, step.mask
     finally:
         env.close()
-        sim.close()
+        if sim is not None:
+            sim.close()
     return {"win_rate": float(np.mean(wins)), "surviving_strength": float(np.mean(surv)) if surv else float("nan"),
             "engine_steps": steps, "seconds": round(time.time() - seconds, 1)}
 
