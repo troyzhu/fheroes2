@@ -1,0 +1,75 @@
+{
+  "history": [
+    {
+      "round": 0,
+      "win_rate": 0.0,
+      "labels": 0
+    },
+    {
+      "round": 1,
+      "win_rate": 0.0,
+      "search_win_rate": 0.16666666666666666,
+      "labels": 184
+    },
+    {
+      "round": 2,
+      "win_rate": 0.0,
+      "search_win_rate": 0.20833333333333334,
+      "labels": 247
+    },
+    {
+      "round": 3,
+      "win_rate": 0.0,
+      "search_win_rate": 0.20833333333333334,
+      "labels": 310
+    }
+  ],
+  "matchups": [
+    {
+      "attacker": "58:33",
+      "defender": "44:3,26:10",
+      "win_rate": 0.375,
+      "reward_std": 1.1244968098149906,
+      "mean_length": 6.375,
+      "scale": 2.5875,
+      "attacker_hero": "13:15",
+      "defender_hero": null,
+      "allow_wide": true
+    },
+    {
+      "attacker": "49:58",
+      "defender": "62:4,58:20,58:59",
+      "win_rate": 0.5625,
+      "reward_std": 1.0951965218990605,
+      "mean_length": 6.3125,
+      "scale": 1.18828125,
+      "attacker_hero": "4:9",
+      "defender_hero": "11:6",
+      "allow_wide": true
+    },
+    {
+      "attacker": "28:1",
+      "defender": "39:55",
+      "win_rate": 0.6875,
+      "reward_std": 1.0081394818395666,
+      "mean_length": 5.625,
+      "scale": 9.1171875,
+      "attacker_hero": "6:12",
+      "defender_hero": null,
+      "allow_wide": true
+    },
+    {
+      "attacker": "9:1,26:1,52:2",
+      "defender": "12:12,23:3,59:2,1:36",
+      "win_rate": 0.5,
+      "reward_std": 1.0917260416423162,
+      "mean_length": 19.75,
+      "scale": 1.6546875,
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true
+    }
+  ],
+  "simulations": 32,
+  "episodes_per_matchup": 6
+}
