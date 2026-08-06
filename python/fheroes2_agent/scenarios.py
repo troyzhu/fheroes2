@@ -239,11 +239,15 @@ def sample_matchups(n: int, seed: int = 0, max_stacks: int = 3) -> list[Matchup]
 
 
 @torch.no_grad()
-def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 16, side: str = "attacker") -> dict:
-    """Win rate and mean reward for one matchup, which is what makes difficulty a number."""
+def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 16, side: str = "attacker",
+            seeds: int = 1) -> dict:
+    """Win rate and mean reward for one matchup, which is what makes difficulty a number.
+
+    With seeds above one the episodes rotate over that many battlefield variants, so the number
+    is about the matchup rather than about one obstacle layout."""
     env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
                     attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
-                    allow_wide=matchup.allow_wide)
+                    allow_wide=matchup.allow_wide, seeds=seeds)
     wins, rewards, lengths = [], [], []
     try:
         for _ in range(episodes):

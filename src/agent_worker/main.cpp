@@ -136,6 +136,9 @@ int main( int argc, char ** argv )
     std::string capabilityAuditPath;
     bool auditCoverage = false;
     bool quiet = false;
+    // Protocol mode only: ask the built-in planner for its own choice at every controlled
+    // decision and emit it as "teacher_action", the DAgger relabeling query.
+    bool probeTeacher = false;
 
     for ( int i = 1; i < argc; ++i ) {
         const auto next = [&]( const char * name ) -> const char * {
@@ -154,6 +157,9 @@ int main( int argc, char ** argv )
         }
         else if ( std::strcmp( argv[i], "--protocol" ) == 0 ) {
             protocolMode = true;
+        }
+        else if ( std::strcmp( argv[i], "--probe-teacher" ) == 0 ) {
+            probeTeacher = true;
         }
         else if ( std::strcmp( argv[i], "--side" ) == 0 ) {
             controlledSide = next( "--side" );
@@ -199,7 +205,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--probe-teacher] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -364,13 +370,20 @@ int main( int argc, char ** argv )
         }
 
         for ( const auto & scenario : scenarios ) {
-            auto decide = []( const fheroes2::agent::Observation & observation,
-                              const fheroes2::agent::ActionSet & set ) -> std::optional<uint32_t> {
+            // The controller is constructed after the lambda that reads its probe, so the
+            // lambda captures a pointer cell that is filled in right after construction.
+            const fheroes2::agent::ExternalDecisionController * probeSource = nullptr;
+            auto decide = [&probeSource]( const fheroes2::agent::Observation & observation,
+                                          const fheroes2::agent::ActionSet & set ) -> std::optional<uint32_t> {
                 std::printf( "{\"record\":\"decision\",\"observation\":%s,\"legal_actions\":[", fheroes2::agent::observationToJson( observation ).c_str() );
                 for ( size_t i = 0; i < set.candidates.size(); ++i ) {
                     std::printf( "%s%u", ( i == 0 ) ? "" : ",", set.candidates[i].canonicalIndex );
                 }
-                std::printf( "]}\n" );
+                std::printf( "]" );
+                if ( probeSource != nullptr && probeSource->lastTeacherProbe().has_value() ) {
+                    std::printf( ",\"teacher_action\":%u", *probeSource->lastTeacherProbe() );
+                }
+                std::printf( "}\n" );
                 std::fflush( stdout );
 
                 // Blocking read. The engine owns the call stack, so this waits inside
@@ -391,6 +404,10 @@ int main( int argc, char ** argv )
             };
 
             fheroes2::agent::ExternalDecisionController controller( side, decide );
+            if ( probeTeacher ) {
+                controller.enableTeacherProbe();
+                probeSource = &controller;
+            }
             fheroes2::agent::EpisodeRecording recording;
             recording.auditTeacherCoverage = true;
 
@@ -403,12 +420,15 @@ int main( int argc, char ** argv )
             std::printf( "{\"record\":\"terminal\",\"scenario_id\":\"%s\",\"termination\":\"%s\",\"rounds\":%d"
                          ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
                          ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
-                         ",\"decisions_seen\":%u,\"decisions_answered\":%u,\"rejected\":%u,\"client_closed\":%s"
-                         ",\"state_digest\":\"%s\"}\n",
+                         ",\"decisions_seen\":%u,\"decisions_answered\":%u,\"rejected\":%u,\"client_closed\":%s",
                          scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds, outcome.attacker.liveStacks,
                          outcome.attacker.liveCreatures, outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures,
                          outcome.defender.hitPoints, controller.decisionsSeen(), controller.decisionsAnswered(), controller.rejectedSelections(),
-                         controller.isFinished() ? "true" : "false", outcome.stateDigest.c_str() );
+                         controller.isFinished() ? "true" : "false" );
+            if ( probeTeacher ) {
+                std::printf( ",\"probes_resolved\":%u,\"probes_outside\":%u", controller.probesResolved(), controller.probesOutsideSchema() );
+            }
+            std::printf( ",\"state_digest\":\"%s\"}\n", outcome.stateDigest.c_str() );
             std::fflush( stdout );
         }
 

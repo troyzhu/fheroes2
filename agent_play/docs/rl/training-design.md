@@ -153,9 +153,11 @@ Cloning error compounds. A policy with per-decision error $\epsilon$ that makes 
 
 With $T$ between 5 and 40 here, that quadratic term is far less punishing than in the long-horizon settings where DAgger was developed. The honest expectation is that DAgger helps but is not transformative at battle scope, and that it becomes important at adventure-map scope where $T$ is in the thousands.
 
-### The precondition, which is open
+### The precondition, resolved 2026-08-05
 
-DAgger requires querying the teacher at arbitrary states the student produced. Whether `AI::BattlePlanner` can be asked "what would you do here" without advancing the arena or consuming combat randomness is unresolved, and it is a genuine engineering question rather than a formality, because the arena is a process singleton and the legality helpers read process-global state. If the answer is no, the fallback is to replay a student trajectory into a fresh arena and query at the divergence point, which costs an episode replay per label.
+DAgger requires querying the teacher at arbitrary states the student produced, and the answer is yes: the planner can be asked "what would you do here" without perturbing the battle. The code says why (no `Rand::` call site anywhere in the planner, analysis members recomputed from the arena on every call, and the pathfinder cache it warms is the one the action-space enumeration already warms under digest-proven gates), and `planner_query.py` says so empirically: 100 paired episodes across every fixture, all three controlled sides, world seeds, and 20 commander-and-wide pool matchups, with terminal state digests identical whether or not every controlled decision also ran the query. The probe costs about 19 percent wall time and resolved 4,297 of 4,297 teacher choices into `simple_v1`, which is the DAgger label rate.
+
+The mechanism is in place: `--probe-teacher` on the worker emits `teacher_action` per decision through `ExternalDecisionController`'s probe of the planner's public `queryUnitTurn`. Two scope limits. The verdict covers the current scenario space, where commanders carry no spellbook, so the spell-planning path never runs and would need re-verification before spellcasting heroes enter. And the probed planner is the same agent that plays the opponent, so DAgger labels inherit every teacher blind spot that cloning already inherits.
 
 ## Stage 3, masked PPO
 

@@ -117,5 +117,27 @@ out = normalize(flat, floor=0.1)
 check(np.all(np.isfinite(out)) and float(np.abs(out).max()) == 0.0,
       "an all-equal batch yields exactly zero advantages, with no division by zero")
 
+# Difficulty weighting: wins scale by the tempered strength ratio, losses by its inverse, so a
+# hard fight pays more for winning and forgives losing, and an easy fight does the opposite.
+from fheroes2_agent.env import apply_difficulty, difficulty_weight  # noqa: E402
+
+def _obs(own_count, enemy_count, monster=1):
+    return {"units": [
+        {"side": "attacker", "monster_id": monster, "count": own_count},
+        {"side": "defender", "monster_id": monster, "count": enemy_count},
+    ]}
+
+check(abs(difficulty_weight(_obs(10, 10), "attacker") - 1.0) < 1e-9, "equal armies weigh 1")
+check(abs(difficulty_weight(_obs(10, 40), "attacker") - 2.0) < 1e-9,
+      "a 4x stronger opponent weighs 2 at the default exponent of one half")
+check(abs(difficulty_weight(_obs(40, 10), "attacker") - 0.5) < 1e-9, "a 4x weaker opponent weighs one half")
+check(abs(difficulty_weight(_obs(1, 1000), "attacker") - 2.0) < 1e-9,
+      "the ratio is capped, so a horde cannot dominate a batch")
+check(abs(difficulty_weight(_obs(10, 40), "defender") - 0.5) < 1e-9, "the ratio is taken from the given side")
+check(abs(apply_difficulty(1.5, 2.0) - 3.0) < 1e-9, "a hard win is amplified")
+check(abs(apply_difficulty(-1.0, 2.0) - (-0.5)) < 1e-9, "a hard loss is forgiven")
+check(abs(apply_difficulty(1.5, 0.5) - 0.75) < 1e-9, "an easy win is damped")
+check(abs(apply_difficulty(-1.0, 0.5) - (-2.0)) < 1e-9, "an easy loss is punished harder")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(0 if failed == 0 else 1)

@@ -22,7 +22,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <vector>
 
+#include "agent_command_snapshot.h"
+#include "ai_battle.h"
 #include "battle_arena.h"
 #include "battle_army.h"
 #include "battle_troop.h"
@@ -66,6 +69,29 @@ void fheroes2::agent::ExternalDecisionController::chooseActions( Battle::Arena &
     }
 
     const Observation observation = captureObservation( arena, currentUnit );
+
+    _lastTeacherProbe.reset();
+    if ( _probeTeacher ) {
+        // Ask the planner what it would do here, before the client decides, so the callback can
+        // read the label alongside the decision. The returned commands are decoded from copies
+        // (snapshotCommand never consumes the original) and then discarded; the planner query
+        // itself consumes no combat randomness, which the planner_query experiment certifies by
+        // terminal-digest equality against unprobed runs.
+        const Battle::Actions planned = AI::BattlePlanner::Get().queryUnitTurn( arena, currentUnit );
+        std::vector<CommandSnapshot> snapshots;
+        snapshots.reserve( planned.size() );
+        for ( const Battle::Command & command : planned ) {
+            snapshots.push_back( snapshotCommand( command ) );
+        }
+        _lastTeacherProbe = resolveTeacherActionIndex( currentUnit, snapshots );
+        if ( _lastTeacherProbe.has_value() ) {
+            ++_probesResolved;
+        }
+        else {
+            ++_probesOutsideSchema;
+        }
+    }
+
     const std::optional<uint32_t> chosen = _decide( observation, set );
 
     if ( !chosen ) {

@@ -68,6 +68,12 @@ The quantity that matters is a property of the army matchup, estimated over a di
 
 Two consequences follow. Difficulty is policy-relative, so a matchup that is hopeless for a freshly cloned policy may be winnable later, which is why [[../decisions/0005-training-and-reward]] treats the target band as a curriculum rather than a fixed filter. And the generator should expose the army matchup and the seed as separate axes, because collapsing them into one scenario identifier makes the measurement above impossible to express.
 
+### The battlefield term, measured 2026-08-05
+
+The paragraph above was doctrine the loop did not implement: `BattleEnv` respawned its worker every episode, so every episode of a matchup replayed the first world seed, and every number this project has reported was measured on one obstacle layout per matchup. The owner asked for battlefields to vary, the reset now keeps the worker alive and rotates its seed variants, and `battlefield_spread.py` measured what the single layout had been hiding: over 12 budget-pool matchups at six battlefields each, the per-battlefield win rates of clone v4 spread 0.137 against a binomial expectation of 0.086, excess variance worth about 0.11 of win rate attributable to the layout alone. The worst case went from 0.42 on its calibration battlefield to zero on five others.
+
+Two conclusions bind future work. A pool calibrated on one battlefield misprices difficulty by up to the whole band width, so calibration and evaluation should pass `seeds` of four or more now that `measure` accepts it. And the battlefield is a free diversity axis for training, one flag on the environment, which the generalization work should exploit before reaching for architecture.
+
 ## Evaluation, where the same problem returns
 
 Every remedy above concerns training. The same decomposition governs whether a reported number means anything, and here there is a cheap technique the project is not yet using.

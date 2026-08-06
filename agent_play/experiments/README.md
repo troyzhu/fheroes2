@@ -20,6 +20,9 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `thunk_validation.py` | The real opening fight as a standing validation ladder, run against any checkpoints after any change | about 2 min per checkpoint |
 | `capture_replay.py` | Record one policy episode as a frame-by-frame replay JSON, encoded per the checkpoint's stamped version, retrying for a wanted outcome | seconds per episode |
 | `render_replay.py` | Replay a recording through the real engine: headless verification, rendered capture, digest equality, ffmpeg assembly at true animation timing | about 2 min per episode, opens a game window |
+| `planner_query.py` | Does querying the built-in planner at a decision perturb the battle? Paired terminal digests with the probe on and off, plus the DAgger label-resolution rate | about 3 min over 100 paired episodes |
+| `battlefield_spread.py` | How much does the obstacle layout alone move a matchup's win rate? Per-battlefield rates against binomial noise | about 5 min over 12 matchups at 6 battlefields |
+| `difficulty_reward.py` | Does difficulty-weighting the terminal reward change what pool training learns, on raw win rate? Paired arms from one clone | about 40 min over 3 paired seeds |
 
 ## Conventions
 

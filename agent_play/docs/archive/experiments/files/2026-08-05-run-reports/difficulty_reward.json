@@ -1,0 +1,2556 @@
+{
+  "baseline": {
+    "train": 0.4734375,
+    "held": 0.478125
+  },
+  "runs": [
+    {
+      "arm": "none",
+      "seed": 0,
+      "train": 0.64375,
+      "held": 0.503125,
+      "history": {
+        "encoding_version": "obs_encoding_v3",
+        "started_from": "cloned policy (agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt)",
+        "fixture": "m1_tiny_melee",
+        "side": "attacker",
+        "attacker": null,
+        "defender": null,
+        "initial_win_rate": 0.4375,
+        "final_win_rate": 0.8125,
+        "initial_mean_terminal_reward": -0.00724271684885025,
+        "iterations": 40,
+        "episodes_per_iteration": 32,
+        "advantage_std_floor": 0.1,
+        "floored_iterations": 0,
+        "seconds": 37.3,
+        "history": [
+          {
+            "iteration": 0,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3189327120780945,
+            "steps": 637,
+            "value_loss": 3.735339403152466,
+            "raw_advantage_std": 1.529090166091919,
+            "reward_std": 1.095985770225525,
+            "entropy": 0.4890538156032562
+          },
+          {
+            "iteration": 1,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.29840928316116333,
+            "steps": 698,
+            "value_loss": 1.4872487783432007,
+            "raw_advantage_std": 1.08900785446167,
+            "reward_std": 1.151035189628601,
+            "entropy": 0.6390237212181091
+          },
+          {
+            "iteration": 2,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.043896473944187164,
+            "steps": 616,
+            "value_loss": 1.2303211688995361,
+            "raw_advantage_std": 1.0680696964263916,
+            "reward_std": 1.1900732517242432,
+            "entropy": 0.671065092086792
+          },
+          {
+            "iteration": 3,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.12105053663253784,
+            "steps": 826,
+            "value_loss": 0.6166163682937622,
+            "raw_advantage_std": 0.7795596718788147,
+            "reward_std": 1.0666669607162476,
+            "entropy": 0.7296206951141357
+          },
+          {
+            "iteration": 4,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.17313626408576965,
+            "steps": 719,
+            "value_loss": 0.7473474740982056,
+            "raw_advantage_std": 0.8618751168251038,
+            "reward_std": 1.1103166341781616,
+            "entropy": 0.6314817070960999
+          },
+          {
+            "iteration": 5,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.1269541233778,
+            "steps": 842,
+            "value_loss": 0.6996700763702393,
+            "raw_advantage_std": 0.8364599347114563,
+            "reward_std": 1.207906723022461,
+            "entropy": 0.6867383718490601
+          },
+          {
+            "iteration": 6,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": -0.051442746073007584,
+            "steps": 775,
+            "value_loss": 0.5759940147399902,
+            "raw_advantage_std": 0.7527082562446594,
+            "reward_std": 1.0772781372070312,
+            "entropy": 0.6316099762916565
+          },
+          {
+            "iteration": 7,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.2900241017341614,
+            "steps": 814,
+            "value_loss": 0.5543752908706665,
+            "raw_advantage_std": 0.7383487224578857,
+            "reward_std": 1.1447486877441406,
+            "entropy": 0.6379867196083069
+          },
+          {
+            "iteration": 8,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.07843881845474243,
+            "steps": 680,
+            "value_loss": 0.5418049693107605,
+            "raw_advantage_std": 0.7228121161460876,
+            "reward_std": 1.1205637454986572,
+            "entropy": 0.8353680968284607
+          },
+          {
+            "iteration": 9,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": -0.012764900922775269,
+            "steps": 862,
+            "value_loss": 0.5108596682548523,
+            "raw_advantage_std": 0.7140241265296936,
+            "reward_std": 1.1249642372131348,
+            "entropy": 0.8735286593437195
+          },
+          {
+            "iteration": 10,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.011585723608732224,
+            "steps": 757,
+            "value_loss": 0.4954952001571655,
+            "raw_advantage_std": 0.7038339376449585,
+            "reward_std": 1.1522389650344849,
+            "entropy": 0.8038633465766907
+          },
+          {
+            "iteration": 11,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.26475340127944946,
+            "steps": 564,
+            "value_loss": 0.5525153279304504,
+            "raw_advantage_std": 0.7153417468070984,
+            "reward_std": 1.1218736171722412,
+            "entropy": 0.7232022285461426
+          },
+          {
+            "iteration": 12,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.07781249284744263,
+            "steps": 648,
+            "value_loss": 0.5494453310966492,
+            "raw_advantage_std": 0.7342941164970398,
+            "reward_std": 1.1202505826950073,
+            "entropy": 0.7495124340057373
+          },
+          {
+            "iteration": 13,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.5012878179550171,
+            "steps": 652,
+            "value_loss": 0.4835398495197296,
+            "raw_advantage_std": 0.6878559589385986,
+            "reward_std": 1.0973502397537231,
+            "entropy": 0.80622798204422
+          },
+          {
+            "iteration": 14,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.0032034777104854584,
+            "steps": 947,
+            "value_loss": 0.4155080318450928,
+            "raw_advantage_std": 0.6433553099632263,
+            "reward_std": 1.1399503946304321,
+            "entropy": 0.8209014534950256
+          },
+          {
+            "iteration": 15,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.34444957971572876,
+            "steps": 983,
+            "value_loss": 0.4268634021282196,
+            "raw_advantage_std": 0.6523929834365845,
+            "reward_std": 1.1193126440048218,
+            "entropy": 0.6559750437736511
+          },
+          {
+            "iteration": 16,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4687461256980896,
+            "steps": 621,
+            "value_loss": 0.5852706432342529,
+            "raw_advantage_std": 0.7504896521568298,
+            "reward_std": 1.1465091705322266,
+            "entropy": 0.7241295576095581
+          },
+          {
+            "iteration": 17,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4919660687446594,
+            "steps": 855,
+            "value_loss": 0.3808712959289551,
+            "raw_advantage_std": 0.6137953400611877,
+            "reward_std": 1.1683588027954102,
+            "entropy": 0.6201096773147583
+          },
+          {
+            "iteration": 18,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.28026455640792847,
+            "steps": 736,
+            "value_loss": 0.3634648025035858,
+            "raw_advantage_std": 0.6007350087165833,
+            "reward_std": 1.1400020122528076,
+            "entropy": 0.7601064443588257
+          },
+          {
+            "iteration": 19,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.3987675607204437,
+            "steps": 760,
+            "value_loss": 0.4608655571937561,
+            "raw_advantage_std": 0.6606248021125793,
+            "reward_std": 1.088470458984375,
+            "entropy": 0.764325737953186
+          },
+          {
+            "iteration": 20,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.5016480684280396,
+            "steps": 764,
+            "value_loss": 0.3682524859905243,
+            "raw_advantage_std": 0.6060037612915039,
+            "reward_std": 1.0955859422683716,
+            "entropy": 0.6894127130508423
+          },
+          {
+            "iteration": 21,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.6210290193557739,
+            "steps": 890,
+            "value_loss": 0.3139719069004059,
+            "raw_advantage_std": 0.5580688714981079,
+            "reward_std": 1.102730393409729,
+            "entropy": 0.6958550810813904
+          },
+          {
+            "iteration": 22,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.21943259239196777,
+            "steps": 613,
+            "value_loss": 0.49063995480537415,
+            "raw_advantage_std": 0.6971834897994995,
+            "reward_std": 1.1529209613800049,
+            "entropy": 0.697726309299469
+          },
+          {
+            "iteration": 23,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.44064098596572876,
+            "steps": 731,
+            "value_loss": 0.43259021639823914,
+            "raw_advantage_std": 0.6541973352432251,
+            "reward_std": 1.1250251531600952,
+            "entropy": 0.7760555744171143
+          },
+          {
+            "iteration": 24,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.3343517482280731,
+            "steps": 742,
+            "value_loss": 0.3406572639942169,
+            "raw_advantage_std": 0.578970730304718,
+            "reward_std": 1.18487548828125,
+            "entropy": 0.7044503092765808
+          },
+          {
+            "iteration": 25,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.2241806983947754,
+            "steps": 678,
+            "value_loss": 0.3961848318576813,
+            "raw_advantage_std": 0.6288307905197144,
+            "reward_std": 1.1544817686080933,
+            "entropy": 0.8008295893669128
+          },
+          {
+            "iteration": 26,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.40362000465393066,
+            "steps": 811,
+            "value_loss": 0.35123729705810547,
+            "raw_advantage_std": 0.5907954573631287,
+            "reward_std": 1.1739263534545898,
+            "entropy": 0.7325505614280701
+          },
+          {
+            "iteration": 27,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.2432173788547516,
+            "steps": 718,
+            "value_loss": 0.39040887355804443,
+            "raw_advantage_std": 0.6248158812522888,
+            "reward_std": 1.1812849044799805,
+            "entropy": 0.7310779094696045
+          },
+          {
+            "iteration": 28,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.6274308562278748,
+            "steps": 673,
+            "value_loss": 0.33645573258399963,
+            "raw_advantage_std": 0.5787398219108582,
+            "reward_std": 1.1165574789047241,
+            "entropy": 0.5594199299812317
+          },
+          {
+            "iteration": 29,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.32156902551651,
+            "steps": 744,
+            "value_loss": 0.36559516191482544,
+            "raw_advantage_std": 0.5987522006034851,
+            "reward_std": 1.1748931407928467,
+            "entropy": 0.728265106678009
+          },
+          {
+            "iteration": 30,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.34623968601226807,
+            "steps": 764,
+            "value_loss": 0.3372638523578644,
+            "raw_advantage_std": 0.572201132774353,
+            "reward_std": 1.1210709810256958,
+            "entropy": 0.7254560589790344
+          },
+          {
+            "iteration": 31,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.29939424991607666,
+            "steps": 609,
+            "value_loss": 0.3895358443260193,
+            "raw_advantage_std": 0.6132649779319763,
+            "reward_std": 1.1530802249908447,
+            "entropy": 0.9057703614234924
+          },
+          {
+            "iteration": 32,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.24272285401821136,
+            "steps": 760,
+            "value_loss": 0.472152978181839,
+            "raw_advantage_std": 0.6860146522521973,
+            "reward_std": 1.1781814098358154,
+            "entropy": 0.7478517293930054
+          },
+          {
+            "iteration": 33,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4416523277759552,
+            "steps": 770,
+            "value_loss": 0.35394981503486633,
+            "raw_advantage_std": 0.5886068940162659,
+            "reward_std": 1.129741907119751,
+            "entropy": 0.646674394607544
+          },
+          {
+            "iteration": 34,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.5336596965789795,
+            "steps": 831,
+            "value_loss": 0.2844754755496979,
+            "raw_advantage_std": 0.5314108729362488,
+            "reward_std": 1.1181706190109253,
+            "entropy": 0.7628161907196045
+          },
+          {
+            "iteration": 35,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4739425778388977,
+            "steps": 712,
+            "value_loss": 0.3539573848247528,
+            "raw_advantage_std": 0.5896927118301392,
+            "reward_std": 1.158226490020752,
+            "entropy": 0.6867371201515198
+          },
+          {
+            "iteration": 36,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.6556006669998169,
+            "steps": 650,
+            "value_loss": 0.4395813047885895,
+            "raw_advantage_std": 0.6515719294548035,
+            "reward_std": 1.0416768789291382,
+            "entropy": 0.7721490859985352
+          },
+          {
+            "iteration": 37,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.29589951038360596,
+            "steps": 749,
+            "value_loss": 0.3982861638069153,
+            "raw_advantage_std": 0.6250326633453369,
+            "reward_std": 1.1532858610153198,
+            "entropy": 0.8054274320602417
+          },
+          {
+            "iteration": 38,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3689359128475189,
+            "steps": 696,
+            "value_loss": 0.37154656648635864,
+            "raw_advantage_std": 0.606322705745697,
+            "reward_std": 1.1373443603515625,
+            "entropy": 0.7247430682182312
+          },
+          {
+            "iteration": 39,
+            "win_rate": 0.8125,
+            "mean_terminal_reward": 0.877155601978302,
+            "steps": 723,
+            "value_loss": 0.3281722664833069,
+            "raw_advantage_std": 0.5343723893165588,
+            "reward_std": 0.9144374132156372,
+            "entropy": 0.7232765555381775
+          }
+        ]
+      }
+    },
+    {
+      "arm": "difficulty",
+      "seed": 0,
+      "train": 0.625,
+      "held": 0.421875,
+      "history": {
+        "encoding_version": "obs_encoding_v3",
+        "started_from": "cloned policy (agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt)",
+        "fixture": "m1_tiny_melee",
+        "side": "attacker",
+        "attacker": null,
+        "defender": null,
+        "initial_win_rate": 0.4375,
+        "final_win_rate": 0.59375,
+        "initial_mean_terminal_reward": 0.18428108096122742,
+        "iterations": 40,
+        "episodes_per_iteration": 32,
+        "advantage_std_floor": 0.1,
+        "floored_iterations": 0,
+        "seconds": 37.5,
+        "history": [
+          {
+            "iteration": 0,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5402761101722717,
+            "steps": 637,
+            "value_loss": 3.4775800704956055,
+            "raw_advantage_std": 1.5196325778961182,
+            "reward_std": 1.2202600240707397,
+            "entropy": 0.4890538156032562
+          },
+          {
+            "iteration": 1,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.721177339553833,
+            "steps": 734,
+            "value_loss": 1.445971131324768,
+            "raw_advantage_std": 1.143330693244934,
+            "reward_std": 1.3761591911315918,
+            "entropy": 0.6091121435165405
+          },
+          {
+            "iteration": 2,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.3010609745979309,
+            "steps": 639,
+            "value_loss": 1.319090723991394,
+            "raw_advantage_std": 1.063961148262024,
+            "reward_std": 1.2578901052474976,
+            "entropy": 0.5783615708351135
+          },
+          {
+            "iteration": 3,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.07694380730390549,
+            "steps": 833,
+            "value_loss": 0.7188419103622437,
+            "raw_advantage_std": 0.8439632654190063,
+            "reward_std": 1.3246314525604248,
+            "entropy": 0.7189485430717468
+          },
+          {
+            "iteration": 4,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.31546953320503235,
+            "steps": 831,
+            "value_loss": 0.8563968539237976,
+            "raw_advantage_std": 0.9121145606040955,
+            "reward_std": 1.3655147552490234,
+            "entropy": 0.6596213579177856
+          },
+          {
+            "iteration": 5,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.6627814173698425,
+            "steps": 893,
+            "value_loss": 0.8037561774253845,
+            "raw_advantage_std": 0.8892752528190613,
+            "reward_std": 1.4113209247589111,
+            "entropy": 0.6411471962928772
+          },
+          {
+            "iteration": 6,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.43552592396736145,
+            "steps": 682,
+            "value_loss": 0.6868391633033752,
+            "raw_advantage_std": 0.8266638517379761,
+            "reward_std": 1.2901846170425415,
+            "entropy": 0.6987741589546204
+          },
+          {
+            "iteration": 7,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.19378411769866943,
+            "steps": 850,
+            "value_loss": 0.5911750197410583,
+            "raw_advantage_std": 0.7639613151550293,
+            "reward_std": 1.2634351253509521,
+            "entropy": 0.698535680770874
+          },
+          {
+            "iteration": 8,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.2183956801891327,
+            "steps": 700,
+            "value_loss": 0.6880680918693542,
+            "raw_advantage_std": 0.8291791677474976,
+            "reward_std": 1.4786465167999268,
+            "entropy": 0.7380678057670593
+          },
+          {
+            "iteration": 9,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.19835582375526428,
+            "steps": 826,
+            "value_loss": 0.6219038963317871,
+            "raw_advantage_std": 0.784246027469635,
+            "reward_std": 1.340734839439392,
+            "entropy": 0.8424638509750366
+          },
+          {
+            "iteration": 10,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.20930564403533936,
+            "steps": 751,
+            "value_loss": 0.5798875689506531,
+            "raw_advantage_std": 0.7614967823028564,
+            "reward_std": 1.2860591411590576,
+            "entropy": 0.7677865624427795
+          },
+          {
+            "iteration": 11,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.7883511781692505,
+            "steps": 520,
+            "value_loss": 0.7253303527832031,
+            "raw_advantage_std": 0.8149123191833496,
+            "reward_std": 1.3526402711868286,
+            "entropy": 0.6522786021232605
+          },
+          {
+            "iteration": 12,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.027611400932073593,
+            "steps": 654,
+            "value_loss": 0.6808923482894897,
+            "raw_advantage_std": 0.7799744009971619,
+            "reward_std": 1.2188668251037598,
+            "entropy": 0.7802478671073914
+          },
+          {
+            "iteration": 13,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.6508922576904297,
+            "steps": 621,
+            "value_loss": 0.6517494916915894,
+            "raw_advantage_std": 0.7939012050628662,
+            "reward_std": 1.2465598583221436,
+            "entropy": 0.6981675624847412
+          },
+          {
+            "iteration": 14,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.10614249110221863,
+            "steps": 896,
+            "value_loss": 0.4630325734615326,
+            "raw_advantage_std": 0.6741470098495483,
+            "reward_std": 1.2622709274291992,
+            "entropy": 0.9253381490707397
+          },
+          {
+            "iteration": 15,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.0943710207939148,
+            "steps": 959,
+            "value_loss": 0.4287636876106262,
+            "raw_advantage_std": 0.6504825353622437,
+            "reward_std": 1.3123795986175537,
+            "entropy": 0.7944164276123047
+          },
+          {
+            "iteration": 16,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.35222679376602173,
+            "steps": 756,
+            "value_loss": 0.5389465689659119,
+            "raw_advantage_std": 0.7160046696662903,
+            "reward_std": 1.3303813934326172,
+            "entropy": 0.7768324613571167
+          },
+          {
+            "iteration": 17,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.4213583767414093,
+            "steps": 883,
+            "value_loss": 0.40957099199295044,
+            "raw_advantage_std": 0.6392964720726013,
+            "reward_std": 1.3015929460525513,
+            "entropy": 0.7313209772109985
+          },
+          {
+            "iteration": 18,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.5362221002578735,
+            "steps": 730,
+            "value_loss": 0.5156516432762146,
+            "raw_advantage_std": 0.7179942727088928,
+            "reward_std": 1.3262110948562622,
+            "entropy": 0.8022139668464661
+          },
+          {
+            "iteration": 19,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.23317073285579681,
+            "steps": 704,
+            "value_loss": 0.5115179419517517,
+            "raw_advantage_std": 0.7149134278297424,
+            "reward_std": 1.2153500318527222,
+            "entropy": 0.8933681845664978
+          },
+          {
+            "iteration": 20,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.6212710738182068,
+            "steps": 764,
+            "value_loss": 0.41184329986572266,
+            "raw_advantage_std": 0.6266322135925293,
+            "reward_std": 1.291252613067627,
+            "entropy": 0.7182546854019165
+          },
+          {
+            "iteration": 21,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.6305790543556213,
+            "steps": 787,
+            "value_loss": 0.5443781614303589,
+            "raw_advantage_std": 0.736022412776947,
+            "reward_std": 1.3769522905349731,
+            "entropy": 0.7790002226829529
+          },
+          {
+            "iteration": 22,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5588520765304565,
+            "steps": 616,
+            "value_loss": 0.5103442668914795,
+            "raw_advantage_std": 0.7101656794548035,
+            "reward_std": 1.3640486001968384,
+            "entropy": 0.7524007558822632
+          },
+          {
+            "iteration": 23,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.2991403341293335,
+            "steps": 740,
+            "value_loss": 0.44741714000701904,
+            "raw_advantage_std": 0.6672492027282715,
+            "reward_std": 1.2634974718093872,
+            "entropy": 0.8490803241729736
+          },
+          {
+            "iteration": 24,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.48444849252700806,
+            "steps": 769,
+            "value_loss": 0.4564131498336792,
+            "raw_advantage_std": 0.6755819916725159,
+            "reward_std": 1.341455101966858,
+            "entropy": 0.7935830950737
+          },
+          {
+            "iteration": 25,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.298678994178772,
+            "steps": 589,
+            "value_loss": 0.5593936443328857,
+            "raw_advantage_std": 0.7288060784339905,
+            "reward_std": 1.2372418642044067,
+            "entropy": 0.6961118578910828
+          },
+          {
+            "iteration": 26,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.3347846269607544,
+            "steps": 800,
+            "value_loss": 0.4263603091239929,
+            "raw_advantage_std": 0.65272057056427,
+            "reward_std": 1.2586312294006348,
+            "entropy": 0.7715606093406677
+          },
+          {
+            "iteration": 27,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3281104564666748,
+            "steps": 689,
+            "value_loss": 0.516376256942749,
+            "raw_advantage_std": 0.7185819745063782,
+            "reward_std": 1.3689831495285034,
+            "entropy": 0.7540122866630554
+          },
+          {
+            "iteration": 28,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.7161572575569153,
+            "steps": 737,
+            "value_loss": 0.41456425189971924,
+            "raw_advantage_std": 0.6432437896728516,
+            "reward_std": 1.2887449264526367,
+            "entropy": 0.5879807472229004
+          },
+          {
+            "iteration": 29,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.529308021068573,
+            "steps": 639,
+            "value_loss": 0.48326146602630615,
+            "raw_advantage_std": 0.6951669454574585,
+            "reward_std": 1.2594995498657227,
+            "entropy": 0.7225390672683716
+          },
+          {
+            "iteration": 30,
+            "win_rate": 0.75,
+            "mean_terminal_reward": 0.9773970246315002,
+            "steps": 701,
+            "value_loss": 0.4232702851295471,
+            "raw_advantage_std": 0.58962082862854,
+            "reward_std": 1.0829178094863892,
+            "entropy": 0.7341524362564087
+          },
+          {
+            "iteration": 31,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.3203292787075043,
+            "steps": 646,
+            "value_loss": 0.5232085585594177,
+            "raw_advantage_std": 0.6971268057823181,
+            "reward_std": 1.210296392440796,
+            "entropy": 0.8855594396591187
+          },
+          {
+            "iteration": 32,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5125828981399536,
+            "steps": 671,
+            "value_loss": 0.5148955583572388,
+            "raw_advantage_std": 0.716598391532898,
+            "reward_std": 1.3727824687957764,
+            "entropy": 0.6845260262489319
+          },
+          {
+            "iteration": 33,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.8957242965698242,
+            "steps": 771,
+            "value_loss": 0.40357109904289246,
+            "raw_advantage_std": 0.6213541626930237,
+            "reward_std": 1.1678513288497925,
+            "entropy": 0.6216484308242798
+          },
+          {
+            "iteration": 34,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5361394882202148,
+            "steps": 826,
+            "value_loss": 0.3368868827819824,
+            "raw_advantage_std": 0.5781854391098022,
+            "reward_std": 1.1788723468780518,
+            "entropy": 0.6762978434562683
+          },
+          {
+            "iteration": 35,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.2739711105823517,
+            "steps": 662,
+            "value_loss": 0.5422418713569641,
+            "raw_advantage_std": 0.7186437845230103,
+            "reward_std": 1.3394775390625,
+            "entropy": 0.6496654748916626
+          },
+          {
+            "iteration": 36,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.7451285719871521,
+            "steps": 623,
+            "value_loss": 0.4025554955005646,
+            "raw_advantage_std": 0.6197304129600525,
+            "reward_std": 1.2905774116516113,
+            "entropy": 0.6838067173957825
+          },
+          {
+            "iteration": 37,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.8101592659950256,
+            "steps": 723,
+            "value_loss": 0.4388602077960968,
+            "raw_advantage_std": 0.6466848254203796,
+            "reward_std": 1.135756015777588,
+            "entropy": 0.6787524819374084
+          },
+          {
+            "iteration": 38,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.43927791714668274,
+            "steps": 608,
+            "value_loss": 0.4046383798122406,
+            "raw_advantage_std": 0.634449303150177,
+            "reward_std": 1.2436606884002686,
+            "entropy": 0.7778787612915039
+          },
+          {
+            "iteration": 39,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.44601988792419434,
+            "steps": 718,
+            "value_loss": 0.38014623522758484,
+            "raw_advantage_std": 0.615054726600647,
+            "reward_std": 1.1599606275558472,
+            "entropy": 0.6942099332809448
+          }
+        ]
+      }
+    },
+    {
+      "arm": "none",
+      "seed": 1,
+      "train": 0.575,
+      "held": 0.3375,
+      "history": {
+        "encoding_version": "obs_encoding_v3",
+        "started_from": "cloned policy (agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt)",
+        "fixture": "m1_tiny_melee",
+        "side": "attacker",
+        "attacker": null,
+        "defender": null,
+        "initial_win_rate": 0.5,
+        "final_win_rate": 0.59375,
+        "initial_mean_terminal_reward": 0.08530069887638092,
+        "iterations": 40,
+        "episodes_per_iteration": 32,
+        "advantage_std_floor": 0.1,
+        "floored_iterations": 0,
+        "seconds": 36.6,
+        "history": [
+          {
+            "iteration": 0,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.05417868494987488,
+            "steps": 658,
+            "value_loss": 4.024587154388428,
+            "raw_advantage_std": 1.4527068138122559,
+            "reward_std": 1.1484912633895874,
+            "entropy": 0.5584233403205872
+          },
+          {
+            "iteration": 1,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.08823852241039276,
+            "steps": 576,
+            "value_loss": 2.142704963684082,
+            "raw_advantage_std": 1.3057334423065186,
+            "reward_std": 1.1054338216781616,
+            "entropy": 0.6018947958946228
+          },
+          {
+            "iteration": 2,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.007891327142715454,
+            "steps": 764,
+            "value_loss": 1.1309820413589478,
+            "raw_advantage_std": 1.0625112056732178,
+            "reward_std": 1.1548640727996826,
+            "entropy": 0.564140796661377
+          },
+          {
+            "iteration": 3,
+            "win_rate": 0.34375,
+            "mean_terminal_reward": -0.189864382147789,
+            "steps": 748,
+            "value_loss": 0.9499234557151794,
+            "raw_advantage_std": 0.9715100526809692,
+            "reward_std": 1.1255849599838257,
+            "entropy": 0.6575841307640076
+          },
+          {
+            "iteration": 4,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.23645320534706116,
+            "steps": 705,
+            "value_loss": 0.7676846385002136,
+            "raw_advantage_std": 0.8642024397850037,
+            "reward_std": 1.094425916671753,
+            "entropy": 0.7252105474472046
+          },
+          {
+            "iteration": 5,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.6237308979034424,
+            "steps": 676,
+            "value_loss": 0.7666847109794617,
+            "raw_advantage_std": 0.7964845895767212,
+            "reward_std": 1.022325873374939,
+            "entropy": 0.7206650972366333
+          },
+          {
+            "iteration": 6,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.2060936987400055,
+            "steps": 621,
+            "value_loss": 0.7938123345375061,
+            "raw_advantage_std": 0.8824412822723389,
+            "reward_std": 1.1421482563018799,
+            "entropy": 0.7356395125389099
+          },
+          {
+            "iteration": 7,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3529503345489502,
+            "steps": 680,
+            "value_loss": 0.6676486134529114,
+            "raw_advantage_std": 0.8170908093452454,
+            "reward_std": 1.131025791168213,
+            "entropy": 0.667683482170105
+          },
+          {
+            "iteration": 8,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.3996228575706482,
+            "steps": 725,
+            "value_loss": 0.5173349380493164,
+            "raw_advantage_std": 0.7191651463508606,
+            "reward_std": 1.0968737602233887,
+            "entropy": 0.7362173199653625
+          },
+          {
+            "iteration": 9,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.15288589894771576,
+            "steps": 673,
+            "value_loss": 0.5322486758232117,
+            "raw_advantage_std": 0.7143061757087708,
+            "reward_std": 1.1640315055847168,
+            "entropy": 0.7828755378723145
+          },
+          {
+            "iteration": 10,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.17760470509529114,
+            "steps": 641,
+            "value_loss": 0.5559107065200806,
+            "raw_advantage_std": 0.7341324090957642,
+            "reward_std": 1.187689185142517,
+            "entropy": 0.7766997218132019
+          },
+          {
+            "iteration": 11,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3661593496799469,
+            "steps": 656,
+            "value_loss": 0.6068938970565796,
+            "raw_advantage_std": 0.7582040429115295,
+            "reward_std": 1.1383670568466187,
+            "entropy": 0.68171226978302
+          },
+          {
+            "iteration": 12,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4295659363269806,
+            "steps": 893,
+            "value_loss": 0.45534536242485046,
+            "raw_advantage_std": 0.6736956238746643,
+            "reward_std": 1.1163150072097778,
+            "entropy": 0.7709648013114929
+          },
+          {
+            "iteration": 13,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.33752286434173584,
+            "steps": 666,
+            "value_loss": 0.4694843888282776,
+            "raw_advantage_std": 0.6738044023513794,
+            "reward_std": 1.1119921207427979,
+            "entropy": 0.7740031480789185
+          },
+          {
+            "iteration": 14,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": -0.003932744264602661,
+            "steps": 629,
+            "value_loss": 0.5691726803779602,
+            "raw_advantage_std": 0.7292743921279907,
+            "reward_std": 1.1334062814712524,
+            "entropy": 0.6720098853111267
+          },
+          {
+            "iteration": 15,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.09663131088018417,
+            "steps": 722,
+            "value_loss": 0.47508010268211365,
+            "raw_advantage_std": 0.6869120597839355,
+            "reward_std": 1.174458622932434,
+            "entropy": 0.7608856558799744
+          },
+          {
+            "iteration": 16,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.03340969607234001,
+            "steps": 595,
+            "value_loss": 0.47681623697280884,
+            "raw_advantage_std": 0.6832469701766968,
+            "reward_std": 1.1773598194122314,
+            "entropy": 0.7259421944618225
+          },
+          {
+            "iteration": 17,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.5281304121017456,
+            "steps": 620,
+            "value_loss": 0.5189177393913269,
+            "raw_advantage_std": 0.6833889484405518,
+            "reward_std": 1.1174370050430298,
+            "entropy": 0.6249707937240601
+          },
+          {
+            "iteration": 18,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.11647096276283264,
+            "steps": 798,
+            "value_loss": 0.4575202167034149,
+            "raw_advantage_std": 0.6709129810333252,
+            "reward_std": 1.1244949102401733,
+            "entropy": 0.6951590180397034
+          },
+          {
+            "iteration": 19,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.22267018258571625,
+            "steps": 699,
+            "value_loss": 0.4251793622970581,
+            "raw_advantage_std": 0.6519685387611389,
+            "reward_std": 1.15753972530365,
+            "entropy": 0.6812778115272522
+          },
+          {
+            "iteration": 20,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.6035894155502319,
+            "steps": 739,
+            "value_loss": 0.37257447838783264,
+            "raw_advantage_std": 0.5998228788375854,
+            "reward_std": 1.1001259088516235,
+            "entropy": 0.6792858839035034
+          },
+          {
+            "iteration": 21,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.25439348816871643,
+            "steps": 627,
+            "value_loss": 0.3921066224575043,
+            "raw_advantage_std": 0.6142957806587219,
+            "reward_std": 1.1873213052749634,
+            "entropy": 0.6652421951293945
+          },
+          {
+            "iteration": 22,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4686129689216614,
+            "steps": 589,
+            "value_loss": 0.48226305842399597,
+            "raw_advantage_std": 0.6808950304985046,
+            "reward_std": 1.1411982774734497,
+            "entropy": 0.5436551570892334
+          },
+          {
+            "iteration": 23,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.03346793353557587,
+            "steps": 727,
+            "value_loss": 0.3766722083091736,
+            "raw_advantage_std": 0.6038913726806641,
+            "reward_std": 1.175386667251587,
+            "entropy": 0.6787500381469727
+          },
+          {
+            "iteration": 24,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.15795359015464783,
+            "steps": 572,
+            "value_loss": 0.42607617378234863,
+            "raw_advantage_std": 0.6518359184265137,
+            "reward_std": 1.167528510093689,
+            "entropy": 0.5961076617240906
+          },
+          {
+            "iteration": 25,
+            "win_rate": 0.375,
+            "mean_terminal_reward": -0.08056171238422394,
+            "steps": 654,
+            "value_loss": 0.36966174840927124,
+            "raw_advantage_std": 0.6020419597625732,
+            "reward_std": 1.1912416219711304,
+            "entropy": 0.6334472298622131
+          },
+          {
+            "iteration": 26,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.5811886787414551,
+            "steps": 704,
+            "value_loss": 0.3804500699043274,
+            "raw_advantage_std": 0.563323438167572,
+            "reward_std": 1.0781378746032715,
+            "entropy": 0.6070777177810669
+          },
+          {
+            "iteration": 27,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.13433662056922913,
+            "steps": 594,
+            "value_loss": 0.33999010920524597,
+            "raw_advantage_std": 0.5614064931869507,
+            "reward_std": 1.2129795551300049,
+            "entropy": 0.6641244888305664
+          },
+          {
+            "iteration": 28,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": -0.0011226534843444824,
+            "steps": 597,
+            "value_loss": 0.562075138092041,
+            "raw_advantage_std": 0.7413196563720703,
+            "reward_std": 1.136176347732544,
+            "entropy": 0.7126908302307129
+          },
+          {
+            "iteration": 29,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4304463267326355,
+            "steps": 771,
+            "value_loss": 0.41272780299186707,
+            "raw_advantage_std": 0.6336650252342224,
+            "reward_std": 1.1221871376037598,
+            "entropy": 0.6256192922592163
+          },
+          {
+            "iteration": 30,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.5953856706619263,
+            "steps": 737,
+            "value_loss": 0.39982473850250244,
+            "raw_advantage_std": 0.5927983522415161,
+            "reward_std": 1.0870894193649292,
+            "entropy": 0.6406065821647644
+          },
+          {
+            "iteration": 31,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.664256751537323,
+            "steps": 564,
+            "value_loss": 0.4008450210094452,
+            "raw_advantage_std": 0.6311821341514587,
+            "reward_std": 1.0510599613189697,
+            "entropy": 0.6324589848518372
+          },
+          {
+            "iteration": 32,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4497257471084595,
+            "steps": 686,
+            "value_loss": 0.39388686418533325,
+            "raw_advantage_std": 0.6273767948150635,
+            "reward_std": 1.135433316230774,
+            "entropy": 0.6050534248352051
+          },
+          {
+            "iteration": 33,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.5105603337287903,
+            "steps": 705,
+            "value_loss": 0.40772879123687744,
+            "raw_advantage_std": 0.6365114450454712,
+            "reward_std": 1.1012647151947021,
+            "entropy": 0.5716530084609985
+          },
+          {
+            "iteration": 34,
+            "win_rate": 0.8125,
+            "mean_terminal_reward": 0.8773790597915649,
+            "steps": 756,
+            "value_loss": 0.3245736062526703,
+            "raw_advantage_std": 0.5625461339950562,
+            "reward_std": 0.9268617630004883,
+            "entropy": 0.6971107721328735
+          },
+          {
+            "iteration": 35,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.36308109760284424,
+            "steps": 674,
+            "value_loss": 0.3884196877479553,
+            "raw_advantage_std": 0.5971428155899048,
+            "reward_std": 1.2133361101150513,
+            "entropy": 0.6397800445556641
+          },
+          {
+            "iteration": 36,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3548922836780548,
+            "steps": 701,
+            "value_loss": 0.4027354419231415,
+            "raw_advantage_std": 0.6345645189285278,
+            "reward_std": 1.1290744543075562,
+            "entropy": 0.7236074209213257
+          },
+          {
+            "iteration": 37,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.5514030456542969,
+            "steps": 778,
+            "value_loss": 0.2893875539302826,
+            "raw_advantage_std": 0.5243791937828064,
+            "reward_std": 1.1305021047592163,
+            "entropy": 0.657660722732544
+          },
+          {
+            "iteration": 38,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.4186268448829651,
+            "steps": 751,
+            "value_loss": 0.4023279845714569,
+            "raw_advantage_std": 0.6339724659919739,
+            "reward_std": 1.1085379123687744,
+            "entropy": 0.7439231276512146
+          },
+          {
+            "iteration": 39,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3871535658836365,
+            "steps": 745,
+            "value_loss": 0.33763962984085083,
+            "raw_advantage_std": 0.5809385776519775,
+            "reward_std": 1.1551451683044434,
+            "entropy": 0.6399579048156738
+          }
+        ]
+      }
+    },
+    {
+      "arm": "difficulty",
+      "seed": 1,
+      "train": 0.60625,
+      "held": 0.353125,
+      "history": {
+        "encoding_version": "obs_encoding_v3",
+        "started_from": "cloned policy (agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt)",
+        "fixture": "m1_tiny_melee",
+        "side": "attacker",
+        "attacker": null,
+        "defender": null,
+        "initial_win_rate": 0.5,
+        "final_win_rate": 0.53125,
+        "initial_mean_terminal_reward": 0.23620280623435974,
+        "iterations": 40,
+        "episodes_per_iteration": 32,
+        "advantage_std_floor": 0.1,
+        "floored_iterations": 0,
+        "seconds": 38.6,
+        "history": [
+          {
+            "iteration": 0,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": 0.027601927518844604,
+            "steps": 658,
+            "value_loss": 3.8870270252227783,
+            "raw_advantage_std": 1.4420865774154663,
+            "reward_std": 1.1602914333343506,
+            "entropy": 0.5584233403205872
+          },
+          {
+            "iteration": 1,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": 0.028673790395259857,
+            "steps": 569,
+            "value_loss": 2.2943918704986572,
+            "raw_advantage_std": 1.358543038368225,
+            "reward_std": 1.2208341360092163,
+            "entropy": 0.6050598621368408
+          },
+          {
+            "iteration": 2,
+            "win_rate": 0.3125,
+            "mean_terminal_reward": -0.1841690093278885,
+            "steps": 740,
+            "value_loss": 1.109984040260315,
+            "raw_advantage_std": 1.0255622863769531,
+            "reward_std": 1.194619059562683,
+            "entropy": 0.5994488000869751
+          },
+          {
+            "iteration": 3,
+            "win_rate": 0.375,
+            "mean_terminal_reward": 0.038403190672397614,
+            "steps": 747,
+            "value_loss": 0.8761067986488342,
+            "raw_advantage_std": 0.9349969625473022,
+            "reward_std": 1.2301338911056519,
+            "entropy": 0.64659184217453
+          },
+          {
+            "iteration": 4,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.18398386240005493,
+            "steps": 563,
+            "value_loss": 1.191191554069519,
+            "raw_advantage_std": 1.0818586349487305,
+            "reward_std": 1.4002457857131958,
+            "entropy": 0.6568263173103333
+          },
+          {
+            "iteration": 5,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.9422500133514404,
+            "steps": 705,
+            "value_loss": 0.9067999124526978,
+            "raw_advantage_std": 0.8505063652992249,
+            "reward_std": 1.2135361433029175,
+            "entropy": 0.6081852316856384
+          },
+          {
+            "iteration": 6,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.1251467615365982,
+            "steps": 670,
+            "value_loss": 0.8682471513748169,
+            "raw_advantage_std": 0.8848209381103516,
+            "reward_std": 1.259810447692871,
+            "entropy": 0.6942145228385925
+          },
+          {
+            "iteration": 7,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.4416148364543915,
+            "steps": 641,
+            "value_loss": 0.8438745737075806,
+            "raw_advantage_std": 0.9184842109680176,
+            "reward_std": 1.3654223680496216,
+            "entropy": 0.6917234063148499
+          },
+          {
+            "iteration": 8,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3208543658256531,
+            "steps": 669,
+            "value_loss": 0.7102876901626587,
+            "raw_advantage_std": 0.8419862985610962,
+            "reward_std": 1.2375388145446777,
+            "entropy": 0.677147626876831
+          },
+          {
+            "iteration": 9,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.24708512425422668,
+            "steps": 706,
+            "value_loss": 0.697364091873169,
+            "raw_advantage_std": 0.8237081170082092,
+            "reward_std": 1.4080432653427124,
+            "entropy": 0.6902972459793091
+          },
+          {
+            "iteration": 10,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.6815325021743774,
+            "steps": 711,
+            "value_loss": 0.5480379462242126,
+            "raw_advantage_std": 0.7314330339431763,
+            "reward_std": 1.2204512357711792,
+            "entropy": 0.7771911025047302
+          },
+          {
+            "iteration": 11,
+            "win_rate": 0.375,
+            "mean_terminal_reward": -0.027134552597999573,
+            "steps": 679,
+            "value_loss": 0.6904629468917847,
+            "raw_advantage_std": 0.8086698651313782,
+            "reward_std": 1.296507716178894,
+            "entropy": 0.6712915301322937
+          },
+          {
+            "iteration": 12,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.6114178895950317,
+            "steps": 847,
+            "value_loss": 0.5640974044799805,
+            "raw_advantage_std": 0.7429409027099609,
+            "reward_std": 1.2269927263259888,
+            "entropy": 0.6673585176467896
+          },
+          {
+            "iteration": 13,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.3638730049133301,
+            "steps": 651,
+            "value_loss": 0.5601328611373901,
+            "raw_advantage_std": 0.7477053999900818,
+            "reward_std": 1.3070259094238281,
+            "entropy": 0.6467142105102539
+          },
+          {
+            "iteration": 14,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3619402050971985,
+            "steps": 697,
+            "value_loss": 0.47041746973991394,
+            "raw_advantage_std": 0.6858517527580261,
+            "reward_std": 1.1998577117919922,
+            "entropy": 0.609689474105835
+          },
+          {
+            "iteration": 15,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.7076960802078247,
+            "steps": 696,
+            "value_loss": 0.4942651093006134,
+            "raw_advantage_std": 0.698166012763977,
+            "reward_std": 1.3623162508010864,
+            "entropy": 0.6508408188819885
+          },
+          {
+            "iteration": 16,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.603256106376648,
+            "steps": 602,
+            "value_loss": 0.5953359603881836,
+            "raw_advantage_std": 0.7691767811775208,
+            "reward_std": 1.3232805728912354,
+            "entropy": 0.6640716195106506
+          },
+          {
+            "iteration": 17,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.4893209636211395,
+            "steps": 675,
+            "value_loss": 0.4801110327243805,
+            "raw_advantage_std": 0.691096305847168,
+            "reward_std": 1.3886345624923706,
+            "entropy": 0.5576960444450378
+          },
+          {
+            "iteration": 18,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3393285870552063,
+            "steps": 791,
+            "value_loss": 0.5711340308189392,
+            "raw_advantage_std": 0.7514832019805908,
+            "reward_std": 1.2328068017959595,
+            "entropy": 0.6160498857498169
+          },
+          {
+            "iteration": 19,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3104536831378937,
+            "steps": 677,
+            "value_loss": 0.49338752031326294,
+            "raw_advantage_std": 0.6924334764480591,
+            "reward_std": 1.249712586402893,
+            "entropy": 0.5278233885765076
+          },
+          {
+            "iteration": 20,
+            "win_rate": 0.75,
+            "mean_terminal_reward": 0.9188214540481567,
+            "steps": 789,
+            "value_loss": 0.39281198382377625,
+            "raw_advantage_std": 0.5913184881210327,
+            "reward_std": 1.0802652835845947,
+            "entropy": 0.4925346374511719
+          },
+          {
+            "iteration": 21,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.44785282015800476,
+            "steps": 688,
+            "value_loss": 0.533380389213562,
+            "raw_advantage_std": 0.6888025403022766,
+            "reward_std": 1.2628992795944214,
+            "entropy": 0.67708420753479
+          },
+          {
+            "iteration": 22,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.43140193819999695,
+            "steps": 610,
+            "value_loss": 0.5511261224746704,
+            "raw_advantage_std": 0.7419762015342712,
+            "reward_std": 1.305990219116211,
+            "entropy": 0.6825429201126099
+          },
+          {
+            "iteration": 23,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.6468861103057861,
+            "steps": 725,
+            "value_loss": 0.5520152449607849,
+            "raw_advantage_std": 0.7363229990005493,
+            "reward_std": 1.1674224138259888,
+            "entropy": 0.6082113981246948
+          },
+          {
+            "iteration": 24,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.4433295726776123,
+            "steps": 603,
+            "value_loss": 0.42051926255226135,
+            "raw_advantage_std": 0.6466850638389587,
+            "reward_std": 1.333504319190979,
+            "entropy": 0.6459389328956604
+          },
+          {
+            "iteration": 25,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.7305184602737427,
+            "steps": 682,
+            "value_loss": 0.4807749092578888,
+            "raw_advantage_std": 0.6630570292472839,
+            "reward_std": 1.2847070693969727,
+            "entropy": 0.6828673481941223
+          },
+          {
+            "iteration": 26,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.4509963393211365,
+            "steps": 758,
+            "value_loss": 0.4221038520336151,
+            "raw_advantage_std": 0.6415500640869141,
+            "reward_std": 1.3125096559524536,
+            "entropy": 0.6641008853912354
+          },
+          {
+            "iteration": 27,
+            "win_rate": 0.75,
+            "mean_terminal_reward": 0.9800751209259033,
+            "steps": 621,
+            "value_loss": 0.522513747215271,
+            "raw_advantage_std": 0.7057916522026062,
+            "reward_std": 1.2780228853225708,
+            "entropy": 0.7650856375694275
+          },
+          {
+            "iteration": 28,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.512398898601532,
+            "steps": 638,
+            "value_loss": 0.5083097815513611,
+            "raw_advantage_std": 0.6829323768615723,
+            "reward_std": 1.2934081554412842,
+            "entropy": 0.7963957786560059
+          },
+          {
+            "iteration": 29,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.539038360118866,
+            "steps": 826,
+            "value_loss": 0.45459502935409546,
+            "raw_advantage_std": 0.6680431365966797,
+            "reward_std": 1.2030085325241089,
+            "entropy": 0.5907605290412903
+          },
+          {
+            "iteration": 30,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.4374767541885376,
+            "steps": 748,
+            "value_loss": 0.40730658173561096,
+            "raw_advantage_std": 0.6236721277236938,
+            "reward_std": 1.1963783502578735,
+            "entropy": 0.6257622241973877
+          },
+          {
+            "iteration": 31,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5624369978904724,
+            "steps": 549,
+            "value_loss": 0.5555307865142822,
+            "raw_advantage_std": 0.7448745369911194,
+            "reward_std": 1.2200514078140259,
+            "entropy": 0.5785463452339172
+          },
+          {
+            "iteration": 32,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.2169487476348877,
+            "steps": 843,
+            "value_loss": 0.4036242663860321,
+            "raw_advantage_std": 0.6285736560821533,
+            "reward_std": 1.1705204248428345,
+            "entropy": 0.5359942317008972
+          },
+          {
+            "iteration": 33,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.8482005596160889,
+            "steps": 739,
+            "value_loss": 0.4037007987499237,
+            "raw_advantage_std": 0.5692451000213623,
+            "reward_std": 1.1327524185180664,
+            "entropy": 0.5118387937545776
+          },
+          {
+            "iteration": 34,
+            "win_rate": 0.71875,
+            "mean_terminal_reward": 0.849629282951355,
+            "steps": 758,
+            "value_loss": 0.3677651286125183,
+            "raw_advantage_std": 0.6030706167221069,
+            "reward_std": 1.1416562795639038,
+            "entropy": 0.7003666758537292
+          },
+          {
+            "iteration": 35,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.9496134519577026,
+            "steps": 736,
+            "value_loss": 0.3530532121658325,
+            "raw_advantage_std": 0.5938963294029236,
+            "reward_std": 1.2914941310882568,
+            "entropy": 0.5549505352973938
+          },
+          {
+            "iteration": 36,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.6677780151367188,
+            "steps": 739,
+            "value_loss": 0.34943222999572754,
+            "raw_advantage_std": 0.589126706123352,
+            "reward_std": 1.291005253791809,
+            "entropy": 0.6831305027008057
+          },
+          {
+            "iteration": 37,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.8197157979011536,
+            "steps": 758,
+            "value_loss": 0.43870270252227783,
+            "raw_advantage_std": 0.6593193411827087,
+            "reward_std": 1.2168902158737183,
+            "entropy": 0.5396892428398132
+          },
+          {
+            "iteration": 38,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.6493525505065918,
+            "steps": 775,
+            "value_loss": 0.46083933115005493,
+            "raw_advantage_std": 0.6786816120147705,
+            "reward_std": 1.2835023403167725,
+            "entropy": 0.6389564275741577
+          },
+          {
+            "iteration": 39,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.367340624332428,
+            "steps": 764,
+            "value_loss": 0.4150809645652771,
+            "raw_advantage_std": 0.6318283677101135,
+            "reward_std": 1.2377073764801025,
+            "entropy": 0.5594262480735779
+          }
+        ]
+      }
+    },
+    {
+      "arm": "none",
+      "seed": 2,
+      "train": 0.5875,
+      "held": 0.36875,
+      "history": {
+        "encoding_version": "obs_encoding_v3",
+        "started_from": "cloned policy (agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt)",
+        "fixture": "m1_tiny_melee",
+        "side": "attacker",
+        "attacker": null,
+        "defender": null,
+        "initial_win_rate": 0.46875,
+        "final_win_rate": 0.53125,
+        "initial_mean_terminal_reward": 0.05621412396430969,
+        "iterations": 40,
+        "episodes_per_iteration": 32,
+        "advantage_std_floor": 0.1,
+        "floored_iterations": 0,
+        "seconds": 36.6,
+        "history": [
+          {
+            "iteration": 0,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.10470345616340637,
+            "steps": 674,
+            "value_loss": 4.151937484741211,
+            "raw_advantage_std": 1.5440874099731445,
+            "reward_std": 1.1133835315704346,
+            "entropy": 0.564468264579773
+          },
+          {
+            "iteration": 1,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.10744655877351761,
+            "steps": 934,
+            "value_loss": 1.3078070878982544,
+            "raw_advantage_std": 1.0409342050552368,
+            "reward_std": 1.1882163286209106,
+            "entropy": 0.4737507104873657
+          },
+          {
+            "iteration": 2,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": -0.010506130754947662,
+            "steps": 653,
+            "value_loss": 1.2306971549987793,
+            "raw_advantage_std": 1.1008143424987793,
+            "reward_std": 1.1305699348449707,
+            "entropy": 0.6131436228752136
+          },
+          {
+            "iteration": 3,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.15085577964782715,
+            "steps": 799,
+            "value_loss": 0.834865927696228,
+            "raw_advantage_std": 0.9118916988372803,
+            "reward_std": 1.1572574377059937,
+            "entropy": 0.616152822971344
+          },
+          {
+            "iteration": 4,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.17231258749961853,
+            "steps": 640,
+            "value_loss": 0.7207108736038208,
+            "raw_advantage_std": 0.8435491919517517,
+            "reward_std": 1.1799196004867554,
+            "entropy": 0.6822654008865356
+          },
+          {
+            "iteration": 5,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": -0.012007735669612885,
+            "steps": 703,
+            "value_loss": 0.6603415012359619,
+            "raw_advantage_std": 0.7962533235549927,
+            "reward_std": 1.1247297525405884,
+            "entropy": 0.6569114923477173
+          },
+          {
+            "iteration": 6,
+            "win_rate": 0.28125,
+            "mean_terminal_reward": -0.39561671018600464,
+            "steps": 696,
+            "value_loss": 0.6522342562675476,
+            "raw_advantage_std": 0.7856621742248535,
+            "reward_std": 0.9668601751327515,
+            "entropy": 0.8300529718399048
+          },
+          {
+            "iteration": 7,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.250036358833313,
+            "steps": 850,
+            "value_loss": 0.555393397808075,
+            "raw_advantage_std": 0.7384292483329773,
+            "reward_std": 1.1110670566558838,
+            "entropy": 0.7016993761062622
+          },
+          {
+            "iteration": 8,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.10148345679044724,
+            "steps": 672,
+            "value_loss": 0.6248434782028198,
+            "raw_advantage_std": 0.7850598692893982,
+            "reward_std": 1.1810503005981445,
+            "entropy": 0.7136414051055908
+          },
+          {
+            "iteration": 9,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.14194458723068237,
+            "steps": 743,
+            "value_loss": 0.5231216549873352,
+            "raw_advantage_std": 0.7171463966369629,
+            "reward_std": 1.1510992050170898,
+            "entropy": 0.7664633989334106
+          },
+          {
+            "iteration": 10,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.08056776225566864,
+            "steps": 807,
+            "value_loss": 0.39700108766555786,
+            "raw_advantage_std": 0.6298937797546387,
+            "reward_std": 1.1159385442733765,
+            "entropy": 0.7867276072502136
+          },
+          {
+            "iteration": 11,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.049928218126297,
+            "steps": 638,
+            "value_loss": 0.5821178555488586,
+            "raw_advantage_std": 0.7628244161605835,
+            "reward_std": 1.1573132276535034,
+            "entropy": 0.7655590772628784
+          },
+          {
+            "iteration": 12,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.3349829912185669,
+            "steps": 791,
+            "value_loss": 0.4393217861652374,
+            "raw_advantage_std": 0.6483697891235352,
+            "reward_std": 1.1928237676620483,
+            "entropy": 0.8661785125732422
+          },
+          {
+            "iteration": 13,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.07230320572853088,
+            "steps": 681,
+            "value_loss": 0.38579386472702026,
+            "raw_advantage_std": 0.6202549338340759,
+            "reward_std": 1.1505818367004395,
+            "entropy": 0.8110854625701904
+          },
+          {
+            "iteration": 14,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.010051112622022629,
+            "steps": 667,
+            "value_loss": 0.5014395117759705,
+            "raw_advantage_std": 0.6995246410369873,
+            "reward_std": 1.1527023315429688,
+            "entropy": 0.7207704186439514
+          },
+          {
+            "iteration": 15,
+            "win_rate": 0.375,
+            "mean_terminal_reward": -0.14411932229995728,
+            "steps": 642,
+            "value_loss": 0.38158008456230164,
+            "raw_advantage_std": 0.6177049279212952,
+            "reward_std": 1.1126835346221924,
+            "entropy": 0.8570264577865601
+          },
+          {
+            "iteration": 16,
+            "win_rate": 0.3125,
+            "mean_terminal_reward": -0.27685511112213135,
+            "steps": 631,
+            "value_loss": 0.46014404296875,
+            "raw_advantage_std": 0.6713244318962097,
+            "reward_std": 1.081050992012024,
+            "entropy": 0.7945684194564819
+          },
+          {
+            "iteration": 17,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.2574220895767212,
+            "steps": 771,
+            "value_loss": 0.4650527536869049,
+            "raw_advantage_std": 0.6629068851470947,
+            "reward_std": 1.189748764038086,
+            "entropy": 0.8701733946800232
+          },
+          {
+            "iteration": 18,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.14699706435203552,
+            "steps": 731,
+            "value_loss": 0.5116729736328125,
+            "raw_advantage_std": 0.7111256122589111,
+            "reward_std": 1.1535879373550415,
+            "entropy": 0.8421722650527954
+          },
+          {
+            "iteration": 19,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3474562168121338,
+            "steps": 797,
+            "value_loss": 0.4451858401298523,
+            "raw_advantage_std": 0.6515676379203796,
+            "reward_std": 1.1302064657211304,
+            "entropy": 0.862228274345398
+          },
+          {
+            "iteration": 20,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.288059800863266,
+            "steps": 695,
+            "value_loss": 0.38740840554237366,
+            "raw_advantage_std": 0.6173073053359985,
+            "reward_std": 1.141855239868164,
+            "entropy": 0.7822386622428894
+          },
+          {
+            "iteration": 21,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.1105867475271225,
+            "steps": 660,
+            "value_loss": 0.480174720287323,
+            "raw_advantage_std": 0.6912373304367065,
+            "reward_std": 1.112508773803711,
+            "entropy": 0.8564251661300659
+          },
+          {
+            "iteration": 22,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.22476531565189362,
+            "steps": 739,
+            "value_loss": 0.48975080251693726,
+            "raw_advantage_std": 0.6986877918243408,
+            "reward_std": 1.1612504720687866,
+            "entropy": 0.8971630930900574
+          },
+          {
+            "iteration": 23,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.04661836102604866,
+            "steps": 737,
+            "value_loss": 0.40427398681640625,
+            "raw_advantage_std": 0.6320487856864929,
+            "reward_std": 1.119710087776184,
+            "entropy": 0.8857777714729309
+          },
+          {
+            "iteration": 24,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.49691295623779297,
+            "steps": 750,
+            "value_loss": 0.4021049737930298,
+            "raw_advantage_std": 0.61489337682724,
+            "reward_std": 1.090482473373413,
+            "entropy": 0.8526918292045593
+          },
+          {
+            "iteration": 25,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.06733860075473785,
+            "steps": 636,
+            "value_loss": 0.45012232661247253,
+            "raw_advantage_std": 0.6435049772262573,
+            "reward_std": 1.1300245523452759,
+            "entropy": 0.8102330565452576
+          },
+          {
+            "iteration": 26,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.22052207589149475,
+            "steps": 615,
+            "value_loss": 0.4211788475513458,
+            "raw_advantage_std": 0.641781210899353,
+            "reward_std": 1.1552093029022217,
+            "entropy": 0.8242081999778748
+          },
+          {
+            "iteration": 27,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.2984841763973236,
+            "steps": 691,
+            "value_loss": 0.4184056222438812,
+            "raw_advantage_std": 0.6468077898025513,
+            "reward_std": 1.1497269868850708,
+            "entropy": 0.8098177313804626
+          },
+          {
+            "iteration": 28,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.14862704277038574,
+            "steps": 808,
+            "value_loss": 0.38275471329689026,
+            "raw_advantage_std": 0.618655264377594,
+            "reward_std": 1.1566907167434692,
+            "entropy": 0.8612236380577087
+          },
+          {
+            "iteration": 29,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": -0.05750483274459839,
+            "steps": 669,
+            "value_loss": 0.3542182445526123,
+            "raw_advantage_std": 0.5847227573394775,
+            "reward_std": 1.1461384296417236,
+            "entropy": 0.6650763154029846
+          },
+          {
+            "iteration": 30,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.0009340569376945496,
+            "steps": 689,
+            "value_loss": 0.4101788401603699,
+            "raw_advantage_std": 0.6402044892311096,
+            "reward_std": 1.1390937566757202,
+            "entropy": 0.853329598903656
+          },
+          {
+            "iteration": 31,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.5903251767158508,
+            "steps": 580,
+            "value_loss": 0.42333537340164185,
+            "raw_advantage_std": 0.6199140548706055,
+            "reward_std": 1.089656114578247,
+            "entropy": 0.8193092346191406
+          },
+          {
+            "iteration": 32,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.24417351186275482,
+            "steps": 754,
+            "value_loss": 0.3436310589313507,
+            "raw_advantage_std": 0.5638973712921143,
+            "reward_std": 1.175152063369751,
+            "entropy": 0.8110765814781189
+          },
+          {
+            "iteration": 33,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.3049149513244629,
+            "steps": 752,
+            "value_loss": 0.331757515668869,
+            "raw_advantage_std": 0.5696619749069214,
+            "reward_std": 1.1596283912658691,
+            "entropy": 0.6765321493148804
+          },
+          {
+            "iteration": 34,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.17316173017024994,
+            "steps": 730,
+            "value_loss": 0.36358919739723206,
+            "raw_advantage_std": 0.6021896004676819,
+            "reward_std": 1.183763861656189,
+            "entropy": 0.7695844173431396
+          },
+          {
+            "iteration": 35,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.17889368534088135,
+            "steps": 613,
+            "value_loss": 0.3064802289009094,
+            "raw_advantage_std": 0.5475724935531616,
+            "reward_std": 1.186432123184204,
+            "entropy": 0.8046928644180298
+          },
+          {
+            "iteration": 36,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.24572308361530304,
+            "steps": 694,
+            "value_loss": 0.3894667327404022,
+            "raw_advantage_std": 0.621451199054718,
+            "reward_std": 1.186837911605835,
+            "entropy": 0.788231372833252
+          },
+          {
+            "iteration": 37,
+            "win_rate": 0.75,
+            "mean_terminal_reward": 0.698456883430481,
+            "steps": 768,
+            "value_loss": 0.3987797796726227,
+            "raw_advantage_std": 0.5815567970275879,
+            "reward_std": 0.9928457140922546,
+            "entropy": 0.7528173327445984
+          },
+          {
+            "iteration": 38,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.3891172409057617,
+            "steps": 907,
+            "value_loss": 0.3773030638694763,
+            "raw_advantage_std": 0.6136096715927124,
+            "reward_std": 1.160986304283142,
+            "entropy": 0.7824852466583252
+          },
+          {
+            "iteration": 39,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.2193375676870346,
+            "steps": 751,
+            "value_loss": 0.3990936875343323,
+            "raw_advantage_std": 0.6243103742599487,
+            "reward_std": 1.152168869972229,
+            "entropy": 0.8709573149681091
+          }
+        ]
+      }
+    },
+    {
+      "arm": "difficulty",
+      "seed": 2,
+      "train": 0.565625,
+      "held": 0.4125,
+      "history": {
+        "encoding_version": "obs_encoding_v3",
+        "started_from": "cloned policy (agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt)",
+        "fixture": "m1_tiny_melee",
+        "side": "attacker",
+        "attacker": null,
+        "defender": null,
+        "initial_win_rate": 0.46875,
+        "final_win_rate": 0.625,
+        "initial_mean_terminal_reward": 0.20203524827957153,
+        "iterations": 40,
+        "episodes_per_iteration": 32,
+        "advantage_std_floor": 0.1,
+        "floored_iterations": 0,
+        "seconds": 36.6,
+        "history": [
+          {
+            "iteration": 0,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.2366764098405838,
+            "steps": 674,
+            "value_loss": 3.959275960922241,
+            "raw_advantage_std": 1.539040446281433,
+            "reward_std": 1.1546831130981445,
+            "entropy": 0.564468264579773
+          },
+          {
+            "iteration": 1,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.5265811085700989,
+            "steps": 927,
+            "value_loss": 1.1867924928665161,
+            "raw_advantage_std": 1.041592001914978,
+            "reward_std": 1.1546066999435425,
+            "entropy": 0.4371713697910309
+          },
+          {
+            "iteration": 2,
+            "win_rate": 0.375,
+            "mean_terminal_reward": 0.0032730847597122192,
+            "steps": 632,
+            "value_loss": 1.217044472694397,
+            "raw_advantage_std": 1.066709041595459,
+            "reward_std": 1.1434119939804077,
+            "entropy": 0.6473473906517029
+          },
+          {
+            "iteration": 3,
+            "win_rate": 0.34375,
+            "mean_terminal_reward": -0.09715066105127335,
+            "steps": 782,
+            "value_loss": 1.0982394218444824,
+            "raw_advantage_std": 1.0144065618515015,
+            "reward_std": 1.395363211631775,
+            "entropy": 0.6023600101470947
+          },
+          {
+            "iteration": 4,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.1649215817451477,
+            "steps": 603,
+            "value_loss": 0.9337162971496582,
+            "raw_advantage_std": 0.9652912616729736,
+            "reward_std": 1.3784565925598145,
+            "entropy": 0.6047367453575134
+          },
+          {
+            "iteration": 5,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.20032350718975067,
+            "steps": 713,
+            "value_loss": 0.7860515117645264,
+            "raw_advantage_std": 0.8864162564277649,
+            "reward_std": 1.322906732559204,
+            "entropy": 0.6038171648979187
+          },
+          {
+            "iteration": 6,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.32205620408058167,
+            "steps": 739,
+            "value_loss": 0.6830005645751953,
+            "raw_advantage_std": 0.8205264210700989,
+            "reward_std": 1.253229022026062,
+            "entropy": 0.7181146144866943
+          },
+          {
+            "iteration": 7,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.277915894985199,
+            "steps": 746,
+            "value_loss": 0.6782383918762207,
+            "raw_advantage_std": 0.8234472870826721,
+            "reward_std": 1.341762661933899,
+            "entropy": 0.6357582807540894
+          },
+          {
+            "iteration": 8,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.21591100096702576,
+            "steps": 714,
+            "value_loss": 0.618355393409729,
+            "raw_advantage_std": 0.7852359414100647,
+            "reward_std": 1.2731716632843018,
+            "entropy": 0.7875350117683411
+          },
+          {
+            "iteration": 9,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5418555736541748,
+            "steps": 701,
+            "value_loss": 0.6257628798484802,
+            "raw_advantage_std": 0.7722856998443604,
+            "reward_std": 1.1994659900665283,
+            "entropy": 0.6817848086357117
+          },
+          {
+            "iteration": 10,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": 0.04476609081029892,
+            "steps": 652,
+            "value_loss": 0.5459039807319641,
+            "raw_advantage_std": 0.7208091616630554,
+            "reward_std": 1.2279366254806519,
+            "entropy": 0.7672196626663208
+          },
+          {
+            "iteration": 11,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.4598408341407776,
+            "steps": 725,
+            "value_loss": 0.4861144721508026,
+            "raw_advantage_std": 0.6830923557281494,
+            "reward_std": 1.1974457502365112,
+            "entropy": 0.6621939539909363
+          },
+          {
+            "iteration": 12,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.3267323970794678,
+            "steps": 706,
+            "value_loss": 0.46820032596588135,
+            "raw_advantage_std": 0.6791436076164246,
+            "reward_std": 1.2332441806793213,
+            "entropy": 0.7521640062332153
+          },
+          {
+            "iteration": 13,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.2117210030555725,
+            "steps": 636,
+            "value_loss": 0.5917022228240967,
+            "raw_advantage_std": 0.7662717700004578,
+            "reward_std": 1.37380850315094,
+            "entropy": 0.7111139297485352
+          },
+          {
+            "iteration": 14,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5562359690666199,
+            "steps": 660,
+            "value_loss": 0.5547006130218506,
+            "raw_advantage_std": 0.7397850751876831,
+            "reward_std": 1.2546601295471191,
+            "entropy": 0.6720235347747803
+          },
+          {
+            "iteration": 15,
+            "win_rate": 0.375,
+            "mean_terminal_reward": 0.01105719804763794,
+            "steps": 624,
+            "value_loss": 0.4834020137786865,
+            "raw_advantage_std": 0.6906161308288574,
+            "reward_std": 1.2254679203033447,
+            "entropy": 0.8688943386077881
+          },
+          {
+            "iteration": 16,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.3640804588794708,
+            "steps": 738,
+            "value_loss": 0.6386403441429138,
+            "raw_advantage_std": 0.7747930884361267,
+            "reward_std": 1.366342306137085,
+            "entropy": 0.8321136236190796
+          },
+          {
+            "iteration": 17,
+            "win_rate": 0.59375,
+            "mean_terminal_reward": 0.5771111249923706,
+            "steps": 759,
+            "value_loss": 0.511634111404419,
+            "raw_advantage_std": 0.7144266963005066,
+            "reward_std": 1.3189573287963867,
+            "entropy": 0.7395791411399841
+          },
+          {
+            "iteration": 18,
+            "win_rate": 0.34375,
+            "mean_terminal_reward": -0.13226619362831116,
+            "steps": 749,
+            "value_loss": 0.5101316571235657,
+            "raw_advantage_std": 0.6813932061195374,
+            "reward_std": 1.225162148475647,
+            "entropy": 0.7858385443687439
+          },
+          {
+            "iteration": 19,
+            "win_rate": 0.40625,
+            "mean_terminal_reward": 0.14810475707054138,
+            "steps": 812,
+            "value_loss": 0.48779234290122986,
+            "raw_advantage_std": 0.6885248422622681,
+            "reward_std": 1.3078502416610718,
+            "entropy": 0.809255838394165
+          },
+          {
+            "iteration": 20,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.5053891539573669,
+            "steps": 747,
+            "value_loss": 0.4721735715866089,
+            "raw_advantage_std": 0.6728777885437012,
+            "reward_std": 1.2620431184768677,
+            "entropy": 0.7882537841796875
+          },
+          {
+            "iteration": 21,
+            "win_rate": 0.34375,
+            "mean_terminal_reward": -0.019102148711681366,
+            "steps": 589,
+            "value_loss": 0.5485216975212097,
+            "raw_advantage_std": 0.723767876625061,
+            "reward_std": 1.3412606716156006,
+            "entropy": 0.7197233438491821
+          },
+          {
+            "iteration": 22,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3082173764705658,
+            "steps": 732,
+            "value_loss": 0.5144538879394531,
+            "raw_advantage_std": 0.7114967107772827,
+            "reward_std": 1.229923129081726,
+            "entropy": 0.7195317149162292
+          },
+          {
+            "iteration": 23,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.12714198231697083,
+            "steps": 670,
+            "value_loss": 0.5150346159934998,
+            "raw_advantage_std": 0.7173152565956116,
+            "reward_std": 1.2771340608596802,
+            "entropy": 0.7787777185440063
+          },
+          {
+            "iteration": 24,
+            "win_rate": 0.375,
+            "mean_terminal_reward": 0.020529747009277344,
+            "steps": 710,
+            "value_loss": 0.4251827597618103,
+            "raw_advantage_std": 0.6344142556190491,
+            "reward_std": 1.2671470642089844,
+            "entropy": 0.7693209052085876
+          },
+          {
+            "iteration": 25,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.4550424814224243,
+            "steps": 646,
+            "value_loss": 0.5607050657272339,
+            "raw_advantage_std": 0.7271345853805542,
+            "reward_std": 1.3723454475402832,
+            "entropy": 0.7271695733070374
+          },
+          {
+            "iteration": 26,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.22587980329990387,
+            "steps": 589,
+            "value_loss": 0.4116095006465912,
+            "raw_advantage_std": 0.6413124203681946,
+            "reward_std": 1.2070534229278564,
+            "entropy": 0.821204662322998
+          },
+          {
+            "iteration": 27,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.41448527574539185,
+            "steps": 712,
+            "value_loss": 0.45696353912353516,
+            "raw_advantage_std": 0.6733580231666565,
+            "reward_std": 1.33742094039917,
+            "entropy": 0.8046528697013855
+          },
+          {
+            "iteration": 28,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.31154581904411316,
+            "steps": 810,
+            "value_loss": 0.45611703395843506,
+            "raw_advantage_std": 0.6722345948219299,
+            "reward_std": 1.2295106649398804,
+            "entropy": 0.7292219996452332
+          },
+          {
+            "iteration": 29,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.20302265882492065,
+            "steps": 638,
+            "value_loss": 0.4882882237434387,
+            "raw_advantage_std": 0.6914863586425781,
+            "reward_std": 1.2579069137573242,
+            "entropy": 0.6646909117698669
+          },
+          {
+            "iteration": 30,
+            "win_rate": 0.4375,
+            "mean_terminal_reward": 0.21127158403396606,
+            "steps": 672,
+            "value_loss": 0.4555903971195221,
+            "raw_advantage_std": 0.6696972250938416,
+            "reward_std": 1.291038990020752,
+            "entropy": 0.7491995692253113
+          },
+          {
+            "iteration": 31,
+            "win_rate": 0.5625,
+            "mean_terminal_reward": 0.38921722769737244,
+            "steps": 562,
+            "value_loss": 0.3484031558036804,
+            "raw_advantage_std": 0.5872930884361267,
+            "reward_std": 1.1880583763122559,
+            "entropy": 0.833276629447937
+          },
+          {
+            "iteration": 32,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.32921940088272095,
+            "steps": 722,
+            "value_loss": 0.37653908133506775,
+            "raw_advantage_std": 0.6072982549667358,
+            "reward_std": 1.2563163042068481,
+            "entropy": 0.7888569831848145
+          },
+          {
+            "iteration": 33,
+            "win_rate": 0.5,
+            "mean_terminal_reward": 0.2793102562427521,
+            "steps": 689,
+            "value_loss": 0.3808818757534027,
+            "raw_advantage_std": 0.6164300441741943,
+            "reward_std": 1.3068926334381104,
+            "entropy": 0.7215920686721802
+          },
+          {
+            "iteration": 34,
+            "win_rate": 0.53125,
+            "mean_terminal_reward": 0.3304649889469147,
+            "steps": 790,
+            "value_loss": 0.3881555497646332,
+            "raw_advantage_std": 0.6222208142280579,
+            "reward_std": 1.27570378780365,
+            "entropy": 0.7502679228782654
+          },
+          {
+            "iteration": 35,
+            "win_rate": 0.46875,
+            "mean_terminal_reward": 0.2721673250198364,
+            "steps": 666,
+            "value_loss": 0.4635782241821289,
+            "raw_advantage_std": 0.6774605512619019,
+            "reward_std": 1.3137134313583374,
+            "entropy": 0.7168838381767273
+          },
+          {
+            "iteration": 36,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.6577646732330322,
+            "steps": 759,
+            "value_loss": 0.458710640668869,
+            "raw_advantage_std": 0.6581745743751526,
+            "reward_std": 1.137362003326416,
+            "entropy": 0.7311511635780334
+          },
+          {
+            "iteration": 37,
+            "win_rate": 0.65625,
+            "mean_terminal_reward": 0.6946353912353516,
+            "steps": 749,
+            "value_loss": 0.3699362277984619,
+            "raw_advantage_std": 0.5982310771942139,
+            "reward_std": 1.1175659894943237,
+            "entropy": 0.6038302779197693
+          },
+          {
+            "iteration": 38,
+            "win_rate": 0.6875,
+            "mean_terminal_reward": 0.8471218943595886,
+            "steps": 878,
+            "value_loss": 0.4866894781589508,
+            "raw_advantage_std": 0.6436676979064941,
+            "reward_std": 1.1387649774551392,
+            "entropy": 0.6931025981903076
+          },
+          {
+            "iteration": 39,
+            "win_rate": 0.625,
+            "mean_terminal_reward": 0.6035053730010986,
+            "steps": 751,
+            "value_loss": 0.5175637602806091,
+            "raw_advantage_std": 0.7192927002906799,
+            "reward_std": 1.3074421882629395,
+            "entropy": 0.7214755415916443
+          }
+        ]
+      }
+    }
+  ],
+  "iterations": 40,
+  "train_matchups": 40,
+  "held_matchups": 20,
+  "seconds": 393.1
+}

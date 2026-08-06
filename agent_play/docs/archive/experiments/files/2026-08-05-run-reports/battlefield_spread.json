@@ -1,0 +1,295 @@
+{
+  "seeds": 6,
+  "episodes": 24,
+  "checkpoint": "policy_v4.pt",
+  "rows": [
+    {
+      "matchup": {
+        "attacker": "39:10,65:1,18:1,40:5,51:1",
+        "defender": "22:23",
+        "win_rate": 0.5,
+        "reward_std": 1.141296056832934,
+        "mean_length": 44.9375,
+        "scale": 2.2765625,
+        "attacker_hero": "9:11",
+        "defender_hero": "10:3",
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.375,
+        "m1_tiny_melee-seed1": 0.08333333333333333,
+        "m1_tiny_melee-seed2": 0.3333333333333333,
+        "m1_tiny_melee-seed3": 0.20833333333333334,
+        "m1_tiny_melee-seed4": 0.375,
+        "m1_tiny_melee-seed5": 0.08333333333333333
+      },
+      "mean": 0.24305555555555555,
+      "spread": 0.13798315785577547,
+      "binomial": 0.08755463829069247
+    },
+    {
+      "matchup": {
+        "attacker": "64:1,33:1,27:2",
+        "defender": "52:3,14:1,23:4",
+        "win_rate": 0.3125,
+        "reward_std": 1.007769163581607,
+        "mean_length": 17.75,
+        "scale": 1.34375,
+        "attacker_hero": null,
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.25,
+        "m1_tiny_melee-seed1": 0.20833333333333334,
+        "m1_tiny_melee-seed2": 0.041666666666666664,
+        "m1_tiny_melee-seed3": 0.25,
+        "m1_tiny_melee-seed4": 0.25,
+        "m1_tiny_melee-seed5": 0.08333333333333333
+      },
+      "mean": 0.18055555555555555,
+      "spread": 0.09378857231185629,
+      "binomial": 0.0785162528062344
+    },
+    {
+      "matchup": {
+        "attacker": "11:1,66:1,30:1,14:1",
+        "defender": "63:1,13:1",
+        "win_rate": 0.3125,
+        "reward_std": 0.9589272235776516,
+        "mean_length": 26.3125,
+        "scale": 0.4109375,
+        "attacker_hero": null,
+        "defender_hero": "20:15",
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.3333333333333333,
+        "m1_tiny_melee-seed1": 0.2916666666666667,
+        "m1_tiny_melee-seed2": 0.08333333333333333,
+        "m1_tiny_melee-seed3": 0.25,
+        "m1_tiny_melee-seed4": 0.041666666666666664,
+        "m1_tiny_melee-seed5": 0.2916666666666667
+      },
+      "mean": 0.2152777777777778,
+      "spread": 0.12195361899175107,
+      "binomial": 0.08389806716407902
+    },
+    {
+      "matchup": {
+        "attacker": "28:1,15:1,59:1,28:1,27:1",
+        "defender": "27:7,14:7,12:29,41:7",
+        "win_rate": 0.5625,
+        "reward_std": 1.0858297614306587,
+        "mean_length": 46.625,
+        "scale": 7.2515625,
+        "attacker_hero": "23:16",
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.6666666666666666,
+        "m1_tiny_melee-seed1": 0.5,
+        "m1_tiny_melee-seed2": 0.7916666666666666,
+        "m1_tiny_melee-seed3": 0.375,
+        "m1_tiny_melee-seed4": 0.5,
+        "m1_tiny_melee-seed5": 0.75
+      },
+      "mean": 0.5972222222222222,
+      "spread": 0.1638653467083625,
+      "binomial": 0.10011406817271255
+    },
+    {
+      "matchup": {
+        "attacker": "18:1,47:1,34:1",
+        "defender": "63:13,34:13,48:13,1:163",
+        "win_rate": 0.375,
+        "reward_std": 1.0245505161385409,
+        "mean_length": 22.25,
+        "scale": 12.537500000000001,
+        "attacker_hero": "25:5",
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.5833333333333334,
+        "m1_tiny_melee-seed1": 0.20833333333333334,
+        "m1_tiny_melee-seed2": 0.5833333333333334,
+        "m1_tiny_melee-seed3": 0.9583333333333334,
+        "m1_tiny_melee-seed4": 0.6666666666666666,
+        "m1_tiny_melee-seed5": 0.5833333333333334
+      },
+      "mean": 0.5972222222222222,
+      "spread": 0.23959842947608692,
+      "binomial": 0.10011406817271255
+    },
+    {
+      "matchup": {
+        "attacker": "39:82,23:17",
+        "defender": "62:4,26:20",
+        "win_rate": 0.4375,
+        "reward_std": 1.2787850042454911,
+        "mean_length": 7.375,
+        "scale": 1.81015625,
+        "attacker_hero": "22:12",
+        "defender_hero": "6:6",
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.6666666666666666,
+        "m1_tiny_melee-seed1": 0.9583333333333334,
+        "m1_tiny_melee-seed2": 1.0,
+        "m1_tiny_melee-seed3": 0.7083333333333334,
+        "m1_tiny_melee-seed4": 0.9583333333333334,
+        "m1_tiny_melee-seed5": 0.8333333333333334
+      },
+      "mean": 0.8541666666666666,
+      "spread": 0.14129854131510977,
+      "binomial": 0.07204338167099456
+    },
+    {
+      "matchup": {
+        "attacker": "39:33,19:1,52:1",
+        "defender": "22:1,39:16,45:1,22:15",
+        "win_rate": 0.625,
+        "reward_std": 1.1184103983514888,
+        "mean_length": 25.6875,
+        "scale": 1.49921875,
+        "attacker_hero": "10:5",
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.75,
+        "m1_tiny_melee-seed1": 0.9583333333333334,
+        "m1_tiny_melee-seed2": 0.8333333333333334,
+        "m1_tiny_melee-seed3": 0.7916666666666666,
+        "m1_tiny_melee-seed4": 1.0,
+        "m1_tiny_melee-seed5": 0.9166666666666666
+      },
+      "mean": 0.8750000000000001,
+      "spread": 0.09860132971832694,
+      "binomial": 0.06750771560841519
+    },
+    {
+      "matchup": {
+        "attacker": "16:9,46:1,13:12,44:1",
+        "defender": "16:36",
+        "win_rate": 0.375,
+        "reward_std": 1.0179579407478767,
+        "mean_length": 45.25,
+        "scale": 2.4320312499999996,
+        "attacker_hero": "4:14",
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.6666666666666666,
+        "m1_tiny_melee-seed1": 0.5416666666666666,
+        "m1_tiny_melee-seed2": 0.3333333333333333,
+        "m1_tiny_melee-seed3": 0.2916666666666667,
+        "m1_tiny_melee-seed4": 0.5416666666666666,
+        "m1_tiny_melee-seed5": 0.2916666666666667
+      },
+      "mean": 0.4444444444444444,
+      "spread": 0.15957118462605632,
+      "binomial": 0.10143010324169743
+    },
+    {
+      "matchup": {
+        "attacker": "4:1,1:4,17:1,51:1,26:1",
+        "defender": "64:7",
+        "win_rate": 0.625,
+        "reward_std": 1.0765742632662476,
+        "mean_length": 21.6875,
+        "scale": 2.2765625,
+        "attacker_hero": "19:7",
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.75,
+        "m1_tiny_melee-seed1": 0.6666666666666666,
+        "m1_tiny_melee-seed2": 0.7083333333333334,
+        "m1_tiny_melee-seed3": 0.875,
+        "m1_tiny_melee-seed4": 0.6666666666666666,
+        "m1_tiny_melee-seed5": 0.7083333333333334
+      },
+      "mean": 0.7291666666666666,
+      "spread": 0.07795119555779045,
+      "binomial": 0.09071076720564675
+    },
+    {
+      "matchup": {
+        "attacker": "41:1,28:2",
+        "defender": "2:2,18:2,23:2,50:22,13:2",
+        "win_rate": 0.75,
+        "reward_std": 0.9974340788922028,
+        "mean_length": 21.1875,
+        "scale": 2.4320312499999996,
+        "attacker_hero": "17:14",
+        "defender_hero": null,
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.6666666666666666,
+        "m1_tiny_melee-seed1": 0.625,
+        "m1_tiny_melee-seed2": 0.5833333333333334,
+        "m1_tiny_melee-seed3": 0.8333333333333334,
+        "m1_tiny_melee-seed4": 0.625,
+        "m1_tiny_melee-seed5": 0.6666666666666666
+      },
+      "mean": 0.6666666666666666,
+      "spread": 0.08740073734751264,
+      "binomial": 0.09622504486493763
+    },
+    {
+      "matchup": {
+        "attacker": "22:2,11:1",
+        "defender": "24:8,15:8",
+        "win_rate": 0.3125,
+        "reward_std": 1.0831526209819813,
+        "mean_length": 7.375,
+        "scale": 2.5875,
+        "attacker_hero": "10:18",
+        "defender_hero": "16:7",
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.4166666666666667,
+        "m1_tiny_melee-seed1": 0.0,
+        "m1_tiny_melee-seed2": 0.0,
+        "m1_tiny_melee-seed3": 0.0,
+        "m1_tiny_melee-seed4": 0.041666666666666664,
+        "m1_tiny_melee-seed5": 0.0
+      },
+      "mean": 0.0763888888888889,
+      "spread": 0.16753247335853916,
+      "binomial": 0.054219317953109775
+    },
+    {
+      "matchup": {
+        "attacker": "30:2,62:1,11:1,48:1",
+        "defender": "52:7,12:7,2:14,59:7,23:7",
+        "win_rate": 0.4375,
+        "reward_std": 1.0939102023993368,
+        "mean_length": 41.5625,
+        "scale": 6.940625,
+        "attacker_hero": "4:15",
+        "defender_hero": "1:5",
+        "allow_wide": true
+      },
+      "per_seed": {
+        "m1_tiny_melee": 0.3333333333333333,
+        "m1_tiny_melee-seed1": 0.5,
+        "m1_tiny_melee-seed2": 0.6666666666666666,
+        "m1_tiny_melee-seed3": 0.2916666666666667,
+        "m1_tiny_melee-seed4": 0.5833333333333334,
+        "m1_tiny_melee-seed5": 0.625
+      },
+      "mean": 0.5,
+      "spread": 0.15590239111558088,
+      "binomial": 0.10206207261596575
+    }
+  ]
+}

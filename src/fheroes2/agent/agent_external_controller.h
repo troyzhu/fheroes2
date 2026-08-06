@@ -64,6 +64,34 @@ namespace fheroes2::agent
 
         void chooseActions( Battle::Arena & arena, const Battle::Unit & currentUnit, Battle::Actions & output ) override;
 
+        // Teacher probe. When enabled, every answered decision also asks the built-in AI's
+        // planner what it would do at this exact pre-decision state, resolved to a canonical
+        // index the same way passive teacher decisions are. This is the DAgger relabeling
+        // query: the student acts, the teacher labels. The planner consumes no combat
+        // randomness and recomputes its analysis on every call, so the probe leaves the battle
+        // unchanged; agent_play/experiments/planner_query.py holds the terminal-digest proof.
+        void enableTeacherProbe()
+        {
+            _probeTeacher = true;
+        }
+
+        // The probe for the decision currently being made (valid inside the decide callback),
+        // empty when the probe is off or the teacher's choice falls outside simple_v1.
+        const std::optional<uint32_t> & lastTeacherProbe() const
+        {
+            return _lastTeacherProbe;
+        }
+
+        uint32_t probesResolved() const
+        {
+            return _probesResolved;
+        }
+
+        uint32_t probesOutsideSchema() const
+        {
+            return _probesOutsideSchema;
+        }
+
         // Number of decisions this controller was asked for, and how many it answered. They
         // differ once the caller has closed the connection.
         uint32_t decisionsSeen() const
@@ -95,5 +123,9 @@ namespace fheroes2::agent
         uint32_t _answered{ 0 };
         uint32_t _rejected{ 0 };
         bool _finished{ false };
+        bool _probeTeacher{ false };
+        std::optional<uint32_t> _lastTeacherProbe;
+        uint32_t _probesResolved{ 0 };
+        uint32_t _probesOutsideSchema{ 0 };
     };
 }

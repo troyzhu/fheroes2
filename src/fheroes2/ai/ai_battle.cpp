@@ -664,6 +664,11 @@ void AI::BattlePlanner::battleBegins()
     _defenderForceTotalNumberOfDeadUnits = 0;
 }
 
+Battle::Actions AI::BattlePlanner::queryUnitTurn( Battle::Arena & arena, const Battle::Unit & currentUnit )
+{
+    return planUnitTurn( arena, currentUnit );
+}
+
 void AI::BattlePlanner::BattleTurn( Battle::Arena & arena, const Battle::Unit & currentUnit, Battle::Actions & actions )
 {
     // Return immediately if our limit of turns has been exceeded

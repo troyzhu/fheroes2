@@ -13,12 +13,57 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import subprocess
 from dataclasses import dataclass
 
 import numpy as np
 
 from .encoding import encode_mask, encode_observation
+
+_STRENGTH: dict[int, float] | None = None
+
+
+def _monster_strength() -> dict[int, float]:
+    """Engine strength per monster id, from the vendored capability audit."""
+    global _STRENGTH
+    if _STRENGTH is None:
+        path = pathlib.Path(__file__).parent / "data" / "monster_capabilities_v1.json"
+        _STRENGTH = {r["monster_id"]: float(r["strength"]) for r in json.loads(path.read_text())}
+    return _STRENGTH
+
+
+def difficulty_weight(observation: dict, side: str, exponent: float = 0.5, cap: float = 4.0) -> float:
+    """Opponent-to-own strength ratio at this state, tempered into a reward weight.
+
+    Counts are priced by the engine's own creature strength, the same pricing the value-budget
+    sampler uses, so a Peasant and a Champion are not the same unit. The ratio is clipped to
+    [1/cap, cap] before the exponent, because horde matchups reach order-of-magnitude ratios and
+    an unbounded weight would let one scenario dominate a batch. Commander stat bonuses are not
+    priced in, a known simplification recorded in reward-design.
+
+    At the default exponent 0.5 and cap 4, the weight spans [0.5, 2].
+    """
+    strength = _monster_strength()
+    mine = side == "attacker"
+    own = sum(strength[u["monster_id"]] * u["count"] for u in observation["units"] if (u["side"] == "attacker") == mine)
+    enemy = sum(strength[u["monster_id"]] * u["count"] for u in observation["units"] if (u["side"] == "attacker") != mine)
+    if own <= 0.0 or enemy <= 0.0:
+        return 1.0
+    ratio = min(max(enemy / own, 1.0 / cap), cap)
+    return ratio ** exponent
+
+
+def apply_difficulty(reward: float, weight: float) -> float:
+    """Difficulty-weighted terminal reward: wins scale by the weight, losses by its inverse.
+
+    A hard fight (weight above one) pays more for winning and forgives losing; an easy fight
+    pays less for winning and punishes losing harder. Both directions serve the same end, that
+    the gradient stops over-rewarding easy victories and over-penalizing lopsided losses. The
+    sign split is well defined because the margin-weighted terminal reward never lands strictly
+    between 0 and 1: a win is at least 1 and everything else is at most 0.
+    """
+    return reward * (weight if reward > 0 else 1.0 / weight)
 
 
 class ScenarioRejected(RuntimeError):
@@ -42,8 +87,15 @@ class BattleEnv:
     def __init__(self, worker: str, fixture: str = "m1_tiny_melee", side: str = "attacker", seeds: int = 1, home: str = "/tmp",
                  attacker: str | None = None, defender: str | None = None,
                  attacker_hero: str | None = None, defender_hero: str | None = None,
-                 allow_wide: bool = False):
+                 allow_wide: bool = False, probe_teacher: bool = False,
+                 reward_weighting: str = "none"):
+        if reward_weighting not in ("none", "difficulty"):
+            raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
+        # DAgger relabeling: each decision record then carries "teacher_action", the planner's
+        # own choice at the same state, when it resolves inside simple_v1.
+        if probe_teacher:
+            self._cmd += ["--probe-teacher"]
         # Army overrides, "monsterId:count,...". These are the difficulty control: a matchup is
         # only worth training on when the policy neither always wins nor always loses it.
         if attacker:
@@ -66,34 +118,59 @@ class BattleEnv:
         # Own hit points at the first decision, which is before any damage has been dealt, so it
         # is the starting force. The terminal record carries no initial totals.
         self._own_initial_hp: float = 0.0
+        self._reward_weighting = reward_weighting
+        self._difficulty = 1.0
         self.side = side
+        # The scenario id of the episode in progress, from the worker's episode_start record.
+        # With seeds > 1 this is how a caller tells the battlefield variants apart.
+        self.scenario_id: str | None = None
 
     def _readline(self) -> dict | None:
         assert self._proc is not None
         line = self._proc.stdout.readline()
         return json.loads(line) if line else None
 
-    def reset(self) -> tuple[np.ndarray, np.ndarray]:
+    def _spawn(self) -> None:
         self.close()
         self._proc = subprocess.Popen(
             self._cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1, env=self._env,
         )
+
+    def reset(self) -> tuple[np.ndarray, np.ndarray]:
+        # Between episodes the worker is kept alive and advances to its next scenario, which is
+        # what makes `seeds` a rotation over battlefields rather than dead configuration: the
+        # worker's scenario list is the world-seed variants, one episode each, and a fresh
+        # process restarts the cycle. A reset that abandons a battle mid-episode still needs a
+        # fresh process, because the worker is blocked waiting for an action.
+        spawned = False
+        if self._proc is None or self._pending is not None:
+            self._spawn()
+            spawned = True
+        self._pending = None
         while True:
             record = self._readline()
             if record is None:
-                # Surface the worker's own reason. Scenario validation rejects an army the
-                # allowlist or the count limits do not permit, and swallowing that turns a
-                # precise message into an unexplained crash mid-sweep.
-                detail = (self._proc.stderr.read() or "").strip().splitlines()
-                reason = detail[-1] if detail else "no diagnostic on stderr"
-                raise ScenarioRejected(f"{reason} (attacker={self._attacker}, defender={self._defender})")
-            if record["record"] == "decision":
+                if spawned:
+                    # Died right after spawning, which is the worker refusing the scenario.
+                    # Surface its own reason rather than an unexplained crash mid-sweep.
+                    detail = (self._proc.stderr.read() or "").strip().splitlines()
+                    reason = detail[-1] if detail else "no diagnostic on stderr"
+                    raise ScenarioRejected(f"{reason} (attacker={self._attacker}, defender={self._defender})")
+                # Scenario list exhausted: start the next cycle of battlefields.
+                self._spawn()
+                spawned = True
+                continue
+            if record["record"] == "episode_start":
+                self.scenario_id = record.get("scenario_id")
+            elif record["record"] == "decision":
                 self._pending = record
                 mine = self.side == "attacker"
                 self._own_initial_hp = float(
                     sum(u["hit_points"] for u in record["observation"]["units"] if (u["side"] == "attacker") == mine)
                 )
+                if self._reward_weighting == "difficulty":
+                    self._difficulty = difficulty_weight(record["observation"], self.side)
                 return encode_observation(record["observation"]), encode_mask(record["legal_actions"])
 
     def step(self, action: int) -> Step:
@@ -111,13 +188,20 @@ class BattleEnv:
 
         # Terminal. The reward is defined here rather than in the environment, per ADR 0005,
         # which keeps the objective a training-configuration choice rather than engine behaviour.
-        return Step(
+        reward = terminal_reward(record, self.side, self._own_initial_hp)
+        if self._reward_weighting == "difficulty":
+            reward = apply_difficulty(reward, self._difficulty)
+        step = Step(
             observation=np.zeros_like(encode_observation(self._pending["observation"])),
             mask=np.zeros(encode_mask([]).shape, dtype=bool),
-            reward=terminal_reward(record, self.side, self._own_initial_hp),
+            reward=reward,
             done=True,
             info=record,
         )
+        # Nothing is pending once the battle ended, which is also what tells reset() that the
+        # worker is between episodes and can simply be read forward.
+        self._pending = None
+        return step
 
     def close(self) -> None:
         if self._proc is None:
@@ -179,7 +263,7 @@ class MatchupPool:
     """
 
     def __init__(self, worker: str, matchups, side: str = "attacker", seed: int = 0, home: str = "/tmp",
-                 hold_within_group: bool = False):
+                 hold_within_group: bool = False, seeds: int = 1, reward_weighting: str = "none"):
         import random
 
         self._worker = worker
@@ -189,6 +273,8 @@ class MatchupPool:
         self._home = home
         self._env: BattleEnv | None = None
         self._hold = hold_within_group
+        self._seeds = seeds
+        self._reward_weighting = reward_weighting
         self.side = side
         self.current = None
 
@@ -197,14 +283,20 @@ class MatchupPool:
         self.current = self._rng.choice(self._matchups)
 
     def reset(self):
-        self.close()
+        # The environment is rebuilt only when the matchup changes. Keeping it across episodes
+        # of the same matchup is what lets `seeds` rotate battlefields inside a group, since the
+        # rotation lives in the worker's scenario list and dies with the process.
+        previous = self.current
         if not self._hold or self.current is None:
             self.current = self._rng.choice(self._matchups)
-        self._env = BattleEnv(self._worker, side=self._side, attacker=self.current.attacker,
-                              defender=self.current.defender, home=self._home,
-                              attacker_hero=getattr(self.current, "attacker_hero", None),
-                              defender_hero=getattr(self.current, "defender_hero", None),
-                              allow_wide=getattr(self.current, "allow_wide", False))
+        if self._env is None or self.current is not previous:
+            self.close()
+            self._env = BattleEnv(self._worker, side=self._side, attacker=self.current.attacker,
+                                  defender=self.current.defender, home=self._home,
+                                  attacker_hero=getattr(self.current, "attacker_hero", None),
+                                  defender_hero=getattr(self.current, "defender_hero", None),
+                                  allow_wide=getattr(self.current, "allow_wide", False),
+                                  seeds=self._seeds, reward_weighting=self._reward_weighting)
         return self._env.reset()
 
     def step(self, action: int) -> Step:

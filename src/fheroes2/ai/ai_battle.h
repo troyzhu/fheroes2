@@ -80,6 +80,13 @@ namespace AI
 
         void BattleTurn( Battle::Arena & arena, const Battle::Unit & currentUnit, Battle::Actions & actions );
 
+        // What this planner would do for the given unit at the current arena state, without the
+        // attacking-side turn-limit bookkeeping that BattleTurn adds. Planning consumes no
+        // combat randomness and recomputes the analysis members on every call, so querying and
+        // discarding the result leaves the battle unchanged; the agent-side teacher probe
+        // (src/fheroes2/agent/agent_external_controller.cpp) relies on exactly that.
+        Battle::Actions queryUnitTurn( Battle::Arena & arena, const Battle::Unit & currentUnit );
+
     private:
         BattlePlanner() = default;
 
