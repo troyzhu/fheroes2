@@ -28,6 +28,8 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `ppo_from_strongest.py` | Does PPO still earn anything from a strong supervised anchor, or erode it? Paired against the anchor's vendored evaluation | about 35 min over 3 seeds |
 | `critic_calibration.py` | Where does the behavior value actually work? Explained variance and bias on teacher holdout against student-played states | about 8 min including the refit |
 | `search_probe.py` | Does root-PUCT with rollout values lift play on the matchups the policy loses? | about 15 min at 32 simulations |
+| `search_teacher.py` | Collection half of a search-taught round: search plays and labels in the dataset schema, sharded across cores | about 30 min at 6 shards |
+| `validation_battery.py` | The report card: fresh generator samples, held-out pool, OOD stress suites, and the Thunk ladder, per checkpoint over battlefields | about 20 min per checkpoint |
 
 ## Conventions
 

@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""Search plays and labels: the collection half of one search-taught distillation round.
+
+Root-PUCT with the clone prior and rollout scoring chooses every controlled action, the episode
+follows the searched action, and each decision is written in the dataset schema with the
+searched choice as the label. This is the AlphaZero improvement step assembled from this
+project's parts, held to the one-round discipline the offline literature imposes; the probe
+measured the operator at +0.79 win rate on the matchups the policy loses.
+
+Collection runs at one battlefield per matchup, deliberately: simulations replay the live
+episode's action prefix, and the battlefield rotation lives in the worker's scenario cycle,
+which a side environment cannot yet synchronize to. Battlefield variety stays the teacher
+corpus's job; these labels contribute decision quality.
+
+Shards partition the matchup list so cores collect in parallel:
+    ./search_teacher.py WORKER CHECKPOINT --out-dir DIR --shard 0 --shards 6 [...]
+
+Usage:
+    ./search_teacher.py WORKER CHECKPOINT --out-dir DIR [--shard 0 --shards 1]
+                        [--simulations 32] [--hard-episodes 24] [--easy-episodes 8]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import pathlib
+import sys
+import time
+
+import numpy as np
+import torch
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
+
+from fheroes2_agent.env import BattleEnv  # noqa: E402
+from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from search_probe import search_action, policy_action  # noqa: E402
+
+POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive" / "experiments" / "files" \
+    / "2026-08-05-run-reports" / "pool_value.json"
+SHARE2_EVALS = POOL.parent / "dagger_share2.json"
+
+
+def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: pathlib.Path,
+                    episodes: int, simulations: int, c_puct: float) -> tuple[int, int]:
+    kwargs = dict(attacker=entry["attacker"], defender=entry["defender"],
+                  attacker_hero=entry.get("attacker_hero"), defender_hero=entry.get("defender_hero"),
+                  allow_wide=bool(entry.get("allow_wide")))
+    env = BattleEnv(worker, **kwargs)
+    sim = BattleEnv(worker, **kwargs)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    decisions = 0
+    wins = 0
+    try:
+        for episode in range(episodes):
+            observation, mask = env.reset()
+            prefix: list[int] = []
+            records = []
+            while True:
+                action = search_action(sim, model, prefix, observation, mask, simulations, c_puct)
+                raw = env._pending
+                records.append({"record": "decision", "observation": raw["observation"],
+                                "legal_actions": raw["legal_actions"], "teacher_resolved": True,
+                                "teacher_action": int(action)})
+                decisions += 1
+                prefix.append(action)
+                step = env.step(action)
+                if step.done:
+                    records.append(step.info)
+                    wins += step.info["termination"] == "victory"
+                    break
+                observation, mask = step.observation, step.mask
+            (out_dir / f"episode_{episode:04d}.jsonl").write_text("\n".join(json.dumps(r) for r in records) + "\n")
+    finally:
+        env.close()
+        sim.close()
+    return decisions, wins
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("worker")
+    parser.add_argument("checkpoint")
+    parser.add_argument("--out-dir", required=True)
+    parser.add_argument("--shard", type=int, default=0)
+    parser.add_argument("--shards", type=int, default=1)
+    parser.add_argument("--simulations", type=int, default=32)
+    parser.add_argument("--c-puct", type=float, default=1.5)
+    parser.add_argument("--hard-episodes", type=int, default=24,
+                        help="episodes for the 15 matchups the prior loses worst, where labels differ most")
+    parser.add_argument("--easy-episodes", type=int, default=8)
+    args = parser.parse_args()
+
+    model = BattlePolicy()
+    model.load_state_dict(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    model.eval()
+
+    entries = json.loads(POOL.read_text())["matchups"][:40]
+    rates = json.loads(SHARE2_EVALS.read_text())["evals"]["train"]
+    hard = set(np.argsort(rates)[:15].tolist())
+
+    out_root = pathlib.Path(args.out_dir)
+    started = time.time()
+    total_decisions = 0
+    total_wins = 0
+    total_eps = 0
+    for index, entry in enumerate(entries):
+        if index % args.shards != args.shard:
+            continue
+        episodes = args.hard_episodes if index in hard else args.easy_episodes
+        decisions, wins = collect_matchup(args.worker, model, entry, out_root / f"matchup_{index:03d}",
+                                          episodes, args.simulations, args.c_puct)
+        total_decisions += decisions
+        total_wins += wins
+        total_eps += episodes
+        print(f"shard {args.shard}: matchup {index} done, {decisions} labeled, {wins}/{episodes} won", flush=True)
+
+    print(f"shard {args.shard}: {total_eps} episodes, {total_decisions} labels, "
+          f"{total_wins}/{total_eps} won, {round(time.time() - started)}s")
+
+
+if __name__ == "__main__":
+    main()
