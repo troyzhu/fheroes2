@@ -29,6 +29,9 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/one-step-offline-rl]] | paper | 2021 | primary | One improvement step against the behavior value beats iterating, because iteration queries the value off-data | improvement-step discipline |
 | [[works/bcq-extrapolation]] | paper | 2019 | primary | Extrapolation error: value estimates queried off-data, then maximized into | the critic calibration result |
 | [[works/double-q-overestimation]] | paper | 2016 | primary | Max-operator overestimation in bootstrapped values, absent from our MC-fitted critic, acquired the moment anything bootstraps | value-estimation boundary |
+| [[works/expert-iteration]] | paper | 2017 | primary | Planning and generalization split into two jobs; imitation extended to domains where the best expert is not good enough | the search-teaching loop's name and framing |
+| [[works/mcts-regularized-policy-optimization]] | paper | 2020 | primary | Visit counts approximate a regularized policy-optimization solution, poorly at small simulation budgets | the value-leaf probe and the distillation target |
+| [[works/muzero]] | paper | 2020 | primary | Value trained on search returns and jointly with the policy; the learned model is what we do not need | the requirements for a usable leaf evaluator |
 | [[works/gae]] | paper | 2016 | primary | The bias-variance dial of credit assignment; its low-bias end pays in value accuracy our critic does not have off-distribution | credit-assignment measurement |
 | [[works/alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
 | [[works/griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |

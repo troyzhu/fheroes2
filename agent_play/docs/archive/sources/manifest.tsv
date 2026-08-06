@@ -58,3 +58,6 @@ arxiv-1812.02900.pdf	OK	2239587	Off-Policy Deep Reinforcement Learning without E
 arxiv-1509.06461.pdf	OK	789062	Deep Reinforcement Learning with Double Q-learning	https://arxiv.org/abs/1509.06461
 uct-kocsis-szepesvari-2006.pdf	OK	335549	Bandit based Monte-Carlo Planning (UCT), Kocsis and Szepesvari, ECML 2006	http://ggp.stanford.edu/readings/uct.pdf
 arxiv-1506.02438.pdf	OK	1798117	High-Dimensional Continuous Control Using Generalized Advantage Estimation	https://arxiv.org/abs/1506.02438
+arxiv-1705.08439.pdf	OK	1251901	Thinking Fast and Slow with Deep Learning and Tree Search	https://arxiv.org/abs/1705.08439
+arxiv-2007.12509.pdf	OK	1456554	Monte-Carlo Tree Search as Regularized Policy Optimization	https://arxiv.org/abs/2007.12509
+arxiv-1911.08265.pdf	OK	2701361	Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model	https://arxiv.org/abs/1911.08265

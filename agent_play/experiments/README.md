@@ -34,6 +34,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `play_vs.py` | Battle a checkpoint yourself: you command one side in the real battle window, the policy answers the other over the line protocol | interactive, needs a display |
 | `ability_ablation.py` | Do explicit per-creature ability features earn their place, paired on one corpus and judged by the battery? | about 25 min for both arms |
 | `builtin_ai_baseline.py` | The engine's own AI on every validation suite: the baseline a player recognizes, and the bar the policies must clear | about 70 s for all suites |
+| `search_value.py` | Can a value network replace rollouts at search leaves, and is it calibrated where it would be used? | about 10 min including the fit |
 | `tabula_rasa_pilot.py` | Could search bootstrap a policy from random initialization, with no demonstrations at all? Rounds of search play, distil, evaluate on a fixed matchup set | about 20 min for three rounds |
 
 ## Conventions
