@@ -244,6 +244,18 @@ All of this is premature until a policy exists that is worth playing against, wh
 
 Population-based training runs many configurations at once and periodically copies the weights and perturbs the hyperparameters of the better performers into the worse. It tunes on a schedule rather than to a fixed value, which suits reinforcement learning where the best learning rate early differs from the best learning rate late. The comparable shipped system used it. It is worth considering only once a single run trains reliably.
 
+### Anchored fine-tuning, a destination constraint
+
+PPO's clip and the divergence trust region both constrain $\pi_\theta$ against the previous iterate, and the previous iterate re-centers every update. That is a step-size constraint with a KL interpretation, and it bounds nothing about the endpoint: per-step divergences do not telescope, so over many iterations the policy can walk arbitrarily far from where it started while every individual step stays inside the clip. The anchored form adds a penalty $\beta \, D_{\mathrm{KL}}(\pi_\theta \,\|\, \pi_{\text{ref}})$ against a fixed reference, the language-model fine-tuning pattern where $\pi_{\text{ref}}$ is the supervised checkpoint, and the two constraints are complements rather than substitutes, one governing the step and the other the destination.
+
+The distinction is measured here, not theoretical: the 2026-08-05 run of PPO from the strongest clone eroded held-out play by $0.060 \pm 0.016$ with the clip active at its default the whole time ([[../archive/experiments/2026-08-05-dagger-and-battlefield-transfer]]). What the anchor cannot do is help discovery, since it taxes divergence from the reference exactly where a new behavior would need it; and on matchups the policy never wins, the terminal reward has zero outcome variance and no gradient for any constraint to shape, the degeneracy [[scenario-distribution]] measured. Signal on such matchups has to be manufactured, by curriculum or by shaping, before any constraint question arises.
+
+### Search as an improvement operator
+
+Monte Carlo tree search over a learned policy prior and value function is an improvement operator: the searched decision is better than the prior's, and distilling searched decisions back into the policy is AlphaZero's whole loop. Its usual costs are copying game state and handling chance, and this environment has both unusually cheap. A simulation is a fresh worker replaying the action prefix and rolling out, about five milliseconds headless, since determinism makes any recorded state reachable by replay; and stochastic damage and morale become controlled determinization through the seed discipline, one seed per simulation, several per node where an expectation matters.
+
+The role that fits this project is search as the next teacher rather than as the deployed policy. The scripted planner's ceiling is measured, the relabeling pipeline already exists, and swapping its labeler from the planner query to a short search turns the same machinery into policy iteration past the teacher, at an honest cost of hours per labeling round unless search runs only on pivotal states. This stays a recorded direction rather than a plan until the owner weighs it against the curriculum route.
+
 ### Evaluation
 
 Elo places agents on a scalar scale from pairwise results. TrueSkill extends it with an explicit uncertainty per player, which allows scheduling matches until that uncertainty is small enough to rank confidently rather than playing a fixed number.
