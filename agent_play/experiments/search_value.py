@@ -103,9 +103,12 @@ def value_leaf_search(sim: BattleEnv, policy, value_model, prefix: list[int], ob
     return max(scores, key=scores.get), steps
 
 
-def play(worker: str, policy, value_model, episodes: int, simulations: int) -> dict:
-    env = BattleEnv(worker, **THUNK)
-    sim = BattleEnv(worker, **THUNK)
+def play(worker: str, policy, value_model, episodes: int, simulations: int, matchup: dict | None = None,
+         seeds: int = 1) -> dict:
+    spec = dict(matchup) if matchup else dict(THUNK)
+    spec["seeds"] = seeds
+    env = BattleEnv(worker, **spec)
+    sim = BattleEnv(worker, **spec)
     wins, surv, steps, seconds = [], [], 0, time.time()
     try:
         for _ in range(episodes):
@@ -141,6 +144,8 @@ def main() -> None:
     parser.add_argument("--simulations", type=int, default=32)
     parser.add_argument("--out", default=None)
     parser.add_argument("--report", default=None)
+    parser.add_argument("--held-out", type=int, default=0,
+                        help="instead of the Thunk fight, run value-leaf search over this many held-out pool matchups")
     args = parser.parse_args()
 
     out_path = args.out or str(pathlib.Path(tempfile.mkdtemp(prefix="search_value_")) / "value.pt")
@@ -159,6 +164,27 @@ def main() -> None:
         report["calibration"]["policy_states"] = evaluate_value(value_model, load_dir(list(args.policy_data)))
     for name, stats in report["calibration"].items():
         print(f"{name:20s} n={stats['n']:7d} EV {stats['explained_variance']:+.3f} bias {stats['bias']:+.3f}", flush=True)
+
+    if args.held_out:
+        entries = json.loads((pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive"
+                              / "experiments" / "files" / "2026-08-05-run-reports" / "pool_value.json").read_text())
+        rates = []
+        for entry in entries["matchups"][40:40 + args.held_out]:
+            spec = dict(attacker=entry["attacker"], defender=entry["defender"],
+                        attacker_hero=entry.get("attacker_hero"), defender_hero=entry.get("defender_hero"),
+                        allow_wide=bool(entry.get("allow_wide")))
+            result = play(args.worker, policy, value_model, args.episodes, args.simulations, matchup=spec,
+                          seeds=args.episodes)
+            rates.append(result["win_rate"])
+            print(f"  held-out {entry['attacker']} vs {entry['defender']}: {result['win_rate']:.2f}", flush=True)
+        arr = np.array(rates)
+        report["held_out_value_search"] = {"rates": rates, "mean": float(arr.mean()),
+                                           "se": float(arr.std(ddof=1) / np.sqrt(len(arr)))}
+        print(f"value-leaf search on held-out: mean {arr.mean():.3f} +/- {arr.std(ddof=1)/np.sqrt(len(arr)):.3f} "
+              f"(built-in AI reads 0.660)")
+        if args.report:
+            pathlib.Path(args.report).write_text(json.dumps(report, indent=2))
+        return
 
     report["value_leaf_search"] = play(args.worker, policy, value_model, args.episodes, args.simulations)
     print(f"value-leaf search on Thunk-1000: win {report['value_leaf_search']['win_rate']:.2f}, "

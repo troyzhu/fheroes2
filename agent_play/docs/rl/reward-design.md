@@ -125,3 +125,12 @@ Prefer the terminal candidates until learning demonstrably stalls, which has not
 - [[rl-methods]], for the shaping theorem and the estimators the reward feeds.
 - [[scenario-distribution]], for why the scenario decides more than the reward does.
 - [[rlhf-transfer]], for over-optimization and the proxy-against-gold protocol.
+
+
+## Stalls, and the evasion exploit the owner predicted
+
+A battle nobody finishes is a possibility the reward has to price, because a policy that cannot win can always try not to lose. The owner raised the flying version, a fast unit that simply keeps its distance forever; the measured facts as of 2026-08-06 are that `simple_v1` rejects flying movement outright (deferred to Phase 1b), so the flying exploit cannot be fielded yet, that the runner already stops any battle after forty consecutive no-death rounds with a `stalemate` termination (61 of 16,060 recorded episodes) and hard-caps at 100 rounds, and that the walking version of the exploit works today: `evasion_stalemate.py` commands fast Rogues to always move to the cell farthest from slow Zombies, and every episode ends in `stalemate` at exactly round 40, none looping.
+
+What a stall pays is grounded in the engine rather than chosen. The built-in AI's own stalemate breaker forces the attacking hero to retreat after fifty deathless turns, and a forced retreat loses the attacker the battle and the army. `_side_won` in `env.py` scores our earlier termination the same way: the defender who outlasted the attacker wins, +1 plus survival, and the attacker who failed to force an engagement loses with the survival term zeroed, -1.0 flat. The zeroing matters: the first run of the demo showed an evading attacker banking 0.0 through full survival, which still beat fighting and losing at -0.4, exactly the preference the exploit needs; -1.0 flat makes any fight with survivors strictly better than any stall, for the side whose job is to engage.
+
+Evaluation win rates are deliberately not changed by any of this: `measure` still counts only outright destruction as a win, so a stalling policy cannot inflate a battery column, and the reward's game-faithful semantics live only where behavior is optimized. If flying support arrives with Phase 1b, the demo reruns with Sprites, and the defender-side incentive, evasion as a legitimate +2.0 when the attacker cannot force a fight, becomes a real strategy the training distribution has to expect.

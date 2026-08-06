@@ -251,7 +251,9 @@ def terminal_reward(record: dict, side: str, own_initial_hit_points: float) -> f
     """
     own = "attacker" if side == "attacker" else "defender"
     survived = record[own]["hit_points"] / own_initial_hit_points if own_initial_hit_points > 0 else 0.0
-    won = record["termination"] == ("victory" if side == "attacker" else "defeat")
+    won = _side_won(record, side)
+    if record["termination"] == "stalemate" and side == "attacker":
+        survived = 0.0
     return (1.0 if won else -1.0) + survived
 
 
@@ -263,8 +265,35 @@ def terminal_reward_strength(record: dict, side: str) -> float:
     own = record["attacker" if side == "attacker" else "defender"]
     initial = float(own.get("initial_strength", 0.0))
     survived = float(own.get("strength", 0.0)) / initial if initial > 0 else 0.0
-    won = record["termination"] == ("victory" if side == "attacker" else "defeat")
+    won = _side_won(record, side)
+    if record["termination"] == "stalemate" and side == "attacker":
+        survived = 0.0
     return (1.0 if won else -1.0) + survived
+
+
+def _side_won(record: dict, side: str) -> bool:
+    """Who a terminal record says won, including the stall case the owner raised.
+
+    A battle nobody finishes is not a free draw. The engine's own AI settles it: after fifty
+    turns without a death it forces the attacking hero to retreat, which loses the attacker the
+    battle. The runner stops at forty no-death rounds (its captains cannot retreat, so letting
+    the engine's breaker fire would abort), and this function scores that termination the way
+    the engine would have resolved it: the defender outlasted the attacker and wins, the
+    attacker who failed to force an engagement loses. Without this, an evading defender scored
+    -1 + survival = 0.0, and a policy in a losing matchup would rationally prefer stalling at
+    0.0 to fighting at -0.4; with it, evasion is worth +2.0 to a defender exactly when the real
+    game would award the battle. The retreat also costs the attacker its army, so both reward
+    functions zero the attacker's survival term at a stalemate, -1.0 flat, strictly worse than
+    fighting and losing with anything left; the first run of the evasion demo showed that was
+    not yet true, an evading attacker banking 0.0 through full survival.
+
+    The 100-round `round_limit` cap stays a loss for both sides: it has no engine analogue, it
+    never fired in 16,060 recorded episodes (61 stalemates did), and a battle still trading
+    deaths at that horizon is an artifact of truncation rather than a stall anyone chose.
+    """
+    if record["termination"] == "stalemate":
+        return side == "defender"
+    return record["termination"] == ("victory" if side == "attacker" else "defeat")
 
 
 class MatchupPool:
