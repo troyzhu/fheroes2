@@ -103,12 +103,14 @@ def load_episode(path: pathlib.Path, gamma: float = 0.99) -> tuple[list[np.ndarr
     return observations, masks, actions, returns
 
 
-def load_dir(root: str | pathlib.Path) -> Samples:
-    root = pathlib.Path(root)
+def load_dir(root: str | pathlib.Path | list[str | pathlib.Path]) -> Samples:
+    # Several roots load as one corpus, which is how an aggregated dataset (teacher
+    # demonstrations plus DAgger relabelings) trains without copying gigabytes under one tree.
+    roots = [pathlib.Path(r) for r in (root if isinstance(root, list) else [root])]
     # Recursive, because recorders that sample many matchups write one subdirectory per matchup.
-    files = sorted(root.rglob("*.jsonl"))
+    files = [path for r in roots for path in sorted(r.rglob("*.jsonl"))]
     if not files:
-        raise FileNotFoundError(f"no .jsonl episodes under {root}")
+        raise FileNotFoundError(f"no .jsonl episodes under {', '.join(map(str, roots))}")
 
     all_obs: list[np.ndarray] = []
     all_masks: list[np.ndarray] = []
@@ -125,7 +127,8 @@ def load_dir(root: str | pathlib.Path) -> Samples:
         all_returns.extend(returns if returns else [float("nan")] * len(actions))
 
     if not all_actions:
-        raise ValueError(f"{len(files)} files under {root} produced no samples; was --audit-coverage set when recording?")
+        raise ValueError(f"{len(files)} files under {', '.join(map(str, roots))} produced no samples; "
+                         "was --audit-coverage set when recording?")
 
     samples = Samples(
         observations=np.stack(all_obs),
