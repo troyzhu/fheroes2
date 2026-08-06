@@ -187,9 +187,11 @@ void fheroes2::agent::TrajectoryWriter::writeTerminal( const EpisodeOutcome & ou
          << ",\"decision_digest\":\"" << escapeJson( decisionDigest ) << '"' //
          << ",\"state_digest\":\"" << escapeJson( outcome.stateDigest ) << '"' //
          << ",\"attacker\":{\"live_stacks\":" << outcome.attacker.liveStacks << ",\"live_creatures\":" << outcome.attacker.liveCreatures
-         << ",\"hit_points\":" << outcome.attacker.hitPoints << '}' //
+         << ",\"hit_points\":" << outcome.attacker.hitPoints << ",\"strength\":" << outcome.attacker.strength
+         << ",\"initial_strength\":" << outcome.attackerInitialStrength << '}' //
          << ",\"defender\":{\"live_stacks\":" << outcome.defender.liveStacks << ",\"live_creatures\":" << outcome.defender.liveCreatures
-         << ",\"hit_points\":" << outcome.defender.hitPoints << '}';
+         << ",\"hit_points\":" << outcome.defender.hitPoints << ",\"strength\":" << outcome.defender.strength
+         << ",\"initial_strength\":" << outcome.defenderInitialStrength << '}';
 
     // Per-unit terminal state. These fields were previously computed, folded into the state
     // digest, and then discarded, so the only inspectable form of the extracted state was a

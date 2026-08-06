@@ -70,6 +70,7 @@
 #include "icn.h"
 #include "image_palette.h"
 #include "image_tool.h"
+#include "localevent.h"
 #include "render_processor.h"
 #include "screen.h"
 #include "settings.h"
@@ -359,6 +360,17 @@ int runTool( int argc, char ** argv )
     std::optional<AGG::AGGInitializer> aggInitializer;
     std::optional<fheroes2::h2d::H2DInitializer> h2dInitializer;
 
+    // Teardown in the game's own order, which is load-bearing: the asset initializers go first
+    // and the display is released only afterwards, because releasing it out from under them
+    // aborts during their destruction, and a throwing destructor cannot be caught anywhere.
+    const auto shutdownRender = [&aggInitializer, &h2dInitializer]() {
+        h2dInitializer.reset();
+        aggInitializer.reset();
+        fheroes2::Display::instance().setRenderObserver( {} );
+        fheroes2::RenderProcessor::instance().unregisterRenderers();
+        fheroes2::Display::instance().release();
+    };
+
     if ( render ) {
         hardwareInitializer.emplace();
         coreInitializer.emplace();
@@ -406,6 +418,20 @@ int runTool( int argc, char ** argv )
 
         conf.setGameLanguage( conf.getGameLanguage() );
         Game::Init();
+
+        // Game::Init installs a quit hook that asks the engine to throw on window close, and the
+        // engine processes the pending quit again while the battle interface tears down, so the
+        // second throw lands during unwinding where no catch can exist and the process aborts,
+        // which macOS reports as a crash. This hook throws exactly once: the first close ends the
+        // battle through the catch below, and every later quit event is ignored.
+        LocalEvent::Get().setQuitEventProcessingHook( []() {
+            static bool alreadyRequested = false;
+            if ( alreadyRequested ) {
+                return false;
+            }
+            alreadyRequested = true;
+            return true;
+        } );
 
         if ( !framesDir.empty() ) {
             display.setRenderObserver( makeFrameDumper( framesDir ) );
@@ -461,23 +487,20 @@ int runTool( int argc, char ** argv )
         outcome = fheroes2::agent::runEpisode( scenario, nullptr, &controller, render, humanSide );
     }
     catch ( const fheroes2::UserRequestedApplicationClosure & ) {
-        // Closing the battle window is a normal way to end a live game, and the engine reports
-        // it by exception; without this it escapes main and the process aborts, which macOS then
-        // reports as a crash.
+        // Closing the battle window is a normal way to end a live game, and the engine reports it
+        // by exception. Returning normally from here still aborted: something in the render
+        // teardown or a static destructor throws afterwards, and a throwing destructor is
+        // uncatchable by construction, so macOS kept reporting a crash on a clean quit. This tool
+        // owns no state worth persisting past this point, so it flushes and leaves immediately
+        // instead of unwinding. The operating system reclaims the window, the audio device and
+        // the process memory.
         std::fprintf( stderr, "battle window closed by the user\n" );
-        fheroes2::Display::instance().setRenderObserver( {} );
-        fheroes2::RenderProcessor::instance().unregisterRenderers();
-        fheroes2::Display::instance().release();
-        return 4;
+        std::fflush( nullptr );
+        std::_Exit( 4 );
     }
 
     if ( render ) {
-        // The game's DisplayInitializer destructor does exactly this, and in this order: the
-        // display must be released while the SDL core (destroyed later, declared earlier) is
-        // still alive, or teardown dies inside static destruction.
-        fheroes2::Display::instance().setRenderObserver( {} );
-        fheroes2::RenderProcessor::instance().unregisterRenderers();
-        fheroes2::Display::instance().release();
+        shutdownRender();
     }
 
     const bool exact = playSide.empty() && ( controller.rejectedSelections() == 0 ) && !controller.isFinished()
@@ -492,6 +515,13 @@ int runTool( int argc, char ** argv )
                  controller.decisionsSeen(), controller.rejectedSelections(), exact ? "true" : "false", outcome.attacker.liveStacks, outcome.attacker.liveCreatures,
                  outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints, outcome.stateDigest.c_str() );
     std::fflush( stdout );
+
+    if ( !playSide.empty() ) {
+        // Same reasoning as the closure path above: a finished live battle has printed its
+        // result, and unwinding the interactive render stack is what produced the crash report.
+        std::fflush( nullptr );
+        std::_Exit( exact ? 0 : 3 );
+    }
 
     return exact ? 0 : 3;
 }
