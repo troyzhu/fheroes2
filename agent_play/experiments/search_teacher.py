@@ -44,7 +44,7 @@ from fheroes2_agent.env import BattleEnv  # noqa: E402
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from search_probe import search_action, policy_action  # noqa: E402
+from search_probe import policy_action, search_action, search_action_detail  # noqa: E402
 
 POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive" / "experiments" / "files" \
     / "2026-08-05-run-reports" / "pool_value.json"
@@ -53,7 +53,8 @@ SHARE2_EVALS = POOL.parent / "dagger_share2.json"
 
 def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: pathlib.Path,
                     episodes: int, simulations: int, c_puct: float, side: str = "attacker",
-                    min_win_fraction: float = 0.0, seed_offset: int = 0) -> tuple[int, int]:
+                    min_win_fraction: float = 0.0, seed_offset: int = 0,
+                    record_candidates: bool = False) -> tuple[int, int]:
     """Returns (decisions, wins) actually written; (0, wins) when the win filter drops the
     matchup, since labels from fights search cannot win teach the least-bad line of a lost
     position, which the credit measurement showed is exactly the poison. A nonzero seed offset
@@ -74,11 +75,23 @@ def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: path
             prefix: list[int] = []
             records = []
             while True:
-                action = search_action(sim, model, prefix, observation, mask, simulations, c_puct)
+                if record_candidates:
+                    action, means, visits, prior = search_action_detail(
+                        sim, model, prefix, observation, mask, simulations, c_puct)
+                else:
+                    action = search_action(sim, model, prefix, observation, mask, simulations, c_puct)
                 raw = env._pending
-                records.append({"record": "decision", "observation": raw["observation"],
-                                "legal_actions": raw["legal_actions"], "teacher_resolved": True,
-                                "teacher_action": int(action)})
+                record = {"record": "decision", "observation": raw["observation"],
+                          "legal_actions": raw["legal_actions"], "teacher_resolved": True,
+                          "teacher_action": int(action)}
+                if record_candidates:
+                    # Per-candidate search measurements, keyed by canonical action index. Extra
+                    # fields are invisible to the standard dataset loader, so these episodes
+                    # remain valid hard-label corpora as well.
+                    record["search_values"] = {str(a): round(means[a], 4) for a in means}
+                    record["search_visits"] = {str(a): visits[a] for a in visits}
+                    record["prior"] = {str(a): round(prior[a], 6) for a in prior}
+                records.append(record)
                 decisions += 1
                 prefix.append(action)
                 step = env.step(action)

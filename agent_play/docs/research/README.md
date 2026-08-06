@@ -32,6 +32,11 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/expert-iteration]] | paper | 2017 | primary | Planning and generalization split into two jobs; imitation extended to domains where the best expert is not good enough | the search-teaching loop's name and framing |
 | [[works/mcts-regularized-policy-optimization]] | paper | 2020 | primary | Visit counts approximate a regularized policy-optimization solution, poorly at small simulation budgets | the value-leaf probe and the distillation target |
 | [[works/muzero]] | paper | 2020 | primary | Value trained on search returns and jointly with the policy; the learned model is what we do not need | the requirements for a usable leaf evaluator |
+| [[works/cql]] | paper | 2020 | primary | Pessimistic Q lower-bounds the policy's value, so improvement cannot exploit off-data guesses | remedies survey, pessimism family |
+| [[works/iql]] | paper | 2022 | primary | Expectile regression never evaluates unseen actions; policy extracted by advantage weighting | remedies survey, avoid-the-query family |
+| [[works/awr]] | paper | 2019 | primary | Improvement as supervised regression on taken actions weighted by exponentiated advantage | the first arm this project runs |
+| [[works/td3-bc]] | paper | 2021 | primary | A cloning term inside the policy loss matches elaborate offline machinery | confirms our stage-3 anchor |
+| [[works/edac-ensembles]] | paper | 2021 | primary | Ensemble disagreement penalizes exactly where data is absent | remedies survey, uncertainty family |
 | [[works/gae]] | paper | 2016 | primary | The bias-variance dial of credit assignment; its low-bias end pays in value accuracy our critic does not have off-distribution | credit-assignment measurement |
 | [[works/alphastar]] | paper | 2019 | primary | Entity transformer, semantic minimap, scatter connections; supervised stage reaching 87% before any RL | ADR 0004, BC staging |
 | [[works/griddly]] | project | 2020–23 | primary | Multiple observers over one state; semantic planes match pixel observers at roughly 14× the throughput | ADR 0004 |

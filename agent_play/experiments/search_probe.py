@@ -75,12 +75,18 @@ def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) 
     return step.reward
 
 
-def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
-                  observation: np.ndarray, mask: np.ndarray, simulations: int, c_puct: float) -> int:
+def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
+                         observation: np.ndarray, mask: np.ndarray, simulations: int,
+                         c_puct: float) -> tuple[int, dict, dict, dict]:
+    """The search decision plus its whole measurement: per-candidate mean rollout values, visit
+    counts, and the prior. The values are the counterfactuals only search produces (a real
+    playout per candidate it tried), which is what makes them valid soft-distillation targets
+    where fitted state values and behavior Q measured 0.00; the prior anchors the target on
+    support per Grill et al."""
     prior = priors(model, observation, mask)
     actions = list(prior)
     if len(actions) == 1:
-        return actions[0]
+        return actions[0], {actions[0]: 0.0}, {actions[0]: 1}, prior
     visits = {a: 0 for a in actions}
     total_return = {a: 0.0 for a in actions}
     for n in range(simulations):
@@ -93,7 +99,14 @@ def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
         value = rollout(sim, model, prefix, chosen)
         visits[chosen] += 1
         total_return[chosen] += value
-    return max(visits, key=visits.get)
+    means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
+    return max(visits, key=visits.get), means, visits, prior
+
+
+def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
+                  observation: np.ndarray, mask: np.ndarray, simulations: int, c_puct: float) -> int:
+    action, _, _, _ = search_action_detail(sim, model, prefix, observation, mask, simulations, c_puct)
+    return action
 
 
 def play(env: BattleEnv, sim: BattleEnv | None, model: BattlePolicy, simulations: int, c_puct: float) -> tuple[bool, int]:
