@@ -42,3 +42,23 @@ The reading is the night's recurring one, mixture proportions rather than label 
 ## The two arms around generation one
 
 Both quick arms lost to generation one. The defender split, 7,081 defender labels added to the generation-one recipe, restored the perfect 850 rung but left the top rung at 0.417 and dropped the defender mirrors it was meant to bank, so no tested proportion of generation-two labels preserves the peak. Upweighting generation one's own labels to triple weight, no new data at all, also degraded the ladder, 0.833 and 0.542 on the top rungs against double weight's 1.000 and 0.792, with a consolation of perfect commander extremes; the mixture dial is monotone-then-costly even on the winning set. Generation one at double weight stands, and the deep-label arm, forty-eight simulations per decision from a fresh seed, is the night's last pre-registered attempt to climb past it.
+
+## The definitive table, five checkpoints in one paired run
+
+| Suite | Clone v4 | share2 | combined v2 | Generation 1 | Generation 3 |
+|---|---|---|---|---|---|
+| Fresh sampled | 0.392 | 0.387 | 0.366 | 0.378 | 0.384 |
+| Held-out pool | 0.385 | 0.550 | 0.504 | 0.527 | 0.512 |
+| Stress hordes | 0.167 | 0.200 | 0.192 | 0.158 | 0.192 |
+| Stress wide-only | 0.375 | 0.431 | 0.431 | 0.431 | 0.403 |
+| Stress commanders | 0.927 | 0.969 | 0.938 | 0.969 | 0.927 |
+| Thunk ladder | 0.573 | 0.906 | 0.802 | 0.917 | 0.917 |
+| Held-out as defender | 0.258 | 0.235 | 0.273 | 0.256 | 0.298 |
+| Mirrors as attacker | 0.312 | 0.174 | 0.167 | 0.201 | 0.104 |
+| Mirrors as defender | 0.299 | 0.368 | 0.354 | 0.271 | 0.264 |
+
+No strict dominator exists, and the sharpest stable discriminator is the ladder's top rung: generation one reads 0.71 to 0.79 across every battery of the night where share2 reads 0.42 to 0.54, while everywhere else the two sit within evaluation noise of each other. The night's verdict is therefore: `policy_gen1` is the improved policy, materially better on the flagship out-of-distribution validation and at parity on the rest; share2 remains the held-out co-champion; and the fresh-sampled suite reads 0.37 to 0.39 for every checkpoint from clone v4 onward, because the raw distribution's hopeless half admits no policy improvement at all.
+
+## The deep-label arm, and the plateau confirmed
+
+Forty-eight simulations per decision bought better labels and the same law. The collection kept 792 episodes and 10,220 labels across the six shards, search again winning essentially everything it kept, and the distill traded axes once more in the same-run pairing: held-out 0.519 against generation one's 0.498, defender suites up (0.304 against 0.250 on the held-out-as-defender), commander extremes perfect, and the ladder down, 0.896 against 0.948 with the top rung at 0.583 against 0.792, wide-only and attacker mirrors down with it. Three attempts from three directions, more data, re-weighted data, and better data, all traded against the peak rather than climbing past it. At this corpus and this network, the supervised mixture is saturated: every label set buys its own axes at the price of others, and generation one's blend happens to sit on the owner's flagship validation.
