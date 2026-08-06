@@ -74,3 +74,23 @@ What survives at full strength: every checkpoint since the DAgger era towers ove
 ## The deep-label arm, and the plateau confirmed
 
 Forty-eight simulations per decision bought better labels and the same law. The collection kept 792 episodes and 10,220 labels across the six shards, search again winning essentially everything it kept, and the distill traded axes once more in the same-run pairing: held-out 0.519 against generation one's 0.498, defender suites up (0.304 against 0.250 on the held-out-as-defender), commander extremes perfect, and the ladder down, 0.896 against 0.948 with the top rung at 0.583 against 0.792, wide-only and attacker mirrors down with it. Three attempts from three directions, more data, re-weighted data, and better data, all traded against the peak rather than climbing past it. At this corpus and this network, the supervised mixture is saturated: every label set buys its own axes at the price of others, and generation one's blend happens to sit on the owner's flagship validation.
+
+## The baseline that was missing, and it changes the standing
+
+The owner asked the morning after for the built-in AI's own numbers, on the grounds that beating the clone answers a question about the pipeline while beating the engine's AI answers the question a player asks. The measurement is cheap, since the engine plays both sides natively (`builtin_ai_baseline.py`, one battlefield per episode, the same suites), and it reframes everything above.
+
+| Suite | Built-in AI | Clone v4 | share2 | Generation 1 |
+|---|---|---|---|---|
+| Held-out pool | 0.660 | 0.385 | 0.550 | 0.527 |
+| Thunk ladder | 0.969 | 0.573 | 0.906 | 0.917 |
+| Held-out as defender | 0.338 | 0.258 | 0.235 | 0.256 |
+| Mirrors as attacker | 0.361 | 0.312 | 0.174 | 0.201 |
+| Mirrors as defender | 0.639 | 0.299 | 0.368 | 0.271 |
+| Stress hordes | 0.192 | 0.167 | 0.200 | 0.158 |
+| Stress wide-only | 0.458 | 0.375 | 0.431 | 0.431 |
+| Stress commanders | 0.958 | 0.927 | 0.969 | 0.969 |
+| Fresh sampled | 0.446 | 0.392 | 0.387 | 0.378 |
+
+The teacher still leads almost everywhere: held-out by 0.13, the Thunk ladder by 0.05 with 0.88 against 0.67 at the top rung, defender mirrors by 0.37, and commander extremes is the single suite where the policies edge ahead. The honest standing is that the pipeline closed most of the distance from a naive clone to its teacher, on the flagship fight from 0.08 to roughly 0.7 against the teacher's 0.88, and surpassed it nowhere that matters. That is what the empty relabeling band predicted the evening before: imitation converges toward its demonstrator, and every gain since has been recovery of the teacher's competence rather than progress past it.
+
+Two consequences bind the program. Every future improvement claim carries this column beside it, because progress against clone v4 flatters and progress against the AI does not. And the escalation ranking hardens: search is the only operator measured above the planner, by the probe and by 90 percent collection win rates on matchups the policies lose, so passing the teacher means deploying search at decision time or distilling far more of it, not another supervised generation.

@@ -46,16 +46,21 @@ namespace fheroes2::agent
     //   - GetType() is CAPTAIN, because the engine forbids captains to retreat or surrender,
     //     which removes the battle-flow branches a real hero would open (those need a kingdom
     //     and treasury this headless world does not fully populate).
-    //   - GetControl() is CONTROL_AI, because Army::GetControl defers to the commander when one
-    //     is set, and a human-controlled army would stall the headless loop waiting for input.
+    //   - GetControl() is CONTROL_AI by default, because Army::GetControl defers to the commander
+    //     when one is set, and a human-controlled army would stall the headless loop waiting for
+    //     input. The interactive replay tool passes CONTROL_HUMAN for the side a person plays,
+    //     which is the only way the battle interface ever takes that army's turns; every headless
+    //     caller keeps the default and is unaffected.
     //   - No spell book is ever added, so CanCastSpell is false and the AI's casting logic
     //     skips the commander entirely; spell power is the engine's floor value and unused.
     class ScenarioCommander final : public HeroBase
     {
     public:
-        ScenarioCommander( Army & army, const PlayerColor color, const int attackStat, const int defenseStat )
+        ScenarioCommander( Army & army, const PlayerColor color, const int attackStat, const int defenseStat,
+                           const int control = CONTROL_AI )
             : _army( army )
             , _color( color )
+            , _control( control )
         {
             attack = attackStat;
             defense = defenseStat;
@@ -79,7 +84,7 @@ namespace fheroes2::agent
 
         int GetControl() const override
         {
-            return CONTROL_AI;
+            return _control;
         }
 
         bool isValid() const override
@@ -175,5 +180,6 @@ namespace fheroes2::agent
     private:
         Army & _army;
         PlayerColor _color;
+        int _control{ CONTROL_AI };
     };
 }

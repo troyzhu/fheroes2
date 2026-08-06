@@ -62,6 +62,8 @@
 #include "agent_scenario.h"
 #include "agg.h"
 #include "core.h"
+#include "cursor.h"
+#include "exception.h"
 #include "game.h"
 #include "game_assets.h"
 #include "h2d.h"
@@ -174,7 +176,36 @@ namespace
     }
 }
 
+namespace
+{
+    // The whole tool, so main can guarantee no exception ever escapes: an uncaught one aborts
+    // the process, which macOS reports to the user as a crash even when the battle ended
+    // normally. Interactive play reaches several engine paths that signal by exception.
+    int runTool( int argc, char ** argv );
+}
+
 int main( int argc, char ** argv )
+{
+    try {
+        return runTool( argc, argv );
+    }
+    catch ( const fheroes2::UserRequestedApplicationClosure & ) {
+        std::fprintf( stderr, "closed by the user\n" );
+        return 4;
+    }
+    catch ( const std::exception & error ) {
+        std::fprintf( stderr, "error: %s\n", error.what() );
+        return 5;
+    }
+    catch ( ... ) {
+        std::fprintf( stderr, "unknown error\n" );
+        return 5;
+    }
+}
+
+namespace
+{
+int runTool( int argc, char ** argv )
 {
     std::string actionsPath;
     std::string fixtureId = "m1_tiny_melee";
@@ -334,8 +365,23 @@ int main( int argc, char ** argv )
 
         fheroes2::Display & display = fheroes2::Display::instance();
         display.setResolution( fheroes2::ResolutionInfo( fheroes2::Display::DEFAULT_WIDTH, fheroes2::Display::DEFAULT_HEIGHT ) );
-        fheroes2::engine().setTitle( "fheroes2 agent replay" );
-        fheroes2::cursor().show( false );
+        fheroes2::engine().setTitle( playSide.empty() ? "fheroes2 agent replay" : "fheroes2: you versus the agent" );
+
+        auto & cursor = fheroes2::cursor();
+        if ( playSide.empty() ) {
+            // A recorded replay has no one to click, and the game's own initializer hides the
+            // cursor at startup too.
+            cursor.show( false );
+        }
+        else {
+            // Interactive play needs what the game's DisplayInitializer sets up for it: the
+            // configured emulation mode, the updater that redraws the cursor when the theme
+            // changes, and a visible cursor. Without these the battle renders but no pointer
+            // ever appears, so nothing can be clicked.
+            cursor.enableSoftwareEmulation( conf.isSoftwareEmulationEnabled() );
+            cursor.registerUpdater( Cursor::Refresh );
+            cursor.show( true );
+        }
 
         fheroes2::RenderProcessor & renderProcessor = fheroes2::RenderProcessor::instance();
         display.subscribe( [&renderProcessor]( std::vector<uint8_t> & palette ) { return renderProcessor.preRenderAction( palette ); },
@@ -410,7 +456,20 @@ int main( int argc, char ** argv )
     }
 
     fheroes2::agent::ExternalDecisionController controller( side, decide );
-    const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, nullptr, &controller, render, humanSide );
+    fheroes2::agent::EpisodeOutcome outcome;
+    try {
+        outcome = fheroes2::agent::runEpisode( scenario, nullptr, &controller, render, humanSide );
+    }
+    catch ( const fheroes2::UserRequestedApplicationClosure & ) {
+        // Closing the battle window is a normal way to end a live game, and the engine reports
+        // it by exception; without this it escapes main and the process aborts, which macOS then
+        // reports as a crash.
+        std::fprintf( stderr, "battle window closed by the user\n" );
+        fheroes2::Display::instance().setRenderObserver( {} );
+        fheroes2::RenderProcessor::instance().unregisterRenderers();
+        fheroes2::Display::instance().release();
+        return 4;
+    }
 
     if ( render ) {
         // The game's DisplayInitializer destructor does exactly this, and in this order: the
@@ -435,4 +494,5 @@ int main( int argc, char ** argv )
     std::fflush( stdout );
 
     return exact ? 0 : 3;
+}
 }

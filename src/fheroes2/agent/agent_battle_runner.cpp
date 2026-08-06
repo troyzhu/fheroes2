@@ -303,14 +303,27 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     // hold raw pointers to them for the arena's whole lifetime. When absent nothing is attached
     // and every code path is byte-identical to before commanders existed, which the milestone
     // gates' golden digests prove on every run.
+    // A commander's control decides its whole army's, because Army::GetControl defers to it, so
+    // the human side's commander must carry CONTROL_HUMAN or the battle interface never takes
+    // that army's turns and the built-in AI plays them instead.
+    const int attackerControl = ( humanSide == HumanSide::Attacker ) ? CONTROL_HUMAN : CONTROL_AI;
+    const int defenderControl = ( humanSide == HumanSide::Defender ) ? CONTROL_HUMAN : CONTROL_AI;
+    if ( humanSide != HumanSide::None ) {
+        // Diagnostic rather than decoration: the first interactive attempt silently played
+        // itself because the army reported AI control, and this line makes that visible.
+        std::fprintf( stderr, "[runner] human side=%s\n", ( humanSide == HumanSide::Attacker ) ? "attacker" : "defender" );
+    }
+
     std::optional<ScenarioCommander> attackerCommander;
     if ( scenario.attackerCommander.present ) {
-        attackerCommander.emplace( attackingArmy, PlayerColor::BLUE, scenario.attackerCommander.attack, scenario.attackerCommander.defense );
+        attackerCommander.emplace( attackingArmy, PlayerColor::BLUE, scenario.attackerCommander.attack, scenario.attackerCommander.defense,
+                                   attackerControl );
         attackingArmy.SetCommander( &*attackerCommander );
     }
     std::optional<ScenarioCommander> defenderCommander;
     if ( scenario.defenderCommander.present ) {
-        defenderCommander.emplace( defendingArmy, PlayerColor::RED, scenario.defenderCommander.attack, scenario.defenderCommander.defense );
+        defenderCommander.emplace( defendingArmy, PlayerColor::RED, scenario.defenderCommander.attack, scenario.defenderCommander.defense,
+                                   defenderControl );
         defendingArmy.SetCommander( &*defenderCommander );
     }
 
