@@ -59,6 +59,8 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, default=6)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--manifest", default=None, help="where to record what was sampled")
+    parser.add_argument("--planes", action="store_true",
+                        help="record with the planes_v1 obstacle layer on every observation")
     parser.add_argument("--horde-only", action="store_true")
     parser.add_argument("--horde-max", type=int, default=900, help="upper bound of the horde total hit points")
     args = parser.parse_args()
@@ -77,6 +79,7 @@ def main() -> None:
         sub = out / f"m{index:04d}"
         sub.mkdir(exist_ok=True)
         cmd = [args.worker, "--runs", "1", "--seeds", str(args.seeds), "--allow-wide",
+               *(["--planes"] if args.planes else []),
                "--attacker", spec["attacker"], "--defender", spec["defender"],
                "--audit-coverage", "--trajectory-dir", str(sub), "--quiet"]
         if "attacker_hero" in spec:

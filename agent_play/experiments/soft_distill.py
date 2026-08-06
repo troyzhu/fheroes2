@@ -31,10 +31,12 @@ from fheroes2_agent.encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, encode_
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 
 
-def load_soft(root: str, lam: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def load_soft(roots, lam: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Soft rows: (observations, masks, hard argmax actions, dense pi_bar targets)."""
+    if isinstance(roots, str):
+        roots = [roots]
     observations, masks, actions, targets = [], [], [], []
-    for path in sorted(pathlib.Path(root).rglob("*.jsonl")):
+    for path in sorted(q for root in roots for q in pathlib.Path(root).rglob("*.jsonl")):
         for line in path.read_text().splitlines():
             record = json.loads(line)
             if record.get("record") != "decision" or "search_values" not in record:
@@ -115,7 +117,7 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--roots", nargs="+", required=True)
-    parser.add_argument("--soft-root", required=True)
+    parser.add_argument("--soft-root", nargs="+", required=True)
     parser.add_argument("--lam", type=float, default=0.5)
     parser.add_argument("--soft-weight", type=float, default=2.0)
     parser.add_argument("--epochs", type=int, default=25)
