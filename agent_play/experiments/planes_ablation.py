@@ -82,6 +82,12 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
         # Approximate capacity match for the planes arm, trunk-only widening; the report carries
         # the exact parameter counts so the approximation is visible.
         model = BattlePolicy(trunk_hidden=360)
+    elif arm == "mean":
+        model = BattlePolicy(pooling="mean")
+    elif arm == "mean_wide":
+        # Mean pooling drops parameters (the trunk narrows to one embedding), so this arm widens
+        # the trunk back toward the concat baseline's count, the capacity control in reverse.
+        model = BattlePolicy(pooling="mean", trunk_hidden=300)
     else:
         model = BattlePolicy()
     parameters = sum(p.numel() for p in model.parameters())
@@ -128,6 +134,8 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--report", default=None)
+    parser.add_argument("--arms", nargs="+", default=["entity", "planes", "wide"],
+                        choices=["entity", "planes", "wide", "mean", "mean_wide"])
     args = parser.parse_args()
 
     started = time.time()
@@ -138,7 +146,7 @@ def main() -> None:
     out_dir = pathlib.Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     results = {}
-    for arm in ("entity", "planes", "wide"):
+    for arm in args.arms:
         results[arm] = train_arm(data, arm, args.epochs, args.seed, str(out_dir / f"policy_{arm}.pt"))
         print(f"{arm:7s} arm: agreement {results[arm]['agreement']:.4f} at epoch {results[arm]['epoch']}, "
               f"{results[arm]['parameters']:,} parameters", flush=True)

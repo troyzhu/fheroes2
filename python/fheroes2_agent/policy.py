@@ -66,8 +66,14 @@ def load_policy(state_dict: dict) -> "BattlePolicy":
     slot_hidden = state_dict["slot_encoder.0.weight"].shape[0]
     trunk_hidden = state_dict["trunk.0.weight"].shape[0]
     global_hidden = state_dict["global_encoder.0.weight"].shape[0]
+    # The trunk's input width tells concatenation (SLOT_COUNT * slot_hidden + ...) apart from
+    # mean pooling (slot_hidden + ...), so the pooling choice is self-describing too.
+    trunk_in = state_dict["trunk.0.weight"].shape[1]
+    plane_width = 128 if planes else 0
+    pooling = "concat" if trunk_in >= SLOT_COUNT * slot_hidden + global_hidden + plane_width else "mean"
     model = BattlePolicy(slot_hidden=slot_hidden, trunk_hidden=trunk_hidden,
-                         global_hidden=global_hidden, ability_features=ability, planes=planes)
+                         global_hidden=global_hidden, ability_features=ability, planes=planes,
+                         pooling=pooling)
     model.load_state_dict(state_dict)
     return model
 
@@ -79,7 +85,8 @@ class BattlePolicy(nn.Module):
     # is the memorization regime training-design.md warns about; 96 and 192 give 396,570 at the
     # current 634-wide encoding.
     def __init__(self, slot_hidden: int = 96, trunk_hidden: int = 192, global_hidden: int = 32,
-                 ability_features: bool = False, planes: bool = False) -> None:
+                 ability_features: bool = False, planes: bool = False,
+                 pooling: str = "concat") -> None:
         super().__init__()
         # Optional architectural inductive bias: each slot's input is extended by its creature's
         # fixed ability profile, computed inside the model from the one-hot the observation
@@ -114,8 +121,15 @@ class BattlePolicy(nn.Module):
             )
             plane_width = 128
             self.plane_fc = nn.Sequential(nn.Linear(32 * BOARD_HEIGHT * BOARD_WIDTH, plane_width), nn.ReLU())
+        # Mean pooling replaces the ordered concatenation with a present-masked average of the
+        # slot embeddings, granting permutation invariance by construction; the trunk narrows
+        # accordingly. the-policy-network.md carries the design argument on both sides.
+        if pooling not in ("concat", "mean"):
+            raise ValueError(f"unknown pooling {pooling!r}")
+        self.pooling = pooling
+        slot_block = SLOT_COUNT * slot_hidden if pooling == "concat" else slot_hidden
         self.trunk = nn.Sequential(
-            nn.Linear(SLOT_COUNT * slot_hidden + global_hidden + plane_width, trunk_hidden),
+            nn.Linear(slot_block + global_hidden + plane_width, trunk_hidden),
             nn.ReLU(),
             nn.Linear(trunk_hidden, trunk_hidden),
             nn.ReLU(),
@@ -139,7 +153,13 @@ class BattlePolicy(nn.Module):
         present = slots[:, :, :1]
         encoded = encoded * present
 
-        parts = [encoded.flatten(1), self.global_encoder(globals_)]
+        if self.pooling == "mean":
+            present_counts = present.sum(dim=1).clamp(min=1.0)
+            pooled = encoded.sum(dim=1) / present_counts
+            slot_block = pooled
+        else:
+            slot_block = encoded.flatten(1)
+        parts = [slot_block, self.global_encoder(globals_)]
         if self.planes:
             if planes is None:
                 raise ValueError("this policy was built with planes=True and needs the tensor per sample")
