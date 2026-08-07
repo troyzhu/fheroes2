@@ -60,7 +60,7 @@ One controlled ablation is available, from [[../research/works/invalid-action-ma
 | 100 to 198 | RANGED attack on the enemy whose head cell is $c$, index $100 + c$ | 99 |
 | 199 to 792 | MELEE onto target cell $t$ from direction $d$, index $199 + 6t + d$ | 594 |
 
-Direction $d$ runs 0 to 5 over the six real hex directions in the engine's own enum order, `TOP_LEFT`, `TOP_RIGHT`, `RIGHT`, `BOTTOM_RIGHT`, `BOTTOM_LEFT`, `LEFT`, and it is the direction from the attacking cell to the target cell. `Battle::Board::GetDirection(a, b)` returns the direction from `a` to `b`, which fixes the orientation and is worth stating because the reverse convention would silently produce a valid-looking index for the wrong attack.
+Direction matters because a melee attack is really two commitments at once: which stack to hit, and which adjacent hex to stand on while hitting it. The attacker walks to that hex and ends its turn there, so the same target struck from a different side leaves the attacker somewhere else, facing different retaliation and a different next round; that is why melee needs $99 \times 6$ slots while ranged, which never moves the shooter, needs only 99. Direction $d$ runs 0 to 5 over the six real hex directions in the engine's own enum order, `TOP_LEFT`, `TOP_RIGHT`, `RIGHT`, `BOTTOM_RIGHT`, `BOTTOM_LEFT`, `LEFT`, and it is the direction from the attacking cell to the target cell. `Battle::Board::GetDirection(a, b)` returns the direction from `a` to `b`, which fixes the orientation and is worth stating because the reverse convention would silently produce a valid-looking index for the wrong attack.
 
 ### A worked index
 

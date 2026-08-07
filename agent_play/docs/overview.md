@@ -154,7 +154,7 @@ The discount range is relaxed. Most treatments require $\gamma \in [0, 1)$ so in
 | Worker | `fheroes2_agent_worker`, the entry point outside both build systems' source globs. |
 | episodes/s | Throughput unit for the environment alone, measured with no protocol layer attached. |
 
-Board constants: 11 by 9 gives 99 cells, six hex directions, and an action space of $1 + 99 + 99 + 594 = 793$ slots.
+Board constants: the battlefield is 11 by 9, so 99 cells, and every cell has six hex neighbours. The 793-slot action space decomposes as $1 + 99 + 99 + 594$: one skip, 99 move-to-cell actions, 99 ranged-attack actions (one per target cell), and $99 \times 6 = 594$ melee actions. Melee needs the factor of six because a melee attack is a pair, which cell to strike and which adjacent hex to strike it from: the attacker walks to that neighbouring hex and ends its turn there, so attacking the same stack from its left or from below leaves the attacker on different cells facing different retaliation and different next turns. [[implementation/legal-actions-and-masking]] walks a concrete example.
 
 ### What is recap and what is new
 
@@ -307,10 +307,13 @@ git switch agent-env
 # Build, then run all four gates
 make -C src/dist -j"$(sysctl -n hw.ncpu)"
 ./agent_play/spike/build_spike.sh
-./agent_play/spike/verify_phase0.sh    # 7 passed, Phase 0 invariants
-./agent_play/verify_m1.sh              # 4 passed, deterministic runner
+./agent_play/spike/verify_phase0.sh    # Phase 0 invariants
+./agent_play/verify_m1.sh              # 5 passed, deterministic runner
 ./agent_play/verify_m2.sh              # 8 passed, hook inertness and passive logs
-./agent_play/verify_m3.sh              # 8 passed, legal actions and full teacher coverage
+./agent_play/verify_m3.sh              # 9 passed, legal actions and full teacher coverage
+./agent_play/verify_agent.sh           # 11 passed, the Python training stack end to end
+./agent_play/lint_docs.sh              # docs: style, links, and fact checks
+./agent_play/verify_memory.sh          # agent memory still describes reality
 ```
 
 Two numbers carry the determinism claim: map seed `2227197244` and spike digest `2cfd42cb104aa5e7`. Both are machine-independent and have reproduced across three working trees, two machines, and both optimization levels. A mismatch is a real finding, so stop and investigate before building on top of it.

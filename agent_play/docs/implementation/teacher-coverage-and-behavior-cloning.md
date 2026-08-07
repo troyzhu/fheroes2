@@ -37,11 +37,9 @@ The choice of teacher matters for the same reason. A random player would exercis
 
 The teacher is `AI::BattlePlanner`, the game's own tactical AI, which already plays both sides of every headless battle. The passive recorder observes its choices through the decision hook without influencing them.
 
-At each full-fledged decision, computed at the same pre-application state, we take the legal candidate set our enumerator produces and the canonical index of the action the teacher actually chose. Coverage is then
+Call $\mathcal{D}$ the set of recorded decisions: one element per full-fledged teacher turn, so a 116-decision recording gives $|\mathcal{D}| = 116$. At each decision $d \in \mathcal{D}$, captured at the same pre-application state the teacher saw, the enumerator produces the legal candidate set $\mathcal{A}^{\text{legal}}_d$ and the recorder resolves the teacher's actual choice to its canonical index $a^{\text{teacher}}_d$. Coverage is the fraction of decisions whose teacher action lands inside the enumerated legal set:
 
-$$\text{coverage} = \frac{\left|\{\, d : a^{\text{teacher}}_d \in \mathcal{A}^{\text{legal}}_d \,\}\right|}{\left|\{\, d \,\}\right|}$$
-
-over decisions $d$. A value below 1 has three possible causes. the enumeration missed a legal action, the canonical indexing cannot express it, or the creature lies outside the `simple_v1` allowlist and the scenario should have been rejected. All three are worth knowing before training rather than after.
+$$\text{coverage} = \frac{\left|\{\, d \in \mathcal{D} : a^{\text{teacher}}_d \in \mathcal{A}^{\text{legal}}_d \,\}\right|}{|\mathcal{D}|}$$ A value below 1 has three possible causes. the enumeration missed a legal action, the canonical indexing cannot express it, or the creature lies outside the `simple_v1` allowlist and the scenario should have been rejected. All three are worth knowing before training rather than after.
 
 The current measurement is 116 of 116 decisions across all five fixtures, with a minimum candidate count of 5 per decision. Zero failures in 116 correlated trials puts the 95% Clopper-Pearson lower bound at 0.974, so the honest reading is that the miss rate is under roughly 2.6% rather than exactly zero.
 
