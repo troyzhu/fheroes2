@@ -23,31 +23,60 @@ Slots are filled in the engine's unit order, own side and enemy side mixed, livi
 ## The network, layer by layer
 
 ```mermaid
-flowchart LR
-    subgraph obs["observation, 634"]
-        s0["slot 0, 63"] --- s1["slot 1, 63"] --- sd["..."] --- s9["slot 9, 63"]
-        g["globals, 4"]
-    end
-    enc["shared slot encoder\n63 → 96 → 96\n(same weights for every slot)"]
-    s0 --> enc
-    s1 --> enc
-    s9 --> enc
-    genc["globals encoder\n4 → 32"]
-    g --> genc
-    cat["concatenate in slot order\n10 × 96 + 32 = 992"]
-    enc --> cat
+flowchart TD
+    slots["10 unit slots<br/>each 63 features"] -- "shared weights, applied per slot" --> enc["slot encoder<br/>63 → 96 → 96"]
+    globals["4 globals"] --> genc["globals encoder<br/>4 → 32"]
+    enc -- "10 × 96, slot order" --> cat["concatenate<br/>960 + 32 = 992"]
     genc --> cat
-    trunk["trunk\n992 → 192 → 192"]
-    cat --> trunk
-    pi["policy head\n192 → 793 logits"]
-    v["value head\n192 → 1"]
-    trunk --> pi
-    trunk --> v
-    mask["legality mask\nillegal entries to −10⁸"]
-    pi --> mask
+    cat --> trunk["trunk<br/>992 → 192 → 192"]
+    trunk --> pi["policy head<br/>192 → 793 logits"]
+    trunk --> v["value head<br/>192 → 1"]
+    pi --> mask["mask illegal to −10⁸,<br/>softmax over the rest"]
+    planes["(7, 9, 11) planes,<br/>optional"] -.-> pconv["plane conv 7→32→32,<br/>flatten, 3168 → 128"]
+    pconv -. "planes arm only" .-> cat
 ```
 
-One two-layer perceptron, 63 to 96 to 96, embeds every slot with the same weights, which is what makes a stack's meaning come from its features rather than from which slot happens to hold it, at the embedding stage. The ten 96-wide embeddings are then concatenated in slot order into a 960-wide block, the encoded globals append 32 more, and a two-layer 192-wide trunk feeds both heads. 396,570 parameters in total. The policy head's 793 logits are masked to the legal actions ([[../implementation/legal-actions-and-masking]]) and softmaxed.
+The same architecture as PyTorch itself prints it, which is the ground truth the diagram summarizes, captured verbatim from `print(BattlePolicy())`:
+
+```text
+BattlePolicy(
+  (slot_encoder): Sequential(
+    (0): Linear(in_features=63, out_features=96, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=96, out_features=96, bias=True)
+    (3): ReLU()
+  )
+  (global_encoder): Sequential(
+    (0): Linear(in_features=4, out_features=32, bias=True)
+    (1): ReLU()
+  )
+  (trunk): Sequential(
+    (0): Linear(in_features=992, out_features=192, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=192, out_features=192, bias=True)
+    (3): ReLU()
+  )
+  (policy_head): Linear(in_features=192, out_features=793, bias=True)
+  (value_head): Linear(in_features=192, out_features=1, bias=True)
+)
+```
+
+A planes-built checkpoint adds two modules and widens the trunk's first layer to 1120:
+
+```text
+  (plane_conv): Sequential(
+    (0): Conv2d(7, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): ReLU()
+    (2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (3): ReLU()
+  )
+  (plane_fc): Sequential(
+    (0): Linear(in_features=3168, out_features=128, bias=True)
+    (1): ReLU()
+  )
+```
+
+One two-layer perceptron, 63 to 96 to 96, embeds every slot with the same weights, which is what makes a stack's meaning come from its features rather than from which slot happens to hold it, at the embedding stage. The ten 96-wide embeddings are then concatenated in slot order into a 960-wide block, the encoded globals append 32 more, and a two-layer 192-wide trunk feeds both heads. 396,570 parameters in total. The policy head's 793 logits are masked to the legal actions ([[../implementation/legal-actions-and-masking]]) and softmaxed. The `Sequential` printout above is regenerated in one line, `python3 -c "import sys; sys.path.insert(0, 'python'); from fheroes2_agent.policy import BattlePolicy; print(BattlePolicy())"`, so a drifted diagram is always one command from being caught.
 
 ## Where the slot lifecycle bites
 
