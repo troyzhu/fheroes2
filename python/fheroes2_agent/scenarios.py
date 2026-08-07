@@ -251,7 +251,7 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
     env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
                     attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
                     allow_wide=matchup.allow_wide, seeds=seeds, planes=wants_planes)
-    wins, rewards, lengths, survival = [], [], [], []
+    wins, rewards, lengths, survival, damage, margins = [], [], [], [], [], []
     try:
         for _ in range(episodes):
             observation, mask = env.reset()
@@ -268,13 +268,22 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
                     wins.append(won)
                     rewards.append(step.reward)
                     lengths.append(steps)
+                    own = step.info["attacker" if side == "attacker" else "defender"]
+                    foe = step.info["defender" if side == "attacker" else "attacker"]
+                    own_initial = float(own.get("initial_strength", 0.0))
+                    foe_initial = float(foe.get("initial_strength", 0.0))
+                    own_kept = float(own.get("strength", 0.0)) / own_initial if own_initial > 0 else 0.0
+                    foe_kept = float(foe.get("strength", 0.0)) / foe_initial if foe_initial > 0 else 0.0
+                    # The unconditional margin is selection-free: own strength kept minus the
+                    # enemy's, defined for every episode, so it cannot flatter by conditioning.
+                    margins.append(own_kept - foe_kept)
                     if won:
-                        # Win quality, the owner's metric: engine creature strength kept, so a
-                        # bloodless win reads near 1 and a pyrrhic one near 0.
-                        own = step.info["attacker" if side == "attacker" else "defender"]
-                        initial = float(own.get("initial_strength", 0.0))
-                        if initial > 0:
-                            survival.append(float(own.get("strength", 0.0)) / initial)
+                        # Win quality: engine creature strength kept, near 1 for a bloodless win.
+                        survival.append(own_kept)
+                    else:
+                        # Loss quality, the owner's counterpart metric: how much of the enemy a
+                        # losing fight destroyed, near 0 for a rout, near 1 for a near-win.
+                        damage.append(1.0 - foe_kept)
                     break
                 observation, mask = step.observation, step.mask
     finally:
@@ -288,6 +297,8 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
         "reward_std": float(np.std(rewards)),
         "mean_length": float(np.mean(lengths)),
         "surviving_strength": float(np.mean(survival)) if survival else None,
+        "loss_damage": float(np.mean(damage)) if damage else None,
+        "strength_margin": float(np.mean(margins)),
         "in_band": 0.2 <= win_rate <= 0.8,
     }
 

@@ -145,18 +145,25 @@ def main() -> None:
             # each suite also carries win quality (engine strength kept when winning) and mean
             # episode length, and graded suites are never collapsed to one number.
             survs = [m["surviving_strength"] for m in measured if m["surviving_strength"] is not None]
+            damages = [m["loss_damage"] for m in measured if m["loss_damage"] is not None]
+            margins = [m["strength_margin"] for m in measured]
             lens = [m["mean_length"] for m in measured]
             report["quality"][name][suite] = {
                 "surviving_strength": [m["surviving_strength"] for m in measured],
+                "loss_damage": [m["loss_damage"] for m in measured],
+                "strength_margin": margins,
                 "mean_length": lens,
             }
-            surv_txt = f" surv {np.mean(survs):.2f}" if survs else " surv  -- "
+            surv_txt = f" wq {np.mean(survs):.2f}" if survs else " wq  --"
+            dmg_txt = f" lq {np.mean(damages):.2f}" if damages else " lq  --"
+            mg_txt = f" mg {np.mean(margins):+.2f}"
+            tail = f"{surv_txt}{dmg_txt}{mg_txt} len {np.mean(lens):.0f}"
             if suite == "thunk_ladder":
                 rungs = "/".join(f"{r:.2f}" for r in rates)
-                print(f"{name:24s} {suite:18s} rungs {rungs}{surv_txt} len {np.mean(lens):.0f}", flush=True)
+                print(f"{name:24s} {suite:18s} rungs {rungs}{tail}", flush=True)
             else:
-                print(f"{name:24s} {suite:18s} mean {np.mean(rates):.3f}{surv_txt} len {np.mean(lens):.0f}  " +
-                      " ".join(f"{r:.2f}" for r in rates[:8]) + (" ..." if len(rates) > 8 else ""), flush=True)
+                print(f"{name:24s} {suite:18s} mean {np.mean(rates):.3f}{tail}  " +
+                      " ".join(f"{r:.2f}" for r in rates[:6]) + (" ..." if len(rates) > 6 else ""), flush=True)
 
     print(f"\ntotal {round(time.time() - started)}s")
     if args.report:
