@@ -34,7 +34,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.encoding import encode_mask, encode_observation  # noqa: E402
 from fheroes2_agent.env import BattleEnv  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 
 POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive" / "experiments" / "files" \
     / "2026-08-05-run-reports" / "pool_value.json"
@@ -157,8 +157,7 @@ def main() -> None:
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
-    model = BattlePolicy()
-    model.load_state_dict(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    model = load_policy(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     model.eval()
 
     entries = json.loads(POOL.read_text())["matchups"][:40]

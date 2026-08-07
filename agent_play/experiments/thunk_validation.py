@@ -27,7 +27,7 @@ import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 
 ARMY = "11:1,11:1,11:1,10:2,9:2"
@@ -52,8 +52,7 @@ def main() -> None:
     results = []
     print(f"{'checkpoint':32s} " + "  ".join(f"{n:>6d}" for n in LADDER))
     for path in args.checkpoints:
-        model = BattlePolicy()
-        model.load_state_dict(torch.load(path, map_location="cpu", weights_only=True)["state_dict"])
+        model = load_policy(torch.load(path, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         row = []
         for n in LADDER:

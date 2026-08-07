@@ -28,7 +28,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.dataset import load_dir, split_by_episode  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent import train_critic  # noqa: E402
 
 
@@ -63,8 +63,7 @@ def main() -> None:
     out_path = args.out or str(pathlib.Path(tempfile.mkdtemp(prefix="critic_cal_")) / "critic_v3.pt")
     result = train_critic.train(list(args.teacher_data), checkpoint=args.checkpoint, epochs=args.epochs, out=out_path)
 
-    model = BattlePolicy()
-    model.load_state_dict(torch.load(out_path, map_location="cpu", weights_only=True)["state_dict"])
+    model = load_policy(torch.load(out_path, map_location="cpu", weights_only=True)["state_dict"])
     model.eval()
 
     report = {"fit": {k: v for k, v in result.items() if k != "state_dict"}, "strata": {}}

@@ -31,7 +31,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.env import MatchupPool  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 from fheroes2_agent import train_ppo  # noqa: E402
 
@@ -68,8 +68,7 @@ def main() -> None:
     held_set = [as_matchup(e) for e in entries[args.train_matchups: args.train_matchups + args.held_matchups]]
 
     started = time.time()
-    base_model = BattlePolicy()
-    base_model.load_state_dict(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    base_model = load_policy(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     base_model.eval()
     baseline = {"train": evaluate(base_model, args.worker, train_set, args.eval_episodes),
                 "held": evaluate(base_model, args.worker, held_set, args.eval_episodes)}
@@ -84,8 +83,7 @@ def main() -> None:
             out_path = workdir / f"{arm}_s{seed}.pt"
             history = train_ppo.train(args.worker, checkpoint=args.checkpoint, iterations=args.iterations,
                                       seed=seed, env=pool, quiet=True, out=str(out_path))
-            model = BattlePolicy()
-            model.load_state_dict(torch.load(out_path, map_location="cpu", weights_only=True)["state_dict"])
+            model = load_policy(torch.load(out_path, map_location="cpu", weights_only=True)["state_dict"])
             model.eval()
             run = {"arm": arm, "seed": seed,
                    "train": evaluate(model, args.worker, train_set, args.eval_episodes),

@@ -27,7 +27,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.env import MatchupPool  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 from fheroes2_agent import train_ppo  # noqa: E402
 
@@ -64,8 +64,7 @@ def main() -> None:
         out = workdir / f"s{seed}.pt"
         train_ppo.train(args.worker, checkpoint=args.checkpoint, iterations=args.iterations,
                         seed=seed, env=pool, quiet=True, out=str(out))
-        model = BattlePolicy()
-        model.load_state_dict(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
+        model = load_policy(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         run = {"seed": seed,
                "train": [measure(model, args.worker, m, episodes=args.eval_episodes, seeds=args.eval_seeds)["win_rate"]

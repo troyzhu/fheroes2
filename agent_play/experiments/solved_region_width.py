@@ -33,7 +33,7 @@ import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 from fheroes2_agent.train_ppo import train  # noqa: E402
 
@@ -79,8 +79,7 @@ def main() -> None:
                   iterations=args.iterations, episodes_per_iter=32, seed=0, quiet=True, out=str(out))
         plateau = statistics.mean(h["win_rate"] for h in r["history"][-5:])
 
-        model = BattlePolicy()
-        model.load_state_dict(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
+        model = load_policy(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
 
         curve = []

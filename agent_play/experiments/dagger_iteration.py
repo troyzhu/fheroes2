@@ -33,7 +33,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.env import BattleEnv  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 from fheroes2_agent import train_bc  # noqa: E402
 
@@ -130,8 +130,7 @@ def main() -> None:
     else:
         collection_set = [as_matchup(e) for e in entries[: args.matchups]]
 
-    student = BattlePolicy()
-    student.load_state_dict(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    student = load_policy(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     student.eval()
 
     dagger_dir = pathlib.Path(args.dagger_dir)
@@ -143,8 +142,7 @@ def main() -> None:
 
     result = train_bc.train(list(args.teacher_data) + [str(dagger_dir)], epochs=args.epochs, out=args.out)
 
-    dagger_model = BattlePolicy()
-    dagger_model.load_state_dict(torch.load(args.out, map_location="cpu", weights_only=True)["state_dict"])
+    dagger_model = load_policy(torch.load(args.out, map_location="cpu", weights_only=True)["state_dict"])
     dagger_model.eval()
 
     evals = {"train": evaluate(dagger_model, args.worker, train_set, args.eval_episodes),

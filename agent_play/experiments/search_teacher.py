@@ -41,7 +41,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.env import BattleEnv  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from search_probe import policy_action, search_action, search_action_detail  # noqa: E402
@@ -142,8 +142,7 @@ def main() -> None:
                              "2026-08-06)")
     args = parser.parse_args()
 
-    model = BattlePolicy()
-    model.load_state_dict(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    model = load_policy(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     model.eval()
 
     out_root = pathlib.Path(args.out_dir)

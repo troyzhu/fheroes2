@@ -33,7 +33,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 from fheroes2_agent import train_bc  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 from search_teacher import collect_matchup  # noqa: E402
 
@@ -86,8 +86,7 @@ def main() -> None:
             searched_wins += wins
         out = workdir / f"round{rnd}.pt"
         train_bc.train([str(data_root)], epochs=15, seed=rnd, out=str(out))
-        model = BattlePolicy()
-        model.load_state_dict(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
+        model = load_policy(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         rate = float(np.mean([measure(model, args.worker, m, episodes=args.eval_episodes, seeds=4)["win_rate"]
                               for m in suite]))

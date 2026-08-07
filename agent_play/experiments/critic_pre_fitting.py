@@ -33,7 +33,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.dataset import load_dir, split_by_episode  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.train_critic import train as fit_critic  # noqa: E402
 from fheroes2_agent.train_ppo import train as train_ppo  # noqa: E402
 
@@ -45,8 +45,7 @@ def agreement(checkpoint: str, data_dir: str) -> float:
     """Held-out teacher agreement, to price what fitting the critic cost the cloned policy."""
     samples = load_dir(data_dir)
     _, held = split_by_episode(samples, 0.2, 0)
-    model = BattlePolicy()
-    model.load_state_dict(torch.load(checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    model = load_policy(torch.load(checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     model.eval()
     obs, masks = torch.from_numpy(held.observations), torch.from_numpy(held.masks)
     actions = torch.from_numpy(held.actions)

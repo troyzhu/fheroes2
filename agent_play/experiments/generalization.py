@@ -33,7 +33,7 @@ import torch
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent.env import MatchupPool  # noqa: E402
-from fheroes2_agent.policy import BattlePolicy  # noqa: E402
+from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import measure, policy_fingerprint, pool_matchups  # noqa: E402
 from fheroes2_agent.train_group import train  # noqa: E402
 
@@ -50,8 +50,7 @@ def evaluate(model: BattlePolicy, worker: str, matchups: list, episodes: int) ->
 
 
 def load(checkpoint: str) -> BattlePolicy:
-    model = BattlePolicy()
-    model.load_state_dict(torch.load(checkpoint, map_location="cpu", weights_only=True)["state_dict"])
+    model = load_policy(torch.load(checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     return model
 
 
