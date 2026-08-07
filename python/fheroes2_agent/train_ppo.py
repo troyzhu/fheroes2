@@ -116,6 +116,7 @@ def train(
     entropy_coef: float = 0.01,
     seed: int = 0,
     out: str | None = None,
+    heartbeat: str | None = None,
     quiet: bool = False,
     advantage_std_floor: float = 0.1,
     env: object | None = None,
@@ -254,6 +255,13 @@ def train(
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,
                         "grad_norms": grad_norms_first})
+        # Live monitoring heartbeat (owner-requested 2026-08-07): one JSON line per iteration,
+        # appended as it happens, so a dashboard can watch training health without waiting for
+        # the end-of-run report. Defaults on whenever a checkpoint path exists.
+        beat_path = heartbeat or (out + ".heartbeat.jsonl" if out else None)
+        if beat_path:
+            with open(beat_path, "a") as beat:
+                beat.write(json.dumps(history[-1]) + "\n")
         if not quiet:
             print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  "
                   f"value_loss {value_loss_before:.3f}  entropy {entropy_before:.3f}  steps {n}")

@@ -38,6 +38,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `soft_distill.py` | Does distilling search's whole per-candidate measurement beat distilling its argmax, at identical data? Prior-anchored soft targets against a hard-label twin | about 8 min for both arms |
 | `real_map_fights.py` | Real opening fights harvested from the shipped maps by dump, nearest stack per hero, stratified across maps, evaluated with the built-in AI column attached | about 1 min end to end |
 | `fidelity_report.py` | Fidelity beyond exact match: top-1/3/5 accuracy, the probability given to the teacher's move, and the policy's entropy, on a corpus holdout | about 30 s per checkpoint |
+| `training_dashboard.py` | Live training health: heartbeat sparklines per run, per-term gradient norms, the advantage floor drawn where the collapse lives, pipeline log tails, self-refreshing HTML | continuous; --once for a snapshot |
 | `builtin_ai_baseline.py` | The engine's own AI on every validation suite: the baseline a player recognizes, and the bar the policies must clear | about 70 s for all suites |
 | `search_value.py` | Can a value network replace rollouts at search leaves, and is it calibrated where it would be used? | about 10 min including the fit |
 | `symmetry_gap.py` | Does the same army win as often from the other chair, and how much of any gap is the game rather than the policy? | about 6 min over 10 matchups |
