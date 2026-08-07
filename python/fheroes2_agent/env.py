@@ -92,7 +92,7 @@ class BattleEnv:
                  seed_offset: int = 0, planes: bool = False):
         if reward_weighting not in ("none", "difficulty"):
             raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
-        if reward_margin not in ("hit_points", "strength"):
+        if reward_margin not in ("hit_points", "strength", "two_sided"):
             raise ValueError(f"unknown reward_margin {reward_margin!r}")
         self._reward_margin = reward_margin
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
@@ -209,6 +209,8 @@ class BattleEnv:
         # which keeps the objective a training-configuration choice rather than engine behaviour.
         if self._reward_margin == "strength":
             reward = terminal_reward_strength(record, self.side)
+        elif self._reward_margin == "two_sided":
+            reward = terminal_reward_two_sided(record, self.side)
         else:
             reward = terminal_reward(record, self.side, self._own_initial_hp)
         if self._reward_weighting == "difficulty":
@@ -265,6 +267,33 @@ def terminal_reward(record: dict, side: str, own_initial_hit_points: float) -> f
     if record["termination"] == "stalemate" and side == "attacker":
         survived = 0.0
     return (1.0 if won else -1.0) + survived
+
+
+def terminal_reward_two_sided(record: dict, side: str) -> float:
+    """The owner's piecewise form, directed 2026-08-07: wins graded by own strength kept, losses
+    graded by the damage dealt to the enemy, both priced by engine creature strength.
+
+    The loss branch replaces own-survival credit with enemy-destruction credit, because in a
+    lost fight surviving often means having fled while damage dealt measures having fought; a
+    rout still reads -1.0 and a near-win loss approaches 0.0, so every loss stays below every
+    win and the difficulty weighting's sign split keeps holding. The two enemy-term objections
+    recorded in reward-design do not apply: the win branch never reads the foe (no collapse into
+    the win bit), and the credit is terminal-only (no per-step damage-farming incentive).
+    Stalemates keep their engine-grounded resolution: the defender's win branch prices its kept
+    strength, and the forfeiting attacker's enemy-damage is zero by construction, reading -1.0.
+    """
+    own = record["attacker" if side == "attacker" else "defender"]
+    foe = record["defender" if side == "attacker" else "attacker"]
+    won = _side_won(record, side)
+    if won:
+        initial = float(own.get("initial_strength", 0.0))
+        kept = float(own.get("strength", 0.0)) / initial if initial > 0 else 0.0
+        return 1.0 + kept
+    foe_initial = float(foe.get("initial_strength", 0.0))
+    destroyed = 1.0 - (float(foe.get("strength", 0.0)) / foe_initial if foe_initial > 0 else 0.0)
+    if record["termination"] == "stalemate" and side == "attacker":
+        destroyed = 0.0
+    return -1.0 + destroyed
 
 
 def terminal_reward_strength(record: dict, side: str) -> float:

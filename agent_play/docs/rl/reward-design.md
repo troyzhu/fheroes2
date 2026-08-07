@@ -8,7 +8,7 @@ tags: [agent-env, reward, design]
 
 # Reward design, the space and what is known about it
 
-[[../decisions/0005-training-and-reward]] fixes the criteria and names four candidates. Three of those are implemented, the hit-point margin, its strength-priced variant, and the difficulty weighting, and the rest are a sentence each, which is thin for what is the single choice that decides what the agent is actually being asked to do. This page carries the design space, what the evidence says about each part of it, and what would have to be measured to choose.
+[[../decisions/0005-training-and-reward]] fixes the criteria and names four candidates. Four of those are implemented, the hit-point margin, its strength-priced variant, the owner's two-sided piecewise form, and the difficulty weighting, and the rest are a sentence each, which is thin for what is the single choice that decides what the agent is actually being asked to do. This page carries the design space, what the evidence says about each part of it, and what would have to be measured to choose.
 
 Nothing here is decided. The record decides; this exists so the record has something to decide from.
 
@@ -48,6 +48,7 @@ Everything here keeps the signal at the end of the episode, which is what makes 
 | Value-weighted survival (implemented 2026-08-05, owner-directed) | $\pm 1 + \sum_i c_i n_i^T / \sum_i c_i n_i^0$ with $c_i$ the engine's creature strength | Weights each creature by what it is worth rather than what its hit points weigh, so losing a Champion costs a Champion; the same pricing the budget sampler and difficulty weight use | Engine-computed per side in the terminal record; opt-in as `reward_margin="strength"`, hit-points margin stays the default; training effect unmeasured, and its live consumer is search rollout scoring, where it makes root-PUCT prefer minimum-value-loss wins |
 | Speed bonus | $\pm 1 + \alpha(1 - T / T_{\max})$ | Rewards finishing quickly, which matters because a battle is one episode in a longer game | Encourages risk-taking that a campaign would not want, and $\alpha$ is arbitrary |
 | Opponent-relative | $\pm 1 + (\text{own survival} - \text{foe survival})$ | Rewards damage inflicted as well as damage avoided | Reintroduces the degeneracy above, since the foe's survival is almost always zero |
+| Two-sided piecewise (implemented 2026-08-07, owner-directed) | win: $+1 + \text{own kept}$; loss: $-1 + \text{foe destroyed}$, strength-priced | The owner's form: losses graded by the damage they dealt, since surviving a loss often means having fled while damage dealt measures having fought; dodges both recorded objections, the win branch never reads the foe and the credit is terminal-only | Opt-in as `reward_margin="two_sided"`; composes with difficulty weighting, sign split intact since every loss stays at or below zero; training effect unmeasured |
 
 Value-weighted survival is the one worth measuring next. Hit points are a poor proxy for what a stack is worth, because a Peasant has one hit point and a Master Swordsman thirty, so the current reward already weights by hit points implicitly, and creature cost is the game's own answer to the same question.
 
