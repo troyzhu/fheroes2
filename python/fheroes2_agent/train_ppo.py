@@ -154,6 +154,7 @@ def train(
     degenerate = 0
     started = time.time()
 
+    grad_norms_first: dict = {}
     for iteration in range(iterations):
         batch = collect(env, model, episodes_per_iter)
         # Only the round-limit cap is a truncation, a battle cut off with a future still worth
@@ -214,11 +215,33 @@ def train(
                 # Entropy over the legal set alone, or it measures the mask rather than the
                 # policy's indecision.
                 entropy = distribution.entropy().mean()
-                loss = -surrogate.mean() + value_coef * ((values - ret_t[rows]) ** 2).mean() - entropy_coef * entropy
+                policy_term = -surrogate.mean()
+                value_term = value_coef * ((values - ret_t[rows]) ** 2).mean()
+                entropy_term = -entropy_coef * entropy
+                loss = policy_term + value_term + entropy_term
+
+                # Per-term gradient norms, measured before the sum, on the epoch's first
+                # minibatch (owner-requested diagnostic, 2026-08-07). A shared trunk means the
+                # heads compete for the same weights, and the post-sum clipped norm cannot say
+                # which term dominated; three extra backward passes once per epoch can.
+                if start == 0:
+                    term_norms = {}
+                    for term_name, term in (("policy", policy_term), ("value", value_term),
+                                            ("entropy", entropy_term)):
+                        optimizer.zero_grad(set_to_none=True)
+                        term.backward(retain_graph=True)
+                        total = 0.0
+                        for parameter in model.parameters():
+                            if parameter.grad is not None:
+                                total += float(parameter.grad.norm()) ** 2
+                        term_norms[term_name] = total ** 0.5
+                    grad_norms_first = term_norms
 
                 optimizer.zero_grad(set_to_none=True)
                 loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+                pre_clip = float(torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5))
+                if start == 0:
+                    grad_norms_first["total_pre_clip"] = pre_clip
                 optimizer.step()
 
         wr = win_rate(batch["outcomes"], side)
@@ -229,7 +252,8 @@ def train(
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
-                        "entropy": entropy_before})
+                        "entropy": entropy_before,
+                        "grad_norms": grad_norms_first})
         if not quiet:
             print(f"iter {iteration:3d}  win_rate {wr:.3f}  mean_terminal_reward {mean_reward:+.3f}  "
                   f"value_loss {value_loss_before:.3f}  entropy {entropy_before:.3f}  steps {n}")

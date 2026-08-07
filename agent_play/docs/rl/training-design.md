@@ -354,6 +354,8 @@ What this does not show is that either is better. Both runs converged, and separ
 
 ### Starting hyperparameters
 
+Joint-training diagnostics, owner-requested 2026-08-07: every PPO iteration now records the per-term gradient norms measured before the sum, three extra backward passes on each epoch's first minibatch giving the policy, value and entropy terms' individual norms beside the post-sum pre-clip total, because a shared trunk means the heads compete for the same weights and the clipped total cannot say which term dominated. The first smoke reads policy 6.7, value 7.4, entropy 0.1 at a fresh anchor, the two heads near parity and the entropy term two orders down, which is what the coefficient choices intend.
+
 The table below is the design-era starting point. The shipped trainer (`python/fheroes2_agent/train_ppo.py`) departs from it where measurement pushed: learning rate $10^{-4}$ with plain Adam and no schedule, a single-process environment collecting 32 whole episodes per iteration rather than fixed-length rollouts across four workers, minibatch size 256, and a constant 0.01 entropy coefficient. Clip 0.2, $\gamma$ 0.99, $\lambda$ 0.95, value coefficient 0.5, and gradient-norm 0.5 match as designed.
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.
