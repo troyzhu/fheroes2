@@ -66,7 +66,8 @@ def main() -> None:
                            reward_margin=args.reward_margin, reward_weighting=args.reward_weighting)
         out = workdir / f"s{seed}.pt"
         train_ppo.train(args.worker, checkpoint=args.checkpoint, iterations=args.iterations,
-                        seed=seed, env=pool, quiet=True, out=str(out))
+                        seed=seed, env=pool, quiet=True, out=str(out),
+                        value_warmup_iters=args.value_warmup)
         model = load_policy(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         run = {"seed": seed,

@@ -119,6 +119,7 @@ def train(
     heartbeat: str | None = None,
     quiet: bool = False,
     advantage_std_floor: float = 0.1,
+    value_warmup_iters: int = 0,
     env: object | None = None,
     model_kwargs: dict | None = None,
 ) -> dict:
@@ -154,6 +155,31 @@ def train(
     history = []
     degenerate = 0
     started = time.time()
+
+    # Value warmup (diagnosed 2026-08-07 by the per-term gradient norms): when the anchor's
+    # value head has never seen the objective being optimized, its early errors dominate the
+    # shared trunk, 11.9 against the policy term's 2.2 in the first live reading. Warmup
+    # iterations update the value head alone, everything else frozen, so the head lands on the
+    # new reward scale before any gradient touches what the policy relies on.
+    head_only = [parameter for name, parameter in model.named_parameters() if name.startswith("value_head")]
+    warmup_optimizer = torch.optim.Adam(head_only, lr=1e-3) if value_warmup_iters else None
+    for warmup in range(value_warmup_iters):
+        batch = collect(env, model, episodes_per_iter)
+        truncated = np.array([o["termination"] == "round_limit" for o in batch["outcomes"]])
+        step_truncated = np.zeros_like(batch["dones"])
+        step_truncated[np.flatnonzero(batch["dones"])] = truncated
+        _, warm_returns = compute_gae(batch["rewards"], batch["values"], batch["dones"], step_truncated)
+        obs_w = torch.from_numpy(batch["observations"])
+        masks_w = torch.from_numpy(batch["masks"])
+        ret_w = torch.from_numpy(warm_returns.astype(np.float32))
+        for _ in range(epochs):
+            _, values_w = model(obs_w, masks_w)
+            loss_w = ((values_w - ret_w) ** 2).mean()
+            warmup_optimizer.zero_grad(set_to_none=True)
+            loss_w.backward()
+            warmup_optimizer.step()
+        if not quiet:
+            print(f"value warmup {warmup}: mse {float(loss_w):.3f}")
 
     grad_norms_first: dict = {}
     for iteration in range(iterations):
