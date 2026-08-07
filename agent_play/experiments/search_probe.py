@@ -42,17 +42,34 @@ THUNK = {"attacker": "11:1,11:1,11:1,10:2,9:2", "defender": "1:334,1:333,1:333",
          "attacker_hero": "13:12", "allow_wide": True, "label": "thunk_1000"}
 
 
-def policy_action(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, sample: bool = True) -> int:
+def _plane_arg(model: BattlePolicy, source) -> tuple:
+    """The planes tensor for a planes-built policy, from whichever env presented the state.
+
+    A planes policy hard-fails without its tensor rather than silently reading zeros, so every
+    search path threads the presenting environment through; entity policies get an empty tuple
+    and are untouched."""
+    if not getattr(model, "planes", False):
+        return ()
+    planes = getattr(source, "last_planes", None)
+    if planes is None:
+        raise ValueError("planes policy searched through an env constructed without planes=True")
+    return (torch.from_numpy(planes).unsqueeze(0),)
+
+
+def policy_action(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, sample: bool = True,
+                  env=None) -> int:
     with torch.no_grad():
-        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0))
+        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0),
+                          *_plane_arg(model, env))
         if sample:
             return int(torch.distributions.Categorical(logits=logits).sample())
         return int(logits.argmax())
 
 
-def priors(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray) -> dict[int, float]:
+def priors(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, env=None) -> dict[int, float]:
     with torch.no_grad():
-        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0))
+        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0),
+                          *_plane_arg(model, env))
         probs = torch.softmax(logits, dim=-1).squeeze(0).numpy()
     legal = np.flatnonzero(mask)
     return {int(a): float(probs[a]) for a in legal}
@@ -70,20 +87,22 @@ def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) 
         observation, mask = step.observation, step.mask
     step = sim.step(first)
     while not step.done:
-        action = policy_action(model, step.observation, step.mask)
+        action = policy_action(model, step.observation, step.mask, env=sim)
         step = sim.step(action)
     return step.reward
 
 
 def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                          observation: np.ndarray, mask: np.ndarray, simulations: int,
-                         c_puct: float) -> tuple[int, dict, dict, dict]:
+                         c_puct: float, live: BattleEnv | None = None) -> tuple[int, dict, dict, dict]:
     """The search decision plus its whole measurement: per-candidate mean rollout values, visit
     counts, and the prior. The values are the counterfactuals only search produces (a real
     playout per candidate it tried), which is what makes them valid soft-distillation targets
     where fitted state values and behavior Q measured 0.00; the prior anchors the target on
     support per Grill et al."""
-    prior = priors(model, observation, mask)
+    # The observation is the live environment's state, so a planes policy needs the live
+    # env's tensor here; the sim's belongs to whatever state its own replay last presented.
+    prior = priors(model, observation, mask, env=live if live is not None else sim)
     actions = list(prior)
     if len(actions) == 1:
         return actions[0], {actions[0]: 0.0}, {actions[0]: 1}, prior
@@ -104,8 +123,9 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
 
 
 def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
-                  observation: np.ndarray, mask: np.ndarray, simulations: int, c_puct: float) -> int:
-    action, _, _, _ = search_action_detail(sim, model, prefix, observation, mask, simulations, c_puct)
+                  observation: np.ndarray, mask: np.ndarray, simulations: int, c_puct: float,
+                  live: BattleEnv | None = None) -> int:
+    action, _, _, _ = search_action_detail(sim, model, prefix, observation, mask, simulations, c_puct, live=live)
     return action
 
 

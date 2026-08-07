@@ -77,9 +77,9 @@ def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: path
             while True:
                 if record_candidates:
                     action, means, visits, prior = search_action_detail(
-                        sim, model, prefix, observation, mask, simulations, c_puct)
+                        sim, model, prefix, observation, mask, simulations, c_puct, live=env)
                 else:
-                    action = search_action(sim, model, prefix, observation, mask, simulations, c_puct)
+                    action = search_action(sim, model, prefix, observation, mask, simulations, c_puct, live=env)
                 raw = env._pending
                 record = {"record": "decision", "observation": raw["observation"],
                           "legal_actions": raw["legal_actions"], "teacher_resolved": True,
