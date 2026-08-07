@@ -51,6 +51,7 @@ def main() -> None:
     parser.add_argument("--eval-seeds", type=int, default=4)
     parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"))
     parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
+    parser.add_argument("--value-warmup", type=int, default=0)
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
