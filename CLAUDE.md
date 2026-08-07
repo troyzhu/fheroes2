@@ -22,9 +22,11 @@ than a reading path.
 As of 2026-08-05 all four stages exist: stage 1 cloning, stage 2 DAgger (first round measured,
 `dagger_iteration.py`), stage 2b critic pre-fitting and stage 3 reinforcement learning, built
 under `python/fheroes2_agent/` plus `agent_play/experiments/` and gated by `verify_agent.sh`,
-along with the calibrated scenario generator. Still unbuilt: every reward candidate except the
-margin-weighted terminal one and the opt-in difficulty weighting, the `observable_v1` profile
-and `planes_v1`. Each page under `rl/` says which of its own content exists;
+along with the calibrated scenario generator. As of 2026-08-07 `planes_v1` is also built end
+to end (worker `--planes` obstacle layer, `encode_planes`, the conv-fusion arm on
+`BattlePolicy`, ablated with a capacity control). Still unbuilt: every reward candidate except
+the margin-weighted terminal one, the strength-margin variant and the opt-in difficulty
+weighting, and the `observable_v1` profile. Each page under `rl/` says which of its own content exists;
 `implementation/inventory.md` is the per-component list.
 
 **Notation is not a free choice.** `agent_play/docs/overview.md`'s Notation section is the contract, and the tree is

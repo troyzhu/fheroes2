@@ -125,6 +125,7 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 
 Milestones 4 and 5 were partly overtaken. Blocking external control, the observation emitter and a working Python package all exist, because the training work needed them and building them was cheaper than waiting. What each milestone still owes is therefore narrower than its original scope.
 
+- `planes_v1`, built 2026-08-06/07 ahead of the M4 line item: the worker's `--planes` flag appends the 99-cell obstacle layer to every serialized observation (`agent_observation.{h,cpp}`, threaded through `agent_scenario.h`, the runner's recorder, and `agent_external_controller.{h,cpp}`; byte-identical off, verified against stripped transcripts), `encode_planes` in `python/fheroes2_agent/encoding.py` rasterizes the committed channels, and `BattlePolicy(planes=True)` carries the conv-fusion arm with `load_policy` inferring it from the state dict. Measured by the three-arm capacity-controlled ablation (`planes_ablation.py`, three seeds).
 - M4: strict scenario JSON parsing that names a path and a stable error code on rejection, a vendored JSON parser per §6.5, the `observable_v1` profile and the `planes_v1` modality per ADR 0001 and ADR 0004, an `ENABLE_AGENT` CMake target, and `verify_m4.sh` itself. Blocking external control is done, and the current line protocol is a working subset of §13 rather than protocol v1.
 - M5: golden-trajectory replay across fresh and reused workers, and a worker pool. The Python package and its policies exist.
 - M6: hardening and benchmark modes B and C.

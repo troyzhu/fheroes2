@@ -71,6 +71,10 @@ The cost is what concatenation was chosen for at ten slots: a concatenated trunk
 
 Three measured symptoms fit the diagnosis. Held-out transfer on the fully diverse pool collapsed to $+0.007 \pm 0.046$ where the training split gained $+0.173 \pm 0.039$. The count-extrapolation ablation lost a third of its agreement above the training range under every encoding, so the encoding was not the axis. And the supervised plateau of 2026-08-06, five label arms all trading axes at a fixed network, is what capacity spent on relearnable invariances would look like. None of the three is proof, which is exactly why pooling-against-concatenation is the recorded experiment rather than an adopted change: same corpus, same battery, one axis moved.
 
+## The planes arm, built after this page's first draft
+
+`BattlePolicy(planes=True)` now exists: two 3-by-3 convolutions at 32 channels over the (7, 9, 11) tensor of [[../implementation/observation-design#The planes, half built as of 2026-08-06|encode_planes]], no downsampling, squeezed to 128 and concatenated into the trunk beside the slots and globals, about 441k extra parameters, with `load_policy` inferring the arm from the state dict. The three-seed capacity-controlled ablation found its fidelity gain real (agreement 0.897 against the width control's 0.875) and its play gains modest; [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the champion-mixture measurement. The pooling question above is unchanged by any of this, since the slot lifecycle bites the entity half either way.
+
 ## The experiment, when it runs
 
 Swap the concatenation for mean pooling first (cheapest, most invariant), then attention if the mean collapses needed distinctions. Everything else stays fixed: corpus, losses, battery, multi-seed gate per the experiments README conventions. The battery columns that should move if the diagnosis is right are held-out transfer and count extrapolation; the ladder should hold. A trade, ladder down for transfer up, would say stack-specific relations were load-bearing after all, and attention is the next arm.

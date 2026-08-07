@@ -76,3 +76,7 @@ Either wait, or copy the binary somewhere else and pass that path, since every s
 
 The copy must be private to the run, not shared. A pool build died silently when the "pinned" copy it was spawning per episode was itself overwritten by a fresh pin for a different experiment. One binary copy per concurrently running experiment, named for it.
 
+
+Load checkpoints only through `load_policy`, never a bare `BattlePolicy()` plus `load_state_dict`: the state dict is self-describing (ability table, planes conv, widths), and the direct pattern crashes on any architecture it predates, which killed a full overnight collection round on 2026-08-07. For the same reason, smoke-test the exact invocation path that will run, since a library-path smoke proved nothing about the CLI path that night.
+
+Pin worker binaries per feature, not per day. A pinned copy that predates a feature silently fails any experiment whose evaluation path requests that feature; the first planes replication chains died on a pre-planes worker rejecting `--planes`.
