@@ -182,6 +182,7 @@ def train(
             print(f"value warmup {warmup}: mse {float(loss_w):.3f}")
 
     grad_norms_first: dict = {}
+    loss_decomp_first: dict = {}
     for iteration in range(iterations):
         batch = collect(env, model, episodes_per_iter)
         # Only the round-limit cap is a truncation, a battle cut off with a future still worth
@@ -275,6 +276,8 @@ def train(
                 pre_clip = float(torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5))
                 if start == 0:
                     grad_norms_first["total_pre_clip"] = pre_clip
+                    loss_decomp_first = {"loss_policy": float(policy_term), "loss_value": float(value_term),
+                                         "loss_entropy": float(entropy_term), "loss_total": float(loss)}
                 optimizer.step()
 
         wr = win_rate(batch["outcomes"], side)
@@ -286,6 +289,7 @@ def train(
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,
+                        **loss_decomp_first,
                         "grad_norms": grad_norms_first})
         # Live monitoring heartbeat (owner-requested 2026-08-07): one JSON line per iteration,
         # appended as it happens, so a dashboard can watch training health without waiting for

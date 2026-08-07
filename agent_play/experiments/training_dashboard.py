@@ -24,7 +24,7 @@ import json
 import pathlib
 import time
 
-METRICS = ("win_rate", "mean_terminal_reward", "value_loss", "entropy", "raw_advantage_std")
+METRICS = ("win_rate", "mean_terminal_reward", "loss_total", "loss_policy", "value_loss", "entropy", "raw_advantage_std", "train_loss", "holdout_agreement")
 GRAD_KEYS = ("policy", "value", "entropy", "total_pre_clip")
 
 

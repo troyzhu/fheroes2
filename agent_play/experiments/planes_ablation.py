@@ -88,6 +88,8 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
         # Mean pooling drops parameters (the trunk narrows to one embedding), so this arm widens
         # the trunk back toward the concat baseline's count, the capacity control in reverse.
         model = BattlePolicy(pooling="mean", trunk_hidden=300)
+    elif arm == "softplus":
+        model = BattlePolicy(activation="softplus")
     else:
         model = BattlePolicy()
     parameters = sum(p.numel() for p in model.parameters())
@@ -99,6 +101,7 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
     act = torch.from_numpy(actions)
     pl = torch.from_numpy(planes)
     best = {"agreement": -1.0}
+    beat_path = out + ".heartbeat.jsonl"
     for epoch in range(epochs):
         model.train()
         perm = torch.from_numpy(np.random.default_rng(seed * 1000 + epoch).permutation(train_idx))
@@ -120,6 +123,9 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
                 logits, _ = model(obs[batch], msk[batch], *plane_arg)
                 agree += int((logits.argmax(-1) == act[batch]).sum())
         agreement = agree / len(hold_idx)
+        with open(beat_path, "a") as beat:
+            beat.write(json.dumps({"iteration": epoch, "train_loss": float(loss),
+                                   "holdout_agreement": agreement}) + "\n")
         if agreement > best["agreement"]:
             best = {"epoch": epoch, "agreement": agreement, "parameters": parameters}
             torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION}, out)
@@ -135,7 +141,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--report", default=None)
     parser.add_argument("--arms", nargs="+", default=["entity", "planes", "wide"],
-                        choices=["entity", "planes", "wide", "mean", "mean_wide"])
+                        choices=["entity", "planes", "wide", "mean", "mean_wide", "softplus"])
     args = parser.parse_args()
 
     started = time.time()

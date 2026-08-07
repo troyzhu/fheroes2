@@ -69,11 +69,12 @@ def load_policy(state_dict: dict) -> "BattlePolicy":
     # The trunk's input width tells concatenation (SLOT_COUNT * slot_hidden + ...) apart from
     # mean pooling (slot_hidden + ...), so the pooling choice is self-describing too.
     trunk_in = state_dict["trunk.0.weight"].shape[1]
+    activation = "softplus" if "uses_softplus" in state_dict else "relu"
     plane_width = 128 if planes else 0
     pooling = "concat" if trunk_in >= SLOT_COUNT * slot_hidden + global_hidden + plane_width else "mean"
     model = BattlePolicy(slot_hidden=slot_hidden, trunk_hidden=trunk_hidden,
                          global_hidden=global_hidden, ability_features=ability, planes=planes,
-                         pooling=pooling)
+                         pooling=pooling, activation=activation)
     model.load_state_dict(state_dict)
     return model
 
@@ -86,7 +87,7 @@ class BattlePolicy(nn.Module):
     # current 634-wide encoding.
     def __init__(self, slot_hidden: int = 96, trunk_hidden: int = 192, global_hidden: int = 32,
                  ability_features: bool = False, planes: bool = False,
-                 pooling: str = "concat") -> None:
+                 pooling: str = "concat", activation: str = "relu") -> None:
         super().__init__()
         # Optional architectural inductive bias: each slot's input is extended by its creature's
         # fixed ability profile, computed inside the model from the one-hot the observation
@@ -98,13 +99,26 @@ class BattlePolicy(nn.Module):
             self.register_buffer("ability_table", ability_feature_table())
         # Shared across slots, which is what enforces that a stack's meaning comes from its
         # fields rather than from the slot it happens to occupy.
+        # Softplus entered on the owner's 2026-08-07 direction. The default stays ReLU until
+        # the paired ablation clears the battery, because the agent gate's critic check fails
+        # under softplus at its tiny budget, the exact early signal the measure-first rule
+        # exists to catch. The choice is carried in the state dict by the marker buffer below,
+        # since the two activations leave identical weight shapes.
+        if activation not in ("relu", "softplus"):
+            raise ValueError(f"unknown activation {activation!r}")
+        self.activation = activation
+        if activation == "softplus":
+            # Registered only for softplus, so its very presence in a state dict is the marker
+            # and pre-change ReLU checkpoints load into ReLU models with no missing key.
+            self.register_buffer("uses_softplus", torch.tensor(True))
+        act = nn.Softplus if activation == "softplus" else nn.ReLU
         self.slot_encoder = nn.Sequential(
             nn.Linear(slot_in, slot_hidden),
-            nn.ReLU(),
+            act(),
             nn.Linear(slot_hidden, slot_hidden),
-            nn.ReLU(),
+            act(),
         )
-        self.global_encoder = nn.Sequential(nn.Linear(GLOBAL_FEATURES, global_hidden), nn.ReLU())
+        self.global_encoder = nn.Sequential(nn.Linear(GLOBAL_FEATURES, global_hidden), act())
         # The planes_v1 fusion arm of ADR 0004: a small convolution over the (7, 9, 11) tensor,
         # no downsampling at this board size, squeezed to a fixed width so the trunk grows by a
         # bounded amount. Absent unless requested, and load_policy infers it from the state dict.
@@ -115,12 +129,12 @@ class BattlePolicy(nn.Module):
 
             self.plane_conv = nn.Sequential(
                 nn.Conv2d(len(PLANE_CHANNELS), 32, kernel_size=3, padding=1),
-                nn.ReLU(),
+                act(),
                 nn.Conv2d(32, 32, kernel_size=3, padding=1),
-                nn.ReLU(),
+                act(),
             )
             plane_width = 128
-            self.plane_fc = nn.Sequential(nn.Linear(32 * BOARD_HEIGHT * BOARD_WIDTH, plane_width), nn.ReLU())
+            self.plane_fc = nn.Sequential(nn.Linear(32 * BOARD_HEIGHT * BOARD_WIDTH, plane_width), act())
         # Mean pooling replaces the ordered concatenation with a present-masked average of the
         # slot embeddings, granting permutation invariance by construction; the trunk narrows
         # accordingly. the-policy-network.md carries the design argument on both sides.
@@ -130,9 +144,9 @@ class BattlePolicy(nn.Module):
         slot_block = SLOT_COUNT * slot_hidden if pooling == "concat" else slot_hidden
         self.trunk = nn.Sequential(
             nn.Linear(slot_block + global_hidden + plane_width, trunk_hidden),
-            nn.ReLU(),
+            act(),
             nn.Linear(trunk_hidden, trunk_hidden),
-            nn.ReLU(),
+            act(),
         )
         self.policy_head = nn.Linear(trunk_hidden, ACTION_SPACE_SIZE)
         self.value_head = nn.Linear(trunk_hidden, 1)
