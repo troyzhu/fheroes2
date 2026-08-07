@@ -76,10 +76,26 @@ def render(watch: pathlib.Path, interval: int) -> str:
         parts.append("</tr></table>")
         norms = [r.get("grad_norms", {}) for r in rows]
         if any(norms):
-            parts.append("<table><tr><th>grad norm (pre-sum)</th>" +
-                         "".join(f"<th>{k}</th>" for k in GRAD_KEYS) + "</tr><tr><td>latest</td>" +
-                         "".join(f"<td class='num'>{norms[-1].get(k, float('nan')):.2f}</td>" for k in GRAD_KEYS) +
-                         "</tr></table>")
+            latest = norms[-1]
+            nested = any(isinstance(v, dict) for v in latest.values())
+            if nested:
+                modules = sorted({m for v in latest.values() if isinstance(v, dict) for m in v if m != "total"})
+                head = "<tr><th>grad norm</th>" + "".join(f"<th>{m}</th>" for m in modules) + "<th>total</th></tr>"
+                body = ""
+                for term in ("policy", "value", "entropy"):
+                    v = latest.get(term)
+                    if isinstance(v, dict):
+                        body += (f"<tr><td>{term}</td>" +
+                                 "".join(f"<td class='num'>{v.get(m, 0.0):.2f}</td>" for m in modules) +
+                                 f"<td class='num'>{v.get('total', 0.0):.2f}</td></tr>")
+                pre = latest.get("total_pre_clip")
+                tail_row = f"<tr><td>sum, pre-clip</td><td colspan='{len(modules)}'></td><td class='num'>{pre:.2f}</td></tr>" if pre is not None else ""
+                parts.append(f"<table>{head}{body}{tail_row}</table>")
+            else:
+                parts.append("<table><tr><th>grad norm (pre-sum)</th>" +
+                             "".join(f"<th>{k}</th>" for k in GRAD_KEYS) + "</tr><tr><td>latest</td>" +
+                             "".join(f"<td class='num'>{latest.get(k, float('nan')):.2f}</td>" for k in GRAD_KEYS) +
+                             "</tr></table>")
 
     logs = sorted(watch.glob("*.log"), key=lambda q: q.stat().st_mtime, reverse=True)[:4]
     for log in logs:

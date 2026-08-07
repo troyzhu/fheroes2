@@ -257,11 +257,17 @@ def train(
                                             ("entropy", entropy_term)):
                         optimizer.zero_grad(set_to_none=True)
                         term.backward(retain_graph=True)
-                        total = 0.0
-                        for parameter in model.parameters():
+                        # Decomposed per top-level module (owner-requested 2026-08-07), because
+                        # the interference question is not how big a term's gradient is but
+                        # where it lands: the value term's share inside the shared trunk is the
+                        # number the warmup exists to shrink.
+                        per_module: dict[str, float] = {}
+                        for name, parameter in model.named_parameters():
                             if parameter.grad is not None:
-                                total += float(parameter.grad.norm()) ** 2
-                        term_norms[term_name] = total ** 0.5
+                                module = name.split(".")[0]
+                                per_module[module] = per_module.get(module, 0.0) + float(parameter.grad.norm()) ** 2
+                        term_norms[term_name] = {module: value ** 0.5 for module, value in per_module.items()}
+                        term_norms[term_name]["total"] = sum(per_module.values()) ** 0.5
                     grad_norms_first = term_norms
 
                 optimizer.zero_grad(set_to_none=True)
