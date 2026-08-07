@@ -136,6 +136,7 @@ class BattleEnv:
         # is the starting force. The terminal record carries no initial totals.
         self._own_initial_hp: float = 0.0
         self._reward_weighting = reward_weighting
+        self._reward_margin = reward_margin
         self._difficulty = 1.0
         self.side = side
         # The scenario id of the episode in progress, from the worker's episode_start record.
@@ -355,7 +356,8 @@ class MatchupPool:
     """
 
     def __init__(self, worker: str, matchups, side: str = "attacker", seed: int = 0, home: str = "/tmp",
-                 hold_within_group: bool = False, seeds: int = 1, reward_weighting: str = "none"):
+                 hold_within_group: bool = False, seeds: int = 1, reward_weighting: str = "none",
+                 reward_margin: str = "hit_points"):
         import random
 
         self._worker = worker
@@ -367,6 +369,7 @@ class MatchupPool:
         self._hold = hold_within_group
         self._seeds = seeds
         self._reward_weighting = reward_weighting
+        self._reward_margin = reward_margin
         self.side = side
         self.current = None
 
@@ -388,7 +391,8 @@ class MatchupPool:
                                   attacker_hero=getattr(self.current, "attacker_hero", None),
                                   defender_hero=getattr(self.current, "defender_hero", None),
                                   allow_wide=getattr(self.current, "allow_wide", False),
-                                  seeds=self._seeds, reward_weighting=self._reward_weighting)
+                                  seeds=self._seeds, reward_weighting=self._reward_weighting,
+                                  reward_margin=self._reward_margin)
         return self._env.reset()
 
     def step(self, action: int) -> Step:

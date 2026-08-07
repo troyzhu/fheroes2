@@ -49,6 +49,8 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, default=3)
     parser.add_argument("--eval-episodes", type=int, default=24)
     parser.add_argument("--eval-seeds", type=int, default=4)
+    parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"))
+    parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
@@ -60,7 +62,8 @@ def main() -> None:
     workdir = pathlib.Path(tempfile.mkdtemp(prefix="ppo_strong_"))
     runs = []
     for seed in range(args.seeds):
-        pool = MatchupPool(args.worker, train_set, seed=seed)
+        pool = MatchupPool(args.worker, train_set, seed=seed,
+                           reward_margin=args.reward_margin, reward_weighting=args.reward_weighting)
         out = workdir / f"s{seed}.pt"
         train_ppo.train(args.worker, checkpoint=args.checkpoint, iterations=args.iterations,
                         seed=seed, env=pool, quiet=True, out=str(out))
