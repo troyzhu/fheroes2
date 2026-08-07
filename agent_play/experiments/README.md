@@ -36,6 +36,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `awr_distill.py` | Advantage-weighted distillation against its unweighted twin, one improvement step that never queries an unseen action | about 8 min for both arms |
 | `planes_ablation.py` | Do spatial planes earn their place, with capacity controlled? Entity, planes, and a width-matched control arm from one seed on a planes-recorded corpus | about 15 min for three arms |
 | `soft_distill.py` | Does distilling search's whole per-candidate measurement beat distilling its argmax, at identical data? Prior-anchored soft targets against a hard-label twin | about 8 min for both arms |
+| `real_map_fights.py` | Real opening fights harvested from the shipped maps by dump, nearest stack per hero, stratified across maps, evaluated with the built-in AI column attached | about 1 min end to end |
 | `builtin_ai_baseline.py` | The engine's own AI on every validation suite: the baseline a player recognizes, and the bar the policies must clear | about 70 s for all suites |
 | `search_value.py` | Can a value network replace rollouts at search leaves, and is it calibrated where it would be used? | about 10 min including the fit |
 | `symmetry_gap.py` | Does the same army win as often from the other chair, and how much of any gap is the game rather than the policy? | about 6 min over 10 matchups |

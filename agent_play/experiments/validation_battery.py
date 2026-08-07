@@ -45,6 +45,18 @@ def thunk_split(total: int) -> str:
     return f"1:{first},1:{total // 3},1:{total - first - total // 3}"
 
 
+REAL_MAPS_MANIFEST = pathlib.Path(__file__).resolve().parents[1] / "docs" / "archive" / "experiments" / "files" \
+    / "2026-08-07-run-reports" / "real_map_fights.json"
+
+
+def real_map_suite() -> list:
+    """Real opening fights harvested from the shipped maps, membership frozen by the vendored
+    manifest so the column is stable across runs; real_map_fights.py regenerates it."""
+    entries = json.loads(REAL_MAPS_MANIFEST.read_text())["fights"]
+    return [Matchup(e["attacker"], e["defender"], attacker_hero=e["attacker_hero"], allow_wide=True)
+            for e in entries]
+
+
 def build_suites(fresh_count: int) -> dict[str, list[Matchup]]:
     suites: dict[str, list[Matchup]] = {}
 
@@ -92,6 +104,8 @@ def build_suites(fresh_count: int) -> dict[str, list[Matchup]]:
     suites["mirrors_attacker"] = [Matchup(a, a, attacker_hero="10:10", defender_hero="10:10", allow_wide=True)
                                   for a in mirrors]
     suites["mirrors_defender"] = list(suites["mirrors_attacker"])
+
+    suites["real_maps"] = real_map_suite()
     return suites
 
 
