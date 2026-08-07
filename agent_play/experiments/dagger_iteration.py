@@ -48,7 +48,7 @@ def as_matchup(entry: dict) -> Matchup:
 
 
 def collect(worker: str, model: BattlePolicy, matchups: list[Matchup], out_dir: pathlib.Path,
-            episodes_per: int, battlefields: int) -> dict:
+            episodes_per: int, battlefields: int, planes: bool = False) -> dict:
     """Student-played episodes with teacher labels, one JSONL per episode in the dataset schema."""
     decisions = 0
     labeled = 0
@@ -56,7 +56,7 @@ def collect(worker: str, model: BattlePolicy, matchups: list[Matchup], out_dir: 
     for index, matchup in enumerate(matchups):
         matchup_dir = out_dir / f"matchup_{index:03d}"
         matchup_dir.mkdir(parents=True, exist_ok=True)
-        env = BattleEnv(worker, attacker=matchup.attacker, defender=matchup.defender,
+        env = BattleEnv(worker, planes=planes, attacker=matchup.attacker, defender=matchup.defender,
                         attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
                         allow_wide=matchup.allow_wide, seeds=battlefields, probe_teacher=True)
         try:
@@ -110,6 +110,8 @@ def main() -> None:
     parser.add_argument("--battlefields", type=int, default=4)
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--eval-episodes", type=int, default=24)
+    parser.add_argument("--planes", action="store_true",
+                        help="collect with the planes_v1 obstacle layer on every observation")
     parser.add_argument("--skip-collect", action="store_true", help="reuse an existing --dagger-dir")
     parser.add_argument("--out", default=None)
     parser.add_argument("--report", default=None)
@@ -136,7 +138,7 @@ def main() -> None:
     if args.skip_collect:
         stats = {"episodes": "reused", "decisions": "reused", "labeled": "reused"}
     else:
-        stats = collect(args.worker, student, collection_set, dagger_dir, args.episodes_per_matchup, args.battlefields)
+        stats = collect(args.worker, student, collection_set, dagger_dir, args.episodes_per_matchup, args.battlefields, planes=args.planes)
         print(f"collection: {stats}", flush=True)
 
     result = train_bc.train(list(args.teacher_data) + [str(dagger_dir)], epochs=args.epochs, out=args.out)

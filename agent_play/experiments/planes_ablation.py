@@ -32,11 +32,16 @@ from fheroes2_agent.encoding import ENCODING_VERSION, encode_mask, encode_observ
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 
 
-def load_planes_corpus(root: str):
-    """(observations, masks, actions, planes fp16, episode ids), planes verified nonzero."""
+def load_planes_corpus(roots):
+    """(observations, masks, actions, planes fp16, episode ids), planes verified nonzero.
+
+    A list of roots concatenates, and repeating a root repeats its rows, the same double-weight
+    convention the champion recipe uses on the flat corpus."""
+    if isinstance(roots, str):
+        roots = [roots]
     observations, masks, actions, planes, episodes = [], [], [], [], []
     episode_id = 0
-    for path in sorted(pathlib.Path(root).rglob("*.jsonl")):
+    for path in sorted(q for root in roots for q in pathlib.Path(root).rglob("*.jsonl")):
         rows = 0
         for line in path.read_text().splitlines():
             record = json.loads(line)
@@ -118,7 +123,7 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("worker", help="recorded in the report for provenance; the battery runs separately")
-    parser.add_argument("corpus")
+    parser.add_argument("corpus", nargs="+")
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--seed", type=int, default=0)
