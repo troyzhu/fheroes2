@@ -120,7 +120,7 @@ This closed the project's top risk. The engine exposes no "list legal actions" A
 
 ## What this does not say
 
-The space covers the `simple_v1` profile only, meaning single-cell walking creatures. Wide units, flyers, two-cell and all-adjacent attacks, and area shots are excluded by the capability audit, and each would add targeting semantics this indexing cannot express.
+The space was designed against `simple_v1` and now also serves `wide_v1`: two-cell walkers entered opt-in (worker `--allow-wide`) with teacher coverage staying complete at 1,238 of 1,238, so the feared re-indexing never became necessary. Flyers, all-adjacent attacks, and area shots remain excluded by the capability audit.
 
 ## Go deeper
 

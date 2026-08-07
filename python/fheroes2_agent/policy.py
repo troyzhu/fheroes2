@@ -76,7 +76,8 @@ class BattlePolicy(nn.Module):
     # Sized against the data rather than by habit. The concatenation pool sends
     # SLOT_COUNT * slot_hidden into the trunk, so slot_hidden drives most of the parameter count.
     # At 128 and 256 the model held 626k parameters against roughly 37k training decisions, which
-    # is the memorization regime training-design.md warns about; 96 and 192 give 393k.
+    # is the memorization regime training-design.md warns about; 96 and 192 give 396,570 at the
+    # current 634-wide encoding.
     def __init__(self, slot_hidden: int = 96, trunk_hidden: int = 192, global_hidden: int = 32,
                  ability_features: bool = False, planes: bool = False) -> None:
         super().__init__()

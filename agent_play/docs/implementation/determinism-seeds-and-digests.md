@@ -22,7 +22,7 @@ An fheroes2 battle is a pure function of two inputs, a world seed and an army co
 
 Reproducibility carries three separate jobs here.
 
-Recorded demonstrations are worthless if replaying them produces a different battle, so recorded demonstrations would not correspond to reproducible battles. Regression safety has no cheaper instrument. We are editing engine internals, where re-reading the diff proves nothing and a matching outcome hash proves a great deal. Debugging requires repeated runs until the failure recurs.
+Recorded demonstrations are worthless if replaying them produces a different battle: the recording would describe a fight nobody can reproduce. Regression safety has no cheaper instrument. We are editing engine internals, where re-reading the diff proves nothing and a matching outcome hash proves a great deal. Debugging requires repeated runs until the failure recurs.
 
 The naive approach fails for a specific reason. The engine picks its map seed from a global random device at construction time and exposes no setter, so calling the battle entry point twice gives two different battlefields. Grepping the repository for `SetMapSeed` returns nothing.
 
@@ -88,7 +88,7 @@ Reseed before every episode, always adjacent to map generation. Compare digests,
 
 ## Why it came up here
 
-Every gate under `agent_play/verify_m*.sh` reduces to a digest comparison, and the same five golden fixture digests have now survived a seed-helper extraction, a decision-hook insertion, a legality-rule lift, and candidate enumeration running at every decision. Five fixture digests on one machine are the extent of that evidence.
+Every gate under `agent_play/verify_m*.sh` reduces to a digest comparison, and the same five golden fixture digests have now survived a seed-helper extraction, a decision-hook insertion, a legality-rule lift, and candidate enumeration running at every decision. The evidence has since widened past the five fixture digests: the seed and spike digest reproduced across three working trees, two machines, and both optimization levels, and every replay carries its own digest-equality proof.
 
 ### The single-arena rule is only enforced where assertions live
 

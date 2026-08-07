@@ -40,7 +40,7 @@ Per-component detail for what is already built, meaning which file satisfies whi
 
 Nothing under `rl/` appears above, because training a policy is not a milestone of the environment. The plan was that it begins after 6, and [[decisions/0005-training-and-reward]] governs it.
 
-That is not what happened, and the table would misread the project if it did not say so. Stage 1 cloning, stage 2b critic pre-fitting and stage 3 reinforcement learning were all built and measured during 2026-08-03, while milestones 4 through 6 remain unstarted. The training work reached far enough with a Python worker driving the existing protocol that the hardening milestones were never the blocker they were expected to be. Its own gate is `verify_agent.sh`, 11 of 11, and its record lives in [[archive/experiments/2026-08-03-training-runs]]. The milestone chain above is still the environment's exit criteria and is still owed; what changed is that it is no longer on the critical path to a trained policy.
+That is not what happened, and the table would misread the project if it did not say so. Stage 1 cloning, stage 2b critic pre-fitting and stage 3 reinforcement learning were all built and measured during 2026-08-03. Milestones 4 through 6 are partly overtaken rather than unstarted: external control over a blocking protocol and observation serialization exist (the worker's `--protocol` mode and the planes-carrying observation emitter), while the strict scenario-JSON surface, the `observable_v1` profile, and the gates themselves remain owed. The training work reached far enough with a Python worker driving the existing protocol that the hardening milestones were never the blocker they were expected to be. Its own gate is `verify_agent.sh`, 11 of 11, and its record lives in [[archive/experiments/2026-08-03-training-runs]]. The milestone chain above is still the environment's exit criteria and is still owed; what changed is that it is no longer on the critical path to a trained policy.
 
 ## Milestone 4 in detail
 
@@ -94,7 +94,7 @@ Terminal state can be checked this way today. Running the worker with `--traject
 python3 -m json.tool < /tmp/gate/m1_tiny_melee-run00.jsonl   # one record per line
 ```
 
-Per-decision state cannot be checked this way yet, which is the remaining half of this milestone. A decision record still carries only an index, a unit id, and the chosen commands, so the board between decisions is not observable and the sign-off can currently cover the start of the battle, the action sequence, and the end of it, but not the positions in between.
+Per-decision state is now checkable too: recorded with coverage on, a decision record carries the observation, the legal-action list, and the teacher's resolved index (`agent_trajectory.cpp`), so the board between decisions is auditable sample by sample; the digest remains the episode-level seal.
 
 This upgrades the optional interface run in [[#The milestones]] from a normal-game regression that was the owner's call into a required sign-off for Milestone 4. The reason for the upgrade is that per-decision state serialization is new code with no independent check, where the terminal path at least now has invariants.
 
@@ -102,7 +102,7 @@ This upgrades the optional interface run in [[#The milestones]] from a normal-ga
 
 The two-build-system question. `ENABLE_AGENT` covers the CMake path only, and the specification requires deciding explicitly whether the worker target is also wired into the `src/dist` Makefile or whether that path is declared unsupported for agent builds. Leaving it undecided strands whichever machine lacks CMake, and this machine builds through the Makefile.
 
-Whether `AI::BattlePlanner` can be queried without advancing the arena or consuming combat randomness. This is the precondition for the DAgger stage in [[decisions/0005-training-and-reward]], and that record asks for it to be settled during Milestone 4 while the protocol is being built, because the answer decides whether that stage exists at all.
+Whether `AI::BattlePlanner` could be queried without advancing the arena was settled on 2026-08-05: the public `queryUnitTurn` probe answers at any student-visited state, proven digest-inert over one hundred paired episodes, and the DAgger stage it gates has run its first measured round.
 
 ## Where the project is aimed
 
@@ -130,7 +130,7 @@ Finally, the only comparable shipped system, vcmi-gym for Heroes III, is battle-
 
 The next expansion stays inside battles and lifts the `simple_v1` restrictions. Wide two-cell units, flying movement, two-cell and all-adjacent attacks, area shots, and eventually heroes with spells and castle sieges.
 
-The blocking work is the capability audit and the action indexing. The current canonical space keys melee actions on a target cell and a direction, which presumes a single-cell attacker. A two-cell unit has no single head cell for that purpose, so the indexing needs revisiting before wide units enter. Spells multiply the action space by targets and parameters, which is the point where a flat masked space stops being obviously right and a factorized or pointer head earns consideration.
+The blocking work is the capability audit and the action indexing. The current canonical space keys melee actions on a target cell and a direction, which presumes a single-cell attacker. Wide walkers have since entered opt-in under `wide_v1`, and teacher coverage stayed complete (1,238 of 1,238), so the feared indexing revision never became necessary; flyers remain the genuinely open half. Spells multiply the action space by targets and parameters, which is the point where a flat masked space stops being obviously right and a factorized or pointer head earns consideration.
 
 ## Phase 2, the navigation and management agent
 
@@ -175,7 +175,7 @@ Until that sweep is run and consolidated, no adventure-map design decision shoul
 
 ## Sequencing
 
-The battle environment is finished as a substrate only when Milestones 4 through 6 are done, meaning the protocol, the Python client, and the hardening and benchmark work. Training a battle policy comes after that, and it is where the reward and algorithm choices in [[decisions/0005-training-and-reward]] first meet reality.
+The battle environment is finished as a substrate only when Milestones 4 through 6 are done, meaning the protocol, the Python client, and the hardening and benchmark work. Training a battle policy ran ahead of that ordering: the reward and algorithm choices of [[decisions/0005-training-and-reward]] met reality across 2026-08-03 to 08-07, and the measured residue is that supervised imitation converges to the teacher while the search agent already exceeds it.
 
 Phase 1b and Phase 2 both wait on that, for the same reason the battle came first. A second environment built before the first one has trained anything would be a second untested substrate.
 

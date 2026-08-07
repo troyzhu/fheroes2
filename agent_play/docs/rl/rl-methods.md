@@ -204,7 +204,7 @@ The encoder transfers. Whatever representation cloning learned about which stack
 
 The head does not, and the reason is a specific degeneracy. A softmax head is shift-invariant within a state, so adding any constant $c(o)$ to every logit at $o$ leaves $\pi_\theta(a \mid o)$ unchanged. Cloning therefore never constrains the level of the logits, only their differences inside a state. Action values are not shift-invariant, since $Q^\pi$ has to satisfy a Bellman equation that ties levels across states. The cloned head is undetermined in exactly the dimension a value method needs.
 
-Even the within-state differences are the wrong quantity. They encode how often the teacher picks an action, which is a behavioral frequency, not how much return it earns. Those coincide only if the demonstrator is Boltzmann-rational with respect to our reward at a known temperature, and `AI::BattlePlanner` is a hand-written heuristic planner with no such guarantee. In this project the gap is starker still, because no reward is defined yet, so there is no return for the logits to be calibrated against.
+Even the within-state differences are the wrong quantity. They encode how often the teacher picks an action, which is a behavioral frequency, not how much return it earns. Those coincide only if the demonstrator is Boltzmann-rational with respect to our reward at a known temperature, and `AI::BattlePlanner` is a hand-written heuristic planner with no such guarantee. In this project the reward is terminal-only, so per-decision calibration still has nothing denser than the discounted outcome to anchor on.
 
 Contrast the policy-gradient path, where the continuation is exact rather than approximate. The cloned network is the object PPO keeps optimizing, with the same parameters and the same functional form, and at $\theta = \theta_{\text{old}}$ the importance ratio is exactly 1, so the first update is a true policy-gradient step by the identity in [[#Why the step must be constrained]]. No conversion, no recalibration, no lost stage.
 
@@ -224,13 +224,13 @@ These solve a problem we do not have. Four worker processes on one machine is no
 
 Monte Carlo tree search builds a search tree by simulating continuations, using the simulator rather than a learned reflex. AlphaZero combines it with a learned policy and value that guide and truncate the search. MuZero removes the requirement for a simulator by learning a latent dynamics model, which matters when no simulator exists.
 
-Our simulator is fast and deterministic, which is precisely the setting where search is strongest, so this stays deliberately open rather than rejected. The obstacle is engineering rather than principle. Search needs cheap state copying, and the arena is a process singleton whose legality helpers read process-global state, so copying a position is not currently possible. Opening that path means a forward-model interface of the kind Stratega exposes.
+Our simulator is fast and deterministic, which is precisely the setting where search is strongest, so this stays deliberately open rather than rejected. The obstacle is engineering rather than principle. Search needs cheap state copying, and the arena is a process singleton whose legality helpers read process-global state, so copying a position is unnecessary, since deterministic prefix replay reaches any recorded state in milliseconds. Opening that path means a forward-model interface of the kind Stratega exposes.
 
 ### Imitation and offline methods
 
 Behavior cloning and DAgger are covered in [[training-design]]. Two neighbors deserve naming.
 
-Offline reinforcement learning fits a policy from a fixed dataset with no further interaction, and can in principle exceed the demonstrator by stitching together good segments of mediocre trajectories. Its central difficulty is that value estimates for actions absent from the data are unconstrained and tend to be wildly optimistic, which the modern methods address either by penalizing out-of-distribution actions or by never evaluating them. It needs a reward, which we have deferred, so it is a candidate for later rather than now.
+Offline reinforcement learning fits a policy from a fixed dataset with no further interaction, and can in principle exceed the demonstrator by stitching together good segments of mediocre trajectories. Its central difficulty is that value estimates for actions absent from the data are unconstrained and tend to be wildly optimistic, which the modern methods address either by penalizing out-of-distribution actions or by never evaluating them. It needed a reward, which now exists, and the first offline arms have run: advantage weighting measured negative for a structural reason and soft targets closed at three seeds ([[off-support-and-offline-improvement]]).
 
 Inverse reinforcement learning recovers the reward function a demonstrator appears to be optimizing. It is the wrong tool here, because our reward is ours to choose rather than to infer, and choosing it is a modeling decision we would rather make explicitly.
 
@@ -250,7 +250,7 @@ Everything this project trains falls into one of two families, and they are easy
 
 The value-based family estimates $V$ and uses it: the critic fitted on recorded returns, PPO's GAE baseline, and any search leaf evaluator. Its correctness question is whether the value is accurate on the distribution it will be queried on, which is why [[training-design#The behavior value, measured where it would be spent]] reports explained variance per distribution rather than a single number.
 
-The value-free family replaces $V$ with a baseline built from siblings of the same start: leave-one-out, GRPO and Dr. GRPO, derived and shown identical up to a constant in [[rlhf-transfer]]. Its correctness question is whether the group is a real group, which is why `MatchupPool` holds the matchup within a group and why a per-episode rotation breaks it silently.
+The value-free family replaces $V$ with a baseline built from siblings of the same start: leave-one-out and Dr. GRPO, shown identical up to a constant in [[rlhf-transfer]], with GRPO's studentization a genuinely third variant there. Its correctness question is whether the group is a real group, which is why `MatchupPool` holds the matchup within a group and why a per-episode rotation breaks it silently.
 
 The rule is that a run belongs to exactly one family and reports as that family. A value-free run handed a fitted critic as its baseline is a value-based run wearing the wrong name, and the two families' error bars answer different questions, so their numbers do not belong in one column without saying which is which. `python/fheroes2_agent/README.md` carries the same separation at the module level, including which trainers implement which family and where shared code deliberately lives.
 
@@ -322,7 +322,7 @@ A pointer network selects an element of a variable-length input set by attending
 | DQN and QR-DQN | Not first | Composes poorly with an imitation start |
 | IMPALA, Sample Factory | Rejected | Built for scales we do not have |
 | MCTS, AlphaZero, MuZero | Open, blocked | Needs a copyable state the arena singleton prevents |
-| Offline reinforcement learning | Later | Requires a reward we have deferred |
+| Offline reinforcement learning | Measured | First arms run and recorded in [[off-support-and-offline-improvement]]; support constraints bind |
 | Inverse reinforcement learning | Rejected | Reward is ours to choose, not to infer |
 | Self-play, fictitious play, leagues | Later | Premature before a policy worth playing exists |
 | Population-based training | Later | Tune after a single run is reliable |

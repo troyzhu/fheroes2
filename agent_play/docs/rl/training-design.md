@@ -8,7 +8,7 @@ tags: [agent-env, training, design]
 
 # Training design
 
-Techniques named here are defined in [[rl-methods]], which derives the chain from the policy gradient to PPO and surveys every alternative. This document says how a battle policy is actually fitted: what the network consumes and emits, what loss each stage minimizes, which algorithm optimizes it, which hyperparameters it starts from, and what the alternatives were at each choice. [[../decisions/0005-training-and-reward]] records the decisions; this is the reasoning and the mechanics behind them. Nothing here is implemented yet, so every number is a starting point to be measured rather than a tuned result.
+Techniques named here are defined in [[rl-methods]], which derives the chain from the policy gradient to PPO and surveys every alternative. This document says how a battle policy is actually fitted: what the network consumes and emits, what loss each stage minimizes, which algorithm optimizes it, which hyperparameters it starts from, and what the alternatives were at each choice. [[../decisions/0005-training-and-reward]] records the decisions; this is the reasoning and the mechanics behind them. The document began as pure design and has since been overtaken by its own measurements: the sections marked as built or measured report what ran, and the surviving design prose is the reasoning that led there, kept because the alternatives tables still answer why.
 
 ## Table of contents
 - [[#The learning problem]]
@@ -18,7 +18,7 @@ Techniques named here are defined in [[rl-methods]], which derives the chain fro
 - [[#Stage 2, DAgger]]
 - [[#Stage 3, masked PPO]]
 - [[#Why this order]]
-- [[#Open questions before any of this runs]]
+- [[#Open questions at design time, each since answered]]
 
 ## The learning problem
 
@@ -51,7 +51,7 @@ The observation has two parts, so the encoder does too. Entity records are ten f
 
 ### The encoder, smallest first
 
-The starting architecture is deliberately small, because the domain is small and because a large network on 116 recorded decisions would memorize rather than generalize.
+The starting architecture is deliberately small, because the domain is small and because a large network on the small early corpora would memorize rather than generalize.
 
 Each of the ten entity slots is embedded by a shared multilayer perceptron, roughly two layers of 128 units, applied per slot. Sharing weights across slots enforces the permutation structure that matters here: a stack's meaning comes from its fields, not from which slot it happens to occupy. The slot embeddings are then pooled, by concatenation initially because ten slots is few enough that order can be fixed and learned, with mean or attention pooling as the fallback if concatenation proves brittle to slot permutation.
 
@@ -112,7 +112,7 @@ AdamW, because it is the default that works and decoupled weight decay is the be
 | Schedule | Cosine decay to $10^{-5}$ | Cheap, few epochs, avoids a late-training plateau |
 | Weight decay | $10^{-2}$ | The data are small, so regularization matters more than usual |
 | Batch size | 256 decisions | Large enough for stable gradients, small enough to be many steps per epoch |
-| Epochs | Until validation loss stops improving, patience 5 | The dataset size is not yet known, so a fixed epoch count would be arbitrary |
+| Epochs | Fixed 30 epochs, best-agreement checkpointing, no early stop as shipped | The dataset size is not yet known, so a fixed epoch count would be arbitrary |
 | Gradient clipping | Global norm 0.5 | Carried over from the PPO stage for consistency |
 | Validation split | By scenario, not by decision | Splitting by decision leaks, because decisions within one episode are highly correlated |
 
@@ -120,7 +120,7 @@ That last row is the one most easily got wrong. Two decisions from the same batt
 
 ### Data, and the size problem
 
-The current recorded corpus is 116 decisions across five fixtures, which is a regression anchor rather than a training set. Cloning needs orders of magnitude more, and getting it costs only compute, since the environment runs at roughly 4,600 episodes per second and the teacher plays itself.
+The fixture gate's corpus was 116 decisions; recorded corpora since span tens to hundreds of thousands of decisions, which is a regression anchor rather than a training set. Cloning needs orders of magnitude more, and getting it costs only compute, since the environment runs at roughly 4,600 episodes per second and the teacher plays itself.
 
 The real constraint is diversity rather than volume. Ten thousand episodes of the same five fixtures would give a large dataset covering a tiny region of state space. The scenario generator, currently undefined and flagged in [[../decisions/0005-training-and-reward]] as the largest open modeling choice, is what determines whether the data are worth collecting.
 
@@ -283,7 +283,7 @@ Splitting by episode rather than by decision matters more than it looks. Consecu
 
 The same argument goes one level further, and it took until 2026-08-05 to notice. Episodes from one matchup are the same armies replayed under different seeds, so an episode-level split still leaks matchup identity, and every agreement figure in this section is within-matchup generalization across seeds. The fixture-era numbers could not have been anything else, five fixtures shared across all episodes, and on diverse data the same clone measures near 0.86 episode-split and near 0.52 matchup-split. Quote the matchup-split number for anything that faces new armies; [[../archive/experiments/2026-08-05-diversity-and-encoding]] carries the measurement, and ADR 0006's encoding evidence is built on leak-free splits throughout.
 
-Agreement is a ceiling rather than a target. The teacher plays both sides, so a perfect clone equals the teacher and does not beat it, and the minimum achievable loss is the teacher's conditional entropy given what the observation shows rather than zero. Held-out loss flattened near 0.38 while training loss continued to 0.28, which is the mild overfitting expected at this data scale and is why the network was sized down from 626k parameters to 393k.
+Agreement is a ceiling rather than a target. The teacher plays both sides, so a perfect clone equals the teacher and does not beat it, and the minimum achievable loss is the teacher's conditional entropy given what the observation shows rather than zero. Held-out loss flattened near 0.38 while training loss continued to 0.28, which is the mild overfitting expected at this data scale and is why the network was sized down, at the current encoding 626k parameters to 396,570.
 
 The size question was re-measured on 2026-08-04 with width as the only variable, and the loss-gap reasoning above does not survive it cleanly. Agreement rises monotonically with width, 0.870 at 140k parameters, 0.887 at 397k, 0.901 at 1.27M, so whatever the loss gap showed, tripling the size costs no held-out agreement and buys some. Reinforcement learning at a 40-iteration pool budget prefers the deployed size, with the 1.27M model worse by 0.042 at about 1.8 standard errors, which is the sample-efficiency price of more parameters on the same batches rather than a ceiling. So capacity binds cloning mildly from above and reinforcement learning not at all at current budgets. [[../archive/experiments/2026-08-04-flip-and-collapse#Capacity, asked and measured]] carries the run.
 
@@ -321,7 +321,7 @@ The omission. The `obs_encoding_v1` feature vector had no creature identity at a
 
 It made almost no difference: held-out teacher agreement moved from 0.8867 to 0.8873. That is the honest result and it has an explanation. The fixtures use three creature types whose stat lines already separate them, so identity was redundant information at this data scale. The change is still right, because a roster with creatures sharing a stat line and differing in something unmodelled would need it, and that is what widening past `simple_v1` will produce.
 
-The context that reframes the numbers. vcmi-gym reports roughly five days, 2.5 million battles and $45 of GPU per model, reaching about 45 percent against its strong scripted opponent initially and about 65 percent after moving to a graph encoder. The runs recorded above are a few thousand battles. Three orders of magnitude separate them, so nothing here should be read as evidence about what this architecture reaches, only that the machinery works. Its observation is also 12,685 floats against this one's 634, and includes 165 per-hex vectors where this has no spatial channel at all, since the `planes_v1` modality of [[../decisions/0004-spatial-observation-modality]] is specified and unbuilt.
+The context that reframes the numbers. vcmi-gym reports roughly five days, 2.5 million battles and $45 of GPU per model, reaching about 45 percent against its strong scripted opponent initially and about 65 percent after moving to a graph encoder. The runs recorded above are a few thousand battles. Three orders of magnitude separate them, so nothing here should be read as evidence about what this architecture reaches, only that the machinery works. Its observation is also 12,685 floats against this one's 634, and includes 165 per-hex vectors where this has no spatial channel at all, since the `planes_v1` modality of [[../decisions/0004-spatial-observation-modality]] is built and capacity-ablated as of 2026-08-07.
 
 ### Advantage and trust region compared, 2026-08-03
 
@@ -353,6 +353,8 @@ On the Thunk matchup, PPO's clip fired on 7 to 14 percent of samples while the t
 What this does not show is that either is better. Both runs converged, and separating them on outcome would need the many seeds the comparison above already called for. What it shows is that the quantities differ enough to be worth distinguishing, which is the premise the comparison rests on.
 
 ### Starting hyperparameters
+
+The table below is the design-era starting point. The shipped trainer (`python/fheroes2_agent/train_ppo.py`) departs from it where measurement pushed: learning rate $10^{-4}$ with plain Adam and no schedule, a single-process environment collecting 32 whole episodes per iteration rather than fixed-length rollouts across four workers, minibatch size 256, and a constant 0.01 entropy coefficient. Clip 0.2, $\gamma$ 0.99, $\lambda$ 0.95, value coefficient 0.5, and gradient-norm 0.5 match as designed.
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.
 
@@ -389,17 +391,11 @@ Cloning first because the teacher is free, competent, and already recorded, and 
 
 The staging also fails gracefully. If stage 3 never beats the teacher, stage 1 still produced a working policy and the environment is still validated. If the DAgger precondition turns out to be unsatisfiable, stages 1 and 3 remain intact.
 
-## Open questions before any of this runs
+## Open questions at design time, each since answered
 
-The scenario generator is undefined, and it determines both the training distribution and what any reported win rate means. It is the first thing to settle.
+This section is kept as the design-era question list, with the answers the build produced, because the questions explain why several mechanisms exist at all.
 
-Whether the teacher can be queried at arbitrary states decides whether stage 2 exists.
-
-Whether the plane modality helps at $11 \times 9$ is unmeasured anywhere, and the hex adjacency mismatch gives a concrete reason to doubt it. This is a cheap in-house ablation once cloning runs.
-
-Learner throughput on Apple silicon is unmeasured at these model sizes. The environment produces roughly 4,600 episodes per second, and whether the learner keeps up decides whether four workers is the right number.
-
-The reward is not chosen. [[../decisions/0005-training-and-reward]] fixes the candidates and the criteria, and stage 3 cannot start without it.
+The scenario generator was undefined; it is now built and calibrated (`python/fheroes2_agent/scenarios.py`, [[scenario-distribution#The generator, built and measured]]). Whether the teacher could be queried at a student-visited state decided whether the DAgger stage existed; it was settled affirmatively on 2026-08-05 by the digest-inert planner probe, and the stage ran. Whether the plane modality helps was unmeasured anywhere; the three-seed capacity-controlled ablation now says its fidelity gain is real and its play gain modest ([[the-policy-network#The planes arm, built after this page's first draft]]). The reward was unchosen; [[../decisions/0005-training-and-reward]] chose it, `env.py` implements it with the strength variant, difficulty weighting, and stall semantics, and stage 3 has run against it.
 
 ## Related
 

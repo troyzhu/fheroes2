@@ -22,7 +22,7 @@ Pick the row that matches why you are here.
 | Get it building and see the current state | This note, sections [[#Build and verify]] and [[#Where the project stands]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] for a specific source |
 | Understand what is implemented and how | [[implementation/inventory]] for the inventory, then [[implementation/README]] for how each mechanism works |
-| Understand why a decision was taken | `decisions/`, four accepted records amending the specification |
+| Understand why a decision was taken | `decisions/`, six accepted records amending the specification |
 | Reconstruct history | [[archive/log]] |
 
 ## Table of contents
@@ -61,9 +61,9 @@ Stated as a Markov decision process, which [[rl/rl-and-the-battle-domain]] devel
 | Observation $o$ | A serialization of $s$: padded entity records, optionally an `11 × 9 × C` plane tensor, filtered by an observability profile. |
 | Action $a$ | What the active stack does. One slot of a fixed 793-wide discrete space, with a per-state legality mask; the count derives from the board under [[#Project terms]]. |
 | Transition $P(s' \mid s, a)$ | The fheroes2 engine. Stochastic through damage, morale, and luck rolls, but seeded, so a fixed seed makes an episode reproducible. |
-| Reward $R$ | Deliberately undefined in Phase 1a. The terminal outcome (winner, surviving force) is recorded; the objective is chosen later. |
+| Reward $R$ | Terminal only, chosen in [[decisions/0005-training-and-reward]] and implemented in `python/fheroes2_agent/env.py`: outcome plus survival margin, with the strength-priced variant, opt-in difficulty weighting, and engine-grounded stall semantics. The environment itself still emits outcomes, not rewards. |
 | Episode | One battle, from arena construction to a terminal state or round truncation. |
-| Policy $\pi(a \mid s)$ | Not in this repository. The environment ships without a learner by design. |
+| Policy $\pi(a \mid s)$ | `python/fheroes2_agent/policy.py`, the masked `BattlePolicy`; the C++ environment still ships learner-free, and the whole training stack lives on the Python side, gated by `verify_agent.sh`. |
 
 Two structural facts distinguish this from a Gymnasium environment you would write yourself, and both follow from the engine rather than from taste.
 
@@ -213,8 +213,8 @@ Phase 1a aims at a trustworthy substrate, so the environment itself contains no 
 
 | In scope (`creature_field_v1` with `simple_v1`) | Deferred to Phase 1b | Excluded from this branch |
 |---|---|---|
-| Commander-free armies, one to five stacks per side | Wide (two-cell) units, flyers | Adventure-map control |
-| Open field, fixed tile index 1 | Two-cell and all-adjacent attacks | Castles, sieges, towers |
+| One to five stacks per side, optional per-side commanders (`--attacker-hero`) | Flyers | Adventure-map control |
+| Open field, fixed tile index 1; wide walkers opt-in (`--allow-wide`, `wide_v1`) | All-adjacent attacks | Castles, sieges, towers |
 | Single-cell walking creatures, shooters including blocked ones | Area shots, unusual ranged attacks | Heroes, spells, artifacts |
 | MOVE, ATTACK, SKIP | Spell casting | Screenshots, mouse, keyboard |
 | Both sides engine-driven and hook-interceptable | Retreat and surrender as actions | Rendered pixels, which live on the `play-harness` branch |
@@ -290,7 +290,7 @@ Full evidence, with a 25-row assumption table, is in `local_source_audit.md`.
 
 Measured throughput is about 4,600 episodes/s on the Apple M2 target machine for the tiny-melee fixture with no protocol layer attached, at 12 MB resident memory, scaling linearly to four worker processes. The learner, not the environment, will be the bottleneck.
 
-The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook (`DecisionController`), one opt-in render seam for replays (a null-by-default render observer on the display, a defaulted interface flag on the runner, and a raceless-captain art case, see [[implementation/replay-rendering]]), and the additive `src/fheroes2/agent/` library. Enumerate them with `git diff master --stat -- src/`.
+The branch is `agent-env`, taken from `master` and pushed to `origin`. Engine-source changes are limited to two verbatim lifts (`battle_seed`, `battle_action_validation`), one optional hook (`DecisionController`), one opt-in render seam for replays (a null-by-default render observer on the display, a defaulted interface flag on the runner, and a raceless-captain art case, see [[implementation/replay-rendering]]), one query seam on the built-in AI (a public `BattlePlanner::queryUnitTurn`, the digest-inert teacher probe behind DAgger relabeling), and the additive `src/fheroes2/agent/` library. Enumerate them with `git diff master --stat -- src/`.
 
 ## Build and verify
 
@@ -369,7 +369,7 @@ Rendered pixels are permanently out of the training environment (ADR 0004).
 
 ## Gotchas that will bite
 
-One arena per process. `battle_arena.cpp:73` holds a file-static pointer and the constructor asserts it is null, so each arena must be destroyed before the next, and parallelism means processes.
+One arena per process. `battle_arena.cpp:74` holds a file-static pointer and the constructor asserts it is null, so each arena must be destroyed before the next, and parallelism means processes.
 
 Input `Army` objects are not synchronized after a battle, so terminal state must be read from the `Force` objects before the arena is destroyed.
 
@@ -379,7 +379,7 @@ The Makefile build never defines `NDEBUG`, so `assert()` is live even at `-O3`. 
 
 Run `make -C src/dist clean` after every upstream sync, because the `-MD` depfiles hard-code header paths and a rename breaks incremental builds with `No rule to make target`.
 
-A `FHEROES2_DATA` root needs the repository's own `files/data/resurrection.h2d` in addition to the GOG extraction, or startup throws about nine seconds in (`h2d.cpp:110`).
+A `FHEROES2_DATA` root needs the repository's own `files/data/resurrection.h2d` in addition to the GOG extraction, or startup throws about nine seconds in (`h2d.cpp:126`).
 
 Repository paths may contain spaces, since this clone lives under `/Volumes/External Drive/`. Build scripts must pass flag lists as bash arrays, and because macOS ships bash 3.2, an empty array under `set -u` needs the `${arr[@]+"${arr[@]}"}` form.
 
@@ -389,13 +389,13 @@ If the Makefile build fails in the `.pot` step, put Homebrew's `gettext` ahead o
 
 The historical top risk, legal-action generation, is closed, with validators extracted, full teacher coverage, and no live-arena probing. What remains:
 
-Per-decision state extraction was the highest remaining risk, because everything downstream waited on it, and it was closed on 2026-08-03 ahead of the milestone that owned it. A decision record now carries the observation, the legal-action list and the teacher's chosen index, which is one supervised sample, and 2,000 episodes produce 45,380 of them. What Milestone 4 still owes is the `observable_v1` profile and the `planes` modality rather than the extraction itself. [[roadmap#The state-extraction gap, closed]] carries the detail.
+Per-decision state extraction was the highest remaining risk, because everything downstream waited on it, and it was closed on 2026-08-03 ahead of the milestone that owned it. A decision record now carries the observation, the legal-action list and the teacher's chosen index, which is one supervised sample, and 2,000 episodes produce 45,380 of them. What Milestone 4 still owes is the `observable_v1` profile; the `planes` modality landed 2026-08-07 (worker `--planes`, `encode_planes`, the conv-fusion arm, capacity-controlled ablation). [[roadmap#The state-extraction gap, closed]] carries the detail.
 
 Terminal state extraction was in the same position until 2026-08-03 and is now checked. `verify_m1.sh` asserts eight invariants per fixture that must hold whatever the battle was, which closes the specific hole that every gate proving byte-identical digests could not: a systematically wrong extraction would have been perfectly deterministic and would have passed all of them.
 
 The protocol and JSON surface arriving in Milestone 4, where a strict parser boundary and a vendored dependency enter the tree, and where stdout discipline and invalid-input handling decide whether the worker stays healthy.
 
-The transition from behavior cloning to reinforcement learning, for which no verified small-scale precedent exists ([[archive/research-runs/2026-07-27-rl-approaches]], open question 2).
+The transition from behavior cloning past the teacher: cloning, DAgger and search distillation all ran in-house and converge to the demonstrator rather than beyond it, so exceeding the built-in AI in bare weights remains the open problem ([[archive/experiments/2026-08-07-overnight-champion-mixture]]).
 
 Learner throughput on Apple silicon, unmeasured anywhere in the literature at relevant model sizes.
 

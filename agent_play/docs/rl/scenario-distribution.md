@@ -168,7 +168,7 @@ What calibration cannot do is rescue a matchup whose win rate is a step function
 
 Decided. The acceptance criterion for the generator, in [[../decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.
 
-Open, and now with the analysis attached. Which of the three mechanisms is used, and in what combination, since they are complementary rather than exclusive. The generator itself, which remains the largest undocumented modeling choice in the project. Whether evaluation adopts paired seeds and both-sides play, which this page recommends and which nothing currently depends on.
+Open, and now with the analysis attached. Which of the three mechanisms is used, and in what combination, since they are complementary rather than exclusive. The generator itself, once the largest undocumented modeling choice in the project and now built and documented above, with the residual choice being which of its three sampler generations a given experiment draws from. Whether evaluation adopts paired seeds and both-sides play, which this page recommends and which nothing currently depends on.
 
 Not yet investigated. Whether the difficulty band should be measured against the teacher, which is stable and cheap, or against the current policy, which is the quantity the identity actually refers to but which drifts during training and makes the filter a moving target that could interact badly with the update.
 

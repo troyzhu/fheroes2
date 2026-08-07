@@ -73,7 +73,7 @@ Three measured symptoms fit the diagnosis. Held-out transfer on the fully divers
 
 ## The planes arm, built after this page's first draft
 
-`BattlePolicy(planes=True)` now exists: two 3-by-3 convolutions at 32 channels over the (7, 9, 11) tensor of [[../implementation/observation-design#The planes, half built as of 2026-08-06|encode_planes]], no downsampling, squeezed to 128 and concatenated into the trunk beside the slots and globals, about 441k extra parameters, with `load_policy` inferring the arm from the state dict. The three-seed capacity-controlled ablation found its fidelity gain real (agreement 0.897 against the width control's 0.875) and its play gains modest; [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the champion-mixture measurement. The pooling question above is unchanged by any of this, since the slot lifecycle bites the entity half either way.
+`BattlePolicy(planes=True)` now exists: two 3-by-3 convolutions at 32 channels over the (7, 9, 11) tensor of [[../implementation/observation-design#The planes, built across 2026-08-06 and 07|encode_planes]], no downsampling, squeezed to 128 and concatenated into the trunk beside the slots and globals, about 441k extra parameters, with `load_policy` inferring the arm from the state dict. The three-seed capacity-controlled ablation found its fidelity gain real (agreement 0.897 against the width control's 0.875) and its play gains modest; [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the champion-mixture measurement. The pooling question above is unchanged by any of this, since the slot lifecycle bites the entity half either way.
 
 ## The experiment, when it runs
 

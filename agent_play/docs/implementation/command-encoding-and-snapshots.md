@@ -93,7 +93,7 @@ for ( size_t i = 0; i < scratch.size(); ++i ) {      // WRONG: size() shrinks un
 
 the bound moves toward the counter from both sides and they meet in the middle. For the five-parameter `ATTACK` above the loop runs at $i = 0, 1, 2$ with `size()` at 5, 4, 3, then stops at $i = 3$ against `size()` 2, extracting three parameters of five. For a two-parameter `MOVE` it extracts one of two. Neither case throws, and the snapshot simply records a truncated command.
 
-Hoisting the count before the first read is the whole fix, which is why the shipped loop reads as it does below. This is worth dwelling on because an earlier revision of this document published the broken form as if it were the shipped source.
+Hoisting the count before the first read is the whole fix, and the shipped loop above reads as it does for exactly that reason. This is worth dwelling on because an earlier revision of this document published the broken form as if it were the shipped source.
 
 ### The same command is read two ways, on purpose
 

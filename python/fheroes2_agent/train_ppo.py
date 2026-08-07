@@ -156,10 +156,12 @@ def train(
 
     for iteration in range(iterations):
         batch = collect(env, model, episodes_per_iter)
-        # Both truncation reasons mean the battle still had a future when it was cut off, so
-        # both bootstrap. Stalemate is the runner stopping before the engine AI's no-deaths
-        # retreat path, whose assert a headless battle cannot satisfy.
-        truncated = np.array([o["termination"] in ("round_limit", "stalemate") for o in batch["outcomes"]])
+        # Only the round-limit cap is a truncation, a battle cut off with a future still worth
+        # bootstrapping. A stalemate is decisive as of the 2026-08-06 semantics: the reward
+        # already carries the engine's own resolution, defender wins and the attacker's army is
+        # forfeit, so bootstrapping a value on top would count a future the outcome says does
+        # not exist.
+        truncated = np.array([o["termination"] == "round_limit" for o in batch["outcomes"]])
         # Expand per-episode truncation onto the step that ended each episode.
         step_truncated = np.zeros_like(batch["dones"])
         step_truncated[np.flatnonzero(batch["dones"])] = truncated

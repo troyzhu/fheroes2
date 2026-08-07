@@ -125,7 +125,7 @@ Terminal state has no hook. The read must happen in the caller's driver loop bet
 
 ## What this does not say
 
-Nothing here covers spell casting, siege machinery, or retreat and surrender, which the hook never sees. It also does not describe how a blocked worker receives its action, which is protocol work scheduled for Milestone 4.
+Nothing here covers spell casting, siege machinery, or retreat and surrender, which the hook never sees. The blocked-worker side has since been built: `ExternalDecisionController` blocks inside the hook on a `DecideFn`, and the worker's `--protocol` mode answers it with one action index per stdin line.
 
 ## Go deeper
 

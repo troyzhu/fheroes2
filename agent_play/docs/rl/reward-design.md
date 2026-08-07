@@ -8,7 +8,7 @@ tags: [agent-env, reward, design]
 
 # Reward design, the space and what is known about it
 
-[[../decisions/0005-training-and-reward]] fixes the criteria and names four candidates. One of those is implemented and the rest are a sentence each, which is thin for what is the single choice that decides what the agent is actually being asked to do. This page carries the design space, what the evidence says about each part of it, and what would have to be measured to choose.
+[[../decisions/0005-training-and-reward]] fixes the criteria and names four candidates. Three of those are implemented, the hit-point margin, its strength-priced variant, and the difficulty weighting, and the rest are a sentence each, which is thin for what is the single choice that decides what the agent is actually being asked to do. This page carries the design space, what the evidence says about each part of it, and what would have to be measured to choose.
 
 Nothing here is decided. The record decides; this exists so the record has something to decide from.
 
@@ -19,6 +19,9 @@ Nothing here is decided. The record decides; this exists so the record has somet
 - [[#Potential-based shaping, which is the safe way to be dense]]
 - [[#Two things that are not reward shape but are often mistaken for it]]
 - [[#How a candidate would be chosen]]
+- [[#The difficulty-weighted candidate, owner-directed 2026-08-05]]
+- [[#The lexicographic alternative, from the owner-supplied guide]]
+- [[#Stalls, and the evasion exploit the owner predicted]]
 
 ## What is implemented, and how it behaves
 
@@ -85,7 +88,7 @@ What it does not buy is usefulness. A poor $\Phi$ is harmless and worthless: cor
 | $\Phi = $ own hit points minus foe hit points | The simplest strength estimate, and directly available | Ignores position entirely, so it says nothing about the half of the game that is movement |
 | $\Phi = $ value-weighted own force minus foe force | As above with creature costs | Same, plus the cost table question |
 | $\Phi = $ the engine's own `engine_strength` | The built-in AI's own evaluator, already computed | Only in the `full_v1` profile, so a policy shaped by it cannot be deployed on `observable_v1`, which is the asymmetry [[../decisions/0001-observation-profiles]] warns about |
-| $\Phi = V^{\pi^{*}}$, the fitted teacher value | Principled: shaping by a value function is the ideal case, since it makes the advantage the true one | The fit now exists and explains 0.835 of held-out return variance, so the remaining question is whether shaping by it beats using it as a baseline |
+| $\Phi = V^{\pi^{*}}$, the fitted teacher value | Principled: shaping by a value function is the ideal case, since it makes the advantage the true one | The first fixture-era fit explained 0.835 of held-out return variance on an episode split, a number later measurement retracted in generality: on the current corpus the same construction reads 0.302 on teacher play and $-0.131$ on student-visited states ([[training-design#The behavior value, measured where it would be spent]]), so the remaining question is whether shaping by it beats using it as a baseline |
 
 The last row is the interesting one. Potential-based shaping with $\Phi$ equal to the true value function makes every step's shaped reward equal to the advantage, which is the densest possible correct signal. Pre-fitting a critic on teacher play, which [[training-design]] proposed for a different reason, is most of the work, and as of 2026-08-03 that fit exists and explains 0.835 of held-out return variance.
 

@@ -64,7 +64,7 @@ The cost of ignoring it is specific. Sampling armies uniformly would produce man
 
 ## Critic-free baselines, which this project should seriously consider
 
-PPO needs a critic, and [[training-design]] plans one. The language-model world has largely moved away from that, and the reason applies here more strongly than it does there.
+PPO needs a critic, and [[training-design]] built and measured one. The language-model world has largely moved away from that, and the reason applies here more strongly than it does there.
 
 REINFORCE leave-one-out draws $K$ episodes from the same starting state and uses the mean return of the others as the baseline for each. It is the jackknife construction, and it inherits the jackknife's reason for excluding the held-out sample.
 
@@ -86,9 +86,9 @@ This was re-derived here from two arms producing bit-identical runs, and it is P
 
 So the contested part of GRPO is the part that measurably hurts, and the part the two variants are usually distinguished by does not exist once the batch is normalized. That is the Dr. GRPO argument holding in a setting nothing like the one it was made for, with one of its two claims turning out to be unmeasurable rather than small. It is also the same failure as the amplification in [[training-design#An amplification in advantage normalization]], one level up: both divide by a spread that goes small when a group or a batch stops disagreeing, and both turn noise into a full-sized update. Full numbers in [[../archive/experiments/2026-08-03-training-runs#Advantage and trust region, ten seeds an arm]].
 
-The reason this matters here is that the objection to it does not apply. In a language model, drawing $K$ completions per prompt is the dominant cost. Here the environment runs at roughly 4,600 episodes per second and a scenario is reproducible from a seed, so drawing $K$ episodes from one starting state is close to free. Against that, the critic must be fitted on very little data, and [[training-design]] already flags 116 recorded decisions as a regime where a network memorizes.
+The reason this matters here is that the objection to it does not apply. In a language model, drawing $K$ completions per prompt is the dominant cost. Here the environment runs at roughly 4,600 episodes per second and a scenario is reproducible from a seed, so drawing $K$ episodes from one starting state is close to free. Against that, the critic was ultimately fitted on 45,380 recorded returns rather than the 116 decisions this page once cited, and data scarcity moved from the fit to the coverage question
 
-The cost is real and should be stated. A leave-one-out baseline gives one advantage for the whole episode, so every decision receives the same credit, which is coarse when a battle turns on one decision out of thirty. That is the trade in the next section rather than an argument against trying it. The concrete recommendation is that a leave-one-out baseline belongs in the first round of experiments beside the critic, not as a fallback after the critic disappoints.
+The cost is real and should be stated. A leave-one-out baseline gives one advantage for the whole episode, so every decision receives the same credit, which is coarse when a battle turns on one decision out of thirty. That is the trade in the next section rather than an argument against trying it. The concrete recommendation is that a leave-one-out baseline ran in the first round of experiments beside the critic (`train_rloo.py`, compared 2026-08-03), not as a fallback after the critic disappoints.
 
 ## The aggregation unit, and an episode-length bias we would otherwise inherit
 
@@ -101,7 +101,7 @@ Whether an advantage is computed per decision or per episode is the same choice 
 | Needs | $K$ episodes per start state | a fitted critic |
 | Fits | short battles, weak reward signal | longer battles where one decision decides the outcome |
 
-There is a bias hiding in the per-episode form that the language-model literature had to find the hard way, and this project would inherit it unchanged. If the loss averages per-decision terms within an episode and then averages over episodes, each decision carries weight $1/(B \lvert \tau \rvert)$, so decisions in a short battle are weighted more heavily than decisions in a long one. When episodes run from 5 to 40 decisions that is an eightfold difference in per-decision gradient weight, driven by nothing but episode length.
+There is a bias hiding in the per-episode form that the language-model literature had to find the hard way, and this project would inherit it unchanged. If the loss averages per-decision terms within an episode and then averages over episodes, each decision carries weight $1/(B \lvert \tau \rvert)$, where $B$ is the number of episodes in the batch, so decisions in a short battle are weighted more heavily than decisions in a long one. When episodes run from 5 to 40 decisions that is an eightfold difference in per-decision gradient weight, driven by nothing but episode length.
 
 The fix is to normalize by a decision count rather than per episode, either the batch's actual total or a fixed constant. Dividing by a fixed maximum removes the length dependence entirely and introduces no data-dependent scale, which under an optimizer that already normalizes by a second-moment estimate makes it nearly equivalent to dividing by the batch total. The choice that matters is against per-episode averaging, not between the two fixes.
 

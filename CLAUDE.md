@@ -75,6 +75,7 @@ Quick orientation: Phase 0 and Milestones 1 through 3 are complete and verified 
 Apple M2 Mac mini, and the training work ran ahead of Milestones 4 through 6 rather than after
 them. Engine changes are deliberately small: two verbatim lifts (`battle_seed.{h,cpp}`,
 `battle_action_validation.{h,cpp}`), one optional hook (`battle_decision_controller.h`), one
+query seam on the built-in AI (public `BattlePlanner::queryUnitTurn`, the teacher probe), one
 opt-in render seam for replay videos (a null-by-default render observer on the display, a
 defaulted `showInterface` on the runner, a `Race::NONE` art case in `battle_interface.cpp`; see
 `agent_play/docs/implementation/replay-rendering.md`), and the entry-point-free library under
