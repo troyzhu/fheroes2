@@ -59,6 +59,8 @@ Store the full per-iteration history in every report, never just the headline me
 
 Cloning rolls carry seed noise of about a tenth of win rate on the hardest validation rungs, measured on 2026-08-06 by replicating the champion recipe across seeds, so a single-roll comparison on one rung resolves nothing there. Judge arms on many suites moving coherently, and gate any adoption on a multi-seed battery.
 
+Graded suites are never collapsed to one number: the Thunk ladder reports its four rungs, because a mean of 1.00/1.00/0.96/0.67 hides that the last rung is the only hard one. Win rate alone is also not the report: every battery suite carries win quality, the fraction of engine creature strength kept when winning, and mean episode length beside the rate, per the owner's 2026-08-07 reporting requirement. Agreement, wherever quoted, is top-1 exact match, the fraction of holdout decisions whose argmax equals the teacher's index, with no partial credit for near misses.
+
 Comparisons at a fixed iteration budget are statements about that budget. The divergence trust region read as worse than the ratio clip at 30 iterations on the pool and better at 60, on runs whose first 30 iterations were bit-identical; where feasible, settle a comparison by continuing the same runs rather than by rerunning them, since determinism makes the continuation free of re-run variance.
 
 Results belong in `../docs/archive/experiments/`, which is provenance. Conclusions belong in `../docs/rl/`. Decisions belong in `../docs/decisions/`, and only once the evidence supports one.

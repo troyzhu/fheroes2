@@ -251,7 +251,7 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
     env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
                     attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
                     allow_wide=matchup.allow_wide, seeds=seeds, planes=wants_planes)
-    wins, rewards, lengths = [], [], []
+    wins, rewards, lengths, survival = [], [], [], []
     try:
         for _ in range(episodes):
             observation, mask = env.reset()
@@ -264,9 +264,17 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
                 steps += 1
                 if step.done:
                     target = "victory" if side == "attacker" else "defeat"
-                    wins.append(step.info["termination"] == target)
+                    won = step.info["termination"] == target
+                    wins.append(won)
                     rewards.append(step.reward)
                     lengths.append(steps)
+                    if won:
+                        # Win quality, the owner's metric: engine creature strength kept, so a
+                        # bloodless win reads near 1 and a pyrrhic one near 0.
+                        own = step.info["attacker" if side == "attacker" else "defender"]
+                        initial = float(own.get("initial_strength", 0.0))
+                        if initial > 0:
+                            survival.append(float(own.get("strength", 0.0)) / initial)
                     break
                 observation, mask = step.observation, step.mask
     finally:
@@ -279,6 +287,7 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
         "mean_reward": float(np.mean(rewards)),
         "reward_std": float(np.std(rewards)),
         "mean_length": float(np.mean(lengths)),
+        "surviving_strength": float(np.mean(survival)) if survival else None,
         "in_band": 0.2 <= win_rate <= 0.8,
     }
 

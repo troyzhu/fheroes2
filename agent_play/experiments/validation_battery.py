@@ -134,13 +134,29 @@ def main() -> None:
         model = load_policy(torch.load(path, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         report["results"][name] = {}
+        report.setdefault("quality", {})[name] = {}
         for suite, matchups in suites.items():
             side = SUITE_SIDE.get(suite, "attacker")
-            rates = [measure(model, args.worker, m, episodes=args.episodes, seeds=args.eval_seeds, side=side)["win_rate"]
-                     for m in matchups]
+            measured = [measure(model, args.worker, m, episodes=args.episodes, seeds=args.eval_seeds, side=side)
+                        for m in matchups]
+            rates = [m["win_rate"] for m in measured]
             report["results"][name][suite] = rates
-            print(f"{name:24s} {suite:18s} mean {np.mean(rates):.3f}  " +
-                  " ".join(f"{r:.2f}" for r in rates[:8]) + (" ..." if len(rates) > 8 else ""), flush=True)
+            # The owner's reporting requirements, 2026-08-07: win rate alone hides too much, so
+            # each suite also carries win quality (engine strength kept when winning) and mean
+            # episode length, and graded suites are never collapsed to one number.
+            survs = [m["surviving_strength"] for m in measured if m["surviving_strength"] is not None]
+            lens = [m["mean_length"] for m in measured]
+            report["quality"][name][suite] = {
+                "surviving_strength": [m["surviving_strength"] for m in measured],
+                "mean_length": lens,
+            }
+            surv_txt = f" surv {np.mean(survs):.2f}" if survs else " surv  -- "
+            if suite == "thunk_ladder":
+                rungs = "/".join(f"{r:.2f}" for r in rates)
+                print(f"{name:24s} {suite:18s} rungs {rungs}{surv_txt} len {np.mean(lens):.0f}", flush=True)
+            else:
+                print(f"{name:24s} {suite:18s} mean {np.mean(rates):.3f}{surv_txt} len {np.mean(lens):.0f}  " +
+                      " ".join(f"{r:.2f}" for r in rates[:8]) + (" ..." if len(rates) > 8 else ""), flush=True)
 
     print(f"\ntotal {round(time.time() - started)}s")
     if args.report:
