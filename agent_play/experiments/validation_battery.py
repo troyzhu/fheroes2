@@ -148,16 +148,19 @@ def main() -> None:
             damages = [m["loss_damage"] for m in measured if m["loss_damage"] is not None]
             margins = [m["strength_margin"] for m in measured]
             lens = [m["mean_length"] for m in measured]
+            rewards = [m["mean_reward"] for m in measured]
             report["quality"][name][suite] = {
                 "surviving_strength": [m["surviving_strength"] for m in measured],
                 "loss_damage": [m["loss_damage"] for m in measured],
                 "strength_margin": margins,
+                "mean_reward": rewards,
                 "mean_length": lens,
             }
             surv_txt = f" wq {np.mean(survs):.2f}" if survs else " wq  --"
             dmg_txt = f" lq {np.mean(damages):.2f}" if damages else " lq  --"
             mg_txt = f" mg {np.mean(margins):+.2f}"
-            tail = f"{surv_txt}{dmg_txt}{mg_txt} len {np.mean(lens):.0f}"
+            rw_txt = f" rw {np.mean(rewards):+.2f}"
+            tail = f"{surv_txt}{dmg_txt}{mg_txt}{rw_txt} len {np.mean(lens):.0f}"
             if suite == "thunk_ladder":
                 rungs = "/".join(f"{r:.2f}" for r in rates)
                 print(f"{name:24s} {suite:18s} rungs {rungs}{tail}", flush=True)
