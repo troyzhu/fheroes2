@@ -10,6 +10,8 @@ tags: [agent-env, architecture, network, reference]
 
 The owner asked for the full picture in one place, because the pooling-against-concatenation question is meaningless without it. This page walks the exact tensor path from the worker's JSON to the 793 logits, then shows where the slot lifecycle creates the problem that pooling would remove. The implementation is `python/fheroes2_agent/policy.py` consuming `encoding.py`; widths here are quoted from code, and [[training-design#As built, 2026-08-05|training-design]] carries the capacity measurements behind them.
 
+For the runtime view of this same network, one real decision followed from engine JSON through the forward pass to the chosen action, read [[../implementation/inference-walkthrough]] beside this page.
+
 ## From battle to tensor
 
 A battle state arrives as up to ten living stacks plus four battle-level scalars. The encoder lays them out as ten fixed slots of 63 features each, 630 numbers, then the 4 globals, 634 in total (`obs_encoding_v3`).

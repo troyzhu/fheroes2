@@ -1,0 +1,22 @@
+{
+ "bestiary_value": {
+  "checkpoint": "2026-08-05-checkpoints/value_diverse.pt",
+  "corpus_decisions": 270335,
+  "holdout_ev": 0.8565
+ },
+ "thunk_win_quality_builtin_ai": {
+  "episodes": 160,
+  "win_rate": 0.812,
+  "surviving_strength": 0.393
+ },
+ "thunk_win_quality_gen1": {
+  "episodes": 16,
+  "win_rate": 0.875,
+  "surviving_strength": 0.459
+ },
+ "thunk_win_quality_share2": {
+  "episodes": 16,
+  "win_rate": 0.812,
+  "surviving_strength": 0.41
+ }
+}

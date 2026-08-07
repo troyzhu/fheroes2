@@ -1,0 +1,492 @@
+{
+ "scenario": {
+  "attacker": "5:4,2:8 (4 Veteran Pikemen + 8 Archers)",
+  "defender": "58:5,49:10 (5 Rogues + 10 Zombies)",
+  "checkpoint": "policy_gen1.pt",
+  "torch_seed": 7
+ },
+ "spotlight_decision": {
+  "raw_observation": {
+   "schema": "observation_full_v1",
+   "engine_decision_index": 5,
+   "round": 2,
+   "active_uid": 1,
+   "active_is_attacker": true,
+   "units": [
+    {
+     "uid": 1,
+     "monster_id": 5,
+     "side": "attacker",
+     "active": true,
+     "count": 4,
+     "initial_count": 4,
+     "hit_points": 80,
+     "top_hit_points": 20,
+     "attack": 5,
+     "defense": 9,
+     "speed": 5,
+     "shots": 0,
+     "morale": 1,
+     "luck": 0,
+     "head_cell": 12,
+     "tail_cell": -1,
+     "wide": false,
+     "flying": false,
+     "archer": false,
+     "hand_fighting": false
+    },
+    {
+     "uid": 2,
+     "monster_id": 2,
+     "side": "attacker",
+     "active": false,
+     "count": 8,
+     "initial_count": 8,
+     "hit_points": 80,
+     "top_hit_points": 10,
+     "attack": 5,
+     "defense": 3,
+     "speed": 2,
+     "shots": 11,
+     "morale": 1,
+     "luck": 0,
+     "head_cell": 22,
+     "tail_cell": -1,
+     "wide": false,
+     "flying": false,
+     "archer": true,
+     "hand_fighting": false
+    },
+    {
+     "uid": 4,
+     "monster_id": 49,
+     "side": "defender",
+     "active": false,
+     "count": 10,
+     "initial_count": 10,
+     "hit_points": 150,
+     "top_hit_points": 15,
+     "attack": 5,
+     "defense": 2,
+     "speed": 2,
+     "shots": 0,
+     "morale": 0,
+     "luck": 0,
+     "head_cell": 30,
+     "tail_cell": -1,
+     "wide": false,
+     "flying": false,
+     "archer": false,
+     "hand_fighting": false
+    }
+   ]
+  },
+  "mask_legal_count": 33,
+  "encoded_slots": [
+   {
+    "slot": 0,
+    "unit": "4 Veteran Pikeman (attacker)",
+    "named_features": {
+     "present": 1.0,
+     "is_own_side": 1.0,
+     "is_attacker": 1.0,
+     "is_active": 1.0,
+     "count": 0.233,
+     "initial_count": 0.233,
+     "count_fraction": 1.0,
+     "hit_points": 0.4061,
+     "top_hit_points": 0.2814,
+     "attack": 0.5,
+     "defense": 0.9,
+     "speed": 0.5,
+     "shots": 0.0,
+     "morale": 0.3333,
+     "luck": 0.0,
+     "row": 0.125,
+     "column": 0.1,
+     "cell": 0.1224,
+     "is_wide": 0.0,
+     "is_flying": 0.0,
+     "is_archer": 0.0,
+     "is_hand_fighting": 0.0
+    },
+    "one_hot": "is_monster_5"
+   },
+   {
+    "slot": 1,
+    "unit": "8 Archer (attacker)",
+    "named_features": {
+     "present": 1.0,
+     "is_own_side": 1.0,
+     "is_attacker": 1.0,
+     "is_active": 0.0,
+     "count": 0.318,
+     "initial_count": 0.318,
+     "count_fraction": 1.0,
+     "hit_points": 0.4061,
+     "top_hit_points": 0.2216,
+     "attack": 0.5,
+     "defense": 0.3,
+     "speed": 0.2,
+     "shots": 0.55,
+     "morale": 0.3333,
+     "luck": 0.0,
+     "row": 0.25,
+     "column": 0.0,
+     "cell": 0.2245,
+     "is_wide": 0.0,
+     "is_flying": 0.0,
+     "is_archer": 1.0,
+     "is_hand_fighting": 0.0
+    },
+    "one_hot": "is_monster_2"
+   },
+   {
+    "slot": 2,
+    "unit": "10 Zombie (defender)",
+    "named_features": {
+     "present": 1.0,
+     "is_own_side": 0.0,
+     "is_attacker": 0.0,
+     "is_active": 0.0,
+     "count": 0.3471,
+     "initial_count": 0.3471,
+     "count_fraction": 1.0,
+     "hit_points": 0.4637,
+     "top_hit_points": 0.2563,
+     "attack": 0.5,
+     "defense": 0.2,
+     "speed": 0.2,
+     "shots": 0.0,
+     "morale": 0.0,
+     "luck": 0.0,
+     "row": 0.25,
+     "column": 0.8,
+     "cell": 0.3061,
+     "is_wide": 0.0,
+     "is_flying": 0.0,
+     "is_archer": 0.0,
+     "is_hand_fighting": 0.0
+    },
+    "one_hot": "is_monster_49"
+   }
+  ],
+  "globals": {
+   "round": 0.1,
+   "active_is_attacker": 1.0,
+   "own_stacks": 0.2,
+   "enemy_stacks": 0.1
+  },
+  "top5": [
+   {
+    "action": "MOVE to cell 23",
+    "p": 0.453
+   },
+   {
+    "action": "MOVE to cell 68",
+    "p": 0.374
+   },
+   {
+    "action": "MOVE to cell 67",
+    "p": 0.072
+   },
+   {
+    "action": "MOVE to cell 1",
+    "p": 0.027
+   },
+   {
+    "action": "MOVE to cell 27",
+    "p": 0.022
+   }
+  ],
+  "chosen": "MOVE to cell 23",
+  "p_chosen": 0.453,
+  "value_estimate": -1.459
+ },
+ "play_by_play": [
+  {
+   "decision": 0,
+   "round": 1,
+   "active": "4 Veteran Pikeman (attacker) at cell 0",
+   "legal": 26,
+   "chosen": "MOVE to cell 12",
+   "p_chosen": 0.101,
+   "value_estimate": 0.141,
+   "top5": [
+    {
+     "action": "MOVE to cell 23",
+     "p": 0.849
+    },
+    {
+     "action": "MOVE to cell 12",
+     "p": 0.101
+    },
+    {
+     "action": "MOVE to cell 1",
+     "p": 0.045
+    },
+    {
+     "action": "MOVE to cell 5",
+     "p": 0.002
+    },
+    {
+     "action": "MOVE to cell 4",
+     "p": 0.001
+    }
+   ]
+  },
+  {
+   "decision": 1,
+   "round": 1,
+   "active": "8 Archer (attacker) at cell 22",
+   "legal": 13,
+   "chosen": "SHOOT the stack on cell 28",
+   "p_chosen": 0.532,
+   "value_estimate": 0.789,
+   "top5": [
+    {
+     "action": "SHOOT the stack on cell 28",
+     "p": 0.532
+    },
+    {
+     "action": "SHOOT the stack on cell 32",
+     "p": 0.468
+    },
+    {
+     "action": "MOVE to cell 23",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 44",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 24",
+     "p": 0.0
+    }
+   ]
+  },
+  {
+   "decision": 2,
+   "round": 2,
+   "active": "4 Veteran Pikeman (attacker) at cell 12",
+   "legal": 33,
+   "chosen": "MOVE to cell 23",
+   "p_chosen": 0.453,
+   "value_estimate": -1.459,
+   "top5": [
+    {
+     "action": "MOVE to cell 23",
+     "p": 0.453
+    },
+    {
+     "action": "MOVE to cell 68",
+     "p": 0.374
+    },
+    {
+     "action": "MOVE to cell 67",
+     "p": 0.072
+    },
+    {
+     "action": "MOVE to cell 1",
+     "p": 0.027
+    },
+    {
+     "action": "MOVE to cell 27",
+     "p": 0.022
+    }
+   ]
+  },
+  {
+   "decision": 3,
+   "round": 2,
+   "active": "8 Archer (attacker) at cell 22",
+   "legal": 12,
+   "chosen": "SHOOT the stack on cell 18",
+   "p_chosen": 1.0,
+   "value_estimate": -0.769,
+   "top5": [
+    {
+     "action": "SHOOT the stack on cell 18",
+     "p": 1.0
+    },
+    {
+     "action": "MOVE to cell 1",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 12",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 44",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 13",
+     "p": 0.0
+    }
+   ]
+  },
+  {
+   "decision": 4,
+   "round": 3,
+   "active": "4 Veteran Pikeman (attacker) at cell 23",
+   "legal": 42,
+   "chosen": "MELEE cell 18 from the top-right",
+   "p_chosen": 0.083,
+   "value_estimate": -1.262,
+   "top5": [
+    {
+     "action": "MELEE cell 18 from the right",
+     "p": 0.316
+    },
+    {
+     "action": "MOVE to cell 79",
+     "p": 0.27
+    },
+    {
+     "action": "MOVE to cell 68",
+     "p": 0.17
+    },
+    {
+     "action": "MELEE cell 18 from the top-right",
+     "p": 0.083
+    },
+    {
+     "action": "MOVE to cell 67",
+     "p": 0.061
+    }
+   ]
+  },
+  {
+   "decision": 5,
+   "round": 3,
+   "active": "8 Archer (attacker) at cell 22",
+   "legal": 14,
+   "chosen": "SHOOT the stack on cell 18",
+   "p_chosen": 1.0,
+   "value_estimate": -0.408,
+   "top5": [
+    {
+     "action": "SHOOT the stack on cell 18",
+     "p": 1.0
+    },
+    {
+     "action": "MOVE to cell 23",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 1",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 12",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 44",
+     "p": 0.0
+    }
+   ]
+  },
+  {
+   "decision": 6,
+   "round": 4,
+   "active": "3 Veteran Pikeman (attacker) at cell 28",
+   "legal": 50,
+   "chosen": "MELEE cell 18 from the top-right",
+   "p_chosen": 0.362,
+   "value_estimate": -0.432,
+   "top5": [
+    {
+     "action": "MELEE cell 18 from the top-right",
+     "p": 0.362
+    },
+    {
+     "action": "MELEE cell 18 from the left",
+     "p": 0.349
+    },
+    {
+     "action": "MELEE cell 18 from the bottom-left",
+     "p": 0.08
+    },
+    {
+     "action": "MELEE cell 18 from the right",
+     "p": 0.071
+    },
+    {
+     "action": "MELEE cell 18 from the bottom-right",
+     "p": 0.058
+    }
+   ]
+  },
+  {
+   "decision": 7,
+   "round": 4,
+   "active": "8 Archer (attacker) at cell 22",
+   "legal": 14,
+   "chosen": "SHOOT the stack on cell 18",
+   "p_chosen": 1.0,
+   "value_estimate": -0.418,
+   "top5": [
+    {
+     "action": "SHOOT the stack on cell 18",
+     "p": 1.0
+    },
+    {
+     "action": "MOVE to cell 23",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 1",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 44",
+     "p": 0.0
+    },
+    {
+     "action": "MOVE to cell 12",
+     "p": 0.0
+    }
+   ]
+  },
+  {
+   "decision": 8,
+   "round": 5,
+   "active": "2 Veteran Pikeman (attacker) at cell 28",
+   "legal": 50,
+   "chosen": "MELEE cell 18 from the right",
+   "p_chosen": 0.054,
+   "value_estimate": -0.343,
+   "top5": [
+    {
+     "action": "MELEE cell 18 from the top-right",
+     "p": 0.512
+    },
+    {
+     "action": "MELEE cell 18 from the left",
+     "p": 0.311
+    },
+    {
+     "action": "MELEE cell 18 from the right",
+     "p": 0.054
+    },
+    {
+     "action": "MELEE cell 18 from the bottom-left",
+     "p": 0.034
+    },
+    {
+     "action": "MELEE cell 18 from the bottom-right",
+     "p": 0.034
+    }
+   ]
+  }
+ ],
+ "result": {
+  "termination": "victory",
+  "reward": 1.744,
+  "decisions": 9
+ }
+}

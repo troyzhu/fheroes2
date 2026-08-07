@@ -17,7 +17,7 @@ Six shards, three per side, thirty fresh value-budget matchups each under a virg
 
 ## Generation one, distilled and judged
 
-Corpus: the teacher demonstrations, the unique targeted set, the round-one relabelings at double weight, and the generation-one labels at double weight, 331,000 samples in effect. The nine-suite battery, paired within one run so the columns share evaluation noise:
+Corpus: the teacher demonstrations, the unique targeted set, the round-one relabelings at double weight, and the generation-one labels at double weight, 353,681 samples in the fit. The nine-suite battery, paired within one run so the columns share evaluation noise:
 
 | Suite | share2 | Generation 1 |
 |---|---|---|
@@ -35,7 +35,7 @@ The headline is the ladder: 1.000 / 1.000 / 1.000 / 0.792, the project's best on
 
 ## Generation two, and the gate that failed
 
-The stronger collector kept more of the distribution, 134 of 180 sampled matchups, 808 episodes, 12,704 labels, battlefield-varied through the new offset, in about an hour. Distilled with both generations at double weight, the battery reads a failed gate: the ladder fell to 1.000 / 1.000 / 0.833 / 0.417 and held-out to 0.506, while the defender suites rose modestly (held-out as defender 0.298 against 0.263, defender mirrors 0.285 against 0.229). Generation one's own columns wobble a few hundredths between battery runs, which calibrates the noise; the ladder drop exceeds it.
+The stronger collector kept more of the distribution, 101 of 180 sampled matchups, 808 episodes, 12,704 labels, battlefield-varied through the new offset, in about an hour. Distilled with both generations at double weight, the battery reads a failed gate: the ladder fell to 1.000 / 1.000 / 0.833 / 0.417 and held-out to 0.506, while the defender suites rose modestly (held-out as defender 0.298 against 0.263, defender mirrors 0.285 against 0.229). Generation one's own columns wobble a few hundredths between battery runs, which calibrates the noise; the ladder drop exceeds it.
 
 The reading is the night's recurring one, mixture proportions rather than label quality: twenty-two thousand fresh labels now compete with the horde-recovery relabelings the ladder depends on, and the axis that gained is exactly where the new labels concentrated, defender play. Before the pre-registered deeper-labels pivot, one surgical arm tests that reading directly: keep generation two's defender-side labels, drop its attacker-side ones, and re-distill, aiming to bank the defender gains without paying the ladder.
 
@@ -57,7 +57,7 @@ Both quick arms lost to generation one. The defender split, 7,081 defender label
 | Mirrors as attacker | 0.312 | 0.174 | 0.167 | 0.201 | 0.104 |
 | Mirrors as defender | 0.299 | 0.368 | 0.354 | 0.271 | 0.264 |
 
-No strict dominator exists, and the sharpest stable discriminator is the ladder's top rung: generation one reads 0.71 to 0.79 across every battery of the night where share2 reads 0.42 to 0.54, while everywhere else the two sit within evaluation noise of each other. The night's verdict is therefore: `policy_gen1` is the improved policy, materially better on the flagship out-of-distribution validation and at parity on the rest; share2 remains the held-out co-champion; and the fresh-sampled suite reads 0.37 to 0.39 for every checkpoint from clone v4 onward, because the raw distribution's hopeless half admits no policy improvement at all.
+No strict dominator exists, and even the ladder's top rung is only a soft discriminator: generation one's vendored reads span 0.54 to 0.79 across the night's six batteries, share2's span 0.46 to 0.71, and in this very table share2's top rung (0.708) exceeds generation one's (0.667), which the closing seed replication explains as seed noise on both sides. The night's verdict is therefore: `policy_gen1` is the improved policy, materially better on the flagship out-of-distribution validation and at parity on the rest; share2 remains the held-out co-champion; and the fresh-sampled suite reads 0.37 to 0.39 for every checkpoint from clone v4 onward, because the raw distribution's hopeless half admits no policy improvement at all.
 
 ## The first architectural arm, measured at the plateau's edge
 
@@ -67,7 +67,7 @@ The arm also replicated the champion for free: its plain arm re-rolls generation
 
 ## The seed replication, and what it takes back
 
-Three fresh seeds of the champion recipe, batteried beside the original in one paired run, end the block on its most honest note. Top rungs: the original at 0.542 in this read (its own four reads span 0.542 to 0.792), the re-rolls at 0.500, 0.333 and 0.333; held-out 0.498 to 0.542 throughout. The recipe's expected top rung is therefore near 0.43 with seed noise around 0.10, overlapping share2's 0.42-to-0.54 band, so the recipe-level claim that generation one beats share2 on the ladder is not established; the artifact `policy_gen1` remains the best single checkpoint measured, repeatedly, but part of its crown was a favorable training roll.
+Three fresh seeds of the champion recipe, batteried beside the original in one paired run, end the block on its most honest note. Top rungs: the original at 0.542 in this read (its own six vendored reads span 0.542 to 0.792), the re-rolls at 0.500, 0.333 and 0.333; held-out 0.498 to 0.542 throughout. The recipe's expected top rung is therefore near 0.43 with seed noise around 0.10, overlapping share2's own read band, so the recipe-level claim that generation one beats share2 on the ladder is not established; the artifact `policy_gen1` remains the best single checkpoint measured, repeatedly, but part of its crown was a favorable training roll.
 
 What survives at full strength: every checkpoint since the DAgger era towers over clone v4 (ladder 0.77-plus against 0.573, held-out 0.50-plus against 0.385), and the plateau law rests on many arms moving coherently across suites rather than on any single rung. The block's methodological deliverable is that single-roll comparisons at the flagship rung carry a tenth of seed noise, so future arms gate on multi-seed batteries, a convention now recorded in the experiments README.
 
@@ -99,7 +99,7 @@ Two consequences bind the program. Every future improvement claim carries this c
 
 Three owner questions the day after, each answered by measurement.
 
-Win quality, because a win rate hides how a battle was won. Terminal records now carry per-side army strength, so the Thunk fight reads in value rather than only in outcomes: the built-in AI wins it with 0.393 of its starting strength intact, generation one with 0.444, share2 with 0.471. The policies preserve more than their teacher, which the survival term in the reward earns, and every one of them still spends more than half the army on a fight the owner believes is winnable at near-zero loss.
+Win quality, because a win rate hides how a battle was won. Terminal records now carry per-side army strength, so the Thunk fight reads in value rather than only in outcomes: the built-in AI wins it with 0.393 of its starting strength intact, generation one with 0.444, share2 with 0.471; the audit flagged these as session measurements without a vendored report, and the 2026-08-07 re-measurement (`files/2026-08-07-run-reports/reverified_numbers.json`) reproduces the AI's 0.393 exactly with the policies at 0.459 and 0.410, the preservation ordering intact. The policies preserve more than their teacher, which the survival term in the reward earns, and every one of them still spends more than half the army on a fight the owner believes is winnable at near-zero loss.
 
 Root search wins that fight every time at 32 simulations and preserves 0.443, and neither pricing survival by creature strength nor weighting it five times moved the number (0.416 and 0.449, inside noise). The explanation is structural: root search evaluates a candidate by rolling the rest of the battle out with the policy, so every branch inherits the policy's aggression after the first move, and no scoring rule applied at the root can express a plan the continuation never plays. Multi-ply search, or a value trained on careful play, is what the owner's line would need.
 
@@ -122,3 +122,8 @@ The mirror suite gives both sides the same army and asks which chair wins, which
 Three readings, and the third is the one worth keeping. The game is close to side-neutral on these ten matchups, the engine's own gap being $+0.071 \pm 0.066$, so a policy gap is mostly the policy's own. share2 is essentially symmetric, its excess over the engine sitting at $-0.021 \pm 0.062$. And generation one, the night's champion on the flagship ladder, is the least symmetric of the three: it plays these matchups better from the defender's chair than the attacker's, an excess of $-0.167 \pm 0.092$ against the engine, which is about 1.8 standard errors and therefore suggestive rather than settled.
 
 That is a defect the battery could not see, because every suite except the mirrors fixes the chair, and it fits the night's collection history: generation one's labels came half from each side, but its predecessors' did not, and the ladder it wins is an attacker-side fight. The recorded consequence is that side symmetry joins the battery as a first-class column rather than living in a side experiment, and that any future champion is checked for it before adoption, since a policy that is strong on one flagship fight and asymmetric elsewhere is not obviously the better agent.
+
+
+## Vendoring correction, 2026-08-07
+
+The honesty audit found the six files vendored as generation one's shard manifests were byte-identical copies of generation two's, clobbered at vendoring time. The true generation-one manifests survived in the working directory and corroborate this log exactly, 83 kept, 97 dropped, 664 episodes; they are re-vendored as `gen1_shard*_manifest.json`, and the clobbered copies remain in place as the incident's record. The same audit corrected three numbers above (the fit's sample count, generation two's kept-matchup count, and the top-rung band claim) against the vendored batteries; every result table passed cell for cell.

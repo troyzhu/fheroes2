@@ -15,7 +15,7 @@ The advantage-weighted arm (AWR at $\beta = 1$, the 0.856 bestiary value supplyi
 
 The soft-target pilot (1,183 soft rows, $\lambda = 0.5$) read as a wash and exposed its own under-powering: near-one-hot targets and 0.4 percent of the corpus. Reports `soft_distill.json`, `battery_soft.json`.
 
-The generation-scale soft experiment fixed both: 9,018 soft-labeled decisions over 86 kept fresh matchups from both sides (six shards, win-filtered, battlefield-varied), $\lambda = 0.33$ set to the median per-decision value spread. Against the argmax twin on identical data the soft arm leads seven of nine suites, held-out 0.515 to 0.477, commanders 0.990 to 0.969, with the twin keeping the ladder (0.812 to 0.760) and defender mirrors. Promising, not adopted; the multi-seed gate runs tonight. Reports `soft_distill_gen.json`, `battery_soft2.json`.
+The generation-scale soft experiment fixed both: 9,018 soft-labeled decisions over 86 kept fresh matchups from both sides (six shards, win-filtered, battlefield-varied), $\lambda = 0.33$ set to the median per-decision value spread. Against the argmax twin on identical data the soft arm leads six of nine suites, held-out 0.515 to 0.477, commanders 0.990 to 0.969, with the twin keeping the ladder (0.812 to 0.760) and defender mirrors. Promising, not adopted; the multi-seed gate runs tonight. Reports `soft_distill_gen.json`, `battery_soft2.json`.
 
 ## The planes trio
 

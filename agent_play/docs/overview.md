@@ -23,6 +23,7 @@ Pick the row that matches why you are here.
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] for a specific source |
 | Understand what is implemented and how | [[implementation/inventory]] for the inventory, then [[implementation/README]] for how each mechanism works |
 | Understand why a decision was taken | `decisions/`, six accepted records amending the specification |
+| Follow one inference decision end to end | [[implementation/inference-walkthrough]], a real battle under the microscope |
 | Reconstruct history | [[archive/log]] |
 
 ## Table of contents

@@ -18,6 +18,7 @@ These are reference material rather than a course. Read the one covering whateve
 | [[observation-design]] | Entities against planes, `full_v1` against `observable_v1`, why never pixels, the MDP rule | Implementing observation serialization | `agent_observation.{h,cpp}`, `python/fheroes2_agent/encoding.py` |
 | [[command-encoding-and-snapshots]] | Why `Battle::Command` reads backwards, how to snapshot one safely, canonical keys | Reading or logging engine commands | `agent_command_snapshot.{h,cpp}` |
 | [[teacher-coverage-and-behavior-cloning]] | Who the teacher is, why coverage proves completeness, the cloning ladder | Working on demonstrations or training | recorder in `agent_battle_runner.cpp`, `python/fheroes2_agent/train_bc.py` |
+| [[inference-walkthrough]] | What a trained policy receives, computes, and returns at play time, with every number from one vendored real battle | Reading `env.py` or `policy.py`, or asking what the input exactly is | `python/fheroes2_agent/{env,encoding,policy}.py` |
 | [[built-in-ai-planner]] | What the engine's own battle AI computes, why it is both teacher and benchmark, and where its one-ply value stops | Reading demonstrations, or comparing against the baseline | `ai_battle.cpp`, `battle_troop.cpp` |
 | [[replay-rendering]] | How a recorded episode replays through the real battle interface, and why the video is provably the same battle | Rendering or auditing recorded episodes | `src/agent_replay/`, `agent_play/experiments/{capture,render}_replay.py` |
 

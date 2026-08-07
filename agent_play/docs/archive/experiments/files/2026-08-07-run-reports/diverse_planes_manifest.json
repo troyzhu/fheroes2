@@ -1,0 +1,3203 @@
+{
+ "matchups": [
+  {
+   "regime": "horde",
+   "attacker": "17:2",
+   "defender": "48:47,48:46,48:46",
+   "attacker_hero": "25:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,19:1,9:1",
+   "defender": "17:1,45:1,63:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "24:1,40:1,46:1",
+   "defender": "23:1,50:1",
+   "defender_hero": "17:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1",
+   "defender": "64:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "41:1,24:1,16:1,64:1,23:1",
+   "defender": "13:6",
+   "defender_hero": "25:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "6:5",
+   "defender": "30:39,30:38,30:39",
+   "defender_hero": "9:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "24:1,45:1,14:1",
+   "defender": "46:1,48:1,19:1",
+   "attacker_hero": "19:12",
+   "defender_hero": "7:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "50:1",
+   "defender": "40:1,5:1",
+   "attacker_hero": "24:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "63:1,44:1,18:1,44:1",
+   "defender": "12:31,12:31,12:31",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "34:1,41:2,58:13",
+   "defender": "58:65,58:64,58:65",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:1",
+   "defender": "13:2,16:1",
+   "attacker_hero": "8:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "33:1,4:1",
+   "defender": "62:1",
+   "attacker_hero": "18:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "8:2",
+   "defender": "47:1,8:1,28:1,6:1,26:1",
+   "defender_hero": "19:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "8:1,40:1,14:1",
+   "defender": "59:1",
+   "attacker_hero": "13:19",
+   "defender_hero": "8:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "33:1,12:4",
+   "defender": "3:1,49:1",
+   "attacker_hero": "12:6",
+   "defender_hero": "23:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "62:2,59:4",
+   "defender": "12:94,12:93,12:94",
+   "attacker_hero": "21:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:2",
+   "defender": "12:3,1:9,40:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "27:2,58:10,17:1",
+   "defender": "12:71,12:70,12:70",
+   "defender_hero": "2:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "16:2,66:1",
+   "defender": "50:2,19:1,59:2",
+   "attacker_hero": "20:19",
+   "defender_hero": "9:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:4",
+   "defender": "11:1,16:1,15:1",
+   "defender_hero": "21:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "62:1,47:1,30:4,58:5",
+   "defender": "58:9,58:8,58:9",
+   "attacker_hero": "2:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "49:2,66:1,1:30,3:3,41:1",
+   "defender": "4:2,30:7,13:4,46:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "28:1",
+   "defender": "23:1,1:11",
+   "attacker_hero": "22:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "8:1,49:2",
+   "defender": "18:1,62:1,12:7",
+   "attacker_hero": "12:20",
+   "defender_hero": "8:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,52:1,44:1",
+   "defender": "8:1,10:1,18:1",
+   "defender_hero": "6:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "3:2,65:1,62:1,49:2,52:1",
+   "defender": "51:1,33:1,26:1,45:1",
+   "attacker_hero": "12:18",
+   "defender_hero": "4:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1,6:1",
+   "defender": "3:1,3:1,18:1",
+   "attacker_hero": "18:9",
+   "defender_hero": "17:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "16:1,4:1,22:1",
+   "defender": "64:1,5:1,22:1",
+   "attacker_hero": "10:9",
+   "defender_hero": "3:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "24:3,8:1,40:3",
+   "defender": "1:259,1:258,1:259",
+   "attacker_hero": "1:9",
+   "defender_hero": "21:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "51:2,6:2,5:2,6:2",
+   "defender": "12:92,12:91,12:92",
+   "attacker_hero": "12:0",
+   "defender_hero": "17:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1,59:1,14:1",
+   "defender": "15:1,17:1",
+   "defender_hero": "6:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "34:1,66:1,59:1",
+   "defender": "28:1,17:1",
+   "attacker_hero": "1:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "26:1,45:1",
+   "defender": "49:2",
+   "defender_hero": "12:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:2,41:2,51:2",
+   "defender": "45:2,50:4",
+   "defender_hero": "22:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "17:1,49:3",
+   "defender": "12:50,12:49,12:50",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "44:3",
+   "defender": "1:43,1:42,1:42",
+   "attacker_hero": "1:9",
+   "defender_hero": "14:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "26:1,42:1,27:1,44:1",
+   "defender": "48:8,48:7,48:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "65:4",
+   "defender": "39:93,39:92,39:92",
+   "attacker_hero": "17:19",
+   "defender_hero": "15:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "58:22",
+   "defender": "22:3,42:1",
+   "defender_hero": "15:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "27:1,27:1,4:2,11:1",
+   "defender": "58:16,58:15,58:16",
+   "attacker_hero": "23:10",
+   "defender_hero": "1:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "63:1,6:1,59:2,62:1,10:1",
+   "defender": "30:11,3:5,50:3",
+   "attacker_hero": "14:1",
+   "defender_hero": "24:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,51:1,23:1",
+   "defender": "52:1,25:1,13:1",
+   "attacker_hero": "24:15",
+   "defender_hero": "1:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:6",
+   "defender": "9:1,27:2,19:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "13:1,3:1,28:1,34:1,26:1",
+   "defender": "25:1,51:1,5:1,3:2",
+   "defender_hero": "8:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "15:4,6:3",
+   "defender": "58:72,58:71,58:71",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "33:1,47:1",
+   "defender": "7:2",
+   "attacker_hero": "3:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "33:1,59:1,30:3,2:2",
+   "defender": "64:1,17:1,6:1",
+   "attacker_hero": "3:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "15:1",
+   "defender": "49:1",
+   "defender_hero": "6:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "62:1,2:4,49:3",
+   "defender": "12:18,39:18",
+   "attacker_hero": "11:8",
+   "defender_hero": "6:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1,51:1",
+   "defender": "6:1,7:1,45:1",
+   "defender_hero": "4:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "16:2,66:1",
+   "defender": "12:40,12:39,12:40",
+   "attacker_hero": "21:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "62:4",
+   "defender": "22:2,46:1,30:7,65:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "16:1",
+   "defender": "51:1,44:1",
+   "attacker_hero": "13:0",
+   "defender_hero": "23:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:3,6:2,12:13",
+   "defender": "8:1,46:1,49:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "30:15,33:2",
+   "defender": "24:2,44:1,10:1,25:2",
+   "attacker_hero": "20:2",
+   "defender_hero": "6:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "39:3,1:10,14:1",
+   "defender": "22:1,45:1,49:1",
+   "attacker_hero": "22:15",
+   "defender_hero": "15:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:2,2:5,8:2",
+   "defender": "1:140",
+   "attacker_hero": "16:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "19:1,66:1,59:2",
+   "defender": "6:1,3:3,5:1,17:1,22:1",
+   "defender_hero": "7:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "44:1,9:1",
+   "defender": "14:1,45:1,7:1",
+   "attacker_hero": "20:17",
+   "defender_hero": "24:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1,9:1,11:1",
+   "defender": "27:1",
+   "attacker_hero": "14:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "30:2,14:1,40:1",
+   "defender": "23:1,41:1,52:1",
+   "defender_hero": "4:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "2:4",
+   "defender": "1:19,44:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "26:1",
+   "defender": "1:9,18:1,51:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "13:2,7:1",
+   "defender": "24:1,27:1,11:1",
+   "attacker_hero": "20:13",
+   "defender_hero": "22:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "12:15,34:1",
+   "defender": "33:1,41:1,27:1,64:1",
+   "attacker_hero": "6:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "3:2,15:1,51:1,6:1",
+   "defender": "4:1,65:1,51:1",
+   "defender_hero": "9:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "25:1,30:4",
+   "defender": "62:1,44:1,58:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "41:1,17:1,63:1,40:2",
+   "defender": "12:45,12:45,12:45",
+   "attacker_hero": "1:1",
+   "defender_hero": "0:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "33:3",
+   "defender": "28:1,46:1,15:1,39:6,13:2",
+   "attacker_hero": "3:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "39:8,23:1,17:1,2:2,44:1",
+   "defender": "6:1,14:2,44:1",
+   "attacker_hero": "6:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "27:1,17:1,40:2,25:2,63:1",
+   "defender": "46:1,5:2,1:37",
+   "attacker_hero": "23:14",
+   "defender_hero": "25:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "8:1,6:1,6:1,16:1",
+   "defender": "1:281,1:281,1:281",
+   "attacker_hero": "6:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "3:4,12:13,16:1,41:1",
+   "defender": "12:21,12:21,12:21",
+   "defender_hero": "11:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "50:1,45:1,13:3",
+   "defender": "58:30,58:30,58:30",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "15:2,2:4,8:1",
+   "defender": "12:41",
+   "defender_hero": "9:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "8:5",
+   "defender": "8:2,65:1,47:1",
+   "attacker_hero": "21:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "44:1",
+   "defender": "15:1,26:1",
+   "defender_hero": "5:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "26:2,48:13,51:2",
+   "defender": "1:297,1:297,1:297",
+   "attacker_hero": "12:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "66:1,14:2",
+   "defender": "47:1,62:1,14:1,16:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "48:6,9:1,51:1,41:1,7:1",
+   "defender": "44:4",
+   "defender_hero": "9:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "58:20,41:3",
+   "defender": "58:46,58:46,58:46",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "28:1,63:1,13:1",
+   "defender": "27:1,4:1",
+   "attacker_hero": "10:7",
+   "defender_hero": "14:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "2:1,25:1",
+   "defender": "64:1",
+   "defender_hero": "15:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:20",
+   "defender": "23:1,5:1,4:1",
+   "attacker_hero": "21:13",
+   "defender_hero": "6:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "12:13,52:1,24:3",
+   "defender": "27:1,1:32,30:6,17:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "66:1,3:4,47:1,8:1",
+   "defender": "39:51,39:51,39:51",
+   "attacker_hero": "16:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "24:6",
+   "defender": "16:1,2:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "33:3",
+   "defender": "7:1,50:1,51:1,39:7,63:1",
+   "attacker_hero": "19:1",
+   "defender_hero": "25:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "6:1,25:1",
+   "defender": "39:5",
+   "attacker_hero": "11:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "28:1,1:30,22:2,44:1",
+   "defender": "40:2,3:3,45:1,47:1,46:1",
+   "attacker_hero": "21:1",
+   "defender_hero": "23:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "2:15",
+   "defender": "17:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "66:1,44:2",
+   "defender": "17:1,14:2,8:1,47:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "11:1,10:1,24:2",
+   "defender": "58:75,58:74,58:75",
+   "attacker_hero": "1:18",
+   "defender_hero": "11:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:1,28:1",
+   "defender": "1:26",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "64:3",
+   "defender": "65:1,50:2,13:4",
+   "attacker_hero": "13:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "58:5",
+   "defender": "8:1,42:1,51:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "19:1,1:40,33:1",
+   "defender": "17:1,45:1,44:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:30",
+   "defender": "58:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1",
+   "defender": "50:1,66:1,15:1",
+   "defender_hero": "5:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "64:4",
+   "defender": "16:1,18:1,12:11,66:1,30:6",
+   "attacker_hero": "14:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "11:1,34:1",
+   "defender": "51:1,28:1,18:1,17:1",
+   "attacker_hero": "24:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:8,66:1",
+   "defender": "27:1,33:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "39:2,25:1,47:1",
+   "defender": "18:1,23:1,2:1",
+   "attacker_hero": "16:4",
+   "defender_hero": "18:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1",
+   "defender": "40:1,3:1,23:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "9:1,66:1,51:1,18:1",
+   "defender": "39:83,39:82,39:83",
+   "attacker_hero": "4:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,40:3",
+   "defender": "64:3",
+   "defender_hero": "17:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "48:2,6:1",
+   "defender": "17:1",
+   "attacker_hero": "8:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "39:3,10:1,66:1",
+   "defender": "10:1,3:1,51:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "13:2",
+   "defender": "50:1,16:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "46:1,4:2,45:1,6:1",
+   "defender": "1:33,6:1,7:1",
+   "attacker_hero": "11:18",
+   "defender_hero": "12:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "23:1",
+   "defender": "64:1",
+   "attacker_hero": "10:19",
+   "defender_hero": "13:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "4:1,49:1",
+   "defender": "11:1,25:1,5:1",
+   "attacker_hero": "14:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "47:1,39:13,30:8",
+   "defender": "17:1,13:3,27:1,5:1",
+   "attacker_hero": "3:0",
+   "defender_hero": "5:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "39:7,46:1,65:1",
+   "defender": "40:1,6:1,4:1,45:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "52:4",
+   "defender": "48:13,48:13,48:13",
+   "defender_hero": "11:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "44:1,51:1",
+   "defender": "1:65",
+   "attacker_hero": "5:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:1,16:1,50:1",
+   "defender": "40:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1",
+   "defender": "16:1",
+   "attacker_hero": "5:13",
+   "defender_hero": "18:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "48:4",
+   "defender": "63:1,12:2",
+   "defender_hero": "10:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "47:1",
+   "defender": "59:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "9:2,26:2",
+   "defender": "28:1,5:1,9:1,30:5,47:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "40:5,27:3",
+   "defender": "16:1,52:1,40:2,28:1",
+   "defender_hero": "8:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "49:8",
+   "defender": "48:72,48:71,48:71",
+   "attacker_hero": "7:8",
+   "defender_hero": "10:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "10:2",
+   "defender": "58:39,58:38,58:38",
+   "attacker_hero": "13:12",
+   "defender_hero": "3:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "24:3,40:3",
+   "defender": "19:1,66:1,42:1,8:1,26:1",
+   "attacker_hero": "20:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "17:1,12:10",
+   "defender": "19:1,27:1,51:1",
+   "attacker_hero": "17:13",
+   "defender_hero": "13:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,9:1",
+   "defender": "11:1,2:1",
+   "attacker_hero": "12:14",
+   "defender_hero": "22:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "10:1,14:3",
+   "defender": "44:3",
+   "attacker_hero": "15:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:2,8:1,30:8",
+   "defender": "11:1,24:3,51:2",
+   "defender_hero": "22:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "16:1,27:2,25:4",
+   "defender": "39:60,39:60,39:60",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "10:1,1:40",
+   "defender": "48:56,48:55,48:56",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "49:3,52:1",
+   "defender": "48:49,48:48,48:49",
+   "attacker_hero": "22:19",
+   "defender_hero": "2:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:1,23:1,7:1",
+   "defender": "48:3,62:1",
+   "attacker_hero": "15:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "11:1,2:1,52:1,11:1,44:1",
+   "defender": "34:1,63:1",
+   "defender_hero": "18:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "47:1,4:1,27:1,6:1",
+   "defender": "58:55,58:55,58:55",
+   "attacker_hero": "7:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "18:1",
+   "defender": "46:1,52:1",
+   "attacker_hero": "8:5",
+   "defender_hero": "11:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "39:13",
+   "defender": "40:2",
+   "attacker_hero": "13:17",
+   "defender_hero": "15:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "26:2,7:2",
+   "defender": "12:82,12:81,12:81",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:40",
+   "defender": "46:1,62:1",
+   "defender_hero": "22:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "24:4,7:2,59:3",
+   "defender": "1:103,1:102,1:102",
+   "attacker_hero": "9:8",
+   "defender_hero": "15:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "6:2,5:3,22:3",
+   "defender": "48:41,48:41,48:41",
+   "attacker_hero": "11:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "65:1",
+   "defender": "25:1,19:1,27:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:1,15:1,52:1",
+   "defender": "25:1,33:1,18:1",
+   "attacker_hero": "12:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "34:3",
+   "defender": "65:1,12:18",
+   "defender_hero": "7:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "42:1,39:12,47:1,50:2",
+   "defender": "42:1,22:2,41:1,15:2",
+   "attacker_hero": "21:0",
+   "defender_hero": "10:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "4:1,47:1,3:2,30:4",
+   "defender": "1:110,1:109,1:110",
+   "attacker_hero": "10:5",
+   "defender_hero": "25:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "27:1",
+   "defender": "8:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "13:2,1:20,44:1,50:1",
+   "defender": "39:14,39:14,39:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:1,1:15",
+   "defender": "66:1,3:1",
+   "defender_hero": "18:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "52:1,9:1,49:2,44:1",
+   "defender": "63:2",
+   "attacker_hero": "0:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "47:1,58:19",
+   "defender": "42:1,42:1,8:1,46:1",
+   "attacker_hero": "15:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "46:1,24:2,9:1,30:4",
+   "defender": "47:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "25:4,40:4",
+   "defender": "39:10,39:9,39:9",
+   "attacker_hero": "0:17",
+   "defender_hero": "24:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:1,40:1",
+   "defender": "19:1,26:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "13:16",
+   "defender": "30:40,30:39,30:39",
+   "defender_hero": "1:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "11:1,39:3,27:1",
+   "defender": "41:1,13:1",
+   "attacker_hero": "1:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "12:10,44:1,45:1",
+   "defender": "48:5,33:1,10:1,51:1,62:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "34:1,3:2,16:1,41:1,49:1",
+   "defender": "64:1,13:2,1:20,3:2,4:1",
+   "attacker_hero": "14:19",
+   "defender_hero": "21:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "52:1,51:2,19:1,59:2",
+   "defender": "30:38,30:37,30:38",
+   "defender_hero": "17:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "58:9,23:2,39:12,5:2",
+   "defender": "66:3",
+   "attacker_hero": "12:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "3:1,2:1,28:1",
+   "defender": "48:3,47:1",
+   "defender_hero": "6:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "52:1,41:1,22:1",
+   "defender": "5:1,6:1,49:1",
+   "defender_hero": "0:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "6:2,65:1,2:4",
+   "defender": "50:3,2:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "8:1,48:4",
+   "defender": "27:1",
+   "attacker_hero": "16:10",
+   "defender_hero": "18:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "23:2,51:2",
+   "defender": "48:53,48:53,48:53",
+   "attacker_hero": "16:15",
+   "defender_hero": "12:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,66:1,10:1",
+   "defender": "63:1",
+   "attacker_hero": "1:20",
+   "defender_hero": "12:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1,13:1,65:1",
+   "defender": "4:1,24:1,42:1",
+   "defender_hero": "15:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "9:1,25:3,7:1",
+   "defender": "66:1,5:2,17:1,47:1",
+   "attacker_hero": "2:18",
+   "defender_hero": "1:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "7:1,46:1,63:1",
+   "defender": "12:27,12:26,12:27",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "65:1,34:1,25:1",
+   "defender": "25:1,46:1,13:1",
+   "attacker_hero": "10:4",
+   "defender_hero": "21:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1,23:1",
+   "defender": "1:7,19:1,8:1",
+   "attacker_hero": "8:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "30:6",
+   "defender": "8:1,6:1",
+   "defender_hero": "10:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "62:1,19:1,3:1",
+   "defender": "51:1",
+   "defender_hero": "21:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "19:1,4:1,63:1",
+   "defender": "44:1,9:1,17:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "23:2,45:1,41:1",
+   "defender": "33:3",
+   "attacker_hero": "16:1",
+   "defender_hero": "25:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "22:1",
+   "defender": "9:1",
+   "defender_hero": "24:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "16:1,41:1,19:1,18:1,28:1",
+   "defender": "11:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "15:1",
+   "defender": "12:7",
+   "defender_hero": "0:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "11:1,16:1,66:1",
+   "defender": "59:1,11:1,65:1",
+   "attacker_hero": "24:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "64:5",
+   "defender": "39:97,39:96,39:96",
+   "defender_hero": "13:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "27:1",
+   "defender": "7:1,9:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "65:2",
+   "defender": "12:92,12:91,12:91",
+   "attacker_hero": "21:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "17:1,64:1,5:2,66:1",
+   "defender": "12:74,12:73,12:73",
+   "attacker_hero": "6:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "34:1,16:1,34:1",
+   "defender": "9:1,49:1,51:1",
+   "defender_hero": "19:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "22:1,42:1",
+   "defender": "9:1,2:1",
+   "attacker_hero": "23:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,40:1",
+   "defender": "24:1,25:1,51:1",
+   "defender_hero": "12:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "13:4",
+   "defender": "42:1,11:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "17:1,33:1,22:2",
+   "defender": "4:2,64:1,13:3,17:1,39:10",
+   "defender_hero": "19:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "12:13,50:2",
+   "defender": "12:82,12:81,12:82",
+   "attacker_hero": "25:8",
+   "defender_hero": "21:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "16:1,28:1",
+   "defender": "26:1,25:1,6:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:6",
+   "defender": "65:1,14:2,27:1",
+   "attacker_hero": "5:5",
+   "defender_hero": "4:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "51:1,15:2,1:30,4:2,33:1",
+   "defender": "52:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "24:3,51:2,51:2",
+   "defender": "13:3,63:1,4:2,24:2,9:1",
+   "attacker_hero": "21:8",
+   "defender_hero": "15:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "39:40",
+   "defender": "12:19,12:18,12:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "58:9,11:1,49:2,30:8",
+   "defender": "48:40",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "59:2,64:1,7:2",
+   "defender": "17:1,18:1,8:1,51:2",
+   "attacker_hero": "17:2",
+   "defender_hero": "19:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "30:16",
+   "defender": "39:96,39:95,39:96",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "62:1",
+   "defender": "65:1,15:1,4:1",
+   "attacker_hero": "0:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1,22:1,30:3",
+   "defender": "4:1,65:1,34:1",
+   "defender_hero": "4:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "47:1",
+   "defender": "17:1,14:1",
+   "attacker_hero": "0:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:2",
+   "defender": "66:1,42:1",
+   "attacker_hero": "3:10",
+   "defender_hero": "10:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "26:1",
+   "defender": "24:1,59:1",
+   "attacker_hero": "17:16",
+   "defender_hero": "10:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:1,46:1,33:1",
+   "defender": "10:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "10:2",
+   "defender": "52:1,47:1,8:1,58:5",
+   "attacker_hero": "8:18",
+   "defender_hero": "21:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "39:8,42:1,25:2,15:1,42:1",
+   "defender": "26:1,24:2,42:1,1:26",
+   "attacker_hero": "2:15",
+   "defender_hero": "13:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "42:1,8:1,3:1",
+   "defender": "26:1",
+   "attacker_hero": "8:15",
+   "defender_hero": "13:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "65:1,64:1,25:1,59:1",
+   "defender": "58:19,58:18,58:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "62:1,19:1,59:1,48:6",
+   "defender": "63:2",
+   "attacker_hero": "19:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "48:12,23:2,33:1",
+   "defender": "42:2,33:2",
+   "attacker_hero": "11:12",
+   "defender_hero": "6:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "39:18,16:1,49:4",
+   "defender": "30:47,30:46,30:46",
+   "defender_hero": "4:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "40:1,14:1,62:1,12:5",
+   "defender": "16:1,63:1,6:1,45:1,41:1",
+   "defender_hero": "8:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "64:1,2:2",
+   "defender": "49:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "19:1,62:1,41:1,30:5,23:1",
+   "defender": "4:2,8:1,4:2,24:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1,30:10,40:3",
+   "defender": "64:4",
+   "attacker_hero": "25:20",
+   "defender_hero": "0:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "16:1,2:1,3:1,7:1,64:1",
+   "defender": "28:1,63:1,9:1,47:1,50:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "12:8",
+   "defender": "9:1",
+   "attacker_hero": "7:8",
+   "defender_hero": "9:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "6:2,9:2",
+   "defender": "12:11,13:3,48:8,2:3",
+   "attacker_hero": "21:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "64:3",
+   "defender": "49:3,65:1,15:2",
+   "attacker_hero": "4:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "10:2,41:2",
+   "defender": "23:2,15:2,58:8,12:10,39:10",
+   "attacker_hero": "14:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "7:2,25:4",
+   "defender": "45:1,48:10,19:1",
+   "attacker_hero": "17:12",
+   "defender_hero": "12:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "44:5",
+   "defender": "12:88,12:88,12:88",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "45:1,13:1,66:1",
+   "defender": "5:1,17:1,34:1",
+   "defender_hero": "1:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "46:1,9:1,63:1,63:1",
+   "defender": "48:54,48:53,48:53",
+   "attacker_hero": "1:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "39:25,14:5",
+   "defender": "7:5",
+   "defender_hero": "21:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "13:9",
+   "defender": "49:6",
+   "attacker_hero": "2:17",
+   "defender_hero": "6:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "42:3",
+   "defender": "46:1,47:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "51:1,51:1,49:2,2:3",
+   "defender": "62:2,52:2",
+   "attacker_hero": "6:14",
+   "defender_hero": "21:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "39:13,40:3",
+   "defender": "1:226,1:226,1:226",
+   "attacker_hero": "20:9",
+   "defender_hero": "23:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "41:3",
+   "defender": "30:46,30:45,30:46",
+   "defender_hero": "4:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "41:3",
+   "defender": "30:14,30:13,30:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "42:3",
+   "defender": "26:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "62:1,33:1,52:1",
+   "defender": "28:1,3:1",
+   "attacker_hero": "2:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:1,25:1,10:1",
+   "defender": "33:1,17:1,65:1",
+   "attacker_hero": "5:4",
+   "defender_hero": "17:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "66:1,40:2,47:1",
+   "defender": "1:253,1:252,1:253",
+   "attacker_hero": "3:3",
+   "defender_hero": "16:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "39:13",
+   "defender": "48:4,17:1,62:1",
+   "defender_hero": "7:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "44:1,11:1,41:1",
+   "defender": "16:1,1:14,15:1",
+   "attacker_hero": "19:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "5:4,7:3",
+   "defender": "30:11,30:10,30:10",
+   "attacker_hero": "14:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "10:1",
+   "defender": "4:1,25:1,24:1,17:1",
+   "defender_hero": "0:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "48:22",
+   "defender": "44:2,14:3",
+   "attacker_hero": "0:8",
+   "defender_hero": "16:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "63:1,47:1,52:2",
+   "defender": "48:38,48:38,48:38",
+   "defender_hero": "14:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "22:2,6:1,26:1",
+   "defender": "27:3",
+   "defender_hero": "20:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "50:2,47:1,65:1,44:1",
+   "defender": "18:3",
+   "attacker_hero": "12:8",
+   "defender_hero": "15:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "41:1,18:1,12:6,62:1,1:18",
+   "defender": "63:1,63:1,7:1",
+   "defender_hero": "10:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "30:6,9:1,52:1",
+   "defender": "66:1,64:1,40:2",
+   "attacker_hero": "21:11",
+   "defender_hero": "13:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1",
+   "defender": "7:1",
+   "attacker_hero": "25:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "28:1",
+   "defender": "30:6",
+   "attacker_hero": "9:19",
+   "defender_hero": "8:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "10:1",
+   "defender": "66:1,24:1",
+   "attacker_hero": "6:7",
+   "defender_hero": "21:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "28:1,1:22,7:1,1:22",
+   "defender": "22:2,45:1",
+   "attacker_hero": "24:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "65:1,4:1",
+   "defender": "59:2",
+   "attacker_hero": "5:5",
+   "defender_hero": "22:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "27:1,2:1,8:1,7:1,22:1",
+   "defender": "14:1,17:1,64:1,27:1",
+   "attacker_hero": "20:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "51:1,1:20,48:5,30:4",
+   "defender": "48:25,48:24,48:25",
+   "attacker_hero": "16:10",
+   "defender_hero": "24:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "25:4,18:1,11:1",
+   "defender": "12:32,12:31,12:32",
+   "defender_hero": "0:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "2:6,7:2",
+   "defender": "12:8,13:2,27:1,62:1,49:2",
+   "attacker_hero": "4:1",
+   "defender_hero": "14:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "14:1,5:1,41:1",
+   "defender": "6:1,64:1,44:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "6:2,33:2",
+   "defender": "63:1,65:1,24:2,65:1",
+   "defender_hero": "9:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "3:12",
+   "defender": "52:1,30:5,27:1,52:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1,1:15",
+   "defender": "19:1,59:1,41:1",
+   "attacker_hero": "21:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:1,22:1,40:1",
+   "defender": "30:4,48:5",
+   "defender_hero": "1:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "5:2,59:2,15:2",
+   "defender": "27:3,2:9",
+   "defender_hero": "15:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "3:2,15:1,52:1,12:6,1:18",
+   "defender": "59:1,33:1,12:8,19:1",
+   "attacker_hero": "9:17",
+   "defender_hero": "15:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "40:5",
+   "defender": "58:29,58:29,58:29",
+   "defender_hero": "12:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "66:1,39:13,5:2",
+   "defender": "15:2,39:12,51:1",
+   "attacker_hero": "6:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "26:2",
+   "defender": "4:1,1:17,3:2",
+   "defender_hero": "19:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "9:1,2:1,65:1,46:1,9:1",
+   "defender": "63:1",
+   "attacker_hero": "24:3",
+   "defender_hero": "3:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "63:1,34:1,42:1,64:1",
+   "defender": "7:1,9:1,26:1,64:1,33:1",
+   "defender_hero": "16:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "64:3",
+   "defender": "26:1,44:1,23:1,46:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "10:2",
+   "defender": "48:40,48:39,48:39",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "26:1,2:2,1:24,1:24,10:1",
+   "defender": "52:2,9:1",
+   "attacker_hero": "15:15",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "3:2",
+   "defender": "25:1,65:1,23:1",
+   "attacker_hero": "20:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "13:4,51:2,8:1",
+   "defender": "25:4,28:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "25:2,3:3,51:1,24:2,15:2",
+   "defender": "45:1,18:1,11:1,17:1",
+   "attacker_hero": "8:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "15:1,52:1,63:1",
+   "defender": "44:1,51:1,8:1",
+   "attacker_hero": "6:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:1,3:1,17:1",
+   "defender": "11:1,24:1,12:2",
+   "defender_hero": "17:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "39:13,45:1",
+   "defender": "58:44,58:43,58:43",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "8:1,2:4,30:8",
+   "defender": "30:17,30:16,30:17",
+   "attacker_hero": "7:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "1:30,58:8,13:3,50:2,65:1",
+   "defender": "11:1,10:1,59:2,33:1",
+   "attacker_hero": "14:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:7,22:1,65:1",
+   "defender": "17:1",
+   "attacker_hero": "8:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "39:12,8:1,17:1,49:2",
+   "defender": "64:1,19:1,27:2",
+   "defender_hero": "20:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "18:1,64:1,52:1,66:1",
+   "defender": "39:89,39:88,39:89",
+   "attacker_hero": "0:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "2:12",
+   "defender": "39:84,39:83,39:84",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "34:1,46:1,65:1",
+   "defender": "48:4,12:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "33:1,5:2,15:2",
+   "defender": "39:5,51:1,9:1,41:1,23:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "41:1,24:3,63:1",
+   "defender": "48:67,48:66,48:67",
+   "defender_hero": "1:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "45:1,52:1,49:2,7:1",
+   "defender": "30:13,30:12,30:13",
+   "defender_hero": "10:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "5:1,47:1",
+   "defender": "51:1",
+   "attacker_hero": "4:18",
+   "defender_hero": "9:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "3:4,24:3,7:1",
+   "defender": "1:233,1:233,1:233",
+   "defender_hero": "9:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "66:1,40:1,28:1",
+   "defender": "6:1",
+   "attacker_hero": "8:15",
+   "defender_hero": "15:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1,13:1",
+   "defender": "39:6",
+   "attacker_hero": "9:14",
+   "defender_hero": "5:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "15:3,41:2,10:1",
+   "defender": "1:203,1:203,1:203",
+   "defender_hero": "10:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "18:1",
+   "defender": "63:1,8:1,8:1",
+   "attacker_hero": "24:10",
+   "defender_hero": "24:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "12:3,11:1,46:1",
+   "defender": "6:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "27:3",
+   "defender": "58:13,58:12,58:12",
+   "attacker_hero": "15:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1",
+   "defender": "49:1,7:1",
+   "attacker_hero": "18:18",
+   "defender_hero": "23:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "44:2,34:1",
+   "defender": "58:28,58:27,58:28",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "12:17,11:1,64:1",
+   "defender": "25:2,59:1,65:1,39:9,58:7",
+   "defender_hero": "13:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "25:2,12:10",
+   "defender": "5:1,9:1",
+   "defender_hero": "3:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "9:1,13:2,16:1",
+   "defender": "58:5,41:1,24:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "2:4,50:2,59:2",
+   "defender": "18:2,13:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "8:1",
+   "defender": "44:1,46:1,50:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:1,24:1",
+   "defender": "41:1,10:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:30",
+   "defender": "9:1",
+   "defender_hero": "10:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "66:1",
+   "defender": "26:1,27:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "14:2,28:1,64:1,3:3",
+   "defender": "47:1,1:62",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "48:22",
+   "defender": "66:1,18:1,19:1",
+   "defender_hero": "16:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "22:1,34:1,45:1,24:2,28:1",
+   "defender": "66:1,18:1,62:1,1:32",
+   "attacker_hero": "22:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:3,13:4",
+   "defender": "50:3,13:5",
+   "attacker_hero": "8:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:1,8:1,40:1",
+   "defender": "12:4,8:1",
+   "defender_hero": "1:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "9:1,10:1,47:1,14:1,52:1",
+   "defender": "7:2",
+   "attacker_hero": "4:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "47:1,34:1,49:1,19:1,7:1",
+   "defender": "65:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:1,23:1",
+   "defender": "24:1,45:1,7:1",
+   "defender_hero": "1:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "33:1,48:2",
+   "defender": "40:1",
+   "defender_hero": "12:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "46:1",
+   "defender": "1:9,50:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "62:1,5:2,27:1,18:1",
+   "defender": "28:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "22:2,24:2",
+   "defender": "41:1,34:1",
+   "attacker_hero": "10:4",
+   "defender_hero": "0:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "6:3,30:16",
+   "defender": "48:44,48:43,48:43",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "24:2,9:1,62:1,46:1",
+   "defender": "11:1,6:1,6:1,16:1,8:1",
+   "attacker_hero": "22:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "17:1,25:1",
+   "defender": "44:1,65:1",
+   "defender_hero": "14:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "1:20,44:1,49:1,64:1",
+   "defender": "39:88,39:87,39:88",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "19:1,11:1",
+   "defender": "18:1,13:1,8:1",
+   "attacker_hero": "12:4",
+   "defender_hero": "8:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "58:30",
+   "defender": "1:84,1:83,1:83",
+   "defender_hero": "2:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "23:1",
+   "defender": "63:1,49:1,7:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:1,4:1,34:1",
+   "defender": "45:1",
+   "attacker_hero": "2:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "66:1,58:6,13:2,44:1",
+   "defender": "6:1,10:1,26:1,45:1,1:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "22:1,1:18,47:1,30:4,25:1",
+   "defender": "25:2,7:1,22:1",
+   "defender_hero": "23:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "1:40,33:1,15:2,33:1",
+   "defender": "48:45,48:44,48:45",
+   "attacker_hero": "0:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "58:15",
+   "defender": "9:1",
+   "attacker_hero": "19:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "3:6",
+   "defender": "11:1,27:1,2:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "16:1,59:1,3:2,30:5,41:1",
+   "defender": "13:12",
+   "attacker_hero": "23:5",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "19:1",
+   "defender": "64:1,22:1",
+   "defender_hero": "23:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "66:1",
+   "defender": "11:1,27:1",
+   "defender_hero": "12:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "62:1,26:1,3:3,52:1,50:2",
+   "defender": "42:2,28:2",
+   "attacker_hero": "18:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "2:1,23:1",
+   "defender": "51:1,44:1,50:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "3:2",
+   "defender": "34:1,58:2,50:1",
+   "attacker_hero": "13:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "58:8,7:1,62:1",
+   "defender": "26:1,19:1,4:2,17:1",
+   "defender_hero": "6:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:1",
+   "defender": "17:1,58:2,11:1",
+   "defender_hero": "12:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "45:5",
+   "defender": "39:85,39:84,39:84",
+   "attacker_hero": "25:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "33:1,59:1,46:1,25:1,12:4",
+   "defender": "19:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "19:1,16:1,45:1,48:6",
+   "defender": "40:6",
+   "defender_hero": "8:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "39:13,51:2",
+   "defender": "30:39,30:38,30:38",
+   "attacker_hero": "24:14",
+   "defender_hero": "15:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "10:1,19:1,3:3,30:6",
+   "defender": "58:73,58:73,58:73",
+   "attacker_hero": "18:5",
+   "defender_hero": "3:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1,48:2",
+   "defender": "2:1,47:1,4:1",
+   "attacker_hero": "23:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "52:1",
+   "defender": "45:1",
+   "defender_hero": "15:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:1,12:2,24:1",
+   "defender": "2:1,24:1,10:1",
+   "attacker_hero": "10:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "65:1",
+   "defender": "50:1,62:1,41:1",
+   "attacker_hero": "19:2",
+   "defender_hero": "20:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "48:6",
+   "defender": "64:1,65:1",
+   "defender_hero": "14:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1,18:1",
+   "defender": "17:1,34:1",
+   "attacker_hero": "23:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "25:4,63:1,27:2",
+   "defender": "12:9,12:8,12:8",
+   "attacker_hero": "20:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "8:1,23:1,2:1,33:1,10:1",
+   "defender": "4:2,58:7",
+   "defender_hero": "6:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "66:1",
+   "defender": "23:1,52:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1,27:1",
+   "defender": "34:1,1:9,11:1",
+   "defender_hero": "21:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "15:1,15:1,41:1",
+   "defender": "26:1,65:1,52:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "42:1,4:2,16:1,9:1,65:1",
+   "defender": "7:2,9:2",
+   "attacker_hero": "19:17",
+   "defender_hero": "23:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "1:38,65:1,50:2,66:1",
+   "defender": "63:1,44:2,14:3",
+   "attacker_hero": "9:17",
+   "defender_hero": "12:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "47:1,47:1,16:1,28:1",
+   "defender": "65:1,8:1,23:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "34:1,34:1,7:2",
+   "defender": "48:75,48:74,48:74",
+   "attacker_hero": "22:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "7:5",
+   "defender": "58:33,58:33,58:33",
+   "defender_hero": "6:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "2:6",
+   "defender": "8:1,44:1,58:4,2:1",
+   "attacker_hero": "7:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "65:2,28:2",
+   "defender": "22:2,24:2,1:31,66:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "24:8",
+   "defender": "58:13,58:12,58:13",
+   "attacker_hero": "14:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "12:2,46:1,39:2",
+   "defender": "7:1,6:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "24:3,26:2,4:3",
+   "defender": "12:13,19:1,40:3",
+   "attacker_hero": "16:9",
+   "defender_hero": "8:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "2:2,34:1,50:1",
+   "defender": "19:1,62:1,17:1,41:1,1:11",
+   "attacker_hero": "7:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "34:1,27:1",
+   "defender": "3:1,23:1,2:1",
+   "defender_hero": "8:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "62:4",
+   "defender": "46:1,4:3,17:1,7:1",
+   "attacker_hero": "0:8",
+   "defender_hero": "21:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "40:1,48:2",
+   "defender": "15:1,4:1",
+   "defender_hero": "16:0",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "3:5,44:2,13:5",
+   "defender": "46:1",
+   "attacker_hero": "23:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:1,45:1,41:1",
+   "defender": "17:1,12:3",
+   "attacker_hero": "21:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "28:2,1:60",
+   "defender": "9:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "3:8",
+   "defender": "48:19,48:18,48:19",
+   "defender_hero": "4:4",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "2:4,26:2,19:1,25:2",
+   "defender": "16:4",
+   "defender_hero": "24:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "59:1,26:1,26:1",
+   "defender": "26:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "12:6,49:1,9:1,42:1,8:1",
+   "defender": "46:1,51:1,50:1,7:1,50:1",
+   "attacker_hero": "8:14",
+   "defender_hero": "5:12",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "10:1,17:1,12:7",
+   "defender": "26:2",
+   "defender_hero": "21:11",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "13:6,11:1",
+   "defender": "48:44,48:44,48:44",
+   "defender_hero": "25:18",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "9:1,2:2,34:1",
+   "defender": "7:1,4:1,27:1,19:1,50:1",
+   "defender_hero": "22:19",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "41:1,49:1",
+   "defender": "28:1,4:1",
+   "attacker_hero": "5:10",
+   "defender_hero": "19:14",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "63:1",
+   "defender": "39:9",
+   "defender_hero": "11:16",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "2:2,41:1,62:1,9:1,18:1",
+   "defender": "19:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "49:1",
+   "defender": "64:1,51:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "58:8,65:1,40:2,26:1,59:2",
+   "defender": "2:7,65:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "19:2,41:2",
+   "defender": "16:1,39:7,13:2,62:1,12:7",
+   "attacker_hero": "14:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "44:2,19:2",
+   "defender": "58:41,58:41,58:41",
+   "attacker_hero": "8:5",
+   "defender_hero": "6:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "47:1",
+   "defender": "4:2",
+   "attacker_hero": "8:18",
+   "defender_hero": "5:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "30:5",
+   "defender": "49:1,46:1,44:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "2:16",
+   "defender": "30:54,30:53,30:54",
+   "attacker_hero": "15:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "33:3",
+   "defender": "48:22",
+   "defender_hero": "24:17",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "1:20",
+   "defender": "2:1,26:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "45:1,63:1,8:1,7:1",
+   "defender": "48:52,48:52,48:52",
+   "attacker_hero": "10:20",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "51:1",
+   "defender": "47:1,62:1",
+   "defender_hero": "10:2",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "16:1,58:2",
+   "defender": "14:1",
+   "defender_hero": "6:6",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "30:4,63:1",
+   "defender": "7:1,66:1,50:1",
+   "attacker_hero": "20:10",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "14:2,47:1,4:2,47:1,58:8",
+   "defender": "52:1,7:1,3:3,7:1",
+   "attacker_hero": "3:19",
+   "defender_hero": "3:7",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "7:4",
+   "defender": "39:61,39:61,39:61",
+   "attacker_hero": "10:7",
+   "defender_hero": "4:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "40:1,46:1,46:1,16:1",
+   "defender": "14:2,50:1",
+   "defender_hero": "22:9",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "52:1",
+   "defender": "13:1,34:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "33:1,17:1,27:2",
+   "defender": "12:22,12:21,12:21",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "25:1,59:1,47:1",
+   "defender": "34:1,14:1",
+   "attacker_hero": "9:18",
+   "defender_hero": "11:1",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "battle",
+   "attacker": "51:1,46:1,2:1,65:1,4:1",
+   "defender": "22:1,34:1,24:1,52:1,2:1",
+   "defender_hero": "13:8",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "skirmish",
+   "attacker": "3:2,4:1,25:1",
+   "defender": "50:3",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  },
+  {
+   "regime": "horde",
+   "attacker": "47:1",
+   "defender": "48:8,48:7,48:8",
+   "attacker_hero": "18:13",
+   "episodes": 30,
+   "verdict": "VERDICT fixtures=30 runs_each=1 deterministic=yes teacher_coverage=complete"
+  }
+ ],
+ "seeds": 6,
+ "sampler_seed": 0,
+ "failures": 0,
+ "seconds": 28.8
+}
