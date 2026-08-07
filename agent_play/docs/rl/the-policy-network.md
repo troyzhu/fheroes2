@@ -61,7 +61,7 @@ BattlePolicy(
 )
 ```
 
-A planes-built checkpoint adds two modules and widens the trunk's first layer to 1120:
+A planes-built checkpoint adds two modules and widens the trunk's first layer to 1120. The (7, 9, 11) input is not pixels: 9 by 11 is the battlefield grid itself, one entry per hex cell, and the seven channels are semantic quantities written at each cell (per-side occupancy, count fraction, log-scaled hit points, speed, shooter, obstacle), image-shaped so a convolution can read the spatial structure while every value stays an exact engine fact, the SC2 feature-layer idea [[../decisions/0004-spatial-observation-modality]] commits to and the reason rendered pixels are rejected permanently:
 
 ```text
   (plane_conv): Sequential(
@@ -76,7 +76,9 @@ A planes-built checkpoint adds two modules and widens the trunk's first layer to
   )
 ```
 
-One two-layer perceptron, 63 to 96 to 96, embeds every slot with the same weights, which is what makes a stack's meaning come from its features rather than from which slot happens to hold it, at the embedding stage. The ten 96-wide embeddings are then concatenated in slot order into a 960-wide block, the encoded globals append 32 more, and a two-layer 192-wide trunk feeds both heads. 396,570 parameters in total. The policy head's 793 logits are masked to the legal actions ([[../implementation/legal-actions-and-masking]]) and softmaxed. The `Sequential` printout above is regenerated in one line, `python3 -c "import sys; sys.path.insert(0, 'python'); from fheroes2_agent.policy import BattlePolicy; print(BattlePolicy())"`, so a drifted diagram is always one command from being caught.
+One two-layer perceptron, 63 to 96 to 96, embeds every slot with the same weights, which is what makes a stack's meaning come from its features rather than from which slot happens to hold it, at the embedding stage. The ten 96-wide embeddings are then concatenated in slot order into a 960-wide block, the encoded globals append 32 more, and a two-layer 192-wide trunk feeds both heads. The trunk is the shared body of a multi-head network, what some papers call the backbone or torso: everything before it is specific to one input kind, everything after it is specific to one output, and both heads read the same 192-wide representation because the features that pick an action and the features that judge a position overlap heavily.
+
+396,570 parameters in total. The policy head's 793 logits are masked to the legal actions ([[../implementation/legal-actions-and-masking]]) and softmaxed. The `Sequential` printout above is regenerated in one line, `python3 -c "import sys; sys.path.insert(0, 'python'); from fheroes2_agent.policy import BattlePolicy; print(BattlePolicy())"`, so a drifted diagram is always one command from being caught.
 
 ## Where the slot lifecycle bites
 
