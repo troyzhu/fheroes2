@@ -1,0 +1,80 @@
+{
+ "checkpoint": "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/sharp_s0/policy_entity.pt",
+ "roots": [
+  "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_diverse_planes",
+  "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_dagger_planes"
+ ],
+ "seed": 0,
+ "holdout_decisions": 44483,
+ "top1": 0.8639,
+ "top3": 0.954,
+ "top5": 0.9734,
+ "mean_teacher_probability": 0.781,
+ "median_teacher_probability": 0.9393,
+ "mean_entropy_nats": 0.5202,
+ "mean_normalized_entropy": 0.1652,
+ "expected_calibration_error": 0.0332,
+ "reliability": [
+  {
+   "bin": "0.0-0.1",
+   "n": 3,
+   "confidence": 0.095,
+   "accuracy": 0.0
+  },
+  {
+   "bin": "0.1-0.2",
+   "n": 304,
+   "confidence": 0.164,
+   "accuracy": 0.237
+  },
+  {
+   "bin": "0.2-0.3",
+   "n": 1024,
+   "confidence": 0.256,
+   "accuracy": 0.277
+  },
+  {
+   "bin": "0.3-0.4",
+   "n": 1554,
+   "confidence": 0.352,
+   "accuracy": 0.408
+  },
+  {
+   "bin": "0.4-0.5",
+   "n": 2107,
+   "confidence": 0.453,
+   "accuracy": 0.489
+  },
+  {
+   "bin": "0.5-0.6",
+   "n": 2773,
+   "confidence": 0.549,
+   "accuracy": 0.62
+  },
+  {
+   "bin": "0.6-0.7",
+   "n": 2887,
+   "confidence": 0.65,
+   "accuracy": 0.737
+  },
+  {
+   "bin": "0.7-0.8",
+   "n": 3342,
+   "confidence": 0.753,
+   "accuracy": 0.84
+  },
+  {
+   "bin": "0.8-0.9",
+   "n": 4835,
+   "confidence": 0.853,
+   "accuracy": 0.914
+  },
+  {
+   "bin": "0.9-1.0",
+   "n": 25654,
+   "confidence": 0.978,
+   "accuracy": 0.988
+  }
+ ],
+ "seconds": 22.8
+}

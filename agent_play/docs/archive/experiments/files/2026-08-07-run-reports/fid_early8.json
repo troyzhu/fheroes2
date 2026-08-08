@@ -1,0 +1,80 @@
+{
+ "checkpoint": "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/sharp_s0/policy_early8.pt",
+ "roots": [
+  "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_diverse_planes",
+  "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_dagger_planes"
+ ],
+ "seed": 0,
+ "holdout_decisions": 44483,
+ "top1": 0.7435,
+ "top3": 0.9069,
+ "top5": 0.9447,
+ "mean_teacher_probability": 0.6189,
+ "median_teacher_probability": 0.706,
+ "mean_entropy_nats": 0.9227,
+ "mean_normalized_entropy": 0.2904,
+ "expected_calibration_error": 0.0486,
+ "reliability": [
+  {
+   "bin": "0.0-0.1",
+   "n": 52,
+   "confidence": 0.087,
+   "accuracy": 0.038
+  },
+  {
+   "bin": "0.1-0.2",
+   "n": 1286,
+   "confidence": 0.161,
+   "accuracy": 0.175
+  },
+  {
+   "bin": "0.2-0.3",
+   "n": 2522,
+   "confidence": 0.253,
+   "accuracy": 0.284
+  },
+  {
+   "bin": "0.3-0.4",
+   "n": 3543,
+   "confidence": 0.351,
+   "accuracy": 0.398
+  },
+  {
+   "bin": "0.4-0.5",
+   "n": 4205,
+   "confidence": 0.454,
+   "accuracy": 0.53
+  },
+  {
+   "bin": "0.5-0.6",
+   "n": 4665,
+   "confidence": 0.55,
+   "accuracy": 0.615
+  },
+  {
+   "bin": "0.6-0.7",
+   "n": 4264,
+   "confidence": 0.649,
+   "accuracy": 0.74
+  },
+  {
+   "bin": "0.7-0.8",
+   "n": 4789,
+   "confidence": 0.749,
+   "accuracy": 0.849
+  },
+  {
+   "bin": "0.8-0.9",
+   "n": 5216,
+   "confidence": 0.852,
+   "accuracy": 0.909
+  },
+  {
+   "bin": "0.9-1.0",
+   "n": 13941,
+   "confidence": 0.972,
+   "accuracy": 0.98
+  }
+ ],
+ "seconds": 22.1
+}
