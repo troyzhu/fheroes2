@@ -60,6 +60,7 @@
 #include "agent_battle_runner.h"
 #include "agent_external_controller.h"
 #include "agent_scenario.h"
+#include "agent_trajectory.h"
 #include "agg.h"
 #include "core.h"
 #include "cursor.h"
@@ -482,9 +483,19 @@ int runTool( int argc, char ** argv )
     }
 
     fheroes2::agent::ExternalDecisionController controller( side, decide );
+
+    // Wired exactly as the worker's protocol mode wires its runEpisode call (a passive
+    // recording with the coverage audit on), so a replayed episode and a protocol-driven one
+    // run byte-identical hook plumbing, and the decision-stream digest printed below compares
+    // the two paths decision by decision rather than only at the terminal state. That
+    // per-decision comparison is the #43 investigation tool. Interactive play keeps the
+    // historical no-recording call: a human's decisions need no replay digest.
+    fheroes2::agent::EpisodeRecording recording;
+    recording.auditTeacherCoverage = true;
+
     fheroes2::agent::EpisodeOutcome outcome;
     try {
-        outcome = fheroes2::agent::runEpisode( scenario, nullptr, &controller, render, humanSide );
+        outcome = fheroes2::agent::runEpisode( scenario, playSide.empty() ? &recording : nullptr, &controller, render, humanSide );
     }
     catch ( const fheroes2::UserRequestedApplicationClosure & ) {
         // Closing the battle window is a normal way to end a live game, and the engine reports it
@@ -509,11 +520,12 @@ int runTool( int argc, char ** argv )
                  ",\"actions_recorded\":%zu,\"actions_used\":%zu,\"decisions_seen\":%u,\"rejected\":%u,\"exact\":%s"
                  ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
                  ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u}"
-                 ",\"state_digest\":\"%s\"}\n",
+                 ",\"decision_digest\":\"%s\",\"state_digest\":\"%s\"}\n",
                  scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds,
                  actions.has_value() ? actions->size() : static_cast<size_t>( 0 ), nextAction,
                  controller.decisionsSeen(), controller.rejectedSelections(), exact ? "true" : "false", outcome.attacker.liveStacks, outcome.attacker.liveCreatures,
-                 outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints, outcome.stateDigest.c_str() );
+                 outcome.attacker.hitPoints, outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints, recording.decisionDigest.c_str(),
+                 outcome.stateDigest.c_str() );
     std::fflush( stdout );
 
     if ( !playSide.empty() ) {
