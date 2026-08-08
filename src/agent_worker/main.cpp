@@ -447,7 +447,11 @@ int main( int argc, char ** argv )
             if ( probeTeacher ) {
                 std::printf( ",\"probes_resolved\":%u,\"probes_outside\":%u", controller.probesResolved(), controller.probesOutsideSchema() );
             }
-            std::printf( ",\"state_digest\":\"%s\"}\n", outcome.stateDigest.c_str() );
+            // The decision-stream digest ("agent_decisions_v0") joins the terminal record so an
+            // externally driven episode can be compared with its replay decision by decision,
+            // not only at the terminal state; digest inequality names a diverging decision
+            // stream even when two battles happen to end alike (#43's investigation tool).
+            std::printf( ",\"decision_digest\":\"%s\",\"state_digest\":\"%s\"}\n", recording.decisionDigest.c_str(), outcome.stateDigest.c_str() );
             std::fflush( stdout );
         }
 
