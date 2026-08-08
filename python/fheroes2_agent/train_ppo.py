@@ -116,6 +116,7 @@ def train(
     trust_region: str = "ratio",
     divergence_threshold: float = 0.05,
     divergence_kind: str = "exact",
+    anchor_kl_coef: float = 0.0,
     value_coef: float = 0.5,
     entropy_coef: float = 0.01,
     entropy_floor: float = 0.0,
@@ -156,6 +157,16 @@ def train(
         raise ValueError(f"unknown divergence kind {divergence_kind!r}")
     trust_region_stamp = trust_region if trust_region == "ratio" \
         else f"divergence:{divergence_kind}:{divergence_threshold}"
+
+    # The anchored form (rl-methods): a KL leash to the frozen starting policy, the constraint
+    # on the destination that the per-step trust region cannot provide, motivated by the wide
+    # round's finding that anchor erosion survives distribution breadth. The reference is the
+    # loaded checkpoint itself, frozen before any update.
+    reference = None
+    if anchor_kl_coef > 0.0:
+        reference = BattlePolicy(**(model_kwargs or {}))
+        reference.load_state_dict(model.state_dict())
+        reference.eval()
 
     baseline = collect(env, model, episodes_per_iter)
     initial_win = win_rate(baseline["outcomes"], side)
@@ -286,6 +297,18 @@ def train(
                 value_term = value_coef * ((values - ret_t[rows]) ** 2).mean()
                 entropy_term = -live_entropy_coef * entropy
                 loss = policy_term + value_term + entropy_term
+                if reference is not None:
+                    with torch.no_grad():
+                        ref_logits, _ = reference(obs[rows], masks[rows])
+                    # Forward KL(pi_theta || pi_ref) over the legal set; both sides are masked
+                    # by the same forward, so illegal entries carry matching -1e8 logits and
+                    # contribute nothing.
+                    kl = (torch.softmax(logits, -1)
+                          * (torch.log_softmax(logits, -1) - torch.log_softmax(ref_logits, -1))).sum(-1).mean()
+                    anchor_term = anchor_kl_coef * kl
+                    loss = loss + anchor_term
+                    if start == 0:
+                        kl_to_anchor_first = float(kl)
 
                 # Per-term gradient norms, measured before the sum, on the epoch's first
                 # minibatch (owner-requested diagnostic, 2026-08-07). A shared trunk means the
@@ -293,8 +316,11 @@ def train(
                 # which term dominated; three extra backward passes once per epoch can.
                 if start == 0:
                     term_norms = {}
-                    for term_name, term in (("policy", policy_term), ("value", value_term),
-                                            ("entropy", entropy_term)):
+                    named_terms = [("policy", policy_term), ("value", value_term),
+                                   ("entropy", entropy_term)]
+                    if reference is not None:
+                        named_terms.append(("anchor", anchor_term))
+                    for term_name, term in named_terms:
                         optimizer.zero_grad(set_to_none=True)
                         term.backward(retain_graph=True)
                         # Decomposed per top-level module (owner-requested 2026-08-07), because
@@ -356,6 +382,8 @@ def train(
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
                         **reward_split,
                         "gate_fraction": gate_fraction_first, "trust_region": trust_region_stamp,
+                        **({"kl_to_anchor": kl_to_anchor_first, "anchor_kl_coef": anchor_kl_coef}
+                           if reference is not None else {}),
                         "terminations": terminations,
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
@@ -392,6 +420,7 @@ def train(
         "trust_region": trust_region,
         **({"divergence_kind": divergence_kind, "divergence_threshold": divergence_threshold}
            if trust_region != "ratio" else {}),
+        **({"anchor_kl_coef": anchor_kl_coef} if anchor_kl_coef > 0.0 else {}),
         # Reported rather than buried. A run that spent most of its budget below the floor was
         # training on batches with almost no outcome spread, which is a statement about the
         # matchup having been solved rather than about the method.
