@@ -47,7 +47,7 @@ Verdict: alive and load-bearing. The search agent is the project's strongest pla
 
 One round of search teaching built the champion; the second round stalled on both architectures, so the plateau is a property of the supervised program rather than any network. Labels chosen by search scoring the owner objective produced the only coherent multi-suite gain since generation one, six of seven suites together at $0.555 \pm 0.043$. Every soft-target family then nulled for one shared reason: with UCB visiting about two candidates per state, visit-count targets at temperature ([[../research/works/mcts-regularized-policy-optimization|the regularized-policy-optimization view]] of AlphaZero's own target) and value-derived soft labels alike carry almost no spread to distill, 0.231 nats against an effectively one-hot baseline. The demonstrated prerequisite is coverage-forced collection, one rollout per candidate before UCB concentrates, which would give the soft-target program the support it measurably lacks.
 
-Verdict: the highest-leverage open build. Coverage-forced collection unlocks three threads at once, soft targets, per-candidate value fitting, and graded calibration, and nothing else in the search-distillation family is worth rerunning before it exists.
+Verdict: built and confirmed as the unlock on 2026-08-08. The first support-complete corpus (80 percent of decisions with every candidate visited) produced the program's first coherent soft-target gain, value-derived labels over their hard twin on seven of eight suites, while visit-derived targets stayed null even with support, a forced sweep making visit counts nearly uniform; the value-softmax is the live distillation lever, and the next builds are a champion-prior corpus at scale plus the rollout-value and calibration consumers on support-complete data ([[../archive/experiments/2026-08-08-selfplay-round2-and-trust-region]]).
 
 ## Value estimation: an educational lab with one hard law
 
@@ -79,7 +79,7 @@ The instrument stack is the quiet result of the week: the thirteen-column batter
 
 | Rank | Approach | Why, and what grounds it |
 |---|---|---|
-| 1 | Coverage-forced collection | Demonstrated prerequisite for soft targets, per-candidate values, and graded calibration at once; every null in the distillation family traces to its absence |
+| 1 | Value-softmax distillation on support-complete corpora at scale | Coverage-forced collection confirmed as the unlock; the first corpus's value-derived soft labels beat their hard twin on seven of eight suites, and scale plus a champion prior are the open follow-through |
 | 2 | Self-play continuation at settled budgets | The one line whose convergence read says it was still climbing when stopped; league structure from the literature already in place |
 | 3 | Anchored reinforcement, the KL leash to gen1 | The wide round measured breadth as half the answer, specialization gone but anchor erosion surviving; the anchored form rl-methods already derives, the Lux winner's frozen-teacher bridge, is the untested lever |
 | 4 | Expert iteration resumed on coverage-forced targets | The operator that built the champion, rerun only once its labels carry spread |
