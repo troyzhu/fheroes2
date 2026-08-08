@@ -21,6 +21,7 @@ The documents, in the order they are worth reading. The code column names where 
 | [[the-policy-network]] | The exact tensor path from worker JSON to masked logits, the slot lifecycle, and why pooling against concatenation is the live architectural question | Reading `policy.py`, or judging any architecture arm | `python/fheroes2_agent/policy.py`, `encoding.py` |
 | [[off-support-and-offline-improvement]] | The off-support problem stated once, four remedy families with vendored primaries, and the order this project tries them | Choosing any offline improvement step | five works notes fetched 2026-08-06 |
 | [[value-estimation-lab]] | Every value estimator fitted here, what each measured, and the literature concept each measurement grounds | Studying value methods, or before fitting the next estimator | probes vendored under the archive's 2026-08-06 run reports |
+| [[program-review]] | The commissioned master review: every approach's verdict, the promising lines ranked, and the remaining experiments, each grounded in a measurement or a works note | Orienting on the whole program, or choosing the next experiment | written 2026-08-07 after the compaction |
 | [[rlhf-transfer]] | What the language-model reinforcement-learning literature contributes here, and what it does not | When a technique from that world looks applicable | group baselines and trust regions in `python/fheroes2_agent/objectives.py` |
 
 ## What is ours and what is precedent
@@ -30,6 +31,8 @@ Unlabeled prose in this tree describes this project. Evidence from any other sys
 ## How they fit together
 
 [[rl-and-the-battle-domain]] fixes the vocabulary and places the problem. [[rl-methods]] is the reference the others link into rather than restating, so a technique is defined once. [[training-design]] applies those techniques to this network and this teacher, and [[reward-design]] carries the one choice that decides what is being optimized. [[scenario-distribution]] concerns the data the whole thing trains on, which turns out to dominate both the gradient and any reported number. [[rlhf-transfer]] is a survey of one adjacent literature, kept separate because most of it does not apply and saying so is the useful part. [[value-estimation-lab]] is the owner-requested study record of the value thread, every estimator beside the concept its failure or success demonstrates. [[the-policy-network]] walks the architecture end to end, owner-requested so the pooling question reads from a full picture rather than a fragment. [[off-support-and-offline-improvement]] is the owner-requested survey of the off-support problem's remedies, each family grounded in a vendored primary.
+
+[[program-review]] assembles all of it into the master review the owner commissioned, verdict by verdict with the promising lines ranked.
 
 Symbols are fixed in [[../overview#Notation]], which also records which topics this tree carries itself and which it assumes from the owner's existing study notes.
 
