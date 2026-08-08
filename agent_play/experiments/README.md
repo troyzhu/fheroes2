@@ -49,6 +49,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `tabula_rasa_pilot.py` | Could search bootstrap a policy from random initialization, with no demonstrations at all? Rounds of search play, distil, evaluate on a fixed matchup set | about 20 min for three rounds |
 | `convergence_report.py` | Had a training run settled when it stopped? Per-metric trend verdicts over a heartbeat's trailing third: converged, trending, or oscillating | seconds per heartbeat |
 | `trust_region_rematch.py` | DPPO's divergence gates against the ratio clip inside the actor-critic trainer: exact total variation and the paper's binary lower bound, matched to the self-play control trio | about 50 min per arm over 3 seeds |
+| `rounds_probe.py` | Round-count histograms and stalemate incidence per checkpoint on the training and held-out matchup slices, from exact terminal records | about 2 min per checkpoint |
 
 ## Conventions
 

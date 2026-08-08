@@ -347,9 +347,16 @@ def train(
             reward_split["reward_on_wins"] = float(np.mean(won_rewards))
         if lost_rewards:
             reward_split["reward_on_losses"] = float(np.mean(lost_rewards))
+        # Termination counts per iteration (owner question, 2026-08-08): without them a
+        # heartbeat cannot say whether training ever triggered the stalemate window, and the
+        # finished long runs proved that unreconstructable after the fact.
+        terminations: dict[str, int] = {}
+        for o in batch["outcomes"]:
+            terminations[o["termination"]] = terminations.get(o["termination"], 0) + 1
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
                         **reward_split,
                         "gate_fraction": gate_fraction_first, "trust_region": trust_region_stamp,
+                        "terminations": terminations,
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,

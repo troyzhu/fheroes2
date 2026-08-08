@@ -1,0 +1,37 @@
+{
+ "gen1_anchor": {
+  "share2": 0.75,
+  "v4": 0.725,
+  "builtin_ai": 0.65
+ },
+ "selfplay_s0": {
+  "share2": 0.925,
+  "v4": 0.85,
+  "builtin_ai": 0.95
+ },
+ "selfplay_s1": {
+  "share2": 0.875,
+  "v4": 0.875,
+  "builtin_ai": 0.975
+ },
+ "selfplay_s2": {
+  "share2": 0.85,
+  "v4": 0.9,
+  "builtin_ai": 0.95
+ },
+ "control_s0": {
+  "share2": 0.8,
+  "v4": 0.65,
+  "builtin_ai": 0.85
+ },
+ "control_s1": {
+  "share2": 0.65,
+  "v4": 0.775,
+  "builtin_ai": 0.875
+ },
+ "control_s2": {
+  "share2": 0.7,
+  "v4": 0.575,
+  "builtin_ai": 0.9
+ }
+}

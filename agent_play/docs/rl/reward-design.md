@@ -137,4 +137,12 @@ A battle nobody finishes is a possibility the reward has to price, because a pol
 
 What a stall pays is grounded in the engine rather than chosen. The built-in AI's own stalemate breaker forces the attacking hero to retreat after fifty deathless turns, and a forced retreat loses the attacker the battle and the army. `_side_won` in `env.py` scores our earlier termination the same way: the defender who outlasted the attacker wins, +1 plus survival, and the attacker who failed to force an engagement loses with the survival term zeroed, -1.0 flat. The zeroing matters: the first run of the demo showed an evading attacker banking 0.0 through full survival, which still beat fighting and losing at -0.4, exactly the preference the exploit needs; -1.0 flat makes any fight with survivors strictly better than any stall, for the side whose job is to engage.
 
+The incidence is now measured for trained policies, not only for the teacher, per the owner's 2026-08-08 double-check. `rounds_probe.py` played the gen1 anchor and all six round-two checkpoints over the training and held-out matchup slices, 616 episodes with exact terminal round counts: every episode ended in victory or defeat, none in `stalemate` or `round_limit`, means sit at 8 to 10 engine rounds per policy, and the longest battle observed anywhere was 34 rounds, against a window that needs forty consecutive deathless ones. The teacher-corpus census stands beside it at 61 stalemates in 16,060 episodes. Training-side incidence is recorded going forward too: every heartbeat now carries a per-iteration termination count, since the finished long runs proved that unreconstructable after the fact (`rounds_probe.json`, 2026-08-08 run reports).
+
+<!-- verify
+exists  agent_play/docs/archive/experiments/files/2026-08-08-run-reports/rounds_probe.json
+exists  agent_play/experiments/rounds_probe.py
+grep    python/fheroes2_agent/train_ppo.py :: terminations
+-->
+
 Evaluation win rates are deliberately not changed by any of this: `measure` still counts only outright destruction as a win, so a stalling policy cannot inflate a battery column, and the reward's game-faithful semantics live only where behavior is optimized. If flying support arrives with Phase 1b, the demo reruns with Sprites, and the defender-side incentive, evasion as a legitimate +2.0 when the attacker cannot force a fight, becomes a real strategy the training distribution has to expect.
