@@ -9,8 +9,14 @@ trailing-third standard deviation (is it noise or drift). The verdict per metric
 when the trailing slope is small against the trailing noise, `trending` when it is not, and
 `oscillating` when level shift is small but variance is large.
 
-A converged win rate with a trending value loss is a policy at rest under a critic still moving,
-and vice versa; the whole point is that "converged" is per-metric, never one word for a run.
+The trained reward leads the ordering and the rate is demoted to a supporting row, per the
+owner's requirement: the rate cannot see quality of win or of loss, which the two-sided
+difficulty-scaled reward was designed to price, so the reward and its per-iteration win/loss
+decomposition (`reward_on_wins`, `reward_on_losses`, emitted since 2026-08-07) carry the
+settlement question. The per-term gradient norms are read too, flattened per module, because
+the loss is a weighted sum and a converged total can hide one term's gradient still growing
+inside it. A converged win rate with a trending value loss is a policy at rest under a critic
+still moving; "converged" is per-metric, never one word for a run.
 
 Usage:
     ./convergence_report.py HEARTBEAT.jsonl [HEARTBEAT.jsonl ...] [--report R.json]
@@ -24,38 +30,59 @@ import pathlib
 
 import numpy as np
 
-METRICS = ("win_rate", "mean_terminal_reward", "value_loss", "entropy", "normalized_entropy",
-           "raw_advantage_std", "loss_policy", "loss_total")
+METRICS = ("mean_terminal_reward", "reward_on_wins", "reward_on_losses", "value_loss",
+           "loss_policy", "loss_total", "entropy", "normalized_entropy", "raw_advantage_std",
+           "win_rate")
+
+
+def flatten_grad_norms(row: dict) -> dict[str, float]:
+    out = {}
+    for term, modules in row.get("grad_norms", {}).items():
+        if isinstance(modules, dict):
+            for module, value in modules.items():
+                out[f"grad.{term}.{module}"] = float(value)
+        else:
+            out[f"grad.{term}"] = float(modules)
+    return out
+
+
+def trend(series: np.ndarray) -> dict | None:
+    if len(series) < 9:
+        return None
+    third = len(series) // 3
+    mid = series[third:2 * third]
+    tail = series[2 * third:]
+    x = np.arange(len(tail), dtype=float)
+    slope = float(np.polyfit(x, tail, 1)[0]) * 100.0
+    noise = float(tail.std(ddof=1))
+    level_shift = float(tail.mean() - mid.mean())
+    # Slope over the tail in units of tail noise per hundred iterations.
+    slope_in_noise = abs(slope) / noise if noise > 1e-9 else 0.0
+    if slope_in_noise < 0.5 and abs(level_shift) < noise:
+        verdict = "converged"
+    elif slope_in_noise >= 0.5:
+        verdict = "trending"
+    else:
+        verdict = "oscillating"
+    return {"tail_mean": round(float(tail.mean()), 4), "mid_mean": round(float(mid.mean()), 4),
+            "level_shift": round(level_shift, 4), "slope_per_100_iters": round(slope, 4),
+            "tail_noise": round(noise, 4), "verdict": verdict}
 
 
 def analyze(rows: list[dict]) -> dict:
-    n = len(rows)
-    out = {"iterations": n}
-    if n < 9:
-        out["note"] = "too short for trend analysis"
-        return out
-    third = n // 3
-    for metric in METRICS:
-        series = np.array([r[metric] for r in rows if metric in r], dtype=float)
-        if len(series) < 9:
-            continue
-        mid = series[third:2 * third]
-        tail = series[2 * third:]
-        x = np.arange(len(tail), dtype=float)
-        slope = float(np.polyfit(x, tail, 1)[0]) * 100.0
-        noise = float(tail.std(ddof=1))
-        level_shift = float(tail.mean() - mid.mean())
-        # Slope over the tail in units of tail noise per hundred iterations.
-        slope_in_noise = abs(slope) / noise if noise > 1e-9 else 0.0
-        if slope_in_noise < 0.5 and abs(level_shift) < noise:
-            verdict = "converged"
-        elif slope_in_noise >= 0.5:
-            verdict = "trending"
+    out = {"iterations": len(rows)}
+    grad_keys = sorted({key for row in rows for key in flatten_grad_norms(row)})
+    for metric in METRICS + tuple(grad_keys) + ("total_pre_clip",):
+        if metric.startswith("grad."):
+            series = np.array([flatten_grad_norms(r)[metric] for r in rows
+                               if metric in flatten_grad_norms(r)], dtype=float)
         else:
-            verdict = "oscillating"
-        out[metric] = {"tail_mean": round(float(tail.mean()), 4), "mid_mean": round(float(mid.mean()), 4),
-                       "level_shift": round(level_shift, 4), "slope_per_100_iters": round(slope, 4),
-                       "tail_noise": round(noise, 4), "verdict": verdict}
+            series = np.array([r[metric] for r in rows if metric in r], dtype=float)
+        stats = trend(series)
+        if stats is not None:
+            out[metric] = stats
+    if len(out) == 1:
+        out["note"] = "too short for trend analysis"
     return out
 
 
@@ -73,7 +100,7 @@ def main() -> None:
         print(f"== {name} ({results[name].get('iterations')} iterations)")
         for metric, stats in results[name].items():
             if isinstance(stats, dict):
-                print(f"  {metric:22s} {stats['verdict']:12s} tail {stats['tail_mean']:+.3f} "
+                print(f"  {metric:28s} {stats['verdict']:12s} tail {stats['tail_mean']:+.3f} "
                       f"shift {stats['level_shift']:+.3f} slope/100 {stats['slope_per_100_iters']:+.4f} "
                       f"noise {stats['tail_noise']:.4f}")
     if args.report:

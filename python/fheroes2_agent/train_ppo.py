@@ -302,7 +302,21 @@ def train(
             torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION,
                         "win_rate": wr, "iteration": iteration}, out)
         mean_reward = float(np.mean(episode_rewards))
+        # The owner's monitoring requirement: the rate alone hides quality, so the trained
+        # reward is also decomposed over won and lost episodes per iteration. Under the
+        # two-sided margin these are the live counterparts of the battery's wq and lq columns,
+        # rising reward_on_losses means cheaper losses even while the rate stands still.
+        won_target = "victory" if side == "attacker" else "defeat"
+        won_flags = [o["termination"] == won_target for o in batch["outcomes"]]
+        won_rewards = [r for r, w in zip(episode_rewards, won_flags) if w]
+        lost_rewards = [r for r, w in zip(episode_rewards, won_flags) if not w]
+        reward_split = {}
+        if won_rewards:
+            reward_split["reward_on_wins"] = float(np.mean(won_rewards))
+        if lost_rewards:
+            reward_split["reward_on_losses"] = float(np.mean(lost_rewards))
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
+                        **reward_split,
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,
