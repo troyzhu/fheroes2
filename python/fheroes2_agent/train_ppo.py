@@ -114,6 +114,7 @@ def train(
     clip: float = 0.2,
     value_coef: float = 0.5,
     entropy_coef: float = 0.01,
+    entropy_floor: float = 0.0,
     seed: int = 0,
     out: str | None = None,
     heartbeat: str | None = None,
@@ -183,6 +184,8 @@ def train(
 
     grad_norms_first: dict = {}
     loss_decomp_first: dict = {}
+    live_entropy_coef = entropy_coef
+    last_normalized_entropy = 1.0
     for iteration in range(iterations):
         batch = collect(env, model, episodes_per_iter)
         # Only the round-limit cap is a truncation, a battle cut off with a future still worth
@@ -243,9 +246,16 @@ def train(
                 # Entropy over the legal set alone, or it measures the mask rather than the
                 # policy's indecision.
                 entropy = distribution.entropy().mean()
+                # The owner's normalized-entropy floor, 2026-08-07: entropy against the uniform
+                # maximum over each state's legal set, so five- and thirty-action states read on
+                # one scale, held above `entropy_floor` by a one-sided controller on the
+                # coefficient. Raw-entropy bonuses demand more nats exactly where more actions
+                # are legal, which is the wrong scale twice over.
+                legal_counts = masks[rows].sum(-1).clamp(min=2).float()
+                normalized_entropy = (distribution.entropy() / legal_counts.log()).mean()
                 policy_term = -surrogate.mean()
                 value_term = value_coef * ((values - ret_t[rows]) ** 2).mean()
-                entropy_term = -entropy_coef * entropy
+                entropy_term = -live_entropy_coef * entropy
                 loss = policy_term + value_term + entropy_term
 
                 # Per-term gradient norms, measured before the sum, on the epoch's first
@@ -280,6 +290,13 @@ def train(
                                          "loss_entropy": float(entropy_term), "loss_total": float(loss)}
                 optimizer.step()
 
+        last_normalized_entropy = float(normalized_entropy)
+        if entropy_floor > 0.0:
+            if last_normalized_entropy < entropy_floor:
+                live_entropy_coef = min(live_entropy_coef * 1.5, 0.3)
+            else:
+                live_entropy_coef = max(live_entropy_coef * 0.9, entropy_coef)
+
         wr = win_rate(batch["outcomes"], side)
         if out:
             torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION,
@@ -289,6 +306,8 @@ def train(
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,
+                        "normalized_entropy": last_normalized_entropy,
+                        "entropy_coef_live": live_entropy_coef,
                         **loss_decomp_first,
                         "grad_norms": grad_norms_first})
         # Live monitoring heartbeat (owner-requested 2026-08-07): one JSON line per iteration,

@@ -52,6 +52,7 @@ def main() -> None:
     parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"))
     parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
     parser.add_argument("--value-warmup", type=int, default=0)
+    parser.add_argument("--entropy-floor", type=float, default=0.0)
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
@@ -68,7 +69,7 @@ def main() -> None:
         out = workdir / f"s{seed}.pt"
         train_ppo.train(args.worker, checkpoint=args.checkpoint, iterations=args.iterations,
                         seed=seed, env=pool, quiet=True, out=str(out),
-                        value_warmup_iters=args.value_warmup)
+                        value_warmup_iters=args.value_warmup, entropy_floor=args.entropy_floor)
         model = load_policy(torch.load(out, map_location="cpu", weights_only=True)["state_dict"])
         model.eval()
         run = {"seed": seed,

@@ -31,7 +31,7 @@ from fheroes2_agent.encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, encode_
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 
 
-def load_soft(roots, lam: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def load_soft(roots, lam: float, target_kind: str = "values") -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Soft rows: (observations, masks, hard argmax actions, dense pi_bar targets)."""
     if isinstance(roots, str):
         roots = [roots]
@@ -45,11 +45,19 @@ def load_soft(roots, lam: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, np
             masks.append(encode_mask(record["legal_actions"]))
             actions.append(int(record["teacher_action"]))
             dense = np.zeros(ACTION_SPACE_SIZE, dtype=np.float32)
-            logits = {int(a): np.log(max(record["prior"][a], 1e-9)) + record["search_values"][a] / lam
-                      for a in record["search_values"]}
-            peak = max(logits.values())
-            for a, l in logits.items():
-                dense[a] = np.exp(l - peak)
+            if target_kind == "visits":
+                # AlphaZero's own anti-collapse target: pi proportional to root visit counts at
+                # temperature tau, softness encoding search's deliberation rather than value
+                # arithmetic; tau = 1 is the canonical opening-move setting.
+                for a, n in record["search_visits"].items():
+                    if n > 0:
+                        dense[int(a)] = float(n) ** (1.0 / lam)
+            else:
+                logits = {int(a): np.log(max(record["prior"][a], 1e-9)) + record["search_values"][a] / lam
+                          for a in record["search_values"]}
+                peak = max(logits.values())
+                for a, l in logits.items():
+                    dense[a] = np.exp(l - peak)
             dense /= dense.sum()
             targets.append(dense)
     return (np.stack(observations), np.stack(masks), np.asarray(actions), np.stack(targets))
@@ -119,6 +127,8 @@ def main() -> None:
     parser.add_argument("--roots", nargs="+", required=True)
     parser.add_argument("--soft-root", nargs="+", required=True)
     parser.add_argument("--lam", type=float, default=0.5)
+    parser.add_argument("--target", default="values", choices=("values", "visits"),
+                        help="visits builds AlphaZero-style pi proportional to N^(1/lam)")
     parser.add_argument("--soft-weight", type=float, default=2.0)
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--seed", type=int, default=0)
@@ -129,7 +139,7 @@ def main() -> None:
 
     started = time.time()
     hard = load_dir(list(args.roots))
-    soft_rows = load_soft(args.soft_root, args.lam)
+    soft_rows = load_soft(args.soft_root, args.lam, args.target)
     entropy = float(np.mean([-(t[t > 0] * np.log(t[t > 0])).sum() for t in soft_rows[3]]))
     print(f"{len(hard.actions)} hard decisions + {len(soft_rows[2])} soft decisions; "
           f"target entropy {entropy:.3f} nats at lambda {args.lam}", flush=True)
