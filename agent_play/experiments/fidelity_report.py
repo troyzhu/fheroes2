@@ -9,6 +9,14 @@ legal actions), the mean probability the policy assigns to the teacher's action,
 entropy of the policy's legal-action distribution, which separates confidently-wrong from
 undecided.
 
+The reliability table's definitions, since the owner asked: each held-out decision contributes
+its top action's probability as "confidence"; decisions bucket into ten confidence bins;
+"predicted" is the mean confidence inside a bin and "actual" is the fraction of those decisions
+whose top action equals the teacher's recorded action. Expected calibration error is the
+bin-weighted mean absolute gap. This is calibration against the imitation target, whether the
+policy is right that its move is the teacher's move, not calibration against winning, which
+would need many episodes per state and is a separate measurement.
+
 Usage:
     ./fidelity_report.py CHECKPOINT --roots DIR [DIR ...] [--planes] [--seed 0]
                          [--report fidelity.json]
