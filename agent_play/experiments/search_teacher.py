@@ -55,7 +55,8 @@ def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: path
                     episodes: int, simulations: int, c_puct: float, side: str = "attacker",
                     min_win_fraction: float = 0.0, seed_offset: int = 0,
                     record_candidates: bool = False, planes: bool = False,
-                    reward_margin: str = "hit_points", reward_weighting: str = "none") -> tuple[int, int]:
+                    reward_margin: str = "hit_points", reward_weighting: str = "none",
+                    coverage_forced: bool = False) -> tuple[int, int]:
     """Returns (decisions, wins) actually written; (0, wins) when the win filter drops the
     matchup, since labels from fights search cannot win teach the least-bad line of a lost
     position, which the credit measurement showed is exactly the poison. A nonzero seed offset
@@ -79,9 +80,11 @@ def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: path
             while True:
                 if record_candidates:
                     action, means, visits, prior = search_action_detail(
-                        sim, model, prefix, observation, mask, simulations, c_puct, live=env)
+                        sim, model, prefix, observation, mask, simulations, c_puct, live=env,
+                        coverage_forced=coverage_forced)
                 else:
-                    action = search_action(sim, model, prefix, observation, mask, simulations, c_puct, live=env)
+                    action = search_action(sim, model, prefix, observation, mask, simulations, c_puct, live=env,
+                                           coverage_forced=coverage_forced)
                 raw = env._pending
                 record = {"record": "decision", "observation": raw["observation"],
                           "legal_actions": raw["legal_actions"], "teacher_resolved": True,
@@ -138,6 +141,9 @@ def main() -> None:
     parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"),
                         help="what search rollouts score by; two_sided is the owner objective")
     parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
+    parser.add_argument("--coverage-forced", action="store_true",
+                        help="visit every root candidate once, widest-prior-first, before UCB takes "
+                             "over: the demonstrated prerequisite for support-complete soft targets")
     parser.add_argument("--record-candidates", action="store_true",
                         help="write per-candidate search values, visits, and the prior onto every "
                              "decision record, the soft-distillation dataset")
@@ -175,7 +181,8 @@ def main() -> None:
                                                   seed_offset=(args.shard * 100 + index) % 16 if args.vary_battlefields else 0,
                                                   record_candidates=args.record_candidates, planes=args.planes,
                                                   reward_margin=args.reward_margin,
-                                                  reward_weighting=args.reward_weighting)
+                                                  reward_weighting=args.reward_weighting,
+                                                  coverage_forced=args.coverage_forced)
             except Exception as error:  # a rejected scenario is data, not a crash
                 manifest.append(entry | {"kept": False, "error": str(error)[:120]})
                 continue
@@ -189,7 +196,8 @@ def main() -> None:
                       f"{total_decisions} labels kept", flush=True)
         out_root.mkdir(parents=True, exist_ok=True)
         (out_root / f"shard{args.shard}_manifest.json").write_text(json.dumps(
-            {"matchups": manifest, "side": args.side, "sample_seed": args.sample_seed}, indent=2))
+            {"matchups": manifest, "side": args.side, "sample_seed": args.sample_seed,
+             "simulations": args.simulations, "coverage_forced": args.coverage_forced}, indent=2))
     else:
         entries = json.loads(POOL.read_text())["matchups"][:40]
         rates = json.loads(SHARE2_EVALS.read_text())["evals"]["train"]
@@ -200,7 +208,8 @@ def main() -> None:
             episodes = args.hard_episodes if index in hard else args.easy_episodes
             decisions, wins = collect_matchup(args.worker, model, entry, out_root / f"matchup_{index:03d}",
                                               episodes, args.simulations, args.c_puct,
-                                              record_candidates=args.record_candidates)
+                                              record_candidates=args.record_candidates,
+                                              coverage_forced=args.coverage_forced)
             total_decisions += decisions
             total_wins += wins
             total_eps += episodes
