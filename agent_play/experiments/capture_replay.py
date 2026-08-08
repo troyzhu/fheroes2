@@ -55,8 +55,8 @@ def frame_of(raw: dict, action: int | None, caption: str | None) -> dict:
 
 def load_model(checkpoint: str):
     state = torch.load(checkpoint, map_location="cpu", weights_only=True)
-    model = BattlePolicy()
-    model.load_state_dict(state["state_dict"])
+    from fheroes2_agent.policy import load_policy
+    model = load_policy(state["state_dict"])
     model.eval()
     version = state.get("encoding_version", "obs_encoding_v2")
     return model, (encode_v2 if version == "obs_encoding_v2" else enc.encode_observation), version
@@ -72,7 +72,8 @@ def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None
         defender_model, defender_encode, defender_version = load_model(defender_checkpoint)
         env_kwargs["side"] = "both"
 
-    env = BattleEnv(worker, **env_kwargs)
+    wants_planes = bool(getattr(attacker_model, "planes", False)) or bool(getattr(defender_model, "planes", False))
+    env = BattleEnv(worker, planes=wants_planes, **env_kwargs)
     frames = []
     try:
         env.reset()
@@ -83,9 +84,12 @@ def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None
             attacker_turn = bool(observation.get("active_is_attacker"))
             model, encode = (attacker_model, attacker_encode) if attacker_turn or defender_checkpoint is None \
                 else (defender_model, defender_encode)
+            plane_arg = ()
+            if getattr(model, "planes", False):
+                plane_arg = (torch.from_numpy(env.last_planes).unsqueeze(0),)
             with torch.no_grad():
                 logits, _ = model(torch.from_numpy(encode(observation)).unsqueeze(0),
-                                  torch.from_numpy(mask).unsqueeze(0))
+                                  torch.from_numpy(mask).unsqueeze(0), *plane_arg)
                 action = int(torch.distributions.Categorical(logits=logits).sample())
             frames.append(frame_of(observation, action, describe_action(action)))
             step = env.step(action)
