@@ -90,10 +90,21 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
         model = BattlePolicy(pooling="mean", trunk_hidden=300)
     elif arm == "softplus":
         model = BattlePolicy(activation="softplus")
+    elif arm in ("ent001", "ent005", "smooth005", "early8"):
+        # The owner's sharpness program, 2026-08-07: a deterministic teacher drives imitation
+        # toward one-hot, which starves later exploration, so these arms keep entropy alive.
+        # ent*: the confidence penalty, loss = CE - beta * H, beta encouraging entropy.
+        # smooth005: label smoothing spread over the legal set only.
+        # early8: plain loss, training stopped at epoch 8 before the softmax saturates.
+        model = BattlePolicy()
     else:
         model = BattlePolicy()
     parameters = sum(p.numel() for p in model.parameters())
     uses_planes = arm == "planes"
+    entropy_beta = {"ent001": 0.01, "ent005": 0.05}.get(arm, 0.0)
+    smooth_eps = 0.05 if arm == "smooth005" else 0.0
+    if arm == "early8":
+        epochs = min(epochs, 8)
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-2)
     schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-5)
     obs = torch.from_numpy(observations)
@@ -109,7 +120,18 @@ def train_arm(data, arm: str, epochs: int, seed: int, out: str) -> dict:
             batch = perm[start:start + 256]
             plane_arg = (pl[batch].float(),) if uses_planes else ()
             logits, _ = model(obs[batch], msk[batch], *plane_arg)
-            loss = torch.nn.functional.cross_entropy(logits, act[batch])
+            if smooth_eps > 0.0:
+                log_probs = torch.log_softmax(logits, dim=-1)
+                legal = msk[batch].float()
+                uniform_legal = legal / legal.sum(-1, keepdim=True)
+                target = torch.zeros_like(log_probs).scatter_(1, act[batch].unsqueeze(1), 1.0)
+                target = (1.0 - smooth_eps) * target + smooth_eps * uniform_legal
+                loss = -(target * log_probs).sum(-1).mean()
+            else:
+                loss = torch.nn.functional.cross_entropy(logits, act[batch])
+            if entropy_beta > 0.0:
+                probs = torch.softmax(logits, dim=-1).clamp_min(1e-12)
+                loss = loss - entropy_beta * (-(probs * probs.log()).sum(-1).mean())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -141,7 +163,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--report", default=None)
     parser.add_argument("--arms", nargs="+", default=["entity", "planes", "wide"],
-                        choices=["entity", "planes", "wide", "mean", "mean_wide", "softplus"])
+                        choices=["entity", "planes", "wide", "mean", "mean_wide", "softplus", "ent001", "ent005", "smooth005", "early8"])
     args = parser.parse_args()
 
     started = time.time()
