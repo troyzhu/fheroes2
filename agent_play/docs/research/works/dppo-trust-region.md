@@ -17,7 +17,7 @@ Sea AI Lab and NUS, the group behind Dr. GRPO. Read on 2026-07-30 after the owne
 
 ## The claim
 
-PPO's clipping condition constrains a noisy single-sample estimate of policy divergence rather than the divergence itself. The identity making that precise is their equation (11):
+PPO's clipping condition constrains a noisy single-sample estimate of policy divergence rather than the divergence itself. The identity making that precise is their equation (10), corrected 2026-08-07 on a re-read against the arXiv HTML after the owner pressed on the mechanism:
 
 $$D_{\mathrm{TV}}\big(\mu(\cdot \mid s_t) \,\|\, \pi(\cdot \mid s_t)\big) = \tfrac{1}{2}\,\mathbb{E}_{a_t \sim \mu}\big[\lvert \rho_t - 1 \rvert\big]$$
 
@@ -42,13 +42,13 @@ Divergence proximal policy optimization keeps PPO's asymmetric masking structure
 
 $$M_t^{\mathrm{DPPO}} = \begin{cases} 0 & \text{if } (\hat A_t > 0 \text{ and } \rho_t > 1 \text{ and } D > \delta) \text{ or } (\hat A_t < 0 \text{ and } \rho_t < 1 \text{ and } D > \delta) \\ 1 & \text{otherwise} \end{cases}$$
 
-with the objective $L^{\mathrm{DPPO}}_\mu(\pi) = \mathbb{E}\big[\sum_t M_t^{\mathrm{DPPO}} \rho_t \hat A_t\big]$. Substituting $D = \lvert \rho_t - 1 \rvert$ recovers PPO exactly, which makes the two directly comparable. The mask blocks an update only when it is already moving away from the trust region, so updates pulling the ratio back toward one are never blocked.
+with the objective $L^{\mathrm{DPPO}}_\mu(\pi) = \mathbb{E}\big[\sum_t M_t^{\mathrm{DPPO}} \rho_t \hat A_t\big]$, their equation (11). The ratio clip is gone from the objective; the paper's mask multiplies blocked terms to zero, while the in-repo arm detaches them instead, an update-identical choice since either way a blocked term contributes no gradient. Substituting the one-sample estimate $D = \lvert \rho_t - 1 \rvert$ recovers PPO's update rule exactly, blocked precisely where the clip's gradient dies, which makes the two directly comparable. The mask blocks an update only when it is already moving away from the trust region, so updates pulling the ratio back toward one are never blocked.
 
 Their theory adapts the policy improvement bound to the finite-horizon undiscounted setting, since the usual $\tfrac{1}{1-\gamma}$ factor diverges at $\gamma = 1$. Theorem 3.2 bounds $\mathcal{J}(\pi) - \mathcal{J}(\mu)$ below by the surrogate minus a term in $D_{\mathrm{TV}}^{\max}$, with a tighter average-divergence form. Pinsker's inequality, $D_{\mathrm{TV}}^2 \le \tfrac12 D_{\mathrm{KL}}$, licenses using KL instead.
 
 ## The cost, which is their problem and not ours
 
-Computing $D$ exactly means summing over the full action distribution at every state. Over a vocabulary of $10^5$ tokens that is memory-prohibitive, so most of their methodology section builds approximations: a binary collapse to sampled-against-rest, and a top-$K$ reduction. Both are lower bounds on the true divergence.
+Computing $D$ exactly means summing over the full action distribution at every state. Over a vocabulary of $10^5$ tokens that is memory-prohibitive, so most of their methodology section builds approximations, and their experiments run on these rather than the exact form: a binary collapse to sampled-against-rest, $D^{\mathrm{Bin}}_{\mathrm{TV}}(t) = \lvert \mu(a_t \mid s_t) - \pi(a_t \mid s_t) \rvert$, their equation (13), and a top-$K$ reduction. Both are lower bounds on the true divergence. The binary form is worth stating because it makes the method's practical face plain: the gate tests the sampled action's probability difference, the mass actually moved, where PPO's gate tests its probability ratio, and the worked example above is exactly the case where those two disagree.
 
 This project's action space is 793 slots with typically 5 to 30 legal after masking. The exact divergence over the legal set is a handful of floating-point operations, so the approximations are unnecessary here and the exact form is available. That inverts the usual direction of transfer, where a language-model technique arrives with costs a small problem cannot pay.
 
