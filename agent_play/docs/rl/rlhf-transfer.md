@@ -1,7 +1,7 @@
 ---
 title: What transfers from RLHF to a battle agent
 type: reference
-updated: 2026-07-30
+updated: 2026-08-07
 related_concepts: ["[[rl-methods]]", "[[training-design]]", "[[../decisions/0005-training-and-reward]]", "[[../overview#Notation]]"]
 tags: [agent-env, rl, rlhf, reference]
 ---

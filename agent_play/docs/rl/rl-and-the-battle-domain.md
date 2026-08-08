@@ -1,7 +1,7 @@
 ---
 title: Reinforcement learning and the fheroes2 battle domain
 type: primer
-updated: 2026-07-30
+updated: 2026-08-07
 related_concepts: ["[[../overview]]", "[[../overview#Notation]]", "[[../implementation/legal-actions-and-masking]]", "[[../implementation/observation-design]]"]
 tags: [agent-env, primer, rl, entry-point]
 ---

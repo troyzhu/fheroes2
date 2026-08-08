@@ -66,14 +66,18 @@ def main() -> None:
             env = SelfPlayEnv(args.worker, matchups, OpponentPool([None], seed=seed),
                               reward_margin="two_sided", rotation_seed=seed)
             try:
-                train_ppo.train(args.worker, checkpoint=ANCHOR, iterations=args.iterations,
-                                seed=seed, env=env, quiet=True, out=str(out),
-                                trust_region="divergence", divergence_kind=kind,
-                                divergence_threshold=threshold,
-                                value_warmup_iters=5, entropy_floor=0.15)
+                result = train_ppo.train(args.worker, checkpoint=ANCHOR, iterations=args.iterations,
+                                         seed=seed, env=env, quiet=True, out=str(out),
+                                         trust_region="divergence", divergence_kind=kind,
+                                         divergence_threshold=threshold,
+                                         value_warmup_iters=5, entropy_floor=0.15)
             finally:
                 env.close()
-            print(f"{name} s{seed} done in {round(time.time() - started)}s -> {out}", flush=True)
+            # The run's own report, stamp included, so the arm is provable from the artifact
+            # rather than from memory of which script produced it.
+            (out_dir / f"tr_{name}_s{seed}.json").write_text(json.dumps(result, indent=1))
+            print(f"{name} s{seed} done in {round(time.time() - started)}s -> {out} "
+                  f"[{result['trust_region']}/{result['divergence_kind']}@{result['divergence_threshold']}]", flush=True)
 
     print("TRUST REGION REMATCH COMPLETE", flush=True)
 

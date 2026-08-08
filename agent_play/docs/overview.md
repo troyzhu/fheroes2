@@ -5,7 +5,7 @@ status: active
 goal: "A deterministic, headless, structured battle environment for fheroes2 that a policy can be trained on"
 branch: agent-env
 date_started: 2026-07-26
-updated: 2026-07-30
+updated: 2026-08-07
 related_concepts: ["[[rl/rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]", "[[implementation/observation-design]]"]
 tags: [agent-env, rl-environment, fheroes2, entry-point]
 ---
@@ -339,7 +339,7 @@ The tree has two documents at the top, then four directories. `README.md` routes
 | `agent_play/docs/README.md` | routing index, the only file GitHub renders by default | to find anything |
 | `agent_play/docs/overview.md` | this file. The problem, both vocabularies, scope, state, build, and this map | first |
 | `agent_play/docs/roadmap.md` | where the project is aimed, what each phase involves, what research is owed | to see what is deliberately not built yet |
-| `agent_play/docs/rl/` | the learning side. Domain, methods, training design, scenario distribution, RLHF transfer | before designing or training a policy |
+| `agent_play/docs/rl/` | the learning side. Domain, methods, training design, reward, the policy network, scenario distribution, RLHF transfer, and the measured labs | before designing or training a policy |
 | `agent_play/docs/implementation/` | the environment side. What exists, plus a primer per built mechanism | to review or extend the code |
 | `agent_play/docs/decisions/` | accepted decision records, each with its options and trade-offs | before implementing the area one touches |
 | `agent_play/docs/research/` | consolidated findings, prior art, and a note per source | to consult or extend the evidence base |
@@ -352,8 +352,12 @@ Outside the documentation tree:
 | Path | What it is |
 |---|---|
 | `agent_play/fheroes2_agent_system_spec_v0.3.md` | the full design document. Where a decision record disagrees with it, the record wins |
+| `python/fheroes2_agent/` | the trainer library: encoding, environments, self-play, the policy network, the training stages |
+| `python/tests/` | the library's unit tests, run by the agent gate |
+| `agent_play/experiments/` | the measurement scripts, indexed one row each in their own README |
+| `src/agent_replay/` | the replay and interactive-play entry point |
 | `agent_play/lint_docs.sh` | the documentation gate, style contract plus wikilink resolution |
-| `agent_play/verify_m*.sh` | the milestone verification gates |
+| `agent_play/verify_m*.sh`, `agent_play/verify_agent.sh`, `agent_play/verify_memory.sh` | the milestone, trainer-library, and agent-memory gates |
 | `agent_play/spike/README.md` | Phase 0 spike usage and limits |
 
 ## Decisions not to relitigate

@@ -1,7 +1,7 @@
 ---
 title: Reward design, the space and what is known about it
 type: design
-updated: 2026-08-03
+updated: 2026-08-07
 related_concepts: ["[[../decisions/0005-training-and-reward]]", "[[rl-methods]]", "[[scenario-distribution]]", "[[rlhf-transfer]]"]
 tags: [agent-env, reward, design]
 ---

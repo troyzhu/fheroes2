@@ -54,7 +54,7 @@ This project's action space is 793 slots with typically 5 to 30 legal after mask
 
 ## Verdict for this project
 
-Worth testing, with the magnitude honestly uncertain. See [[../../rl/rlhf-transfer#The ratio is a one-sample estimate of a divergence you can afford to compute]].
+Worth testing, with the magnitude honestly uncertain, and since measured here twice. In the group-relative trainer the divergence gate never separated cleanly from the clip (slower start, small late edge, threshold-sensitive), but the paper's diagnostic claim held: on the Thunk matchup the clip fired on 7 to 14 percent of samples while the exact total variation exceeded its threshold on 22 to 40 percent, so the two gates are not flagging the same updates, per [[../../rl/training-design]]. The actor-critic rematch is task 48. See [[../../rl/rlhf-transfer#The ratio is a one-sample estimate of a divergence you can afford to compute]].
 
 The pathology is driven by the dynamic range of the behavior probabilities, which in a language model spans $10^{-5}$ to $0.99$. A masked categorical over 5 to 30 legal actions, initialized from behavior cloning, has a far narrower range, so the effect should be milder here than the paper measures. What makes it worth trying anyway is that the remedy costs almost nothing at this action-space size, and that the failure it prevents is the one this project is most exposed to, namely a destabilizing early update from a cloned policy that is already confident.
 

@@ -1,7 +1,7 @@
 ---
 title: Training design
 type: design
-updated: 2026-07-30
+updated: 2026-08-07
 related_concepts: ["[[../overview#Notation]]", "[[../decisions/0005-training-and-reward]]", "[[rl-and-the-battle-domain]]", "[[../implementation/legal-actions-and-masking]]"]
 tags: [agent-env, training, design]
 ---
@@ -118,13 +118,13 @@ AdamW, because it is the default that works and decoupled weight decay is the be
 
 That last row is the one most easily got wrong. Two decisions from the same battle share almost all of their state, so a random decision-level split reports a validation accuracy that is close to training accuracy and means nothing. The split has to be at the level of whole scenarios or whole seeds.
 
-Two rows have since been measured. Best-agreement checkpointing is itself a mild early stop, the saved model is whichever epoch's holdout agreement peaked rather than the last one, and the 2026-08-07 sharpness sweep tested the hard form beside it: a budget cut to eight epochs with the cosine re-armed to that horizon, so the anneal completes rather than being truncated mid-schedule. Verdict: the cut is the one genuine softener among the four arms tried (normalized entropy 0.29 against the full run's 0.165), plays at par on the battery, and posted the only positive held-out delta after downstream reinforcement, $+0.017$, though within one standard error of zero. It stays an experiment arm rather than the shipped default, since the full-budget clone anchors everything else and the gain is not yet distinguishable from noise.
+The epochs row has since been measured further. Best-agreement checkpointing is itself a mild early stop, the saved model is whichever epoch's holdout agreement peaked rather than the last one, and the 2026-08-07 sharpness sweep tested the hard form beside it: a budget cut to eight epochs with the cosine re-armed to that horizon, so the anneal completes rather than being truncated mid-schedule. Verdict: the cut is the one genuine softener among the four arms tried (normalized entropy 0.29 against the full run's 0.165), plays at par on the battery, and posted the only positive held-out delta after downstream reinforcement, $+0.017$, though within one standard error of zero. It stays an experiment arm rather than the shipped default, since the full-budget clone anchors everything else and the gain is not yet distinguishable from noise.
 
 ### Data, and the size problem
 
 The fixture gate's corpus was 116 decisions; recorded corpora since span tens to hundreds of thousands of decisions, which is a regression anchor rather than a training set. Cloning needs orders of magnitude more, and getting it costs only compute, since the environment runs at roughly 4,600 episodes per second and the teacher plays itself.
 
-The real constraint is diversity rather than volume. Ten thousand episodes of the same five fixtures would give a large dataset covering a tiny region of state space. The scenario generator, currently undefined and flagged in [[../decisions/0005-training-and-reward]] as the largest open modeling choice, is what determines whether the data are worth collecting.
+The real constraint is diversity rather than volume. Ten thousand episodes of the same five fixtures would give a large dataset covering a tiny region of state space. The scenario generator, undefined at design time and flagged in [[../decisions/0005-training-and-reward]] as the largest open modeling choice, is what determines whether the data are worth collecting.
 
 ### What success looks like
 
@@ -267,7 +267,7 @@ The floor's role reads differently in that light. It does not prevent knock-offs
 
 The same hazard sits inside GRPO's studentization, which divides each group by its own spread, and [[rlhf-transfer#Critic-free baselines, which this project should seriously consider]] already records that as the reason Dr. GRPO drops the term. That the identical failure appears in the batch normalization every variant applies afterwards was not noticed until it destroyed a run.
 
-### Measured, 2026-08-03
+### Stage 1 measured, 2026-08-03
 
 Stage 1 now exists and has been run. Numbers below are from `python/fheroes2_agent/train_bc.py` on 2,000 recorded episodes.
 

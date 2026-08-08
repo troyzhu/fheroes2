@@ -1,7 +1,7 @@
 ---
 title: fheroes2 agent environment, documentation index
 type: moc
-updated: 2026-08-03
+updated: 2026-08-07
 tags: [agent-env, index, entry-point]
 ---
 
@@ -36,14 +36,14 @@ agent_play/docs/
 ├── README.md          this file, a routing index
 ├── overview.md        the problem, both vocabularies, scope, state, build, and the full map
 ├── roadmap.md         where the project is aimed, and what each phase needs answered first
-├── rl/                the learning side, five documents from the domain to training design
+├── rl/                the learning side, from the domain to training design and its labs
 ├── implementation/    the environment side, one primer per built mechanism
 ├── decisions/         accepted decision records, each with its options and trade-offs
 ├── research/          the literature and what it establishes
 └── archive/           dated and pinned records, provenance rather than a reading path
 ```
 
-The split that matters is `rl/` against `implementation/`. The environment is built and verified, and nothing under `rl/` is implemented yet. Keeping them apart means a reader always knows which side of that line a document sits on.
+The split that matters is `rl/` against `implementation/`. The environment is built and verified, and the learning side is now largely built too, all four training stages plus the spatial observation arm, with `implementation/inventory.md` carrying the per-component list and each `rl/` page stating which of its own content exists. Keeping the directories apart means a reader always knows whether a page argues design or documents a mechanism.
 
 Everything under `archive/` is provenance, kept so a claim can be traced to its run, and every file there carries a date or a commit in its name because every file there goes stale.
 
@@ -56,6 +56,12 @@ Everything under `archive/` is provenance, kept so a claim can be traced to its 
 | `src/fheroes2/battle/battle_decision_controller.h` | The optional decision hook |
 | `src/fheroes2/agent/` | The environment library, compiled into the normal executable, with no entry point |
 | `src/agent_worker/` | The worker entry point, outside both build systems' source globs |
+| `src/agent_replay/` | The replay and interactive-play entry point, rendering recorded episodes through the real engine |
+| `python/fheroes2_agent/` | The trainer library: encoding, environments, self-play, the policy network, and the four training stages |
+| `python/tests/` | The library's unit tests, run by `agent_play/verify_agent.sh` |
 | `python/fheroes2_agent/data/` | The generated monster capability audit that defines the `simple_v1` allowlist |
+| `agent_play/experiments/` | Measurement scripts, one README row each; results vendor into `docs/archive/experiments/files/` |
 | `agent_play/spike/`, `agent_play/tests/`, `agent_play/verify_m*.sh` | The Phase 0 spike, unit tests, and the milestone verification gates |
+| `agent_play/verify_agent.sh`, `agent_play/verify_memory.sh` | The trainer-library gate and the agent-memory fact check |
 | `agent_play/lint_docs.sh` | The documentation gate, the style contract plus wikilink resolution |
+| `agent_play/fheroes2_agent_system_spec_v0.3.md` | The full design document, deliberately outside `docs/` as a frozen pre-build artifact |

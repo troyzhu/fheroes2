@@ -150,6 +150,12 @@ def train(
         env = BattleEnv(worker, fixture=fixture, side=side, attacker=attacker, defender=defender,
                         attacker_hero=attacker_hero, defender_hero=defender_hero, allow_wide=allow_wide)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    if trust_region not in ("ratio", "divergence"):
+        raise ValueError(f"unknown trust region {trust_region!r}")
+    if trust_region == "divergence" and divergence_kind not in ("exact", "binary"):
+        raise ValueError(f"unknown divergence kind {divergence_kind!r}")
+    trust_region_stamp = trust_region if trust_region == "ratio" \
+        else f"divergence:{divergence_kind}:{divergence_threshold}"
 
     baseline = collect(env, model, episodes_per_iter)
     initial_win = win_rate(baseline["outcomes"], side)
@@ -322,8 +328,11 @@ def train(
 
         wr = win_rate(batch["outcomes"], side)
         if out:
+            # The trust-region stamp rides in the checkpoint and in every heartbeat row (owner
+            # requirement, 2026-08-07): a divergence-gated run must never be mistakable for a
+            # clip run from its artifacts alone. Absence of the key means the ratio-clip era.
             torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION,
-                        "win_rate": wr, "iteration": iteration}, out)
+                        "win_rate": wr, "iteration": iteration, "trust_region": trust_region_stamp}, out)
         mean_reward = float(np.mean(episode_rewards))
         # The owner's monitoring requirement: the rate alone hides quality, so the trained
         # reward is also decomposed over won and lost episodes per iteration. Under the
@@ -340,7 +349,7 @@ def train(
             reward_split["reward_on_losses"] = float(np.mean(lost_rewards))
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
                         **reward_split,
-                        "gate_fraction": gate_fraction_first,
+                        "gate_fraction": gate_fraction_first, "trust_region": trust_region_stamp,
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,

@@ -13,7 +13,7 @@ Every file here is dated, machine-pinned, or commit-pinned, which means every fi
 
 | Path | What it records | Staleness warning |
 |---|---|---|
-| `log.md` | The dated project history, oldest first | Narrative only; current state lives in [[../implementation/README|implementation]] |
+| `log.md` | The dated project history through Phase 0 and the milestones, oldest first; the training era continues in the per-day experiment logs below | Narrative only; current state lives in [[../implementation/README|implementation]] |
 | `benchmarks/2026-07-26-source-audit-apple-m3.md` | The Phase 0 engine audit and assumption table | Measured on an Apple M3, not the target machine; its own header says the numbers must be re-run before being quoted |
 | `benchmarks/2026-07-27-apple-m2.md` | Target-hardware throughput, Mode A only | Pinned to commit `b16e6f698`, three milestones ago |
 | `research-runs/2026-07-27-rl-approaches.md` | Claim-by-claim verification transcript with vote tallies | Superseded as reading by [[../research/findings|findings]]; kept for the per-claim votes and arXiv identifiers |
@@ -25,6 +25,8 @@ Every file here is dated, machine-pinned, or commit-pinned, which means every fi
 | `experiments/2026-08-05-planner-reward-battlefields.md` | The planner-query resolution that unblocks DAgger, the difficulty-weighted reward measurement, and the battlefield-spread finding with the dead-seeds discovery | Conclusions live in [[../rl/training-design|training-design]], [[../rl/reward-design|reward-design]], and [[../rl/scenario-distribution|scenario-distribution]] |
 | `experiments/2026-08-06-night-block-search-generations.md` | The overnight search-teaching generations over the fresh distribution, battery-gated per generation | Conclusions promote to [[../rl/training-design|training-design]] once the block closes |
 | `experiments/2026-08-05-dagger-and-battlefield-transfer.md` | DAgger's first round with its matched teacher-data control, and pool transfer re-measured over battlefields | Conclusions live in [[../rl/training-design|training-design]] |
+| `experiments/2026-08-06-offline-arms-and-planes.md` | The offline-improvement arms and the planes ablation, capacity-controlled | Conclusions live in [[../rl/off-support-and-offline-improvement|off-support-and-offline-improvement]] and [[../rl/the-policy-network|the-policy-network]] |
+| `experiments/2026-08-07-overnight-champion-mixture.md` | The champion-mixture day: owner-objective labels, sharpness arms, self-play opening, the full-apparatus correction, convergence | Conclusions promote to [[../rl/training-design|training-design]] and the conventions of `../../experiments/README.md` |
 | `experiments/files/` | Raw run artifacts a log depends on: replay recordings, dated run-report and recording-manifest snapshots, and the anchor checkpoints pools and recordings are calibrated against | Meaningful only through the logs that cite them; datasets re-record from their manifests |
 | `sources/` | Fetched third-party PDFs, HTML snapshots, and vendored READMEs; `manifest.tsv` is the authoritative list and `fetch_references.sh` reproduces it | Third-party material, unmodified |
 

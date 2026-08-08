@@ -202,7 +202,8 @@ if os.environ.get("FACTS") == "1":
     # 3. Index completeness. A moc README indexes its own directory; the mapping below adds the
     # subdirectories whose files a parent README indexes. Mentioning the file's stem anywhere in
     # the README counts, so tables of backticked paths satisfy it as well as wikilinks.
-    indexed_dirs = {DOCS / "research" / "works": DOCS / "research" / "README.md"}
+    indexed_dirs = {DOCS / "research" / "works": DOCS / "research" / "README.md",
+                    DOCS / "archive" / "experiments": DOCS / "archive" / "README.md"}
     for readme in sorted(DOCS.rglob("README.md")):
         head = readme.read_text(encoding="utf-8")[:400]
         if "type: moc" in head:
@@ -224,6 +225,14 @@ if os.environ.get("FACTS") == "1":
     for script in sorted(exp.glob("*.py")):
         if script.name not in exp_readme:
             facts.append(f"experiments/README.md: does not index script {script.name}")
+
+    # 3c. Library modules must be indexed in the library README, same rationale as 3b; the
+    # gap was found when selfplay.py shipped without a row.
+    lib = DOCS.parent.parent / "python" / "fheroes2_agent"
+    lib_readme = (lib / "README.md").read_text(encoding="utf-8") if (lib / "README.md").exists() else ""
+    for module in sorted(lib.glob("*.py")):
+        if module.name != "__init__.py" and module.name not in lib_readme:
+            facts.append(f"python/fheroes2_agent/README.md: does not index module {module.name}")
 
     # 4. Declared claims, the verify_memory.sh grammar.
     DECL = re.compile(r"<!--\s*verify\s*\n(.*?)-->", re.S)

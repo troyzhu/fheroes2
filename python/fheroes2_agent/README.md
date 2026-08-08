@@ -16,7 +16,8 @@ This file exists for one reason beyond orientation: two families of training met
 | `objectives.py` | Advantage estimators and trust regions for both families |
 | `train_bc.py` | Family A, imitation: cloning and every distillation round |
 | `train_critic.py` | Family A, the value head fitted on recorded returns |
-| `train_ppo.py` | Family B with a critic: masked PPO with GAE |
+| `train_ppo.py` | Family B with a critic: masked PPO with GAE, ratio clip or DPPO divergence gates |
+| `selfplay.py` | `OpponentPool` (checkpoints plus the built-in AI as anchor) and `SelfPlayEnv`, the learner's reset/step view of a both-sides battle |
 | `train_rloo.py`, `train_group.py` | Family B without a critic: leave-one-out, GRPO and Dr. GRPO group baselines |
 | `render.py`, `watch.py` | Human-readable boards and action descriptions |
 

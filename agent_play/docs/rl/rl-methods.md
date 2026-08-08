@@ -1,7 +1,7 @@
 ---
 title: Reinforcement learning methods, a reference
 type: reference
-updated: 2026-07-30
+updated: 2026-08-07
 related_concepts: ["[[../overview#Notation]]", "[[training-design]]", "[[rl-and-the-battle-domain]]", "[[../decisions/0005-training-and-reward]]"]
 tags: [agent-env, rl, reference, methods-map]
 ---
@@ -313,18 +313,18 @@ A pointer network selects an element of a variable-length input set by attending
 
 | Technique | Verdict | Where it is used or why not |
 |---|---|---|
-| Behavior cloning | Chosen, stage 1 | Free competent teacher; see [[training-design]] |
-| DAgger | Chosen, stage 2, precondition open | Fixes compounding error; needs a queryable teacher |
-| Masked PPO with GAE | Chosen, stage 3 | Strongest evidence for masked discrete actions |
-| Entropy bonus over the legal set | Chosen, small and decayed | Cloned start needs less exploration pressure |
+| Behavior cloning | Chosen, stage 1, measured | Free competent teacher; see [[training-design]] |
+| DAgger | Chosen, stage 2, measured | One round run 2026-08-05, $+0.094 \pm 0.036$; the queryable-teacher precondition was resolved by the planner probe |
+| Masked PPO with GAE | Chosen, stage 3, measured | Strongest evidence for masked discrete actions; erosion-versus-anchor findings in the day logs |
+| Entropy bonus over the legal set | Chosen, small and decayed | Cloned start needs less exploration pressure; normalized-entropy floor measured null at short budgets |
 | Potential-based shaping | Permitted if shaping is needed | Only form that provably preserves the objective |
-| Sparse or margin-weighted terminal reward | Candidates, undecided | See [[../decisions/0005-training-and-reward]] |
+| Sparse or margin-weighted terminal reward | Decided and implemented | ADR [[../decisions/0005-training-and-reward]]; the two-sided strength-priced margin of [[reward-design]] threaded everywhere 2026-08-07 |
 | DQN and QR-DQN | Not first | Composes poorly with an imitation start |
 | IMPALA, Sample Factory | Rejected | Built for scales we do not have |
-| MCTS, AlphaZero, MuZero | Open, blocked | Needs a copyable state the arena singleton prevents |
+| MCTS, AlphaZero, MuZero | Root search measured, full stack blocked on data | Root-PUCT with rollout leaves reaches 0.963 held-out; value leaves and visit targets both fail at current coverage, see [[value-estimation-lab]] |
 | Offline reinforcement learning | Measured | First arms run and recorded in [[off-support-and-offline-improvement]]; support constraints bind |
 | Inverse reinforcement learning | Rejected | Reward is ours to choose, not to infer |
-| Self-play, fictitious play, leagues | Later | Premature before a policy worth playing exists |
+| Self-play, fictitious play, leagues | In progress | League-lite pool training runs as of 2026-08-07; first long-budget round judged by the full battery |
 | Population-based training | Later | Tune after a single run is reliable |
 | Elo, TrueSkill | Adopted for evaluation | Report the pairwise matrix alongside, cycles break transitivity |
 | Frame stacking, recurrence, belief states | Not needed yet | Battle is near fully observed; see [[../roadmap]] |
