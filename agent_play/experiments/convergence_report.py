@@ -32,7 +32,9 @@ import numpy as np
 
 METRICS = ("mean_terminal_reward", "reward_on_wins", "reward_on_losses", "value_loss",
            "loss_policy", "loss_total", "entropy", "normalized_entropy", "raw_advantage_std",
-           "win_rate")
+           "win_rate",
+           # Supervised heartbeats (train_bc, soft_distill) carry these instead.
+           "train_loss", "train_loss_hard", "train_loss_soft", "holdout_agreement")
 
 
 def flatten_grad_norms(row: dict) -> dict[str, float]:

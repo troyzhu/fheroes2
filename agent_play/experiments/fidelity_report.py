@@ -49,11 +49,15 @@ def main() -> None:
     args = parser.parse_args()
 
     started = time.time()
-    observations, masks, actions, planes, episodes = load_planes_corpus(args.roots)
+    # Entity corpora legitimately carry zero planes; the guard matters only when the evaluated
+    # checkpoint actually consumes them, asserted below once the model is loaded.
+    observations, masks, actions, planes, episodes = load_planes_corpus(args.roots, require_planes=False)
     _, hold = split(episodes, 0.2, args.seed)
     model = load_policy(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     model.eval()
     uses_planes = bool(getattr(model, "planes", False))
+    if uses_planes and float(abs(planes[:, 6]).sum()) == 0.0:
+        raise SystemExit("planes checkpoint evaluated on a corpus recorded without --planes")
 
     hits = {1: 0, 3: 0, 5: 0}
     teacher_probability, entropies, normalized_entropies, total = [], [], [], 0

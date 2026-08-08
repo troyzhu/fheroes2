@@ -81,9 +81,17 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
     hobs, hmasks, hactions = (torch.from_numpy(holdout_s.observations), torch.from_numpy(holdout_s.masks),
                               torch.from_numpy(holdout_s.actions))
     best = {"agreement": -1.0}
+    # Per-epoch training diagnostics (owner requirement, 2026-08-08): loss decomposed into its
+    # hard and soft terms before the sum, the live learning rate, and holdout agreement, kept in
+    # the report and appended per epoch to a heartbeat the dashboard and the convergence report
+    # can read. The first coverage-corpus verdict was drawn without these, which was the gap.
+    history = []
+    beat_path = out + ".heartbeat.jsonl"
     for epoch in range(epochs):
         model.train()
+        epoch_lr = schedule.get_last_lr()[0]
         perm = torch.randperm(len(actions))
+        running_hard = running_soft = 0.0
         for start in range(0, len(actions), 256):
             batch = perm[start:start + 256]
             logits, _ = model(obs[batch], masks[batch])
@@ -93,7 +101,9 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
             if hard_mask.any():
                 rows = batch[hard_mask]
                 ce = torch.nn.functional.nll_loss(log_probs[hard_mask], actions[rows], reduction="none")
-                loss = loss + (ce * weights[rows]).sum()
+                hard_term = (ce * weights[rows]).sum()
+                loss = loss + hard_term
+                running_hard += float(hard_term)
             soft_mask = ~hard_mask
             if soft_mask.any():
                 rows = batch[soft_mask]
@@ -101,7 +111,9 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
                     ce = -(dense[rows - n_hard] * log_probs[soft_mask]).sum(-1)
                 else:
                     ce = torch.nn.functional.nll_loss(log_probs[soft_mask], actions[rows], reduction="none")
-                loss = loss + (ce * weights[rows]).sum()
+                soft_term = (ce * weights[rows]).sum()
+                loss = loss + soft_term
+                running_soft += float(soft_term)
             loss = loss / len(batch)
             optimizer.zero_grad()
             loss.backward()
@@ -116,10 +128,17 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
                 agree += int((logits.argmax(-1) == hactions[sl]).sum())
                 hits += len(hactions[sl])
         agreement = agree / hits
+        row = {"epoch": epoch, "train_loss_hard": round(running_hard / len(actions), 5),
+               "train_loss_soft": round(running_soft / len(actions), 5),
+               "train_loss": round((running_hard + running_soft) / len(actions), 5),
+               "holdout_agreement": round(agreement, 5), "lr": epoch_lr}
+        history.append(row)
+        with open(beat_path, "a") as beat:
+            beat.write(json.dumps(row) + "\n")
         if agreement > best["agreement"]:
             best = {"epoch": epoch, "agreement": agreement}
             torch.save({"state_dict": model.state_dict(), "encoding_version": ENCODING_VERSION}, out)
-    return best
+    return best | {"history": history}
 
 
 def main() -> None:

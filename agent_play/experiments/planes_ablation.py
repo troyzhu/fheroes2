@@ -32,7 +32,7 @@ from fheroes2_agent.encoding import ENCODING_VERSION, encode_mask, encode_observ
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 
 
-def load_planes_corpus(roots):
+def load_planes_corpus(roots, require_planes: bool = True):
     """(observations, masks, actions, planes fp16, episode ids), planes verified nonzero.
 
     A list of roots concatenates, and repeating a root repeats its rows, the same double-weight
@@ -58,7 +58,7 @@ def load_planes_corpus(roots):
         if rows:
             episode_id += 1
     planes_arr = np.stack(planes)
-    if float(np.abs(planes_arr[:, 6]).sum()) == 0.0:
+    if require_planes and float(np.abs(planes_arr[:, 6]).sum()) == 0.0:
         raise SystemExit("obstacle channel is all zeros: this corpus was not recorded with --planes")
     return (np.stack(observations), np.stack(masks), np.asarray(actions), planes_arr, np.asarray(episodes))
 
