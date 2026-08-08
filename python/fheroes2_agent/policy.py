@@ -36,7 +36,13 @@ def ability_feature_table() -> torch.Tensor:
     """A fixed per-creature ability matrix, rows aligned with the one-hot, from the capability
     audit's layer-1 records. Multiplying the observation's existing one-hot by this table gives
     each slot its creature's ability profile as input features, an architectural inductive bias
-    that changes no observation bytes and therefore needs no encoding version."""
+    that changes no observation bytes and therefore needs no encoding version.
+
+    The audit's ability/weakness records additionally carry the layer-2 semantic fields
+    (``trigger``, ``target``, ``effect``, ``magnitude_kind``, closed vocabularies defined in
+    ``src/fheroes2/agent/agent_capabilities.h``). This table deliberately does not consume
+    them: widening the feature rows is an encoding change that ADR discipline says needs its
+    own measured ablation first, so the fields sit in the JSON unconsumed until that runs."""
     path = pathlib.Path(__file__).parent / "data" / "monster_capabilities_v1.json"
     records = {r["monster_id"]: r for r in json.loads(path.read_text())}
     rows = []

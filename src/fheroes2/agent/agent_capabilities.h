@@ -24,6 +24,14 @@
 #include <string>
 #include <vector>
 
+namespace fheroes2
+{
+    // Defined in monster_info.h with a fixed underlying type, so the forward declarations are
+    // exact and this header stays free of engine includes.
+    enum class MonsterAbilityType : int;
+    enum class MonsterWeaknessType : int;
+}
+
 namespace fheroes2::agent
 {
     // Machine-generated capability record for one monster id (agent spec, section 4.2). The
@@ -69,6 +77,37 @@ namespace fheroes2::agent
 
     // Audits every monster id the engine defines (1 .. Monster::MONSTER_COUNT-1).
     std::vector<MonsterCapability> auditAllMonsters();
+
+    // Layer-2 semantic adapter over the raw ability/weakness records (the guide's sections 3-5;
+    // observation-design.md "Ability records"). Layer 1 exports (type_id, percentage, value)
+    // verbatim, but `value` is type-dependent: a spell id for SPELL_CASTER, a morale delta for
+    // MORAL_DECREMENT, unused elsewhere. This adapter maps every TYPE to one tuple from a small
+    // closed vocabulary so a consumer can read the payload without engine knowledge. The engine
+    // stays the authority: each mapping in the .cpp cites the engine call site that justifies it.
+    //
+    //   trigger:        always | on_attack | on_defense | on_turn
+    //   target:         self | enemy_unit | all_adjacent | all_enemies | spell_class
+    //   effect:         damage_mult | resist | immunity | spell_cast | stat_mod | movement
+    //                   | attack_shape | retaliation_mod | other
+    //   magnitudeKind:  how to read the record's payload.
+    //                   percent  -> `percentage` is the magnitude or trigger chance, `value` unused
+    //                   spell_id -> `value` is a Spell id; `percentage`, when nonzero, is the
+    //                               percent chance or percent magnitude attached to it
+    //                   flat     -> `value` is a flat amount
+    //                   none     -> the payload carries no information
+    //
+    // "other" is the escape hatch for types with no grounded battle semantics; today only the
+    // NONE sentinels (absent from engine data) and any future upstream-added type map to it.
+    struct AbilitySemantics
+    {
+        const char * trigger;
+        const char * target;
+        const char * effect;
+        const char * magnitudeKind;
+    };
+
+    AbilitySemantics classifyAbility( const MonsterAbilityType type );
+    AbilitySemantics classifyWeakness( const MonsterWeaknessType type );
 
     // Writes the audit as a JSON array (spec: python/fheroes2_agent/data/monster_capabilities_v1.json).
     // Returns false when the file cannot be opened.

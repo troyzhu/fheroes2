@@ -1,4 +1,7 @@
-# Built test binaries and their objects (test sources are test_*.cpp and re-included below).
+# Built test binaries and their objects (test sources are test_*.cpp / test_*.py and
+# re-included below; the bare test_* pattern otherwise swallowed test_protocol.py, which
+# verify_agent.sh depends on, so fresh checkouts failed that gate).
 *.o
 test_*
 !test_*.cpp
+!test_*.py
