@@ -1,0 +1,68 @@
+{
+ "pool": [
+  "agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_share2.pt",
+  "agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_v4.pt",
+  "None"
+ ],
+ "iterations": 400,
+ "seed": 0,
+ "history_last": {
+  "iteration": 399,
+  "win_rate": 1.0,
+  "mean_terminal_reward": 1.6733976602554321,
+  "steps": 681,
+  "value_loss": 0.08320388942956924,
+  "raw_advantage_std": 0.267261266708374,
+  "reward_std": 0.29367297887802124,
+  "entropy": 0.5613958835601807,
+  "normalized_entropy": 0.17352725565433502,
+  "entropy_coef_live": 0.011957422500000002,
+  "loss_policy": -0.04662831872701645,
+  "loss_value": 0.03751138970255852,
+  "loss_entropy": -0.007332203909754753,
+  "loss_total": -0.016449132934212685,
+  "grad_norms": {
+   "policy": {
+    "slot_encoder": 0.2180710726409514,
+    "global_encoder": 0.014148772888813553,
+    "trunk": 0.6138315389354476,
+    "policy_head": 0.8534277546848935,
+    "total": 1.0737240200141716
+   },
+   "value": {
+    "slot_encoder": 0.1485740137723242,
+    "global_encoder": 0.004358314377233078,
+    "trunk": 0.5775402419163194,
+    "value_head": 2.0408661271181665,
+    "total": 2.126212715681029
+   },
+   "entropy": {
+    "slot_encoder": 0.02093528777453988,
+    "global_encoder": 0.0014802276430570193,
+    "trunk": 0.015529317527803314,
+    "policy_head": 0.018163993791587403,
+    "total": 0.031805152435073064
+   },
+   "total_pre_clip": 2.3868517875671387
+  }
+ },
+ "duels": {
+  "policy_share2.pt": {
+   "before": 0.875,
+   "after": 0.75
+  },
+  "policy_v4.pt": {
+   "before": 0.625,
+   "after": 0.875
+  },
+  "builtin_ai": {
+   "before": 1.0,
+   "after": 1.0
+  }
+ },
+ "held_out_vs_ai": {
+  "before": 0.6125,
+  "after": 0.525
+ },
+ "seconds": 423.3
+}
