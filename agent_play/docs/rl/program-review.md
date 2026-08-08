@@ -79,7 +79,7 @@ The instrument stack is the quiet result of the week: the thirteen-column batter
 
 | Rank | Approach | Why, and what grounds it |
 |---|---|---|
-| 1 | Anchored reinforcement, the KL leash to gen1 | Built and smoke-tested; the wide round showed erosion surviving breadth, and the leash is the destination constraint the rematch proved the step constraint was not providing |
+| 1 | Anchored reinforcement at longer budgets | Measured 2026-08-08: the KL leash recovers about two thirds of held-out erosion and all of the ladder's at zero on-distribution cost, every run converged; beta 0.5 is the standing recipe and longer budgets on the stable base are the open move |
 | 2 | Self-play continuation at settled budgets | The one line whose convergence read says it was still climbing when stopped; league structure from the literature already in place |
 | 3 | Value-softmax distillation, scale-balanced | The twice-replicated small held-out tendency on support-complete data; a soft-mass-balanced scale test and the rollout-value and calibration consumers are what remain |
 | 4 | Expert iteration resumed on coverage-forced targets | The operator that built the champion, rerun only once its labels carry spread |

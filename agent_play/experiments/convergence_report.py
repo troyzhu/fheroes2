@@ -34,7 +34,9 @@ METRICS = ("mean_terminal_reward", "reward_on_wins", "reward_on_losses", "value_
            "loss_policy", "loss_total", "entropy", "normalized_entropy", "raw_advantage_std",
            "win_rate",
            # Supervised heartbeats (train_bc, soft_distill) carry these instead.
-           "train_loss", "train_loss_hard", "train_loss_soft", "holdout_agreement")
+           "train_loss", "train_loss_hard", "train_loss_soft", "holdout_agreement",
+           # Optional reinforcement columns, present when their mechanisms are armed.
+           "kl_to_anchor", "gate_fraction")
 
 
 def flatten_grad_norms(row: dict) -> dict[str, float]:
