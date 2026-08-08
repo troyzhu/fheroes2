@@ -26,4 +26,8 @@ Verified claims anchored here (all 3-0):
 
 Where we use it: masking requirement + eval design in [[../../archive/research-runs/2026-07-27-rl-approaches]], hardware feasibility for the M2 mini, [[../../decisions/0002-action-space]].
 
-Related: [[microrts-py]], [[invalid-action-masking]], [[vcmi-gym]]
+## The tabula-rasa reading, verified 2026-08-08
+
+Strictly from scratch, confirmed in paper and code for the owner's survey: no imitation anywhere, and the working configuration is instructive in both directions. The experiment-level reward is densely shaped, six weighted event terms with the weights $[10, 1, 1, 0.2, 1, 4]$ over win-loss, resource, worker, building, attack and combat-unit events, while the environment's own default is nearly sparse, so the shaping was a deliberate experimental choice, not an accident of the framework. The opponent mix leans on the strongest scripted bot, eighteen of twenty-four environments against the 2020 champion, and the paper's own appendix reports pure self-play performing worse, the ecology point: train against the incumbent when one exists. The line continues past the paper: RAISocketAI, the first deep-learning winner of the IEEE competition in six editions, kept the recipe and added phase-scheduled reward annealing from shaped toward sparse win-loss with separate value heads, plus a map-size transfer curriculum, at 1.5 billion steps over about seventy GPU-days.
+
+Related: [[microrts-py]], [[invalid-action-masking]], [[vcmi-gym]], [[lux-ai-competitions]]

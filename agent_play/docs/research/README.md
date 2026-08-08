@@ -15,6 +15,9 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | Source | Type | Year | Quality | What it establishes | Feeds |
 |---|---|---|---|---|---|
 | [[works/vcmi-gym]] | project | 2023–26 | primary | Heroes III battle RL shipped as an in-game AI; padded-entity plus per-hex encoding; flat masked action space; CleanRL-style stack | ADR 0002, ADR 0003 |
+| [[works/botbowl-competitions]] | project | 2019–23 | primary | Four Blood Bowl bot competitions where strictly-from-scratch RL never beat a scripted bot; the one ML win required imitation bootstrap | tabula-rasa verdict, [[../rl/program-review]] |
+| [[works/pokemon-selfplay-from-scratch]] | paper | 2019, 2025 | primary | Pure self-play PPO beats a tree-search bot for ninety-one dollars in 1v1; the same recipe loses to a simple heuristic in 6v6 until imitation-initialized | tabula-rasa verdict, self-play budgets |
+| [[works/lux-ai-competitions]] | project | 2021-23 | primary | From-scratch self-play wins season one with shaped-then-sparse annealing and a frozen-teacher KL bridge; a rule-based bot wins season two over every learned entry | tabula-rasa verdict, annealing pattern |
 | [[works/gym-microrts]] | paper | 2021 | primary | Masking ablations (0% unmasked to 82–91% fully masked); factorized heads; state of the art in ~60 h on one 16 GB machine | ADR 0002, hardware plan |
 | [[works/invalid-action-masking]] | paper | 2022 | primary | Masking is a valid policy gradient; the $-10^8$ implementation; penalties collapse as the illegal space grows | ADR 0002 |
 | [[works/dppo-trust-region]] | paper | 2026 | primary | PPO's clip constrains a one-sample estimate of TV divergence, not the divergence; over-penalizes low-probability actions and under-penalizes high ones. The exact divergence is affordable at 793 slots | [[../rl/rlhf-transfer]] |
