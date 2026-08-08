@@ -112,11 +112,13 @@ AdamW, because it is the default that works and decoupled weight decay is the be
 | Schedule | Cosine decay to $10^{-5}$ | Cheap, few epochs, avoids a late-training plateau |
 | Weight decay | $10^{-2}$ | The data are small, so regularization matters more than usual |
 | Batch size | 256 decisions | Large enough for stable gradients, small enough to be many steps per epoch |
-| Epochs | Fixed 30 epochs, best-agreement checkpointing, no early stop as shipped | The dataset size is not yet known, so a fixed epoch count would be arbitrary |
+| Epochs | Fixed 30 epochs, best-agreement checkpointing, no explicit early stop as shipped | The dataset size is not yet known, so a fixed epoch count would be arbitrary |
 | Gradient clipping | Global norm 0.5 | Carried over from the PPO stage for consistency |
 | Validation split | By scenario, not by decision | Splitting by decision leaks, because decisions within one episode are highly correlated |
 
 That last row is the one most easily got wrong. Two decisions from the same battle share almost all of their state, so a random decision-level split reports a validation accuracy that is close to training accuracy and means nothing. The split has to be at the level of whole scenarios or whole seeds.
+
+Two rows have since been measured. Best-agreement checkpointing is itself a mild early stop, the saved model is whichever epoch's holdout agreement peaked rather than the last one, and the 2026-08-07 sharpness sweep tested the hard form beside it: a budget cut to eight epochs with the cosine re-armed to that horizon, so the anneal completes rather than being truncated mid-schedule. Verdict: the cut is the one genuine softener among the four arms tried (normalized entropy 0.29 against the full run's 0.165), plays at par on the battery, and posted the only positive held-out delta after downstream reinforcement, $+0.017$, though within one standard error of zero. It stays an experiment arm rather than the shipped default, since the full-budget clone anchors everything else and the gain is not yet distinguishable from noise.
 
 ### Data, and the size problem
 
@@ -357,6 +359,8 @@ What this does not show is that either is better. Both runs converged, and separ
 Joint-training diagnostics, owner-requested 2026-08-07: every PPO iteration now records the per-term gradient norms measured before the sum, three extra backward passes on each epoch's first minibatch giving the policy, value and entropy terms' individual norms beside the post-sum pre-clip total, because a shared trunk means the heads compete for the same weights and the clipped total cannot say which term dominated. The first smoke reads policy 6.7, value 7.4, entropy 0.1 at a fresh anchor, the two heads near parity and the entropy term two orders down, which is what the coefficient choices intend.
 
 The table below is the design-era starting point. The shipped trainer (`python/fheroes2_agent/train_ppo.py`) departs from it where measurement pushed: learning rate $10^{-4}$ with plain Adam and no schedule, a single-process environment collecting 32 whole episodes per iteration rather than fixed-length rollouts across four workers, minibatch size 256, and a constant 0.01 entropy coefficient. Clip 0.2, $\gamma$ 0.99, $\lambda$ 0.95, value coefficient 0.5, and gradient-norm 0.5 match as designed.
+
+The full step-size story, since the owner asked what schedules are actually deployed: cloning anneals, reinforcement does not. Supervised training (`train_bc.py` and every distillation arm) runs AdamW under cosine decay from $3 \times 10^{-4}$ to $10^{-5}$ over its full epoch budget, with the live rate now a column in each epoch's history. PPO runs plain Adam at a constant $10^{-4}$, no anneal, on the reasoning that runs are short and a decaying rate would confound the budget comparisons the experiments lean on; the optional value warmup is a second constant-rate optimizer, Adam at $10^{-3}$ over the value head alone while the trunk stays frozen, which is a schedule in stages rather than in magnitude. The one adaptive schedule deployed anywhere is not a learning rate at all: the normalized-entropy floor moves the entropy coefficient (up 1.5-fold when the floor is breached, decaying 0.9-fold back toward baseline, capped at 0.3), and the live coefficient is a heartbeat column.
 
 These are the community defaults, adjusted for a small fast environment. Every one is a starting point.
 

@@ -91,6 +91,9 @@ def train(
 
     for epoch in range(epochs):
         model.train()
+        # The rate this epoch actually trains at, recorded before the anneal advances it, so
+        # the history is self-contained about the schedule rather than implying it.
+        epoch_lr = schedule.get_last_lr()[0]
         order = torch.randperm(len(train_actions))
         running = 0.0
         for start in range(0, len(order), batch_size):
@@ -106,7 +109,7 @@ def train(
 
         train_loss = running / len(train_actions)
         metrics = evaluate(model, hold_obs, hold_masks, hold_actions)
-        history.append({"epoch": epoch, "train_loss": train_loss, **metrics})
+        history.append({"epoch": epoch, "train_loss": train_loss, "lr": epoch_lr, **metrics})
         print(f"epoch {epoch:3d}  train_loss {train_loss:.4f}  holdout_loss {metrics['loss']:.4f}  agreement {metrics['agreement']:.4f}")
 
         if metrics["agreement"] > best["agreement"]:
