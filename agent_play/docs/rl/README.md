@@ -22,6 +22,7 @@ The documents, in the order they are worth reading. The code column names where 
 | [[off-support-and-offline-improvement]] | The off-support problem stated once, four remedy families with vendored primaries, and the order this project tries them | Choosing any offline improvement step | five works notes fetched 2026-08-06 |
 | [[value-estimation-lab]] | Every value estimator fitted here, what each measured, and the literature concept each measurement grounds | Studying value methods, or before fitting the next estimator | probes vendored under the archive's 2026-08-06 run reports |
 | [[program-review]] | The commissioned master review: every approach's verdict, the promising lines ranked, and the remaining experiments, each grounded in a measurement or a works note | Orienting on the whole program, or choosing the next experiment | written 2026-08-07 after the compaction |
+| [[transfer-and-llm-policies]] | Two owner questions examined critically: transfer learning's one live direction and its measured dead ends, and why a small LLM policy fails on capability and arithmetic alike | Weighing transfer or language-model ideas | written 2026-08-08, primary sources throughout |
 | [[rlhf-transfer]] | What the language-model reinforcement-learning literature contributes here, and what it does not | When a technique from that world looks applicable | group baselines and trust regions in `python/fheroes2_agent/objectives.py` |
 
 ## What is ours and what is precedent
