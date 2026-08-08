@@ -109,8 +109,27 @@ The entity list carries every stack's position, so the policy knows where units 
 
 The engine half of `planes_v1` exists: the worker's `--planes` flag appends a 99-cell `obstacles` array to every serialized observation, engine-read from `Cell::GetObject`, off by default with transcripts proven byte-identical when off. The tensor builder `encode_planes` (in `encoding.py`) rasterizes the committed channel list from the units plus that layer, seven channels of shape 9 by 11 in the engine's own row-offset indexing: per-side occupancy, count fraction, log-scaled hit points, speed, shooter, obstacle. The design insight that shrank the wire format is that every channel except obstacles is derivable from the entity list, so the engine emits only what entities cannot carry. The convolutional fusion arm consuming the tensor exists as of 2026-08-06 (`BattlePolicy(planes=True)`, inferred from the state dict by `load_policy`) and was measured by the capacity-controlled three-seed ablation; corpora recorded without `--planes` have an all-zero obstacle channel that consumers must treat as unknown rather than open ground.
 
-## Ability records, three layers, one built
+## Ability records, three layers, two built
 
 The four ability flags above compress the bestiary's rule diversity to almost nothing, and the owner-supplied guide ([[../research/works/generalized-battle-agent-guide]], its sections 3 through 5) lays out the repair as three layers. Layer 1, raw engine records: every ability and weakness exported as categorical type id plus typed payload (`percentage`, `value`), never as text, with the engine staying the authority on what the rule does. Layer 2, a semantic adapter mapping each raw record to a typed schema of trigger, target, and effect primitives, needed because `value` is type-dependent, a spell id for one type and a magnitude for another. Layer 3, action-conditioned effect summaries, engine-computed answers to "what would this ability do for this candidate in this state", which is what static encoding cannot carry.
 
-Layer 1 is built as of 2026-08-05: the capability audit (`agent_capabilities.cpp`, regenerated into `python/fheroes2_agent/data/monster_capabilities_v1.json`) now carries `abilities` and `weaknesses` arrays per monster, additively, every earlier field unchanged. Nothing consumes them yet; the consumer is a Deep-Sets-style pooled embedding per the guide, an encoding change that ADR discipline says needs its own ablation before any version bump. Layers 2 and 3 are designed in the guide's digest and deliberately deferred, layer 3 because it needs a per-candidate engine query seam of the same shape the teacher probe used, which the probe's digest methodology would also verify.
+Layer 1 is built as of 2026-08-05: the capability audit (`agent_capabilities.cpp`, regenerated into `python/fheroes2_agent/data/monster_capabilities_v1.json`) carries `abilities` and `weaknesses` arrays per monster, additively, every earlier field unchanged.
+
+Layer 2 is built as of 2026-08-07: `classifyAbility` and `classifyWeakness` in `src/fheroes2/agent/agent_capabilities.cpp` map every ability and weakness type the engine defines, 32 and 7 as of that date, to one tuple from the closed vocabulary below, and every exported record gained `trigger`, `target`, `effect` and `magnitude_kind` fields, again additively with each earlier field byte-identical under regeneration. Each mapping carries a comment citing the engine call site that implements the rule, `Battle::Unit::GetSpellMagic` for the caster chance and spell id, `Battle::Unit::CalculateSpellDamage` for the reduction percentages, and so on, because the engine stays the authority and the adapter must never drift into folklore. The `other` effect is the escape hatch for the unmapped; no shipped record needs it, and `test_agent_capabilities` asserts vocabulary membership for every record plus five monsters verified end to end (Cyclops, Crusader, Giant, Bone Dragon, Genie).
+
+| Field | Closed vocabulary | What it answers |
+|---|---|---|
+| `trigger` | `always`, `on_attack`, `on_defense`, `on_turn` | when the rule participates |
+| `target` | `self`, `enemy_unit`, `all_adjacent`, `all_enemies`, `spell_class` | whom it touches |
+| `effect` | `damage_mult`, `resist`, `immunity`, `spell_cast`, `stat_mod`, `movement`, `attack_shape`, `retaliation_mod`, `other` | what kind of consequence |
+| `magnitude_kind` | `percent`, `spell_id`, `flat`, `none` | how to read the payload: `percent` says `percentage` is the magnitude or trigger chance, `spell_id` says `value` is a Spell id with `percentage` as its accompanying chance or percent when nonzero, `flat` says `value` is a flat amount, `none` says the payload carries nothing |
+
+Nothing consumes the new fields yet, deliberately, matching layer 1: the consumer is a Deep-Sets-style pooled embedding per the guide, an encoding change that ADR discipline says needs its own ablation before any version bump, and `ability_feature_table` in `python/fheroes2_agent/policy.py` says so at the seam. Layer 3 stays deferred because it needs a per-candidate engine query seam of the same shape the teacher probe used, which the probe's digest methodology would also verify.
+
+<!-- verify
+grep src/fheroes2/agent/agent_capabilities.cpp :: classifyAbility
+grep src/fheroes2/agent/agent_capabilities.h :: magnitudeKind
+grep python/fheroes2_agent/data/monster_capabilities_v1.json :: "magnitude_kind"
+grep agent_play/tests/test_agent_capabilities.cpp :: closed vocabulary
+-->
+
