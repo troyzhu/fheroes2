@@ -48,7 +48,8 @@ def main() -> None:
     uses_planes = bool(getattr(model, "planes", False))
 
     hits = {1: 0, 3: 0, 5: 0}
-    teacher_probability, entropies, total = [], [], 0
+    teacher_probability, entropies, normalized_entropies, total = [], [], [], 0
+    top_prob, top_correct = [], []
     with torch.no_grad():
         for start in range(0, len(hold), 4096):
             batch = torch.from_numpy(hold[start:start + 4096])
@@ -62,8 +63,33 @@ def main() -> None:
                 hits[k] += int((ranks[:, :k] == target.unsqueeze(1)).any(dim=1).sum())
             teacher_probability.extend(probs.gather(1, target.unsqueeze(1)).squeeze(1).tolist())
             masked = probs.clamp_min(1e-12)
-            entropies.extend((-(masked * masked.log()).sum(dim=-1)).tolist())
+            entropy = -(masked * masked.log()).sum(dim=-1)
+            entropies.extend(entropy.tolist())
+            # The owner's diagnostic: entropy against the uniform maximum over the legal set,
+            # so a five-action state and a thirty-action state read on one scale.
+            legal = torch.from_numpy(masks[batch.numpy()]).sum(-1).clamp(min=2).float()
+            normalized_entropies.extend((entropy / legal.log()).clamp(0, 1).tolist())
+            # Calibration raw material: the confidence of the top action and whether it was the
+            # teacher's move, binned below into a reliability table.
+            top_prob.extend(probs.max(-1).values.tolist())
+            top_correct.extend((ranks[:, 0] == target).tolist())
             total += len(batch)
+
+    bins = np.linspace(0.0, 1.0, 11)
+    top_prob_arr = np.asarray(top_prob)
+    top_correct_arr = np.asarray(top_correct, dtype=float)
+    reliability = []
+    ece = 0.0
+    for lo, hi in zip(bins[:-1], bins[1:]):
+        inside = (top_prob_arr >= lo) & (top_prob_arr < hi if hi < 1.0 else top_prob_arr <= hi)
+        if inside.sum() == 0:
+            continue
+        confidence = float(top_prob_arr[inside].mean())
+        accuracy = float(top_correct_arr[inside].mean())
+        weight = float(inside.mean())
+        ece += weight * abs(confidence - accuracy)
+        reliability.append({"bin": f"{lo:.1f}-{hi:.1f}", "n": int(inside.sum()),
+                            "confidence": round(confidence, 3), "accuracy": round(accuracy, 3)})
 
     result = {
         "checkpoint": args.checkpoint, "roots": args.roots, "seed": args.seed, "holdout_decisions": total,
@@ -71,8 +97,14 @@ def main() -> None:
         "mean_teacher_probability": round(float(np.mean(teacher_probability)), 4),
         "median_teacher_probability": round(float(np.median(teacher_probability)), 4),
         "mean_entropy_nats": round(float(np.mean(entropies)), 4),
+        "mean_normalized_entropy": round(float(np.mean(normalized_entropies)), 4),
+        "expected_calibration_error": round(ece, 4),
+        "reliability": reliability,
         "seconds": round(time.time() - started, 1),
     }
+    print(f"normalized entropy {result['mean_normalized_entropy']}  ECE {result['expected_calibration_error']}")
+    for row in reliability:
+        print(f"  conf {row['bin']}: n={row['n']:6d}  predicted {row['confidence']:.2f}  actual {row['accuracy']:.2f}")
     print(f"top-1 {result['top1']}  top-3 {result['top3']}  top-5 {result['top5']}  "
           f"p(teacher) mean {result['mean_teacher_probability']} median {result['median_teacher_probability']}  "
           f"entropy {result['mean_entropy_nats']} nats  ({total} decisions, {result['seconds']}s)")
