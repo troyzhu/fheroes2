@@ -81,7 +81,7 @@ The instrument stack is the quiet result of the week: the thirteen-column batter
 |---|---|---|
 | 1 | Coverage-forced collection | Demonstrated prerequisite for soft targets, per-candidate values, and graded calibration at once; every null in the distillation family traces to its absence |
 | 2 | Self-play continuation at settled budgets | The one line whose convergence read says it was still climbing when stopped; league structure from the literature already in place |
-| 3 | Wide-distribution self-play | Round two's erosion signature reads as distribution narrowness, twelve training matchups against gen1's generator breadth; the widened round is the direct test |
+| 3 | Anchored reinforcement, the KL leash to gen1 | The wide round measured breadth as half the answer, specialization gone but anchor erosion surviving; the anchored form rl-methods already derives, the Lux winner's frozen-teacher bridge, is the untested lever |
 | 4 | Expert iteration resumed on coverage-forced targets | The operator that built the champion, rerun only once its labels carry spread |
 | 5 | Exploring starts by prefix replay | The endorsed exploration family; the deterministic engine makes mid-battle starts replayable at no engine cost |
 | 6 | Outcome-grounded calibration | The owner-requested metric still unbuilt; pairs naturally with rank 1's data |
