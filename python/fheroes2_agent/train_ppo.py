@@ -24,6 +24,7 @@ import torch
 
 from .encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, OBSERVATION_SIZE
 from .env import BattleEnv
+from .objectives import surrogate as trust_surrogate, total_variation
 from .objectives import normalize_advantages
 from .policy import BattlePolicy
 
@@ -112,6 +113,9 @@ def train(
     minibatch: int = 256,
     lr: float = 1e-4,
     clip: float = 0.2,
+    trust_region: str = "ratio",
+    divergence_threshold: float = 0.05,
+    divergence_kind: str = "exact",
     value_coef: float = 0.5,
     entropy_coef: float = 0.01,
     entropy_floor: float = 0.0,
@@ -242,7 +246,26 @@ def train(
                 logps = distribution.log_prob(actions[rows])
 
                 ratio = torch.exp(logps - old_logps[rows])
-                surrogate = torch.min(ratio * adv_t[rows], torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t[rows])
+                if trust_region == "ratio":
+                    surrogate = torch.min(ratio * adv_t[rows], torch.clamp(ratio, 1 - clip, 1 + clip) * adv_t[rows])
+                else:
+                    # DPPO (task #48): the gate tests a real divergence instead of the sampled
+                    # ratio. `logits_before` is the collection-time policy, computed above before
+                    # any update touched the weights, so it is the correct old distribution.
+                    # "exact" is the full TV over the legal set, affordable at this action count;
+                    # "binary" is the paper's deployed lower bound, the sampled action's moved
+                    # probability mass.
+                    if divergence_kind == "exact":
+                        div = total_variation(logits, logits_before[rows], masks[rows])
+                    else:
+                        div = (logps.exp() - old_logps[rows].exp()).abs()
+                    surrogate = trust_surrogate(ratio, adv_t[rows], trust_region="divergence",
+                                                divergence=div, threshold=divergence_threshold)
+                    gate_hits = ((((adv_t[rows] > 0) & (ratio > 1)) | ((adv_t[rows] < 0) & (ratio < 1)))
+                                 & (div > divergence_threshold))
+                if start == 0:
+                    gate_fraction_first = float(gate_hits.float().mean()) if trust_region != "ratio" \
+                        else float(((ratio < 1 - clip) | (ratio > 1 + clip)).float().mean())
                 # Entropy over the legal set alone, or it measures the mask rather than the
                 # policy's indecision.
                 entropy = distribution.entropy().mean()
@@ -317,6 +340,7 @@ def train(
             reward_split["reward_on_losses"] = float(np.mean(lost_rewards))
         history.append({"iteration": iteration, "win_rate": wr, "mean_terminal_reward": mean_reward,
                         **reward_split,
+                        "gate_fraction": gate_fraction_first,
                         "steps": int(n), "value_loss": value_loss_before,
                         "raw_advantage_std": raw_advantage_std, "reward_std": reward_std,
                         "entropy": entropy_before,
@@ -349,6 +373,9 @@ def train(
         "initial_mean_terminal_reward": initial_reward,
         "iterations": iterations,
         "episodes_per_iteration": episodes_per_iter,
+        "trust_region": trust_region,
+        **({"divergence_kind": divergence_kind, "divergence_threshold": divergence_threshold}
+           if trust_region != "ratio" else {}),
         # Reported rather than buried. A run that spent most of its budget below the floor was
         # training on batches with almost no outcome spread, which is a statement about the
         # matchup having been solved rather than about the method.
