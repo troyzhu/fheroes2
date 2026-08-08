@@ -1,0 +1,72 @@
+{
+ "covxl_soft_values_s0.pt": {
+  "iterations": 25,
+  "train_loss": {
+   "tail_mean": 0.4681,
+   "mid_mean": 0.5664,
+   "level_shift": -0.0982,
+   "slope_per_100_iters": -0.5147,
+   "tail_noise": 0.0145,
+   "verdict": "trending"
+  },
+  "train_loss_hard": {
+   "tail_mean": 0.3798,
+   "mid_mean": 0.4733,
+   "level_shift": -0.0935,
+   "slope_per_100_iters": -0.4894,
+   "tail_noise": 0.0138,
+   "verdict": "trending"
+  },
+  "train_loss_soft": {
+   "tail_mean": 0.0883,
+   "mid_mean": 0.093,
+   "level_shift": -0.0047,
+   "slope_per_100_iters": -0.0252,
+   "tail_noise": 0.0007,
+   "verdict": "trending"
+  },
+  "holdout_agreement": {
+   "tail_mean": 0.8562,
+   "mid_mean": 0.8324,
+   "level_shift": 0.0238,
+   "slope_per_100_iters": 0.1114,
+   "tail_noise": 0.0032,
+   "verdict": "trending"
+  }
+ },
+ "covxl_hard_values_s0.pt": {
+  "iterations": 25,
+  "train_loss": {
+   "tail_mean": 0.4168,
+   "mid_mean": 0.5309,
+   "level_shift": -0.1141,
+   "slope_per_100_iters": -0.5914,
+   "tail_noise": 0.0167,
+   "verdict": "trending"
+  },
+  "train_loss_hard": {
+   "tail_mean": 0.3902,
+   "mid_mean": 0.4901,
+   "level_shift": -0.0999,
+   "slope_per_100_iters": -0.527,
+   "tail_noise": 0.0148,
+   "verdict": "trending"
+  },
+  "train_loss_soft": {
+   "tail_mean": 0.0265,
+   "mid_mean": 0.0408,
+   "level_shift": -0.0142,
+   "slope_per_100_iters": -0.0644,
+   "tail_noise": 0.0018,
+   "verdict": "trending"
+  },
+  "holdout_agreement": {
+   "tail_mean": 0.8551,
+   "mid_mean": 0.8281,
+   "level_shift": 0.027,
+   "slope_per_100_iters": 0.1171,
+   "tail_noise": 0.0034,
+   "verdict": "trending"
+  }
+ }
+}
