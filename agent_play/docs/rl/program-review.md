@@ -27,7 +27,7 @@ grep    python/fheroes2_agent/selfplay.py :: OpponentPool
 | Agent (policy plus search), same pool | $0.963 \pm 0.027$ | 0.660 | Past the baseline decisively |
 | Commander extremes | 0.976 to 1.000 across strong arms | 0.958 | Past the baseline |
 
-The distillation gap is the program's central number: the same prior that searches to 0.963 plays 0.526 raw, so about 0.44 of win rate exists in the search process and has resisted transfer into the weights. The archive log [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the full-apparatus verdicts behind every row, and [[../archive/experiments/2026-08-06-night-block-search-generations]] the search-agent measurement. Two runs are in flight as this page is written: the self-play continuation round at 1000 iterations across seeds, and the DPPO trust-region rematch of task 48.
+The distillation gap is the program's central number: the same prior that searches to 0.963 plays 0.526 raw, so about 0.44 of win rate exists in the search process and has resisted transfer into the weights. The archive log [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the full-apparatus verdicts behind every row, and [[../archive/experiments/2026-08-06-night-block-search-generations]] the search-agent measurement. Both continuation rounds have since been judged in [[../archive/experiments/2026-08-08-selfplay-round2-and-trust-region]]: self-play round two converged and traded training-distribution mastery for held-out erosion in every seed of both arms, with self-play paying less than fixed-opponent training, and the trust-region rematch measured all three divergence gates as outcome-indistinguishable from the ratio clip at this budget.
 
 ## Imitation: measured to its ceiling
 
@@ -81,13 +81,13 @@ The instrument stack is the quiet result of the week: the thirteen-column batter
 |---|---|---|
 | 1 | Coverage-forced collection | Demonstrated prerequisite for soft targets, per-candidate values, and graded calibration at once; every null in the distillation family traces to its absence |
 | 2 | Self-play continuation at settled budgets | The one line whose convergence read says it was still climbing when stopped; league structure from the literature already in place |
-| 3 | DPPO divergence gates | Paper's diagnostic held here (clip and divergence flag different updates); rematch running with exact and binary forms |
+| 3 | Wide-distribution self-play | Round two's erosion signature reads as distribution narrowness, twelve training matchups against gen1's generator breadth; the widened round is the direct test |
 | 4 | Expert iteration resumed on coverage-forced targets | The operator that built the champion, rerun only once its labels carry spread |
 | 5 | Exploring starts by prefix replay | The endorsed exploration family; the deterministic engine makes mid-battle starts replayable at no engine cost |
 | 6 | Outcome-grounded calibration | The owner-requested metric still unbuilt; pairs naturally with rank 1's data |
 | 7 | Larger-n deployment sampling | The adaptive nucleus read positive inside noise; cheap to settle properly |
 
-Closed lines, not to revisit without new evidence: label smoothing (harmful), softplus as default (flagship collapse), visit-temperature targets at current coverage, value networks as leaves at current data, tabula rasa at this budget, AWR against a deterministic teacher, and the entropy floor as a benefit rather than insurance against fixed opponents.
+Closed lines, not to revisit without new evidence: label smoothing (harmful), softplus as default (flagship collapse), visit-temperature targets at current coverage, value networks as leaves at current data, tabula rasa at this budget, AWR against a deterministic teacher, the entropy floor as a benefit rather than insurance against fixed opponents, and the trust-region choice at narrow-range budgets, where the 2026-08-08 rematch measured ratio clip, binary difference and exact total variation as outcome-indistinguishable while their gate fractions differed as theory requires.
 
 ## The remaining experiments, concretely
 

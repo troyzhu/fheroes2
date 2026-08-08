@@ -1,0 +1,56 @@
+{
+ "binary_005_s0": {
+  "trust_region": "divergence:binary:0.05",
+  "share2": 0.725,
+  "v4": 0.575,
+  "builtin_ai": 0.9
+ },
+ "binary_005_s1": {
+  "trust_region": "divergence:binary:0.05",
+  "share2": 0.75,
+  "v4": 0.675,
+  "builtin_ai": 0.9
+ },
+ "binary_005_s2": {
+  "trust_region": "divergence:binary:0.05",
+  "share2": 0.775,
+  "v4": 0.625,
+  "builtin_ai": 0.9
+ },
+ "exact_005_s0": {
+  "trust_region": "divergence:exact:0.05",
+  "share2": 0.725,
+  "v4": 0.675,
+  "builtin_ai": 0.9
+ },
+ "exact_005_s1": {
+  "trust_region": "divergence:exact:0.05",
+  "share2": 0.75,
+  "v4": 0.675,
+  "builtin_ai": 0.9
+ },
+ "exact_005_s2": {
+  "trust_region": "divergence:exact:0.05",
+  "share2": 0.725,
+  "v4": 0.55,
+  "builtin_ai": 0.875
+ },
+ "exact_020_s0": {
+  "trust_region": "divergence:exact:0.2",
+  "share2": 0.8,
+  "v4": 0.7,
+  "builtin_ai": 0.875
+ },
+ "exact_020_s1": {
+  "trust_region": "divergence:exact:0.2",
+  "share2": 0.725,
+  "v4": 0.575,
+  "builtin_ai": 0.875
+ },
+ "exact_020_s2": {
+  "trust_region": "divergence:exact:0.2",
+  "share2": 0.725,
+  "v4": 0.6,
+  "builtin_ai": 0.9
+ }
+}

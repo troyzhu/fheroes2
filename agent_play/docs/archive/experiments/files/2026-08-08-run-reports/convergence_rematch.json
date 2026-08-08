@@ -1,0 +1,1901 @@
+{
+ "tr_binary_005_s0.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5616,
+   "mid_mean": 1.493,
+   "level_shift": 0.0686,
+   "slope_per_100_iters": 0.0118,
+   "tail_noise": 0.1326,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7865,
+   "mid_mean": 1.7393,
+   "level_shift": 0.0471,
+   "slope_per_100_iters": 0.0038,
+   "tail_noise": 0.0449,
+   "verdict": "oscillating"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.5631,
+   "mid_mean": -0.4882,
+   "level_shift": -0.0749,
+   "slope_per_100_iters": 0.0022,
+   "tail_noise": 0.1011,
+   "verdict": "converged"
+  },
+  "value_loss": {
+   "tail_mean": 0.0288,
+   "mid_mean": 0.0464,
+   "level_shift": -0.0176,
+   "slope_per_100_iters": -0.0043,
+   "tail_noise": 0.0221,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0393,
+   "mid_mean": -0.0464,
+   "level_shift": 0.0071,
+   "slope_per_100_iters": 0.0035,
+   "tail_noise": 0.0483,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0459,
+   "mid_mean": -0.0429,
+   "level_shift": -0.003,
+   "slope_per_100_iters": 0.0049,
+   "tail_noise": 0.0538,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.666,
+   "mid_mean": 0.6684,
+   "level_shift": -0.0024,
+   "slope_per_100_iters": 0.0015,
+   "tail_noise": 0.1771,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2145,
+   "mid_mean": 0.2103,
+   "level_shift": 0.0042,
+   "slope_per_100_iters": 0.0035,
+   "tail_noise": 0.0812,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1558,
+   "mid_mean": 0.2043,
+   "level_shift": -0.0485,
+   "slope_per_100_iters": -0.0118,
+   "tail_noise": 0.0598,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.9042,
+   "mid_mean": 0.8895,
+   "level_shift": 0.0146,
+   "slope_per_100_iters": 0.0035,
+   "tail_noise": 0.0536,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0024,
+   "mid_mean": 0.0022,
+   "level_shift": 0.0002,
+   "slope_per_100_iters": -0.0003,
+   "tail_noise": 0.0018,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.021,
+   "mid_mean": 0.0211,
+   "level_shift": -0.0001,
+   "slope_per_100_iters": -0.0052,
+   "tail_noise": 0.0135,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0347,
+   "mid_mean": 0.0321,
+   "level_shift": 0.0026,
+   "slope_per_100_iters": -0.0022,
+   "tail_noise": 0.023,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0457,
+   "mid_mean": 0.0437,
+   "level_shift": 0.002,
+   "slope_per_100_iters": -0.0061,
+   "tail_noise": 0.0294,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.02,
+   "mid_mean": 0.0201,
+   "level_shift": -0.0001,
+   "slope_per_100_iters": -0.0043,
+   "tail_noise": 0.0135,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0191,
+   "mid_mean": 0.0242,
+   "level_shift": -0.0051,
+   "slope_per_100_iters": -0.0003,
+   "tail_noise": 0.0108,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.7475,
+   "mid_mean": 0.9262,
+   "level_shift": -0.1787,
+   "slope_per_100_iters": -0.0258,
+   "tail_noise": 0.3638,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.3541,
+   "mid_mean": 0.4672,
+   "level_shift": -0.1131,
+   "slope_per_100_iters": 0.0031,
+   "tail_noise": 0.2053,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 0.9942,
+   "mid_mean": 1.255,
+   "level_shift": -0.2608,
+   "slope_per_100_iters": -0.0259,
+   "tail_noise": 0.4881,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.5407,
+   "mid_mean": 0.6845,
+   "level_shift": -0.1438,
+   "slope_per_100_iters": -0.0156,
+   "tail_noise": 0.2741,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.2249,
+   "mid_mean": 1.5106,
+   "level_shift": -0.2857,
+   "slope_per_100_iters": -0.0297,
+   "tail_noise": 0.5053,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.003,
+   "mid_mean": 0.0036,
+   "level_shift": -0.0005,
+   "slope_per_100_iters": -0.0003,
+   "tail_noise": 0.0021,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0671,
+   "mid_mean": 0.0779,
+   "level_shift": -0.0107,
+   "slope_per_100_iters": -0.0022,
+   "tail_noise": 0.0353,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.6231,
+   "mid_mean": 0.7545,
+   "level_shift": -0.1314,
+   "slope_per_100_iters": -0.0216,
+   "tail_noise": 0.3773,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1641,
+   "mid_mean": 0.2233,
+   "level_shift": -0.0592,
+   "slope_per_100_iters": -0.0141,
+   "tail_noise": 0.0853,
+   "verdict": "converged"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.5965,
+   "mid_mean": 0.7153,
+   "level_shift": -0.1188,
+   "slope_per_100_iters": -0.0185,
+   "tail_noise": 0.3673,
+   "verdict": "converged"
+  }
+ },
+ "tr_binary_005_s1.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5084,
+   "mid_mean": 1.5043,
+   "level_shift": 0.0041,
+   "slope_per_100_iters": -0.0023,
+   "tail_noise": 0.1379,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7584,
+   "mid_mean": 1.7375,
+   "level_shift": 0.0209,
+   "slope_per_100_iters": 0.0009,
+   "tail_noise": 0.045,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.5029,
+   "mid_mean": -0.3689,
+   "level_shift": -0.134,
+   "slope_per_100_iters": -0.0297,
+   "tail_noise": 0.0992,
+   "verdict": "oscillating"
+  },
+  "value_loss": {
+   "tail_mean": 0.037,
+   "mid_mean": 0.0505,
+   "level_shift": -0.0135,
+   "slope_per_100_iters": 0.0039,
+   "tail_noise": 0.0299,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0391,
+   "mid_mean": -0.0504,
+   "level_shift": 0.0113,
+   "slope_per_100_iters": 0.0015,
+   "tail_noise": 0.0532,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0417,
+   "mid_mean": -0.0472,
+   "level_shift": 0.0055,
+   "slope_per_100_iters": -0.0,
+   "tail_noise": 0.0592,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.6879,
+   "mid_mean": 0.6161,
+   "level_shift": 0.0718,
+   "slope_per_100_iters": 0.0582,
+   "tail_noise": 0.1968,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2217,
+   "mid_mean": 0.1955,
+   "level_shift": 0.0261,
+   "slope_per_100_iters": 0.0162,
+   "tail_noise": 0.072,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1757,
+   "mid_mean": 0.2108,
+   "level_shift": -0.035,
+   "slope_per_100_iters": 0.0078,
+   "tail_noise": 0.0684,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.889,
+   "mid_mean": 0.8895,
+   "level_shift": -0.0005,
+   "slope_per_100_iters": -0.0003,
+   "tail_noise": 0.0586,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0019,
+   "mid_mean": 0.0022,
+   "level_shift": -0.0003,
+   "slope_per_100_iters": 0.0001,
+   "tail_noise": 0.0026,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.0183,
+   "mid_mean": 0.0262,
+   "level_shift": -0.0079,
+   "slope_per_100_iters": 0.0007,
+   "tail_noise": 0.0225,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0336,
+   "mid_mean": 0.0408,
+   "level_shift": -0.0072,
+   "slope_per_100_iters": 0.0014,
+   "tail_noise": 0.0455,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.043,
+   "mid_mean": 0.0556,
+   "level_shift": -0.0126,
+   "slope_per_100_iters": 0.0018,
+   "tail_noise": 0.0565,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.019,
+   "mid_mean": 0.0265,
+   "level_shift": -0.0075,
+   "slope_per_100_iters": 0.001,
+   "tail_noise": 0.0251,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0191,
+   "mid_mean": 0.0191,
+   "level_shift": 0.0001,
+   "slope_per_100_iters": 0.0011,
+   "tail_noise": 0.0144,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.7393,
+   "mid_mean": 0.928,
+   "level_shift": -0.1886,
+   "slope_per_100_iters": 0.0139,
+   "tail_noise": 0.3292,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.3672,
+   "mid_mean": 0.4214,
+   "level_shift": -0.0543,
+   "slope_per_100_iters": -0.001,
+   "tail_noise": 0.2112,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 0.9912,
+   "mid_mean": 1.2349,
+   "level_shift": -0.2437,
+   "slope_per_100_iters": 0.0135,
+   "tail_noise": 0.4458,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.5376,
+   "mid_mean": 0.6816,
+   "level_shift": -0.144,
+   "slope_per_100_iters": 0.0064,
+   "tail_noise": 0.2391,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.2661,
+   "mid_mean": 1.5806,
+   "level_shift": -0.3144,
+   "slope_per_100_iters": 0.0384,
+   "tail_noise": 0.4997,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0036,
+   "mid_mean": 0.0035,
+   "level_shift": 0.0002,
+   "slope_per_100_iters": 0.0004,
+   "tail_noise": 0.0025,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0751,
+   "mid_mean": 0.0819,
+   "level_shift": -0.0068,
+   "slope_per_100_iters": 0.0046,
+   "tail_noise": 0.0393,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.7118,
+   "mid_mean": 0.893,
+   "level_shift": -0.1812,
+   "slope_per_100_iters": 0.0451,
+   "tail_noise": 0.408,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1941,
+   "mid_mean": 0.2671,
+   "level_shift": -0.0731,
+   "slope_per_100_iters": 0.0045,
+   "tail_noise": 0.0919,
+   "verdict": "converged"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.6794,
+   "mid_mean": 0.8472,
+   "level_shift": -0.1677,
+   "slope_per_100_iters": 0.0453,
+   "tail_noise": 0.3977,
+   "verdict": "converged"
+  }
+ },
+ "tr_binary_005_s2.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5227,
+   "mid_mean": 1.5348,
+   "level_shift": -0.0121,
+   "slope_per_100_iters": -0.0095,
+   "tail_noise": 0.1312,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7527,
+   "mid_mean": 1.7199,
+   "level_shift": 0.0328,
+   "slope_per_100_iters": 0.0001,
+   "tail_noise": 0.0485,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.4463,
+   "mid_mean": -0.3186,
+   "level_shift": -0.1276,
+   "slope_per_100_iters": -0.0472,
+   "tail_noise": 0.1082,
+   "verdict": "oscillating"
+  },
+  "value_loss": {
+   "tail_mean": 0.033,
+   "mid_mean": 0.0659,
+   "level_shift": -0.0329,
+   "slope_per_100_iters": -0.0021,
+   "tail_noise": 0.025,
+   "verdict": "oscillating"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0429,
+   "mid_mean": -0.0467,
+   "level_shift": 0.0038,
+   "slope_per_100_iters": -0.0001,
+   "tail_noise": 0.0519,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0444,
+   "mid_mean": -0.0361,
+   "level_shift": -0.0083,
+   "slope_per_100_iters": -0.0034,
+   "tail_noise": 0.0585,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.6646,
+   "mid_mean": 0.6133,
+   "level_shift": 0.0513,
+   "slope_per_100_iters": 0.0368,
+   "tail_noise": 0.1723,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2108,
+   "mid_mean": 0.1963,
+   "level_shift": 0.0145,
+   "slope_per_100_iters": 0.0116,
+   "tail_noise": 0.0714,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1675,
+   "mid_mean": 0.2435,
+   "level_shift": -0.076,
+   "slope_per_100_iters": -0.0088,
+   "tail_noise": 0.0622,
+   "verdict": "oscillating"
+  },
+  "win_rate": {
+   "tail_mean": 0.8955,
+   "mid_mean": 0.9092,
+   "level_shift": -0.0137,
+   "slope_per_100_iters": -0.0023,
+   "tail_noise": 0.0529,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0016,
+   "mid_mean": 0.0021,
+   "level_shift": -0.0005,
+   "slope_per_100_iters": 0.0,
+   "tail_noise": 0.0017,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.0194,
+   "mid_mean": 0.0276,
+   "level_shift": -0.0082,
+   "slope_per_100_iters": 0.0011,
+   "tail_noise": 0.0222,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.03,
+   "mid_mean": 0.0379,
+   "level_shift": -0.0079,
+   "slope_per_100_iters": 0.0013,
+   "tail_noise": 0.035,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0411,
+   "mid_mean": 0.0547,
+   "level_shift": -0.0136,
+   "slope_per_100_iters": 0.0021,
+   "tail_noise": 0.0469,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.0197,
+   "mid_mean": 0.0272,
+   "level_shift": -0.0076,
+   "slope_per_100_iters": 0.0011,
+   "tail_noise": 0.0224,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0175,
+   "mid_mean": 0.0184,
+   "level_shift": -0.001,
+   "slope_per_100_iters": -0.0005,
+   "tail_noise": 0.01,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.8541,
+   "mid_mean": 0.9188,
+   "level_shift": -0.0647,
+   "slope_per_100_iters": -0.0459,
+   "tail_noise": 0.561,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.399,
+   "mid_mean": 0.4446,
+   "level_shift": -0.0457,
+   "slope_per_100_iters": -0.0104,
+   "tail_noise": 0.2649,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 1.131,
+   "mid_mean": 1.2323,
+   "level_shift": -0.1013,
+   "slope_per_100_iters": -0.0513,
+   "tail_noise": 0.6794,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.6086,
+   "mid_mean": 0.6764,
+   "level_shift": -0.0678,
+   "slope_per_100_iters": -0.0229,
+   "tail_noise": 0.3107,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.3451,
+   "mid_mean": 1.6108,
+   "level_shift": -0.2656,
+   "slope_per_100_iters": -0.0498,
+   "tail_noise": 0.6952,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0025,
+   "mid_mean": 0.0033,
+   "level_shift": -0.0008,
+   "slope_per_100_iters": 0.0,
+   "tail_noise": 0.0015,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0634,
+   "mid_mean": 0.083,
+   "level_shift": -0.0196,
+   "slope_per_100_iters": 0.0014,
+   "tail_noise": 0.0333,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.6358,
+   "mid_mean": 0.9476,
+   "level_shift": -0.3118,
+   "slope_per_100_iters": -0.0258,
+   "tail_noise": 0.3834,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1654,
+   "mid_mean": 0.2717,
+   "level_shift": -0.1063,
+   "slope_per_100_iters": -0.0123,
+   "tail_noise": 0.085,
+   "verdict": "oscillating"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.6097,
+   "mid_mean": 0.9029,
+   "level_shift": -0.2931,
+   "slope_per_100_iters": -0.0236,
+   "tail_noise": 0.3739,
+   "verdict": "converged"
+  }
+ },
+ "tr_exact_005_s0.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.535,
+   "mid_mean": 1.4842,
+   "level_shift": 0.0508,
+   "slope_per_100_iters": 0.0093,
+   "tail_noise": 0.133,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7559,
+   "mid_mean": 1.7295,
+   "level_shift": 0.0264,
+   "slope_per_100_iters": 0.0026,
+   "tail_noise": 0.0455,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.554,
+   "mid_mean": -0.4775,
+   "level_shift": -0.0765,
+   "slope_per_100_iters": -0.0265,
+   "tail_noise": 0.1071,
+   "verdict": "converged"
+  },
+  "value_loss": {
+   "tail_mean": 0.0254,
+   "mid_mean": 0.0373,
+   "level_shift": -0.0119,
+   "slope_per_100_iters": -0.0049,
+   "tail_noise": 0.0251,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0387,
+   "mid_mean": -0.0459,
+   "level_shift": 0.0071,
+   "slope_per_100_iters": 0.0007,
+   "tail_noise": 0.0489,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0491,
+   "mid_mean": -0.0448,
+   "level_shift": -0.0043,
+   "slope_per_100_iters": 0.0028,
+   "tail_noise": 0.0618,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.7276,
+   "mid_mean": 0.6507,
+   "level_shift": 0.0769,
+   "slope_per_100_iters": -0.0013,
+   "tail_noise": 0.2233,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.235,
+   "mid_mean": 0.2091,
+   "level_shift": 0.0258,
+   "slope_per_100_iters": 0.0009,
+   "tail_noise": 0.0877,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1423,
+   "mid_mean": 0.1809,
+   "level_shift": -0.0386,
+   "slope_per_100_iters": -0.0149,
+   "tail_noise": 0.0662,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.9044,
+   "mid_mean": 0.8889,
+   "level_shift": 0.0155,
+   "slope_per_100_iters": 0.004,
+   "tail_noise": 0.0542,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0027,
+   "mid_mean": 0.0017,
+   "level_shift": 0.001,
+   "slope_per_100_iters": -0.0006,
+   "tail_noise": 0.0033,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.022,
+   "mid_mean": 0.021,
+   "level_shift": 0.001,
+   "slope_per_100_iters": -0.0046,
+   "tail_noise": 0.0241,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0407,
+   "mid_mean": 0.0273,
+   "level_shift": 0.0134,
+   "slope_per_100_iters": -0.0097,
+   "tail_noise": 0.0545,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0529,
+   "mid_mean": 0.0401,
+   "level_shift": 0.0127,
+   "slope_per_100_iters": -0.0119,
+   "tail_noise": 0.066,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.0248,
+   "mid_mean": 0.0201,
+   "level_shift": 0.0047,
+   "slope_per_100_iters": -0.0052,
+   "tail_noise": 0.0289,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0142,
+   "mid_mean": 0.0148,
+   "level_shift": -0.0006,
+   "slope_per_100_iters": -0.002,
+   "tail_noise": 0.0107,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.5543,
+   "mid_mean": 0.6444,
+   "level_shift": -0.0902,
+   "slope_per_100_iters": -0.0365,
+   "tail_noise": 0.2088,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.3058,
+   "mid_mean": 0.3254,
+   "level_shift": -0.0197,
+   "slope_per_100_iters": -0.026,
+   "tail_noise": 0.1416,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 0.7742,
+   "mid_mean": 0.8819,
+   "level_shift": -0.1078,
+   "slope_per_100_iters": -0.0573,
+   "tail_noise": 0.2941,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.4344,
+   "mid_mean": 0.4951,
+   "level_shift": -0.0607,
+   "slope_per_100_iters": -0.0347,
+   "tail_noise": 0.1801,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 0.9774,
+   "mid_mean": 1.1979,
+   "level_shift": -0.2206,
+   "slope_per_100_iters": -0.0808,
+   "tail_noise": 0.3401,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0025,
+   "mid_mean": 0.0028,
+   "level_shift": -0.0003,
+   "slope_per_100_iters": -0.0001,
+   "tail_noise": 0.0016,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0652,
+   "mid_mean": 0.0779,
+   "level_shift": -0.0127,
+   "slope_per_100_iters": -0.0062,
+   "tail_noise": 0.0362,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.5372,
+   "mid_mean": 0.7516,
+   "level_shift": -0.2145,
+   "slope_per_100_iters": -0.0508,
+   "tail_noise": 0.3137,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1549,
+   "mid_mean": 0.2316,
+   "level_shift": -0.0767,
+   "slope_per_100_iters": -0.0196,
+   "tail_noise": 0.083,
+   "verdict": "converged"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.5093,
+   "mid_mean": 0.7099,
+   "level_shift": -0.2006,
+   "slope_per_100_iters": -0.0466,
+   "tail_noise": 0.302,
+   "verdict": "converged"
+  }
+ },
+ "tr_exact_005_s1.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5371,
+   "mid_mean": 1.5068,
+   "level_shift": 0.0303,
+   "slope_per_100_iters": 0.0206,
+   "tail_noise": 0.1248,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7637,
+   "mid_mean": 1.7587,
+   "level_shift": 0.005,
+   "slope_per_100_iters": -0.0014,
+   "tail_noise": 0.0486,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.4852,
+   "mid_mean": -0.3509,
+   "level_shift": -0.1343,
+   "slope_per_100_iters": -0.0607,
+   "tail_noise": 0.1137,
+   "verdict": "trending"
+  },
+  "value_loss": {
+   "tail_mean": 0.0322,
+   "mid_mean": 0.0575,
+   "level_shift": -0.0254,
+   "slope_per_100_iters": -0.0047,
+   "tail_noise": 0.0279,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0448,
+   "mid_mean": -0.0474,
+   "level_shift": 0.0027,
+   "slope_per_100_iters": 0.0003,
+   "tail_noise": 0.049,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0471,
+   "mid_mean": -0.0379,
+   "level_shift": -0.0092,
+   "slope_per_100_iters": -0.0015,
+   "tail_noise": 0.0538,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.6735,
+   "mid_mean": 0.6514,
+   "level_shift": 0.0221,
+   "slope_per_100_iters": 0.0041,
+   "tail_noise": 0.1457,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2139,
+   "mid_mean": 0.2076,
+   "level_shift": 0.0063,
+   "slope_per_100_iters": 0.0022,
+   "tail_noise": 0.0591,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.162,
+   "mid_mean": 0.2279,
+   "level_shift": -0.0659,
+   "slope_per_100_iters": -0.0144,
+   "tail_noise": 0.0688,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.899,
+   "mid_mean": 0.8809,
+   "level_shift": 0.0181,
+   "slope_per_100_iters": 0.0124,
+   "tail_noise": 0.052,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0019,
+   "mid_mean": 0.002,
+   "level_shift": -0.0001,
+   "slope_per_100_iters": -0.0001,
+   "tail_noise": 0.0019,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.0195,
+   "mid_mean": 0.0221,
+   "level_shift": -0.0026,
+   "slope_per_100_iters": -0.0006,
+   "tail_noise": 0.0184,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0295,
+   "mid_mean": 0.0368,
+   "level_shift": -0.0073,
+   "slope_per_100_iters": -0.0022,
+   "tail_noise": 0.0299,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0414,
+   "mid_mean": 0.0493,
+   "level_shift": -0.008,
+   "slope_per_100_iters": -0.0025,
+   "tail_noise": 0.0405,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.021,
+   "mid_mean": 0.0236,
+   "level_shift": -0.0026,
+   "slope_per_100_iters": -0.0013,
+   "tail_noise": 0.0204,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0161,
+   "mid_mean": 0.018,
+   "level_shift": -0.0019,
+   "slope_per_100_iters": -0.0002,
+   "tail_noise": 0.0083,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.6447,
+   "mid_mean": 0.7477,
+   "level_shift": -0.1029,
+   "slope_per_100_iters": -0.0091,
+   "tail_noise": 0.255,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.3294,
+   "mid_mean": 0.3899,
+   "level_shift": -0.0605,
+   "slope_per_100_iters": -0.0004,
+   "tail_noise": 0.1474,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 0.8822,
+   "mid_mean": 1.029,
+   "level_shift": -0.1468,
+   "slope_per_100_iters": -0.018,
+   "tail_noise": 0.3466,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.4918,
+   "mid_mean": 0.5758,
+   "level_shift": -0.084,
+   "slope_per_100_iters": -0.0183,
+   "tail_noise": 0.213,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.1334,
+   "mid_mean": 1.4083,
+   "level_shift": -0.2749,
+   "slope_per_100_iters": -0.0632,
+   "tail_noise": 0.4113,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0027,
+   "mid_mean": 0.0037,
+   "level_shift": -0.0009,
+   "slope_per_100_iters": -0.0,
+   "tail_noise": 0.0016,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0729,
+   "mid_mean": 0.0901,
+   "level_shift": -0.0172,
+   "slope_per_100_iters": -0.0029,
+   "tail_noise": 0.0419,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.6429,
+   "mid_mean": 0.8984,
+   "level_shift": -0.2555,
+   "slope_per_100_iters": -0.0712,
+   "tail_noise": 0.3732,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1805,
+   "mid_mean": 0.2764,
+   "level_shift": -0.0959,
+   "slope_per_100_iters": -0.0251,
+   "tail_noise": 0.0941,
+   "verdict": "oscillating"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.6118,
+   "mid_mean": 0.8491,
+   "level_shift": -0.2373,
+   "slope_per_100_iters": -0.067,
+   "tail_noise": 0.3602,
+   "verdict": "converged"
+  }
+ },
+ "tr_exact_005_s2.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5139,
+   "mid_mean": 1.4487,
+   "level_shift": 0.0653,
+   "slope_per_100_iters": 0.0093,
+   "tail_noise": 0.1328,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.752,
+   "mid_mean": 1.7367,
+   "level_shift": 0.0153,
+   "slope_per_100_iters": 0.0072,
+   "tail_noise": 0.0505,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.571,
+   "mid_mean": -0.5192,
+   "level_shift": -0.0518,
+   "slope_per_100_iters": -0.0245,
+   "tail_noise": 0.0852,
+   "verdict": "converged"
+  },
+  "value_loss": {
+   "tail_mean": 0.0248,
+   "mid_mean": 0.0365,
+   "level_shift": -0.0117,
+   "slope_per_100_iters": -0.0052,
+   "tail_noise": 0.0208,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0325,
+   "mid_mean": -0.0462,
+   "level_shift": 0.0137,
+   "slope_per_100_iters": 0.0053,
+   "tail_noise": 0.047,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0383,
+   "mid_mean": -0.047,
+   "level_shift": 0.0087,
+   "slope_per_100_iters": 0.0061,
+   "tail_noise": 0.0507,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.7018,
+   "mid_mean": 0.6888,
+   "level_shift": 0.013,
+   "slope_per_100_iters": -0.0256,
+   "tail_noise": 0.1904,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.224,
+   "mid_mean": 0.2188,
+   "level_shift": 0.0053,
+   "slope_per_100_iters": -0.0079,
+   "tail_noise": 0.0757,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1424,
+   "mid_mean": 0.1798,
+   "level_shift": -0.0374,
+   "slope_per_100_iters": -0.0181,
+   "tail_noise": 0.0619,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.8974,
+   "mid_mean": 0.8723,
+   "level_shift": 0.0251,
+   "slope_per_100_iters": 0.0022,
+   "tail_noise": 0.0532,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0013,
+   "mid_mean": 0.0017,
+   "level_shift": -0.0004,
+   "slope_per_100_iters": -0.0003,
+   "tail_noise": 0.0013,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.0171,
+   "mid_mean": 0.0209,
+   "level_shift": -0.0037,
+   "slope_per_100_iters": -0.0036,
+   "tail_noise": 0.0146,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0221,
+   "mid_mean": 0.026,
+   "level_shift": -0.0039,
+   "slope_per_100_iters": -0.0059,
+   "tail_noise": 0.0221,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0322,
+   "mid_mean": 0.0389,
+   "level_shift": -0.0067,
+   "slope_per_100_iters": -0.0077,
+   "tail_noise": 0.0296,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.0154,
+   "mid_mean": 0.0195,
+   "level_shift": -0.0041,
+   "slope_per_100_iters": -0.0035,
+   "tail_noise": 0.0137,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0131,
+   "mid_mean": 0.0166,
+   "level_shift": -0.0035,
+   "slope_per_100_iters": -0.001,
+   "tail_noise": 0.0071,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.5593,
+   "mid_mean": 0.6562,
+   "level_shift": -0.0969,
+   "slope_per_100_iters": -0.0587,
+   "tail_noise": 0.2571,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.2543,
+   "mid_mean": 0.3111,
+   "level_shift": -0.0568,
+   "slope_per_100_iters": -0.0209,
+   "tail_noise": 0.1325,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 0.7389,
+   "mid_mean": 0.8841,
+   "level_shift": -0.1452,
+   "slope_per_100_iters": -0.0737,
+   "tail_noise": 0.3302,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.4029,
+   "mid_mean": 0.492,
+   "level_shift": -0.0891,
+   "slope_per_100_iters": -0.0392,
+   "tail_noise": 0.177,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 0.9617,
+   "mid_mean": 1.1937,
+   "level_shift": -0.232,
+   "slope_per_100_iters": -0.0763,
+   "tail_noise": 0.3495,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0022,
+   "mid_mean": 0.003,
+   "level_shift": -0.0008,
+   "slope_per_100_iters": -0.0003,
+   "tail_noise": 0.0012,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0649,
+   "mid_mean": 0.0835,
+   "level_shift": -0.0186,
+   "slope_per_100_iters": -0.007,
+   "tail_noise": 0.033,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.5648,
+   "mid_mean": 0.7349,
+   "level_shift": -0.1701,
+   "slope_per_100_iters": -0.0285,
+   "tail_noise": 0.2755,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1465,
+   "mid_mean": 0.2192,
+   "level_shift": -0.0727,
+   "slope_per_100_iters": -0.0185,
+   "tail_noise": 0.0649,
+   "verdict": "oscillating"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.5405,
+   "mid_mean": 0.6952,
+   "level_shift": -0.1546,
+   "slope_per_100_iters": -0.0238,
+   "tail_noise": 0.2679,
+   "verdict": "converged"
+  }
+ },
+ "tr_exact_020_s0.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5397,
+   "mid_mean": 1.5262,
+   "level_shift": 0.0135,
+   "slope_per_100_iters": 0.0553,
+   "tail_noise": 0.1768,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7753,
+   "mid_mean": 1.7723,
+   "level_shift": 0.0029,
+   "slope_per_100_iters": 0.0135,
+   "tail_noise": 0.0519,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.5994,
+   "mid_mean": -0.4828,
+   "level_shift": -0.1167,
+   "slope_per_100_iters": -0.0151,
+   "tail_noise": 0.0826,
+   "verdict": "oscillating"
+  },
+  "value_loss": {
+   "tail_mean": 0.0291,
+   "mid_mean": 0.0455,
+   "level_shift": -0.0164,
+   "slope_per_100_iters": -0.0155,
+   "tail_noise": 0.0338,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0366,
+   "mid_mean": -0.0414,
+   "level_shift": 0.0048,
+   "slope_per_100_iters": 0.0087,
+   "tail_noise": 0.0506,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0509,
+   "mid_mean": -0.045,
+   "level_shift": -0.0059,
+   "slope_per_100_iters": 0.0234,
+   "tail_noise": 0.0676,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.7804,
+   "mid_mean": 0.6664,
+   "level_shift": 0.1139,
+   "slope_per_100_iters": -0.1322,
+   "tail_noise": 0.3162,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2537,
+   "mid_mean": 0.2128,
+   "level_shift": 0.0409,
+   "slope_per_100_iters": -0.0381,
+   "tail_noise": 0.107,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1472,
+   "mid_mean": 0.1949,
+   "level_shift": -0.0477,
+   "slope_per_100_iters": -0.0397,
+   "tail_noise": 0.0801,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.9005,
+   "mid_mean": 0.8907,
+   "level_shift": 0.0099,
+   "slope_per_100_iters": 0.0189,
+   "tail_noise": 0.069,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0028,
+   "mid_mean": 0.0033,
+   "level_shift": -0.0005,
+   "slope_per_100_iters": -0.0023,
+   "tail_noise": 0.0054,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.0207,
+   "mid_mean": 0.029,
+   "level_shift": -0.0084,
+   "slope_per_100_iters": -0.0129,
+   "tail_noise": 0.0308,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0459,
+   "mid_mean": 0.0523,
+   "level_shift": -0.0065,
+   "slope_per_100_iters": -0.0354,
+   "tail_noise": 0.0828,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.056,
+   "mid_mean": 0.0675,
+   "level_shift": -0.0114,
+   "slope_per_100_iters": -0.0419,
+   "tail_noise": 0.0977,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.0238,
+   "mid_mean": 0.0303,
+   "level_shift": -0.0065,
+   "slope_per_100_iters": -0.018,
+   "tail_noise": 0.0418,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0203,
+   "mid_mean": 0.0209,
+   "level_shift": -0.0006,
+   "slope_per_100_iters": -0.0044,
+   "tail_noise": 0.0259,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.8628,
+   "mid_mean": 0.9718,
+   "level_shift": -0.109,
+   "slope_per_100_iters": -0.1114,
+   "tail_noise": 0.8313,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.4156,
+   "mid_mean": 0.4552,
+   "level_shift": -0.0396,
+   "slope_per_100_iters": -0.0855,
+   "tail_noise": 0.2888,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 1.142,
+   "mid_mean": 1.2882,
+   "level_shift": -0.1462,
+   "slope_per_100_iters": -0.1764,
+   "tail_noise": 0.9784,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.6021,
+   "mid_mean": 0.6966,
+   "level_shift": -0.0946,
+   "slope_per_100_iters": -0.1044,
+   "tail_noise": 0.4541,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.3007,
+   "mid_mean": 1.5069,
+   "level_shift": -0.2062,
+   "slope_per_100_iters": -0.1832,
+   "tail_noise": 0.9718,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.003,
+   "mid_mean": 0.0034,
+   "level_shift": -0.0003,
+   "slope_per_100_iters": -0.0011,
+   "tail_noise": 0.0028,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0686,
+   "mid_mean": 0.0805,
+   "level_shift": -0.0118,
+   "slope_per_100_iters": -0.0245,
+   "tail_noise": 0.0527,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.5269,
+   "mid_mean": 0.705,
+   "level_shift": -0.1781,
+   "slope_per_100_iters": -0.0757,
+   "tail_noise": 0.3384,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1361,
+   "mid_mean": 0.2015,
+   "level_shift": -0.0654,
+   "slope_per_100_iters": -0.0319,
+   "tail_noise": 0.0811,
+   "verdict": "converged"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.5028,
+   "mid_mean": 0.6693,
+   "level_shift": -0.1666,
+   "slope_per_100_iters": -0.0665,
+   "tail_noise": 0.3268,
+   "verdict": "converged"
+  }
+ },
+ "tr_exact_020_s1.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.5347,
+   "mid_mean": 1.4897,
+   "level_shift": 0.045,
+   "slope_per_100_iters": 0.0263,
+   "tail_noise": 0.1375,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7753,
+   "mid_mean": 1.7629,
+   "level_shift": 0.0125,
+   "slope_per_100_iters": 0.0008,
+   "tail_noise": 0.0486,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.592,
+   "mid_mean": -0.5164,
+   "level_shift": -0.0756,
+   "slope_per_100_iters": 0.006,
+   "tail_noise": 0.1081,
+   "verdict": "converged"
+  },
+  "value_loss": {
+   "tail_mean": 0.0319,
+   "mid_mean": 0.0512,
+   "level_shift": -0.0193,
+   "slope_per_100_iters": -0.0024,
+   "tail_noise": 0.0291,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0395,
+   "mid_mean": -0.0446,
+   "level_shift": 0.0051,
+   "slope_per_100_iters": 0.004,
+   "tail_noise": 0.0531,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0523,
+   "mid_mean": -0.0458,
+   "level_shift": -0.0064,
+   "slope_per_100_iters": 0.0002,
+   "tail_noise": 0.0631,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.7703,
+   "mid_mean": 0.6915,
+   "level_shift": 0.0788,
+   "slope_per_100_iters": -0.0443,
+   "tail_noise": 0.2477,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2455,
+   "mid_mean": 0.2176,
+   "level_shift": 0.0279,
+   "slope_per_100_iters": -0.0156,
+   "tail_noise": 0.0886,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1601,
+   "mid_mean": 0.2093,
+   "level_shift": -0.0492,
+   "slope_per_100_iters": -0.0061,
+   "tail_noise": 0.0716,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.8981,
+   "mid_mean": 0.8802,
+   "level_shift": 0.0179,
+   "slope_per_100_iters": 0.0108,
+   "tail_noise": 0.0542,
+   "verdict": "converged"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0032,
+   "mid_mean": 0.0035,
+   "level_shift": -0.0004,
+   "slope_per_100_iters": 0.0002,
+   "tail_noise": 0.0036,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.023,
+   "mid_mean": 0.0279,
+   "level_shift": -0.005,
+   "slope_per_100_iters": 0.002,
+   "tail_noise": 0.0239,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0475,
+   "mid_mean": 0.0589,
+   "level_shift": -0.0113,
+   "slope_per_100_iters": 0.0053,
+   "tail_noise": 0.0531,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0585,
+   "mid_mean": 0.0722,
+   "level_shift": -0.0137,
+   "slope_per_100_iters": 0.0057,
+   "tail_noise": 0.0634,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.024,
+   "mid_mean": 0.0293,
+   "level_shift": -0.0053,
+   "slope_per_100_iters": 0.0013,
+   "tail_noise": 0.0258,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0212,
+   "mid_mean": 0.0226,
+   "level_shift": -0.0014,
+   "slope_per_100_iters": -0.0013,
+   "tail_noise": 0.0146,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.8485,
+   "mid_mean": 1.0083,
+   "level_shift": -0.1598,
+   "slope_per_100_iters": -0.0286,
+   "tail_noise": 0.3489,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.4118,
+   "mid_mean": 0.4804,
+   "level_shift": -0.0686,
+   "slope_per_100_iters": -0.0271,
+   "tail_noise": 0.2216,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 1.1176,
+   "mid_mean": 1.333,
+   "level_shift": -0.2154,
+   "slope_per_100_iters": -0.0555,
+   "tail_noise": 0.4564,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.5844,
+   "mid_mean": 0.7127,
+   "level_shift": -0.1283,
+   "slope_per_100_iters": -0.0443,
+   "tail_noise": 0.2344,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.3219,
+   "mid_mean": 1.6178,
+   "level_shift": -0.2959,
+   "slope_per_100_iters": -0.0179,
+   "tail_noise": 0.4885,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0031,
+   "mid_mean": 0.0043,
+   "level_shift": -0.0012,
+   "slope_per_100_iters": -0.0001,
+   "tail_noise": 0.0022,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0686,
+   "mid_mean": 0.0947,
+   "level_shift": -0.026,
+   "slope_per_100_iters": 0.0007,
+   "tail_noise": 0.0405,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.6011,
+   "mid_mean": 0.8163,
+   "level_shift": -0.2152,
+   "slope_per_100_iters": 0.0515,
+   "tail_noise": 0.412,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1406,
+   "mid_mean": 0.2247,
+   "level_shift": -0.0841,
+   "slope_per_100_iters": -0.0034,
+   "tail_noise": 0.0767,
+   "verdict": "oscillating"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.5788,
+   "mid_mean": 0.7774,
+   "level_shift": -0.1986,
+   "slope_per_100_iters": 0.0542,
+   "tail_noise": 0.4049,
+   "verdict": "converged"
+  }
+ },
+ "tr_exact_020_s2.pt": {
+  "iterations": 1000,
+  "mean_terminal_reward": {
+   "tail_mean": 1.4969,
+   "mid_mean": 1.3806,
+   "level_shift": 0.1163,
+   "slope_per_100_iters": 0.0236,
+   "tail_noise": 0.1431,
+   "verdict": "converged"
+  },
+  "reward_on_wins": {
+   "tail_mean": 1.7511,
+   "mid_mean": 1.7603,
+   "level_shift": -0.0092,
+   "slope_per_100_iters": -0.0031,
+   "tail_noise": 0.0499,
+   "verdict": "converged"
+  },
+  "reward_on_losses": {
+   "tail_mean": -0.5789,
+   "mid_mean": -0.5119,
+   "level_shift": -0.0669,
+   "slope_per_100_iters": -0.0336,
+   "tail_noise": 0.0978,
+   "verdict": "converged"
+  },
+  "value_loss": {
+   "tail_mean": 0.0318,
+   "mid_mean": 0.0522,
+   "level_shift": -0.0204,
+   "slope_per_100_iters": -0.0124,
+   "tail_noise": 0.0286,
+   "verdict": "converged"
+  },
+  "loss_policy": {
+   "tail_mean": -0.0343,
+   "mid_mean": -0.0435,
+   "level_shift": 0.0092,
+   "slope_per_100_iters": 0.0031,
+   "tail_noise": 0.051,
+   "verdict": "converged"
+  },
+  "loss_total": {
+   "tail_mean": -0.0419,
+   "mid_mean": -0.0489,
+   "level_shift": 0.0069,
+   "slope_per_100_iters": -0.0048,
+   "tail_noise": 0.0577,
+   "verdict": "converged"
+  },
+  "entropy": {
+   "tail_mean": 0.6963,
+   "mid_mean": 0.6737,
+   "level_shift": 0.0226,
+   "slope_per_100_iters": -0.0123,
+   "tail_noise": 0.2245,
+   "verdict": "converged"
+  },
+  "normalized_entropy": {
+   "tail_mean": 0.2283,
+   "mid_mean": 0.2163,
+   "level_shift": 0.012,
+   "slope_per_100_iters": -0.0055,
+   "tail_noise": 0.0912,
+   "verdict": "converged"
+  },
+  "raw_advantage_std": {
+   "tail_mean": 0.1594,
+   "mid_mean": 0.2163,
+   "level_shift": -0.0569,
+   "slope_per_100_iters": -0.0332,
+   "tail_noise": 0.0713,
+   "verdict": "converged"
+  },
+  "win_rate": {
+   "tail_mean": 0.8907,
+   "mid_mean": 0.8331,
+   "level_shift": 0.0577,
+   "slope_per_100_iters": 0.0131,
+   "tail_noise": 0.0574,
+   "verdict": "oscillating"
+  },
+  "grad.entropy.global_encoder": {
+   "tail_mean": 0.0017,
+   "mid_mean": 0.0029,
+   "level_shift": -0.0012,
+   "slope_per_100_iters": 0.0002,
+   "tail_noise": 0.0017,
+   "verdict": "converged"
+  },
+  "grad.entropy.policy_head": {
+   "tail_mean": 0.0205,
+   "mid_mean": 0.0318,
+   "level_shift": -0.0112,
+   "slope_per_100_iters": 0.001,
+   "tail_noise": 0.0154,
+   "verdict": "converged"
+  },
+  "grad.entropy.slot_encoder": {
+   "tail_mean": 0.0296,
+   "mid_mean": 0.0523,
+   "level_shift": -0.0227,
+   "slope_per_100_iters": 0.0009,
+   "tail_noise": 0.0249,
+   "verdict": "converged"
+  },
+  "grad.entropy.total": {
+   "tail_mean": 0.0415,
+   "mid_mean": 0.0705,
+   "level_shift": -0.029,
+   "slope_per_100_iters": 0.0018,
+   "tail_noise": 0.0332,
+   "verdict": "converged"
+  },
+  "grad.entropy.trunk": {
+   "tail_mean": 0.02,
+   "mid_mean": 0.0337,
+   "level_shift": -0.0137,
+   "slope_per_100_iters": 0.0012,
+   "tail_noise": 0.0162,
+   "verdict": "converged"
+  },
+  "grad.policy.global_encoder": {
+   "tail_mean": 0.0172,
+   "mid_mean": 0.0212,
+   "level_shift": -0.004,
+   "slope_per_100_iters": -0.0014,
+   "tail_noise": 0.0122,
+   "verdict": "converged"
+  },
+  "grad.policy.policy_head": {
+   "tail_mean": 0.808,
+   "mid_mean": 1.0213,
+   "level_shift": -0.2133,
+   "slope_per_100_iters": -0.028,
+   "tail_noise": 0.3969,
+   "verdict": "converged"
+  },
+  "grad.policy.slot_encoder": {
+   "tail_mean": 0.3534,
+   "mid_mean": 0.4424,
+   "level_shift": -0.089,
+   "slope_per_100_iters": -0.0217,
+   "tail_noise": 0.1961,
+   "verdict": "converged"
+  },
+  "grad.policy.total": {
+   "tail_mean": 1.0531,
+   "mid_mean": 1.3417,
+   "level_shift": -0.2886,
+   "slope_per_100_iters": -0.0343,
+   "tail_noise": 0.5061,
+   "verdict": "converged"
+  },
+  "grad.policy.trunk": {
+   "tail_mean": 0.5615,
+   "mid_mean": 0.7333,
+   "level_shift": -0.1718,
+   "slope_per_100_iters": -0.0061,
+   "tail_noise": 0.2753,
+   "verdict": "converged"
+  },
+  "grad.total_pre_clip": {
+   "tail_mean": 1.2969,
+   "mid_mean": 1.5938,
+   "level_shift": -0.2969,
+   "slope_per_100_iters": -0.0877,
+   "tail_noise": 0.5375,
+   "verdict": "converged"
+  },
+  "grad.value.global_encoder": {
+   "tail_mean": 0.0032,
+   "mid_mean": 0.0045,
+   "level_shift": -0.0012,
+   "slope_per_100_iters": -0.0007,
+   "tail_noise": 0.0023,
+   "verdict": "converged"
+  },
+  "grad.value.slot_encoder": {
+   "tail_mean": 0.0678,
+   "mid_mean": 0.09,
+   "level_shift": -0.0222,
+   "slope_per_100_iters": -0.0148,
+   "tail_noise": 0.0386,
+   "verdict": "converged"
+  },
+  "grad.value.total": {
+   "tail_mean": 0.6589,
+   "mid_mean": 0.7766,
+   "level_shift": -0.1177,
+   "slope_per_100_iters": -0.1121,
+   "tail_noise": 0.4183,
+   "verdict": "converged"
+  },
+  "grad.value.trunk": {
+   "tail_mean": 0.1609,
+   "mid_mean": 0.2359,
+   "level_shift": -0.075,
+   "slope_per_100_iters": -0.0358,
+   "tail_noise": 0.0903,
+   "verdict": "converged"
+  },
+  "grad.value.value_head": {
+   "tail_mean": 0.634,
+   "mid_mean": 0.7327,
+   "level_shift": -0.0987,
+   "slope_per_100_iters": -0.105,
+   "tail_noise": 0.4087,
+   "verdict": "converged"
+  }
+ }
+}
