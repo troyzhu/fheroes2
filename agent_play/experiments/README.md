@@ -47,6 +47,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `symmetry_gap.py` | Does the same army win as often from the other chair, and how much of any gap is the game rather than the policy? | about 6 min over 10 matchups |
 | `evasion_stalemate.py` | Can a policy stall a battle by pure evasion, and what does a stall pay? The owner-predicted exploit, demonstrated and priced | seconds |
 | `tabula_rasa_pilot.py` | Could search bootstrap a policy from random initialization, with no demonstrations at all? Rounds of search play, distil, evaluate on a fixed matchup set | about 20 min for three rounds |
+| `convergence_report.py` | Had a training run settled when it stopped? Per-metric trend verdicts over a heartbeat's trailing third: converged, trending, or oscillating | seconds per heartbeat |
 
 ## Conventions
 
@@ -71,6 +72,12 @@ The reward column earns a caution the owner's question surfaced: the terminal re
 Agreement, wherever quoted alone, is top-1 exact match against the teacher's index. The diagnostic form is `fidelity_report.py`: top-1/3/5, the mean and median probability the policy gives the teacher's move, and the policy's mean entropy, which together separate confidently-wrong from undecided and near-miss from nowhere-close.
 
 Comparisons at a fixed iteration budget are statements about that budget. The divergence trust region read as worse than the ratio clip at 30 iterations on the pool and better at 60, on runs whose first 30 iterations were bit-identical; where feasible, settle a comparison by continuing the same runs rather than by rerunning them, since determinism makes the continuation free of re-run variance.
+
+Every training verdict states whether the run had settled, read from its heartbeat by `convergence_report.py` rather than eyeballed, because a budget comparison between a settled run and one still trending is a comparison of different things. Two readings need care. Training-pool convergence says nothing about generalization: the 2026-08-07 fixed-AI control converged on its training win rate while its held-out ladder had collapsed, so a settled curve licenses "more iterations would not have changed this", never "this is good". And under self-play the opponent mixture is nonstationary, so the training win rate is not a convergence signal at all there; the loss terms and entropy are what can settle.
+
+### The metric ledger
+
+What a training claim must be able to cite, accumulated from the owner's reporting requirements. During training, from the heartbeat and `training_dashboard.py`: the total loss and its policy, value and entropy terms separately; the per-term gradient norms measured before the sum and split per module; the cheap validation probes; normalized entropy $H/\log K$ as the sharpness diagnostic; and now the settlement verdict above. For a final performance claim: win rate with the built-in AI column beside it, the four quality columns (wq, lq, mg, rw) and episode length per suite, graded suites reported per rung, the real-map suite, the symmetry gauge with the engine's own gap as reference, and for imitation checkpoints the fidelity trio (top-1/3/5, teacher probability, entropy) with the reliability table and its deterministic-teacher caveat. Self-play adds per-opponent duel tables at an episode count that clears the measured $\pm 0.06$ noise band. The one owner-requested read still unbuilt is outcome-grounded calibration, predicted win probability against realized outcomes.
 
 Results belong in `../docs/archive/experiments/`, which is provenance. Conclusions belong in `../docs/rl/`. Decisions belong in `../docs/decisions/`, and only once the evidence supports one.
 
