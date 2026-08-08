@@ -128,13 +128,15 @@ def main() -> None:
     replay["checkpoint"] = pathlib.Path(args.checkpoint).name
     if args.defender_checkpoint:
         replay["defender_checkpoint"] = pathlib.Path(args.defender_checkpoint).name
-        replay["side"] = "both"
     replay["fixture"] = "m1_tiny_melee"  # BattleEnv default; the worker derives the world seed from it
     replay["attacker"] = args.attacker
     replay["defender"] = args.defender
     replay["attacker_hero"] = args.attacker_hero
     replay["defender_hero"] = args.defender_hero
-    replay["side"] = args.side
+    # A duel runs the worker side=both, and the stamp must say so: an earlier version stamped
+    # args.side here unconditionally, which clobbered a duel's "both" into "attacker" and made
+    # its replay desynchronize at the first defender decision (#43).
+    replay["side"] = "both" if args.defender_checkpoint else args.side
     replay["allow_wide"] = args.allow_wide
     pathlib.Path(args.out).write_text(json.dumps(replay))
     print(f"{replay['checkpoint']}: {replay['termination']} in {len(replay['frames'])} decisions "

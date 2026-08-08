@@ -39,8 +39,13 @@ def run_replay(args: argparse.Namespace, replay: dict, actions_path: pathlib.Pat
     for flag, key in (("--attacker-hero", "attacker_hero"), ("--defender-hero", "defender_hero")):
         if replay.get(key):
             cmd += [flag, replay[key]]
-    if replay.get("side"):
-        cmd += ["--side", replay["side"]]
+    # A duel (a second checkpoint on the defender) is a both-side recording whatever its stamp
+    # says: capture_replay once clobbered the duel stamp to "attacker", and replaying a
+    # two-sided action stream one-sided desynchronizes at the first defender decision (#43).
+    # Deriving the side from the recording's substance keeps those vendored duels replayable.
+    side = "both" if replay.get("defender_checkpoint") else replay.get("side")
+    if side:
+        cmd += ["--side", side]
     if replay.get("allow_wide", args.allow_wide):
         cmd.append("--allow-wide")
     if render:
