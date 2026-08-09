@@ -60,8 +60,9 @@ def main() -> None:
                           defender_hero=e.get("defender_hero"), allow_wide=bool(e.get("allow_wide")))
         swapped = Matchup(e["defender"], e["attacker"], attacker_hero=e.get("defender_hero"),
                           defender_hero=e.get("attacker_hero"), allow_wide=bool(e.get("allow_wide")))
-        as_attacker = ai_win_rate(args.worker, forward, "attacker", args.episodes)
-        as_defender = ai_win_rate(args.worker, swapped, "defender", args.episodes)
+        # `ai_win_rate` returns the full column set since 2026-08-08, so take the rate.
+        as_attacker = ai_win_rate(args.worker, forward, "attacker", args.episodes)["win_rate"]
+        as_defender = ai_win_rate(args.worker, swapped, "defender", args.episodes)["win_rate"]
         ai_pairs.append((as_attacker, as_defender))
     ai_gap = np.array([a - d for a, d in ai_pairs])
     report["results"]["builtin_ai"] = {"as_attacker": [a for a, _ in ai_pairs], "as_defender": [d for _, d in ai_pairs],

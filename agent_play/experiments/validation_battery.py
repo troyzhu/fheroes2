@@ -29,9 +29,11 @@ import numpy as np
 import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure, sample_budget_matchup  # noqa: E402
+from sampling_policies import Sampler  # noqa: E402
 
 POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive" / "experiments" / "files" \
     / "2026-08-05-run-reports" / "pool_value.json"
@@ -120,6 +122,9 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=24)
     parser.add_argument("--eval-seeds", type=int, default=4)
     parser.add_argument("--fresh", type=int, default=24)
+    parser.add_argument("--deployment", default="sample", choices=("sample", "greedy", "adaptive"),
+                        help="how the policy acts at evaluation; every historical number is `sample`, "
+                             "which pays a stochasticity penalty the deterministic engine does not")
     parser.add_argument("--reward-margin", default="two_sided",
                         choices=("hit_points", "strength", "two_sided"),
                         help="which objective the rw column reports; stamped into the report")
@@ -132,12 +137,18 @@ def main() -> None:
               "episodes": args.episodes, "eval_seeds": args.eval_seeds,
               # Self-describing: reports without this key predate 2026-08-08 and their rw column
               # is the hit-point margin whatever the checkpoint trained on.
-              "reward_margin": args.reward_margin, "results": {}}
+              "reward_margin": args.reward_margin, "deployment": args.deployment, "results": {}}
 
     for path in args.checkpoints:
         name = pathlib.Path(path).name
         from fheroes2_agent.policy import load_policy
         model = load_policy(torch.load(path, map_location="cpu", weights_only=True)["state_dict"])
+        if args.deployment != "sample":
+            # `measure` samples the distribution it is handed, so a deployment rule is a logits
+            # transform wrapped around the checkpoint rather than a change to the harness: greedy
+            # collapses to the argmax, adaptive keeps the entropy-scaled nucleus.
+            scheme = "greedy" if args.deployment == "greedy" else "adaptive"
+            model = Sampler(model, scheme)
         model.eval()
         report["results"][name] = {}
         report.setdefault("quality", {})[name] = {}
