@@ -2,15 +2,15 @@
 title: "ADR 0005 — Training algorithm and reward design"
 type: adr
 status: partially accepted
-updated: 2026-07-30
-related_concepts: ["[[../rl/rl-and-the-battle-domain]]", "[[../implementation/teacher-coverage-and-behavior-cloning]]"]
+updated: 2026-08-08
+related_concepts: ["[[../rl/rl-and-the-battle-domain]]", "[[../implementation/teacher-coverage-and-behavior-cloning]]", "[[0007-anchored-ppo]]", "[[../rl/reward-design]]"]
 tags: [adr, training, reward, agent-env]
 ---
 
 # ADR 0005 — Training algorithm and reward design
 
 - Status: algorithm choice accepted, reward design deliberately open with the decision criteria fixed here
-- Implementation: nothing here is built. No learner exists in this repository by design, and Milestone 2 has recorded 116 teacher decisions across the fixture set, which is the dataset stage 1 would start from. Everything below binds the training milestones, not the current code.
+- Implementation: built as of 2026-08-08, which reverses this line's original claim that no learner existed here by design. `python/fheroes2_agent/` carries behavior cloning, critic pre-fitting, masked PPO with the ratio clip, the DPPO divergence gates measured null at this budget, the anchored KL leash of [[0007-anchored-ppo]], self-play with pooled opponents, and the two-sided strength-priced terminal reward in `env.py`. The reward question this record left deliberately open is settled by that objective; the alternatives analysis below is kept as the reasoning that led there.
 - Evidence: [[../research/findings]], [[../research/works/alphastar]], [[../implementation/teacher-coverage-and-behavior-cloning]], user question 2026-07-30
 - Techniques: [[../rl/rl-methods]] defines every method named below, with its equation and our verdict.
 - Mechanics: [[../rl/training-design]] carries the architecture, losses, hyperparameters, and the full alternatives analysis. This record states the decisions and their reasons only.
@@ -79,7 +79,7 @@ Stage 3, masked PPO. Proximal policy optimization with legality masking is the w
 
 Implementation. A single-file CleanRL-style implementation rather than a framework, which is what the one shipped comparable system used, and which keeps device placement under our control on Apple silicon. `sb3-contrib`'s `MaskablePPO` is the fallback if that proves inconvenient.
 
-Opponent mixture. Training against a single opponent produces agents that lose to simple strategies. Train against a mixture of the engine AI's configurations from the start.
+Opponent mixture. Training against a single opponent produces agents that lose to simple strategies. Train against opponent variety from the start, which since 2026-08-08 means army handicapping, frozen own checkpoints and search-distilled checkpoints rather than engine difficulty settings: `difficulty.cpp` returns a non-default only on the easiest setting and its battle-side consumers gate ability valuations unreachable under `simple_v1`, so the engine's difficulty knob is not an opponent axis here.
 
 Not chosen, and why. Value-based methods such as masked DQN variants are viable and were used by the comparable system, but policy-gradient methods have the stronger evidence base for masked discrete spaces and compose more naturally with the imitation stages. Planning methods such as MCTS and MuZero remain attractive because the simulator is fast and deterministic, and the environment deliberately keeps that door open, but they are not the first thing to try. Self-play leagues are premature until a policy exists that is worth playing against.
 

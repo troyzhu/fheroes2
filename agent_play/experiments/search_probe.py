@@ -131,7 +131,13 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
         visits[chosen] += 1
         total_return[chosen] += value
     means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
-    return max(visits, key=visits.get), means, visits, prior
+    # Ties on visit count are broken by the mean rollout value, not by action index. `visits` is
+    # keyed in ascending legal-action order, so a plain argmax over it returns the lowest index,
+    # and under coverage forcing ties are the common case rather than the rare one: 11.12 percent
+    # of the 15,007 decisions in the first scaled corpus tied at the top and every one of them
+    # was labeled by array position. The value is the signal the search actually measured.
+    best = max(actions, key=lambda a: (visits[a], means[a]))
+    return best, means, visits, prior
 
 
 def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],

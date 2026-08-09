@@ -33,7 +33,7 @@ The source is Nathan Lambert's *Reinforcement Learning from Human Feedback* ([rl
 | Group and leave-one-out baselines instead of a critic | Yes, strongly | Battles are cheap and seed-repeatable, so the sampling this needs is nearly free |
 | Aggregation unit, per-decision against per-episode | Yes | Battles vary 5 to 40 decisions, the same length-bias structure as variable completion length |
 | The exact statement of value-network bias | Yes | Decides whether a critic fitted on very little data is safe |
-| A KL leash to a reference policy | Contested, and the book argues both sides | The cloned policy is a genuine reference, but reasoning practice removed the leash to allow exploration |
+| A KL leash to a reference policy | Adopted 2026-08-08 after the trigger fired | The cloned policy is a genuine reference, but reasoning practice removed the leash to allow exploration |
 | Replacing the clipped ratio with a computed divergence | Yes, and the usual cost objection is absent here | 793 slots with 5 to 30 legal makes the exact divergence nearly free |
 | Overoptimization and the proxy-against-gold measurement | Yes | The shaped-reward risk in [[../decisions/0005-training-and-reward]] is the same failure |
 | Evaluation variance, contamination, hillclimbing | Yes | The five fixtures cannot be both regression anchors and the reported evaluation |
@@ -129,7 +129,7 @@ The same source argues the other way, and honesty requires reporting it. As reas
 
 The book also notes a third path that costs nothing. On-policy sampling is itself an implicit regularizer, because updates stay near where the policy already puts probability mass, which is why reinforcement learning forgets less than supervised fine-tuning on distant targets. Stage 3 is on-policy, so some protection is already present without any coefficient.
 
-The resulting recommendation is narrower than the one this page carried before. Do not add a KL leash by default. Instrument the divergence from the cloned checkpoint, watch whether early stage-3 updates degrade win rate against the teacher, and add the penalty only if that degradation appears. If it does, the reward-penalty and loss-term forms are both available and the book treats the choice as minor.
+The resulting recommendation was narrower than the one this page carried before: do not add a KL leash by default, instrument the divergence from the cloned checkpoint, and add the penalty only if early updates degrade play against the teacher. That trigger fired. Reinforcement from strong anchors eroded out-of-distribution play in every configuration tried through 2026-08-08, breadth did not fix it and neither did the step-level trust regions, and the leash did: the loss-term form at $\beta = 0.5$ recovers the flagship ladder to anchor level at no on-distribution cost. It is now the standing recipe under [[../decisions/0007-anchored-ppo]], which is the one place on this page where the transfer proved not merely applicable but necessary.
 
 ## The ratio is a one-sample estimate of a divergence you can afford to compute
 

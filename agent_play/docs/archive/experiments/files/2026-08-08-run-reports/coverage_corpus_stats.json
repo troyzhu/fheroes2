@@ -1,0 +1,11 @@
+{
+ "corpus": "coverage_corpus_xl",
+ "simulations": 48,
+ "coverage_forced": true,
+ "decisions": 15007,
+ "ties": 1669,
+ "relabeled": 721,
+ "full_support": 13783,
+ "mean_coverage": 0.9892,
+ "full_support_fraction": 0.9184
+}
