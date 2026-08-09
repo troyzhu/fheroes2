@@ -1,0 +1,427 @@
+{
+  "roots": [
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_diverse",
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_dagger",
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/data_dagger"
+  ],
+  "soft_root": [
+    "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/regret_corpus"
+  ],
+  "lam": 0.5,
+  "soft_weight": 2.0,
+  "seed": 1,
+  "target_entropy": 0.4386475384235382,
+  "soft": {
+    "epoch": 24,
+    "agreement": 0.8579804816622069,
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss_hard": 1.72421,
+        "train_loss_soft": 0.08011,
+        "train_loss": 1.80432,
+        "holdout_agreement": 0.54779,
+        "lr": 0.0003
+      },
+      {
+        "epoch": 1,
+        "train_loss_hard": 1.23999,
+        "train_loss_soft": 0.05342,
+        "train_loss": 1.29341,
+        "holdout_agreement": 0.64277,
+        "lr": 0.00029885663169059926
+      },
+      {
+        "epoch": 2,
+        "train_loss_hard": 1.02893,
+        "train_loss_soft": 0.04392,
+        "train_loss": 1.07284,
+        "holdout_agreement": 0.6905,
+        "lr": 0.00029544455836365144
+      },
+      {
+        "epoch": 3,
+        "train_loss_hard": 0.89084,
+        "train_loss_soft": 0.03947,
+        "train_loss": 0.93032,
+        "holdout_agreement": 0.72265,
+        "lr": 0.0002898175904537964
+      },
+      {
+        "epoch": 4,
+        "train_loss_hard": 0.79161,
+        "train_loss_soft": 0.03662,
+        "train_loss": 0.82824,
+        "holdout_agreement": 0.75197,
+        "lr": 0.0002820644686063602
+      },
+      {
+        "epoch": 5,
+        "train_loss_hard": 0.71698,
+        "train_loss_soft": 0.03512,
+        "train_loss": 0.7521,
+        "holdout_agreement": 0.77044,
+        "lr": 0.0002723074641843674
+      },
+      {
+        "epoch": 6,
+        "train_loss_hard": 0.66086,
+        "train_loss_soft": 0.03412,
+        "train_loss": 0.69499,
+        "holdout_agreement": 0.79075,
+        "lr": 0.00026070045097610465
+      },
+      {
+        "epoch": 7,
+        "train_loss_hard": 0.61627,
+        "train_loss_soft": 0.03334,
+        "train_loss": 0.64961,
+        "holdout_agreement": 0.80137,
+        "lr": 0.00024742647851355997
+      },
+      {
+        "epoch": 8,
+        "train_loss_hard": 0.57868,
+        "train_loss_soft": 0.03275,
+        "train_loss": 0.61144,
+        "holdout_agreement": 0.80834,
+        "lr": 0.00023269488527195444
+      },
+      {
+        "epoch": 9,
+        "train_loss_hard": 0.54738,
+        "train_loss_soft": 0.03225,
+        "train_loss": 0.57963,
+        "holdout_agreement": 0.81871,
+        "lr": 0.00021673799727693548
+      },
+      {
+        "epoch": 10,
+        "train_loss_hard": 0.52122,
+        "train_loss_soft": 0.03198,
+        "train_loss": 0.5532,
+        "holdout_agreement": 0.82406,
+        "lr": 0.00019980746418436733
+      },
+      {
+        "epoch": 11,
+        "train_loss_hard": 0.49889,
+        "train_loss_soft": 0.03168,
+        "train_loss": 0.53057,
+        "holdout_agreement": 0.83081,
+        "lr": 0.00018217029061493007
+      },
+      {
+        "epoch": 12,
+        "train_loss_hard": 0.47866,
+        "train_loss_soft": 0.03134,
+        "train_loss": 0.51,
+        "holdout_agreement": 0.83524,
+        "lr": 0.00016410462533175042
+      },
+      {
+        "epoch": 13,
+        "train_loss_hard": 0.46178,
+        "train_loss_soft": 0.03116,
+        "train_loss": 0.49295,
+        "holdout_agreement": 0.83844,
+        "lr": 0.00014589537466824955
+      },
+      {
+        "epoch": 14,
+        "train_loss_hard": 0.44674,
+        "train_loss_soft": 0.03102,
+        "train_loss": 0.47776,
+        "holdout_agreement": 0.84273,
+        "lr": 0.00012782970938506993
+      },
+      {
+        "epoch": 15,
+        "train_loss_hard": 0.43366,
+        "train_loss_soft": 0.0308,
+        "train_loss": 0.46447,
+        "holdout_agreement": 0.84629,
+        "lr": 0.00011019253581563266
+      },
+      {
+        "epoch": 16,
+        "train_loss_hard": 0.42267,
+        "train_loss_soft": 0.03068,
+        "train_loss": 0.45335,
+        "holdout_agreement": 0.84661,
+        "lr": 9.326200272306445e-05
+      },
+      {
+        "epoch": 17,
+        "train_loss_hard": 0.41304,
+        "train_loss_soft": 0.03057,
+        "train_loss": 0.44361,
+        "holdout_agreement": 0.85129,
+        "lr": 7.730511472804544e-05
+      },
+      {
+        "epoch": 18,
+        "train_loss_hard": 0.40501,
+        "train_loss_soft": 0.03041,
+        "train_loss": 0.43542,
+        "holdout_agreement": 0.85137,
+        "lr": 6.257352148643998e-05
+      },
+      {
+        "epoch": 19,
+        "train_loss_hard": 0.39817,
+        "train_loss_soft": 0.03032,
+        "train_loss": 0.42848,
+        "holdout_agreement": 0.85182,
+        "lr": 4.9299549023895354e-05
+      },
+      {
+        "epoch": 20,
+        "train_loss_hard": 0.39267,
+        "train_loss_soft": 0.0302,
+        "train_loss": 0.42288,
+        "holdout_agreement": 0.85668,
+        "lr": 3.769253581563264e-05
+      },
+      {
+        "epoch": 21,
+        "train_loss_hard": 0.38815,
+        "train_loss_soft": 0.03018,
+        "train_loss": 0.41833,
+        "holdout_agreement": 0.85613,
+        "lr": 2.7935531393639787e-05
+      },
+      {
+        "epoch": 22,
+        "train_loss_hard": 0.3847,
+        "train_loss_soft": 0.03013,
+        "train_loss": 0.41482,
+        "holdout_agreement": 0.8569,
+        "lr": 2.018240954620356e-05
+      },
+      {
+        "epoch": 23,
+        "train_loss_hard": 0.38223,
+        "train_loss_soft": 0.03011,
+        "train_loss": 0.41234,
+        "holdout_agreement": 0.85745,
+        "lr": 1.4555441636348513e-05
+      },
+      {
+        "epoch": 24,
+        "train_loss_hard": 0.38041,
+        "train_loss_soft": 0.03003,
+        "train_loss": 0.41044,
+        "holdout_agreement": 0.85798,
+        "lr": 1.1143368309400725e-05
+      }
+    ]
+  },
+  "hard_twin": {
+    "epoch": 24,
+    "agreement": 0.8596135683928853,
+    "history": [
+      {
+        "epoch": 0,
+        "train_loss_hard": 1.73189,
+        "train_loss_soft": 0.08446,
+        "train_loss": 1.81635,
+        "holdout_agreement": 0.54063,
+        "lr": 0.0003
+      },
+      {
+        "epoch": 1,
+        "train_loss_hard": 1.25339,
+        "train_loss_soft": 0.06271,
+        "train_loss": 1.31609,
+        "holdout_agreement": 0.64131,
+        "lr": 0.00029885663169059926
+      },
+      {
+        "epoch": 2,
+        "train_loss_hard": 1.03385,
+        "train_loss_soft": 0.05367,
+        "train_loss": 1.08752,
+        "holdout_agreement": 0.68944,
+        "lr": 0.00029544455836365144
+      },
+      {
+        "epoch": 3,
+        "train_loss_hard": 0.89438,
+        "train_loss_soft": 0.04826,
+        "train_loss": 0.94264,
+        "holdout_agreement": 0.72283,
+        "lr": 0.0002898175904537964
+      },
+      {
+        "epoch": 4,
+        "train_loss_hard": 0.79438,
+        "train_loss_soft": 0.04494,
+        "train_loss": 0.83932,
+        "holdout_agreement": 0.75203,
+        "lr": 0.0002820644686063602
+      },
+      {
+        "epoch": 5,
+        "train_loss_hard": 0.71979,
+        "train_loss_soft": 0.04215,
+        "train_loss": 0.76194,
+        "holdout_agreement": 0.76806,
+        "lr": 0.0002723074641843674
+      },
+      {
+        "epoch": 6,
+        "train_loss_hard": 0.66167,
+        "train_loss_soft": 0.04002,
+        "train_loss": 0.70169,
+        "holdout_agreement": 0.79104,
+        "lr": 0.00026070045097610465
+      },
+      {
+        "epoch": 7,
+        "train_loss_hard": 0.61715,
+        "train_loss_soft": 0.03827,
+        "train_loss": 0.65543,
+        "holdout_agreement": 0.80476,
+        "lr": 0.00024742647851355997
+      },
+      {
+        "epoch": 8,
+        "train_loss_hard": 0.57893,
+        "train_loss_soft": 0.03653,
+        "train_loss": 0.61546,
+        "holdout_agreement": 0.81225,
+        "lr": 0.00023269488527195444
+      },
+      {
+        "epoch": 9,
+        "train_loss_hard": 0.54783,
+        "train_loss_soft": 0.03561,
+        "train_loss": 0.58343,
+        "holdout_agreement": 0.81668,
+        "lr": 0.00021673799727693548
+      },
+      {
+        "epoch": 10,
+        "train_loss_hard": 0.52217,
+        "train_loss_soft": 0.03429,
+        "train_loss": 0.55646,
+        "holdout_agreement": 0.82339,
+        "lr": 0.00019980746418436733
+      },
+      {
+        "epoch": 11,
+        "train_loss_hard": 0.49889,
+        "train_loss_soft": 0.03335,
+        "train_loss": 0.53224,
+        "holdout_agreement": 0.83012,
+        "lr": 0.00018217029061493007
+      },
+      {
+        "epoch": 12,
+        "train_loss_hard": 0.47876,
+        "train_loss_soft": 0.03259,
+        "train_loss": 0.51135,
+        "holdout_agreement": 0.83545,
+        "lr": 0.00016410462533175042
+      },
+      {
+        "epoch": 13,
+        "train_loss_hard": 0.46195,
+        "train_loss_soft": 0.0315,
+        "train_loss": 0.49345,
+        "holdout_agreement": 0.84023,
+        "lr": 0.00014589537466824955
+      },
+      {
+        "epoch": 14,
+        "train_loss_hard": 0.44684,
+        "train_loss_soft": 0.03104,
+        "train_loss": 0.47788,
+        "holdout_agreement": 0.84336,
+        "lr": 0.00012782970938506993
+      },
+      {
+        "epoch": 15,
+        "train_loss_hard": 0.43375,
+        "train_loss_soft": 0.03035,
+        "train_loss": 0.4641,
+        "holdout_agreement": 0.84612,
+        "lr": 0.00011019253581563266
+      },
+      {
+        "epoch": 16,
+        "train_loss_hard": 0.42303,
+        "train_loss_soft": 0.02972,
+        "train_loss": 0.45276,
+        "holdout_agreement": 0.84952,
+        "lr": 9.326200272306445e-05
+      },
+      {
+        "epoch": 17,
+        "train_loss_hard": 0.41295,
+        "train_loss_soft": 0.0293,
+        "train_loss": 0.44226,
+        "holdout_agreement": 0.85151,
+        "lr": 7.730511472804544e-05
+      },
+      {
+        "epoch": 18,
+        "train_loss_hard": 0.40501,
+        "train_loss_soft": 0.0288,
+        "train_loss": 0.43381,
+        "holdout_agreement": 0.85231,
+        "lr": 6.257352148643998e-05
+      },
+      {
+        "epoch": 19,
+        "train_loss_hard": 0.3982,
+        "train_loss_soft": 0.02847,
+        "train_loss": 0.42667,
+        "holdout_agreement": 0.85436,
+        "lr": 4.9299549023895354e-05
+      },
+      {
+        "epoch": 20,
+        "train_loss_hard": 0.39264,
+        "train_loss_soft": 0.02812,
+        "train_loss": 0.42077,
+        "holdout_agreement": 0.85686,
+        "lr": 3.769253581563264e-05
+      },
+      {
+        "epoch": 21,
+        "train_loss_hard": 0.38806,
+        "train_loss_soft": 0.02788,
+        "train_loss": 0.41594,
+        "holdout_agreement": 0.85706,
+        "lr": 2.7935531393639787e-05
+      },
+      {
+        "epoch": 22,
+        "train_loss_hard": 0.38472,
+        "train_loss_soft": 0.02767,
+        "train_loss": 0.41239,
+        "holdout_agreement": 0.85845,
+        "lr": 2.018240954620356e-05
+      },
+      {
+        "epoch": 23,
+        "train_loss_hard": 0.38219,
+        "train_loss_soft": 0.02752,
+        "train_loss": 0.4097,
+        "holdout_agreement": 0.859,
+        "lr": 1.4555441636348513e-05
+      },
+      {
+        "epoch": 24,
+        "train_loss_hard": 0.38037,
+        "train_loss_soft": 0.02736,
+        "train_loss": 0.40773,
+        "holdout_agreement": 0.85961,
+        "lr": 1.1143368309400725e-05
+      }
+    ]
+  },
+  "seconds": 148.1
+}

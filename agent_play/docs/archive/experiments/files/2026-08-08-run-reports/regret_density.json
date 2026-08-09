@@ -1,0 +1,16 @@
+{
+ "coverage_corpus_xl": {
+  "decisions": 15007,
+  "nonzero_fraction": 0.0682,
+  "mean_regret": 0.0334,
+  "total_regret": 501.2,
+  "p95": 0.0443
+ },
+ "regret_band": {
+  "decisions": 5143,
+  "nonzero_fraction": 0.1143,
+  "mean_regret": 0.1238,
+  "total_regret": 636.9,
+  "p95": 1.1711
+ }
+}

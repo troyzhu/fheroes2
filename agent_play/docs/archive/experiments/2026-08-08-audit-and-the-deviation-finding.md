@@ -87,3 +87,26 @@ The leash made reinforcement non-destructive, which left the obvious question of
 The extra budget buys recovery and not height. Held-out reads 0.507 against the shorter runs' 0.482 and the anchor's 0.498; the Thunk ladder reads 0.906, which is the anchor's number to three decimals; commanders return to the anchor's 0.958. The only suite that moves materially the other way is mirrors as attacker, down 0.045. Quadrupling the budget therefore moves a leashed run from slightly below its anchor to level with it, and nothing in the table suggests a further quadrupling would cross it.
 
 Taken with the leash result this closes a question the erosion verdicts had left open. Reinforcement here is a retention mechanism: the leash stops it destroying the anchor, budget lets it finish returning to the anchor, and neither produces a policy better than the supervised checkpoint it started from. Any crossing has to come from somewhere other than more of this, which is what makes the regret-band data the live line rather than the optimizer (`battery_long4k.json`, `convergence_long4k.json`).
+
+## Collecting in the band beats collecting more
+
+The weighting result left one question: whether collecting where the regret is compounds the gain from reweighting what exists. The screen was extended to the standing pool, which is the distribution the probe's decisive matchups came from, and a four-shard round kept 17 of 40 matchups, every kept one with a prior rate at or below 0.5, at 16 episodes each under coverage-forced search.
+
+The screen works at the level it was aimed at. Against the unscreened scaled corpus the targeted one carries 11.4 percent of decisions with nonzero regret against 6.8, a mean regret of 0.124 against 0.033, and 637 units of total measured regret against 501, which is more teaching signal in a third of the labels (`regret_density.json`).
+
+Distilled with the same regret weighting, three seeds, evaluated greedily against the same arms:
+
+| Suite | Built-in AI | Band only, 5k labels | Unscreened, 15k labels | Combined, 20k labels |
+|---|---|---|---|---|
+| Held-out pool | 0.660 / $+0.87$ | 0.571 / $+0.73$ | 0.546 / $+0.65$ | 0.492 / $+0.55$ |
+| Thunk ladder | 0.969 / $+1.63$ | 0.708 / $+1.03$ | 0.771 / $+1.24$ | 0.812 / $+1.29$ |
+| Held-out as defender | 0.338 / $+0.13$ | 0.283 / $-0.04$ | 0.267 / $-0.07$ | 0.275 / $-0.06$ |
+| Mirrors as attacker | 0.361 / $+0.25$ | 0.167 / $-0.14$ | 0.264 / $+0.02$ | 0.194 / $-0.10$ |
+| Mirrors as defender | 0.639 / $+0.75$ | 0.375 / $+0.25$ | 0.250 / $+0.04$ | 0.375 / $+0.28$ |
+| Commanders | 0.958 / $+1.72$ | 0.917 / $+1.68$ | 0.958 / $+1.74$ | 0.979 / $+1.78$ |
+| Fresh sampled | 0.446 / $+0.31$ | 0.417 / $+0.23$ | 0.396 / $+0.18$ | 0.382 / $+0.14$ |
+| Real maps | 0.568 / $+0.66$ | 0.562 / $+0.64$ | 0.562 / $+0.64$ | 0.562 / $+0.65$ |
+
+A third of the data, targeted, beats three times as much of it collected the old way on held-out, on both defender suites and on fresh samples, and the per-seed held-out values are 0.600, 0.562 and 0.550, every one of them above the unscreened arm's mean. The defender mirror moves furthest, $+0.125$, which is the suite carrying the largest gap to the engine. At 0.571 held-out against 0.660 this is the best weights-only reading this project has produced, and the shortfall is 0.089 where it has sat near 0.13 all week.
+
+Two things keep it honest. The targeted arm loses the Thunk ladder, 0.708 against 0.771, and the attacker mirror, and those are real regressions rather than noise at this spread, so the arm trades rather than dominates. And the combined corpus is worse than either of its parts on held-out, which is almost certainly the soft-mass confound the scale test already flagged: more soft rows at a fixed per-row weight is more total soft mass against a fixed hard set, so that arm needs a mass-matched rerun before it means anything at all (`battery_band.json`, `band_distill_s*.json`).

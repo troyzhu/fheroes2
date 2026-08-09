@@ -28,7 +28,7 @@ exists  agent_play/experiments/deviation_probe.py
 
 | Suite | Built-in AI | `policy_gen1.pt` | Leashed self-play | Standing |
 |---|---|---|---|---|
-| Held-out pool | 0.660 / $+0.87$ | 0.525 / $+0.59$ | 0.499 / $+0.57$ | Short by 0.13 on rate |
+| Held-out pool | 0.660 / $+0.87$ | 0.525 / $+0.59$ | 0.499 / $+0.57$ | Short by 0.13; the regret-band distillation reads 0.571 greedy, short by 0.089 |
 | Thunk ladder | 0.969 / $+1.63$ | 0.875 / $+1.47$ | 0.892 / $+1.48$ | Short by 0.08 |
 | Held-out as defender | 0.338 / $+0.13$ | 0.271 / $-0.06$ | 0.258 / $-0.10$ | Short by 0.08 |
 | Mirrors as attacker | 0.361 / $+0.25$ | 0.194 / $-0.11$ | 0.162 / $-0.15$ | Short by 0.17 |
@@ -105,7 +105,7 @@ Two facts frame the ranking. No reinforcement configuration here has yet produce
 |---|---|---|
 | 1 | Collect where the policy loses, distil weighted by regret | Measured 2026-08-08: weighting soft rows by rank-transformed regret at equal soft mass beats its unweighted twin by $+0.063$ held-out and $+0.135$ on reward, paired positive on every seed, and beats the hard twin by $+0.102$; the deviation probe explains why, and collecting more of the 6.8 percent that carries regret is the untested half |
 | 2 | The deployment rule, per checkpoint | Measured 2026-08-08: greedy helps every distilled arm and hurts the supervised anchor, so the rule is a property of how well a checkpoint ranks rather than a universal correction; the best weights-only reading is 0.546 held-out under a stated rule |
-| 3 | Search-teacher collection in the regret band | The untested half of rank one: whether collecting more of the 6.8 percent that carries regret compounds the weighting gain, with the screen now on both collection paths |
+| 3 | Search-teacher collection in the regret band | Measured 2026-08-08: a screened corpus of 5,143 labels carries 3.7 times the regret per label and beats three times as much unscreened data, held-out 0.571 against 0.546 with every seed above the comparator and the defender mirror up 0.125, at the cost of the ladder; the mass-matched combination is the open rerun |
 | 4 | Anchored reinforcement, closed as retention | Measured 2026-08-08: four times the budget on the leashed base climbs back to the anchor and stops there, held-out 0.507 and the ladder 0.906 against the anchor's 0.498 and 0.906, both runs converged; reinforcement here retains rather than climbs, so a crossing must come from elsewhere |
 | 5 | Group-relative advantages with shared starts | The repository's own strongest precedent for the wide distribution's problem: groups sharing one matchup transferred fivefold better than groups spanning eight, and the wide arm's advantage spread looks difficulty-inflated rather than starved |
 | 6 | The deployment compute ladder | Only 32 and 48 simulations have ever been run; if the crossing survives at eight the agent regime becomes shippable rather than an oracle |
