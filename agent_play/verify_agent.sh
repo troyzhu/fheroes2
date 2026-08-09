@@ -129,6 +129,9 @@ report "reward, GAE and truncation unit tests" "$?" "$(grep -c '^  PASS' "${WORK
 python3 "${PY}/tests/test_objectives.py" > "${WORKDIR}/obj.log" 2>&1
 report "advantage and trust-region unit tests" "$?" "$(grep -c '^  PASS' "${WORKDIR}/obj.log") checks"
 
+python3 "${PY}/tests/test_rewards_and_chairs.py" > "${WORKDIR}/rew.log" 2>&1
+report "two-sided reward, stalemate and chair-aware win rate" "$?" "$(grep -c '^  PASS' "${WORKDIR}/rew.log") checks"
+
 # PPO end to end on a matchup measured to sit inside the difficulty band. Five iterations is
 # enough to show the loop closes; the published improvement comes from a longer run.
 ( cd "${PY}" && timeout 600 python3 -m fheroes2_agent.train_ppo "${WORKER}" \

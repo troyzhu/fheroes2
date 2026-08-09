@@ -408,6 +408,11 @@ def train(
         # appended as it happens, so a dashboard can watch training health without waiting for
         # the end-of-run report. Defaults on whenever a checkpoint path exists.
         beat_path = heartbeat or (out + ".heartbeat.jsonl" if out else None)
+        if beat_path and iteration == 0:
+            # Truncate at run start. Appending across runs concatenates two trainings into one
+            # file, and convergence_report reads a file as a single run, so it would issue a
+            # settlement verdict over the join of two.
+            pathlib.Path(beat_path).write_text("")
         if beat_path:
             with open(beat_path, "a") as beat:
                 beat.write(json.dumps(history[-1]) + "\n")

@@ -26,18 +26,19 @@ exists  agent_play/docs/decisions/0007-anchored-ppo.md
 exists  agent_play/experiments/deviation_probe.py
 -->
 
-| Suite | Built-in AI | `policy_gen1.pt` | Leashed self-play | Standing |
-|---|---|---|---|---|
-| Held-out pool | 0.660 / $+0.87$ | 0.525 / $+0.59$ | 0.499 / $+0.57$ | Short by 0.13; the best distilled arm reads 0.571 to 0.579 greedy, short by about 0.085 |
-| Thunk ladder | 0.969 / $+1.63$ | 0.875 / $+1.47$ | 0.892 / $+1.48$ | Short by 0.08 |
-| Held-out as defender | 0.338 / $+0.13$ | 0.271 / $-0.06$ | 0.258 / $-0.10$ | Short by 0.08 |
-| Mirrors as attacker | 0.361 / $+0.25$ | 0.194 / $-0.11$ | 0.162 / $-0.15$ | Short by 0.17 |
-| Mirrors as defender | 0.639 / $+0.75$ | 0.250 / $+0.04$ | 0.324 / $+0.17$ | Short by 0.32, the largest gap left |
-| Commanders | 0.958 / $+1.72$ | 0.958 / $+1.78$ | 0.976 / $+1.79$ | At par or ahead |
-| Hordes | 0.192 / $-0.33$ | 0.175 / $-0.36$ | 0.167 / $-0.37$ | At par |
-| Fresh sampled | 0.446 / $+0.31$ | 0.372 / $+0.13$ | 0.372 / $+0.14$ | Short by 0.07 |
-| Real maps | 0.568 / $+0.66$ | 0.564 / $+0.64$ | 0.564 / $+0.64$ | At par |
-| Held-out pool, agent regime | 0.660 | search over the prior: $0.963 \pm 0.027$ | | Past the baseline decisively |
+| Suite | Built-in AI | `policy_gen1.pt` | Leashed self-play | Regret-band distillation | Standing |
+|---|---|---|---|---|---|
+| Held-out pool | 0.660 / $+0.87$ | 0.525 / $+0.59$ | 0.499 / $+0.57$ | **0.571 / $+0.74$** | Short by 0.089 |
+| Thunk ladder | 0.969 / $+1.63$ | 0.875 / $+1.47$ | 0.892 / $+1.48$ | 0.708 / $+1.03$ | Short by 0.08 |
+| Held-out as defender | 0.338 / $+0.13$ | 0.271 / $-0.06$ | 0.258 / $-0.10$ | 0.283 / $-0.04$ | Short by 0.08 |
+| Mirrors as attacker | 0.361 / $+0.25$ | 0.194 / $-0.11$ | 0.162 / $-0.15$ | 0.167 / $-0.14$ | Short by 0.17 |
+| Mirrors as defender | 0.639 / $+0.75$ | 0.250 / $+0.04$ | 0.324 / $+0.17$ | 0.375 / $+0.25$ | Short by 0.32, the largest gap left |
+| Commanders | 0.958 / $+1.72$ | 0.958 / $+1.78$ | 0.976 / $+1.79$ | 0.917 / $+1.68$ | At par or ahead |
+| Hordes | 0.192 / $-0.33$ | 0.175 / $-0.36$ | 0.167 / $-0.37$ | -- | At par |
+| Fresh sampled | 0.446 / $+0.31$ | 0.372 / $+0.13$ | 0.372 / $+0.14$ | 0.417 / $+0.23$ | Short by 0.07 |
+| Real maps | 0.568 / $+0.66$ | 0.564 / $+0.64$ | 0.564 / $+0.64$ | 0.562 / $+0.64$ | At par |
+
+The agent regime sits outside this table because it is a different kind of measurement: root search over the same prior reads $0.963 \pm 0.027$ on the held-out pool against the engine's 0.660, at about fifteen seconds an episode against milliseconds for the rows above.
 
 Cells are win rate over the trained two-sided reward, measured on one scale on 2026-08-08 with the built-in AI carrying quality columns for the first time. Three suites are already at par or ahead, so the standing goal reduces to the held-out pool, the two mirror chairs and fresh samples. 
 
@@ -103,11 +104,11 @@ Two facts frame the ranking. No reinforcement configuration here has yet produce
 
 | Rank | Approach | Why, and what grounds it |
 |---|---|---|
-| 1 | Collect where the policy loses, distil weighted by regret | Measured 2026-08-08: weighting soft rows by rank-transformed regret at equal soft mass beats its unweighted twin by $+0.063$ held-out and $+0.135$ on reward, paired positive on every seed, and beats the hard twin by $+0.102$; the deviation probe explains why, and collecting more of the 6.8 percent that carries regret is the untested half |
+| 1 | Collect where the policy loses, distil weighted by regret | Measured 2026-08-08: weighting soft rows by rank-transformed regret at equal soft mass beats its unweighted twin by $+0.063$ held-out and $+0.135$ on reward, paired positive on every seed, and beats the hard twin by $+0.102$; the deviation probe explains why, and rank three measures the collection half |
 | 2 | The deployment rule, per checkpoint | Measured 2026-08-08: greedy helps every distilled arm and hurts the supervised anchor, so the rule is a property of how well a checkpoint ranks rather than a universal correction; the best weights-only reading is 0.546 held-out under a stated rule |
 | 3 | Search-teacher collection in the regret band | Measured twice, the second time at matched soft mass: the screened corpus carries 3.7 times the regret per label, buys the defender mirror clearly (0.375 against 0.278), and leads every arm on the trained reward on both held-out and the defender mirror even where the union edges it on rate; its wins keep more strength than the engine's and its losses destroy more, so the residual gap is conversion rather than fighting |
 | 4 | Anchored reinforcement, closed as retention | Measured 2026-08-08: four times the budget on the leashed base climbs back to the anchor and stops there, held-out 0.507 and the ladder 0.906 against the anchor's 0.498 and 0.906, both runs converged; reinforcement here retains rather than climbs, so a crossing must come from elsewhere |
-| 5 | Group-relative advantages with shared starts | The repository's own strongest precedent for the wide distribution's problem: groups sharing one matchup transferred fivefold better than groups spanning eight, and the wide arm's advantage spread looks difficulty-inflated rather than starved |
+| 5 | Group-relative advantages with shared starts | Groups sharing one matchup reach held-out 0.682 to 0.708 after training against 0.514 for groups spanning eight, three seeds ([[../archive/experiments/2026-08-03-training-runs]]; the fivefold ratio that log also reports is retracted there as an artifact, so the after-training rates are the claim). The wide round's advantage spread looks difficulty-inflated rather than starved, which is the same diagnosis |
 | 6 | The deployment compute ladder | Only 32 and 48 simulations have ever been run; if the crossing survives at eight the agent regime becomes shippable rather than an oracle |
 | 7 | Search-teacher DAgger at learner-reached states | Every corpus was collected from the teacher's own state distribution; gated on the deviation finding, which now supports it |
 | 8 | Outcome-grounded calibration | The owner-requested metric still unbuilt; pairs naturally with the support-complete corpora |
@@ -116,7 +117,7 @@ Closed lines, not to revisit without new evidence: chair-balanced training at ma
 
 ## The honest ceiling
 
-The weights-only regime has not crossed the built-in AI and nothing measured says it is about to. The gap has held near 0.13 on held-out through every architecture and data lever tried, the leash buys retention rather than height, and every remaining forecast is at or inside the noise band. There is no single lever on the list sized to 0.13.
+The weights-only regime has not crossed the built-in AI and nothing measured says it is about to. The gap held near 0.13 on held-out through every architecture and data lever tried until 2026-08-08, when regret-weighted distillation on a targeted corpus brought the best arm to 0.571 against 0.660, a shortfall of 0.089. The leash buys retention rather than height, every remaining forecast is at or inside the noise band, and no single lever on the list is sized to the 0.089 that is left.
 
 Two things could still move it, and neither is a modelling result. The deployment rule is one: every headline was measured under sampling against a deterministic planner, and if greedy holds at full power against a re-measured engine baseline then part of the gap was self-inflicted reporting. The other is that the gap is not diffuse. It concentrates in a handful of positions the policy loses badly and search wins outright, and the 2026-08-08 probe showed those positions carry an action-level signal that no corpus has ever contained. A lever aimed there is the only kind with the right magnitude, which is why it is ranked first.
 

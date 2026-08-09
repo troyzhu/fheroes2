@@ -154,7 +154,13 @@ class SelfPlayEnv:
             if terminal is not None:
                 # The opponent ended the battle before the learner ever moved; extremely rare
                 # (requires zero learner decisions), and a fresh reset is the honest recovery.
-                return self.reset()
+                # Counted against the same cap as the chair skip, since a pairing that always
+                # does this would otherwise recurse until the stack ends the run.
+                self.skipped_resets += 1
+                if _attempt >= 24:
+                    raise RuntimeError("no learner decision after 24 resets; the pairing never "
+                                       "gives this chair a turn")
+                return self.reset(_attempt + 1)
         return observation, mask
 
     def step(self, action: int) -> Step:

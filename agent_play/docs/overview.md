@@ -5,7 +5,7 @@ status: active
 goal: "A deterministic, headless, structured battle environment for fheroes2 that a policy can be trained on"
 branch: agent-env
 date_started: 2026-07-26
-updated: 2026-08-07
+updated: 2026-08-09
 related_concepts: ["[[rl/rl-and-the-battle-domain]]", "[[implementation/legal-actions-and-masking]]", "[[implementation/observation-design]]"]
 tags: [agent-env, rl-environment, fheroes2, entry-point]
 ---
@@ -22,8 +22,9 @@ Pick the row that matches why you are here.
 | Get it building and see the current state | This note, sections [[#Build and verify]] and [[#Where the project stands]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] for a specific source |
 | Understand what is implemented and how | [[implementation/inventory]] for the inventory, then [[implementation/README]] for how each mechanism works |
-| Understand why a decision was taken | `decisions/`, six accepted records amending the specification |
+| Understand why a decision was taken | `decisions/`, the accepted records amending the specification |
 | Follow one inference decision end to end | [[implementation/inference-walkthrough]], a real battle under the microscope |
+| See where the training program stands and what is next | [[rl/program-review]] |
 | Reconstruct history | [[archive/log]] |
 
 ## Table of contents

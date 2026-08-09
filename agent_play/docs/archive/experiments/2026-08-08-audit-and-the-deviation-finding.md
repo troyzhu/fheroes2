@@ -7,6 +7,14 @@ tags: [agent-env, archive, experiment, audit, distillation, search]
 
 # The audit, three measurement defects, and where the signal actually is, 2026-08-08
 
+Superseded within this log:
+
+| Claim, where it first appears | What corrected it |
+|---|---|
+| The combined corpus is worse than either of its parts | The mass-matched rerun: it was the soft-mass confound, and at matched mass the union is nominally highest on held-out |
+| Targeted collection beats the unscreened corpus by 0.025 on held-out | The mass-matched rerun: $+0.021$, inside the band; the defender mirror carries the claim instead |
+| The regret-weighted arm reads 0.613 held-out under greedy | Three seeds read 0.546; the 0.613 was one seed |
+
 The owner asked for an audit of the repository and documentation and for a researched plan to exceed the built-in AI. Fifteen agents ran over the tree and the literature, four auditing structure, facts, currency and writing, five researching levers with an adversarial verifier behind each. Their findings are applied in the commits of this day; this log records the three measurement defects the pass exposed, because each one changed a number that had already been reported, and the one new measurement that changes where the program should aim.
 
 ## Three defects, and what each had been distorting

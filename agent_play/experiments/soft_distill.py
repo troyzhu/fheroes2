@@ -109,6 +109,7 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
     # can read. The first coverage-corpus verdict was drawn without these, which was the gap.
     history = []
     beat_path = out + ".heartbeat.jsonl"
+    pathlib.Path(beat_path).write_text("")  # truncate: see train_ppo, a rerun must not append
     for epoch in range(epochs):
         model.train()
         epoch_lr = schedule.get_last_lr()[0]

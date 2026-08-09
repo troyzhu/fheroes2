@@ -39,18 +39,23 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from fheroes2_agent.env import BattleEnv, ScenarioRejected  # noqa: E402
 from fheroes2_agent.policy import load_policy  # noqa: E402
 from search_probe import search_action_detail  # noqa: E402
-from validation_battery import build_suites  # noqa: E402
+from validation_battery import SUITE_SIDE, build_suites  # noqa: E402
 
 
 def probe_matchup(worker: str, matchup, model, episodes: int, simulations: int, c_puct: float,
-                  seeds: int, coverage_forced: bool = True) -> dict:
-    """Per-decision agreement between coverage-forced search and the policy's greedy argmax."""
-    kwargs = dict(side="attacker", attacker=matchup.attacker, defender=matchup.defender,
+                  seeds: int, coverage_forced: bool = True, side: str = "attacker") -> dict:
+    """Per-decision agreement between coverage-forced search and the policy's greedy argmax.
+
+    The chair comes from the suite: `held_out_as_defender` and `mirrors_defender` are measured
+    from the defending seat, and probing them from the attacker's would silently report the
+    opponent's agreement and the opponent's win rate."""
+    kwargs = dict(side=side, attacker=matchup.attacker, defender=matchup.defender,
                   attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
                   allow_wide=matchup.allow_wide, seeds=seeds, reward_margin="two_sided")
     env = BattleEnv(worker, **kwargs)
     sim = BattleEnv(worker, **kwargs)
     agree = decisions = wins = played = 0
+    won_termination = "victory" if side == "attacker" else "defeat"
     value_gaps = []
     try:
         for _ in range(episodes):
@@ -70,7 +75,7 @@ def probe_matchup(worker: str, matchup, model, episodes: int, simulations: int, 
                 prefix.append(action)
                 step = env.step(action)
                 if step.done:
-                    wins += step.info["termination"] == "victory"
+                    wins += step.info["termination"] == won_termination
                     played += 1
                     break
                 observation, mask = step.observation, step.mask
@@ -110,9 +115,10 @@ def main() -> None:
     model = load_policy(torch.load(args.checkpoint, map_location="cpu", weights_only=True)["state_dict"])
     model.eval()
     matchups = build_suites(24)[args.suite]
+    side = SUITE_SIDE.get(args.suite, "attacker")
     started = time.time()
     report = {"checkpoint": args.checkpoint, "suite": args.suite, "simulations": args.simulations,
-              "episodes": args.episodes, "modes": args.modes, "groups": {}}
+              "episodes": args.episodes, "modes": args.modes, "side": side, "groups": {}}
 
     for mode in args.modes:
       forced = mode == "forced"
@@ -121,7 +127,8 @@ def main() -> None:
         for index in indices:
             try:
                 row = probe_matchup(args.worker, matchups[index], model, args.episodes,
-                                    args.simulations, args.c_puct, args.seeds, coverage_forced=forced)
+                                    args.simulations, args.c_puct, args.seeds,
+                                    coverage_forced=forced, side=side)
             except ScenarioRejected as error:
                 print(f"  matchup {index} rejected ({str(error)[:60]})", flush=True)
                 continue

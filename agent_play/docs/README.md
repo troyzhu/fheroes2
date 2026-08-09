@@ -27,6 +27,7 @@ This tree lives under `agent_play/` rather than under the repository's `docs/` d
 | Understand why an interface is the way it is | [[decisions/README]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] to look up a source |
 | Know what is planned beyond battles, including the navigation agent | [[roadmap]] |
+| See where the training program stands, what is measured and what is next | [[rl/program-review]] |
 | Trace a number back to the run that produced it | [[archive/README]] |
 
 ## The tree

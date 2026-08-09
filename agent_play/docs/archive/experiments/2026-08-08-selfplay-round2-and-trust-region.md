@@ -7,6 +7,15 @@ tags: [agent-env, archive, experiment, self-play, trust-region]
 
 # Self-play round two at settled budgets, and the trust-region rematch, 2026-08-08
 
+Superseded within this log, so a reader meeting these numbers knows before acting on them:
+
+| Claim, where it first appears | What corrected it |
+|---|---|
+| The leash recovers about three fifths of the held-out reward gap | The corrected reward column at the end: the recovery is essentially complete under the objective the policies train on |
+| The duel table shows leashed arms above the anchor | The corrected duel sentence: the round-four anchor duels at 0.750, above every leashed run |
+| Value-derived soft targets lift nine of ten suites | The scale test: the per-suite pattern does not replicate, and only a small held-out tendency survives |
+| Every run converged | Convergence is per metric; the qualified readings are in each section |
+
 The night's plan followed directly from the convergence verdicts: the 400-iteration self-play run had stopped mid-climb, so the continuation round ran the same recipe at 1000 iterations across three seeds, with a matched control trio through the identical `SelfPlayEnv` code path whose pool is the built-in AI alone, so the arms differ in nothing but who answers the other side. Every run trains from the gen1 anchor on the standard pool's first twelve matchups under the two-sided reward with warmup and floor, and every artifact carries the trust-region stamp introduced the same evening. Judgment is the full apparatus by standing rule: battery with quality columns and rungs, symmetry gauge, convergence report, and duels at forty episodes, clear of the measured $\pm 0.06$ noise band.
 
 One apparatus fact belongs before any number below, because it bounds every comparison in this file. The frozen `policy_gen1.pt` is re-evaluated by every round's battery and duel table, and it reads held-out 0.506, 0.498, 0.529 and 0.533 across the day's four batteries, ladder 0.885 to 0.938, and duels against the built-in AI of 0.65, 0.55 and 0.75. An unchanged checkpoint therefore moves 0.03 on held-out and 0.20 on a forty-episode duel table between runs, so a comparison is only safe within one report file, and duel tables at this episode count separate arms only when they differ by more than about 0.2.

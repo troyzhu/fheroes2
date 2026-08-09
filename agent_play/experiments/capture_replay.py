@@ -23,6 +23,7 @@ import numpy as np
 import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 from fheroes2_agent import encoding as enc  # noqa: E402
 from fheroes2_agent.env import BattleEnv  # noqa: E402
@@ -62,7 +63,8 @@ def load_model(checkpoint: str):
     return model, (encode_v2 if version == "obs_encoding_v2" else enc.encode_observation), version
 
 
-def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None, **env_kwargs) -> dict:
+def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None,
+            search_simulations: int = 0, **env_kwargs) -> dict:
     """One policy per side when a defender checkpoint is given: the worker runs side=both and
     each decision routes to the model owning the active side, which is what lets two checkpoints
     fight each other on the record."""
@@ -74,6 +76,11 @@ def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None
 
     wants_planes = bool(getattr(attacker_model, "planes", False)) or bool(getattr(defender_model, "planes", False))
     env = BattleEnv(worker, planes=wants_planes, **env_kwargs)
+    # A searched capture plays the same position the policy would, with root search choosing:
+    # recorded against a policy capture on the same matchup it shows what the 2026-08-08 deviation
+    # probe measured, since the positions where the two disagree are the ones that decide battles.
+    sim = BattleEnv(worker, planes=wants_planes, **env_kwargs) if search_simulations else None
+    prefix: list[int] = []
     frames = []
     try:
         env.reset()
@@ -87,17 +94,33 @@ def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None
             plane_arg = ()
             if getattr(model, "planes", False):
                 plane_arg = (torch.from_numpy(env.last_planes).unsqueeze(0),)
-            with torch.no_grad():
-                logits, _ = model(torch.from_numpy(encode(observation)).unsqueeze(0),
-                                  torch.from_numpy(mask).unsqueeze(0), *plane_arg)
-                action = int(torch.distributions.Categorical(logits=logits).sample())
-            frames.append(frame_of(observation, action, describe_action(action)))
+            if sim is not None:
+                from search_probe import search_action_detail
+                action, means, _, prior = search_action_detail(
+                    sim, model, prefix, encode(observation), mask, search_simulations, 1.5,
+                    live=env, coverage_forced=True)
+                greedy = max(prior, key=prior.get)
+                caption = describe_action(action)
+                if action != greedy:
+                    # The caption says when search overruled the policy and what it was worth, so
+                    # a viewer can see the disagreements rather than infer them from the outcome.
+                    caption += f"  (search overrules the policy, +{means[action] - means.get(greedy, 0.0):.2f})"
+            else:
+                with torch.no_grad():
+                    logits, _ = model(torch.from_numpy(encode(observation)).unsqueeze(0),
+                                      torch.from_numpy(mask).unsqueeze(0), *plane_arg)
+                    action = int(torch.distributions.Categorical(logits=logits).sample())
+                caption = describe_action(action)
+            frames.append(frame_of(observation, action, caption))
+            prefix.append(action)
             step = env.step(action)
             if step.done:
                 return {"frames": frames, "termination": step.info["termination"],
                         "encoding": version, "defender_encoding": defender_version, "reward": step.reward}
     finally:
         env.close()
+        if sim is not None:
+            sim.close()
 
 
 def main() -> None:
@@ -115,6 +138,9 @@ def main() -> None:
     parser.add_argument("--want", default="any", choices=("victory", "defeat", "any"),
                         help="retry until an episode ends this way, so a replay shows what the win rate says")
     parser.add_argument("--tries", type=int, default=6)
+    parser.add_argument("--search-simulations", type=int, default=0,
+                        help="record the searching agent instead of the raw policy, captioning every "
+                             "decision where search overrules the policy and what it was worth")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
@@ -125,7 +151,8 @@ def main() -> None:
                   allow_wide=args.allow_wide)
     replay = None
     for attempt in range(args.tries):
-        candidate = capture(args.worker, args.checkpoint, defender_checkpoint=args.defender_checkpoint, **kwargs)
+        candidate = capture(args.worker, args.checkpoint, defender_checkpoint=args.defender_checkpoint,
+                            search_simulations=args.search_simulations, **kwargs)
         replay = candidate
         if args.want == "any" or candidate["termination"] == args.want:
             break
