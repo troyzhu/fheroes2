@@ -1,0 +1,171 @@
+{
+ "checkpoint": "/Volumes/External Drive/GitHub/fheroes2/agent_play/docs/archive/experiments/files/2026-08-05-checkpoints/policy_gen1.pt",
+ "suite": "held_out_pool",
+ "simulations": 48,
+ "episodes": 4,
+ "modes": [
+  "forced",
+  "ucb"
+ ],
+ "groups": {
+  "forced:losing": {
+   "per_matchup": [
+    {
+     "decisions": 69,
+     "agreement": 0.6956521739130435,
+     "search_win_rate": 0.5,
+     "mean_value_gap_on_disagreement": 0.9111758599565549,
+     "disagreements": 21,
+     "index": 16
+    },
+    {
+     "decisions": 107,
+     "agreement": 0.6448598130841121,
+     "search_win_rate": 0.5,
+     "mean_value_gap_on_disagreement": 0.4557429583505597,
+     "disagreements": 38,
+     "index": 9
+    },
+    {
+     "decisions": 28,
+     "agreement": 0.6785714285714286,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 1.6468278148280824,
+     "disagreements": 9,
+     "index": 11
+    },
+    {
+     "decisions": 34,
+     "agreement": 0.5882352941176471,
+     "search_win_rate": 0.5,
+     "mean_value_gap_on_disagreement": 0.96751536214454,
+     "disagreements": 14,
+     "index": 18
+    }
+   ],
+   "decisions": 238,
+   "agreement": 0.6554621848739496,
+   "deviation_rate": 0.3445378151260504
+  },
+  "forced:winning": {
+   "per_matchup": [
+    {
+     "decisions": 112,
+     "agreement": 0.625,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.6501683065035061,
+     "disagreements": 42,
+     "index": 5
+    },
+    {
+     "decisions": 80,
+     "agreement": 0.8875,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 1.4386043930498404,
+     "disagreements": 9,
+     "index": 13
+    },
+    {
+     "decisions": 139,
+     "agreement": 0.8705035971223022,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.6367859412129973,
+     "disagreements": 18,
+     "index": 12
+    },
+    {
+     "decisions": 66,
+     "agreement": 0.8333333333333334,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.04966446371568776,
+     "disagreements": 11,
+     "index": 19
+    }
+   ],
+   "decisions": 397,
+   "agreement": 0.7984886649874056,
+   "deviation_rate": 0.20151133501259444
+  },
+  "ucb:losing": {
+   "per_matchup": [
+    {
+     "decisions": 56,
+     "agreement": 0.8392857142857143,
+     "search_win_rate": 0.5,
+     "mean_value_gap_on_disagreement": 0.7063792075263188,
+     "disagreements": 9,
+     "index": 16
+    },
+    {
+     "decisions": 91,
+     "agreement": 0.8901098901098901,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.9786519112419987,
+     "disagreements": 10,
+     "index": 9
+    },
+    {
+     "decisions": 37,
+     "agreement": 0.7567567567567568,
+     "search_win_rate": 0.75,
+     "mean_value_gap_on_disagreement": 0.6372292723370996,
+     "disagreements": 9,
+     "index": 11
+    },
+    {
+     "decisions": 36,
+     "agreement": 0.8888888888888888,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.8256320356209476,
+     "disagreements": 4,
+     "index": 18
+    }
+   ],
+   "decisions": 220,
+   "agreement": 0.8545454545454545,
+   "deviation_rate": 0.1454545454545455
+  },
+  "ucb:winning": {
+   "per_matchup": [
+    {
+     "decisions": 102,
+     "agreement": 0.8627450980392157,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.37554899114738866,
+     "disagreements": 14,
+     "index": 5
+    },
+    {
+     "decisions": 74,
+     "agreement": 0.9864864864864865,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.004708817891755923,
+     "disagreements": 1,
+     "index": 13
+    },
+    {
+     "decisions": 124,
+     "agreement": 0.967741935483871,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.2263961099679469,
+     "disagreements": 4,
+     "index": 12
+    },
+    {
+     "decisions": 64,
+     "agreement": 1.0,
+     "search_win_rate": 1.0,
+     "mean_value_gap_on_disagreement": 0.0,
+     "disagreements": 0,
+     "index": 19
+    }
+   ],
+   "decisions": 364,
+   "agreement": 0.9478021978021978,
+   "deviation_rate": 0.052197802197802234
+  }
+ },
+ "deviation_ratio_forced": 1.7097689075630254,
+ "deviation_ratio_ucb": 2.7866028708133963,
+ "seconds": 911.7
+}
