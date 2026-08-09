@@ -33,9 +33,14 @@ def collect(env: BattleEnv, model: BattlePolicy, episodes: int) -> dict:
     """Roll out whole episodes. Battles are 5 to 40 decisions, so an episode is the natural unit."""
     obs_buf, mask_buf, act_buf, logp_buf, val_buf, rew_buf, done_buf = [], [], [], [], [], [], []
     outcomes = []
+    # The chair the learner actually held, per episode. A self-play env may alternate chairs, and
+    # a win rate scored against one fixed termination string inverts every episode played from
+    # the other seat; the reward is already re-perspectived by the env, the rate was not.
+    sides = []
 
     for _ in range(episodes):
         observation, mask = env.reset()
+        episode_side = getattr(env, "side", None)
         while True:
             obs_t = torch.from_numpy(observation).unsqueeze(0)
             mask_t = torch.from_numpy(mask).unsqueeze(0)
@@ -56,6 +61,7 @@ def collect(env: BattleEnv, model: BattlePolicy, episodes: int) -> dict:
 
             if step.done:
                 outcomes.append(step.info)
+                sides.append(episode_side)
                 break
             observation, mask = step.observation, step.mask
 
@@ -68,6 +74,7 @@ def collect(env: BattleEnv, model: BattlePolicy, episodes: int) -> dict:
         "rewards": np.asarray(rew_buf, dtype=np.float32),
         "dones": np.asarray(done_buf, dtype=bool),
         "outcomes": outcomes,
+        "sides": sides,
     }
 
 
@@ -92,9 +99,13 @@ def compute_gae(rewards, values, dones, truncated, gamma=0.99, lam=0.95) -> tupl
     return advantages, advantages + values
 
 
-def win_rate(outcomes: list[dict], side: str) -> float:
-    target = "victory" if side == "attacker" else "defeat"
-    return float(np.mean([o["termination"] == target for o in outcomes])) if outcomes else 0.0
+def win_rate(outcomes: list[dict], side: str, sides: list | None = None) -> float:
+    """The learner's win rate, scored per episode against the chair it actually held."""
+    if not outcomes:
+        return 0.0
+    seats = sides if sides and len(sides) == len(outcomes) else [side] * len(outcomes)
+    return float(np.mean([o["termination"] == ("victory" if (seat or side) == "attacker" else "defeat")
+                          for o, seat in zip(outcomes, seats)]))
 
 
 def train(
@@ -169,7 +180,7 @@ def train(
         reference.eval()
 
     baseline = collect(env, model, episodes_per_iter)
-    initial_win = win_rate(baseline["outcomes"], side)
+    initial_win = win_rate(baseline["outcomes"], side, baseline.get("sides"))
     initial_reward = float(np.mean([r for r, d in zip(baseline["rewards"], baseline["dones"]) if d]))
     if not quiet:
         print(f"before training: win rate {initial_win:.3f}, mean terminal reward {initial_reward:.3f}")
@@ -352,7 +363,7 @@ def train(
             else:
                 live_entropy_coef = max(live_entropy_coef * 0.9, entropy_coef)
 
-        wr = win_rate(batch["outcomes"], side)
+        wr = win_rate(batch["outcomes"], side, batch.get("sides"))
         if out:
             # The trust-region stamp rides in the checkpoint and in every heartbeat row (owner
             # requirement, 2026-08-07): a divergence-gated run must never be mistakable for a
@@ -364,8 +375,9 @@ def train(
         # reward is also decomposed over won and lost episodes per iteration. Under the
         # two-sided margin these are the live counterparts of the battery's wq and lq columns,
         # rising reward_on_losses means cheaper losses even while the rate stands still.
-        won_target = "victory" if side == "attacker" else "defeat"
-        won_flags = [o["termination"] == won_target for o in batch["outcomes"]]
+        seats = batch.get("sides") or [side] * len(batch["outcomes"])
+        won_flags = [o["termination"] == ("victory" if (seat or side) == "attacker" else "defeat")
+                     for o, seat in zip(batch["outcomes"], seats)]
         won_rewards = [r for r, w in zip(episode_rewards, won_flags) if w]
         lost_rewards = [r for r, w in zip(episode_rewards, won_flags) if not w]
         reward_split = {}
