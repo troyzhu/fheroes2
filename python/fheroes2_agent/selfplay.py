@@ -71,13 +71,19 @@ class SelfPlayEnv:
         self._rotation = random.Random(rotation_seed)
         self._kwargs = dict(self._matchups[0])
         self._pool = pool
-        self._learner_side = learner_side
+        # `learner_side="alternate"` draws the chair per episode, which is what the 2026-08-08
+        # scoreboard called for: every round until then trained the attacker chair alone while
+        # two of the three largest remaining gaps to the engine are on the defending side, and
+        # the engine's own mirror split (0.639 to the defender on symmetric armies) says the
+        # defending chair is not the harder one, only the untrained one.
+        self._alternate = learner_side == "alternate"
+        self._learner_side = "attacker" if self._alternate else learner_side
         self._reward_margin = reward_margin
         self._reward_weighting = reward_weighting
         self._seeds = seeds
         self._env: BattleEnv | None = None
         self._mode: str | None = None  # "both" or "single"
-        self.side = learner_side
+        self.side = self._learner_side
         self.opponent_name: str | None = None
 
     def _ensure(self, mode: str) -> None:
@@ -116,6 +122,13 @@ class SelfPlayEnv:
         self.opponent_name = self._pool.current_name
         if len(self._matchups) > 1:
             self._kwargs = dict(self._rotation.choice(self._matchups))
+        if self._alternate:
+            # Drawn per episode rather than swapped every other episode, so a matchup rotation of
+            # any period cannot phase-lock with the chair and hand one side a fixed subset.
+            self._learner_side = self._rotation.choice(("attacker", "defender"))
+            self.side = self._learner_side
+            # The worker is spawned per chair in single mode, so a chair change forces a respawn.
+            self._mode = None
         self._ensure("single" if opponent is None else "both")
         observation, mask = self._env.reset()
         if self._mode == "both":
