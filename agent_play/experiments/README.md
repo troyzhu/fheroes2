@@ -50,6 +50,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `convergence_report.py` | Had a training run settled when it stopped? Per-metric trend verdicts over a heartbeat's trailing third: converged, trending, or oscillating | seconds per heartbeat |
 | `trust_region_rematch.py` | DPPO's divergence gates against the ratio clip inside the actor-critic trainer: exact total variation and the paper's binary lower bound, matched to the self-play control trio | about 50 min per arm over 3 seeds |
 | `rounds_probe.py` | Round-count histograms and stalemate incidence per checkpoint on the training and held-out matchup slices, from exact terminal records | about 2 min per checkpoint |
+| `selfplay_round.py` | One self-play training round with the pool, leash, budget, chair and matchup source as flags, matchups validated per chair | about 15 min per seed at 1000 iterations |
 
 ## Conventions
 

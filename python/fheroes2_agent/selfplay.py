@@ -22,7 +22,7 @@ import random
 import numpy as np
 import torch
 
-from .env import BattleEnv, Step, terminal_reward_strength, terminal_reward_two_sided
+from .env import BattleEnv, ScenarioRejected, Step, terminal_reward_strength, terminal_reward_two_sided
 from .policy import load_policy
 
 
@@ -85,6 +85,8 @@ class SelfPlayEnv:
         self._mode: str | None = None  # "both" or "single"
         self.side = self._learner_side
         self.opponent_name: str | None = None
+        # Episodes whose drawn chair never got a turn; reported rather than hidden.
+        self.skipped_resets = 0
 
     def _ensure(self, mode: str) -> None:
         if self._env is not None and self._mode == mode and len(self._matchups) == 1:
@@ -117,7 +119,7 @@ class SelfPlayEnv:
             observation, mask = step.observation, step.mask
         return observation, mask, None
 
-    def reset(self):
+    def reset(self, _attempt: int = 0):
         opponent = self._pool.draw()
         self.opponent_name = self._pool.current_name
         if len(self._matchups) > 1:
@@ -130,7 +132,23 @@ class SelfPlayEnv:
             # The worker is spawned per chair in single mode, so a chair change forces a respawn.
             self._mode = None
         self._ensure("single" if opponent is None else "both")
-        observation, mask = self._env.reset()
+        try:
+            observation, mask = self._env.reset()
+        except ScenarioRejected:
+            # A chair that never acts is a property of the pairing, not a broken scenario: a lone
+            # weak defender can die before its first turn, so the worker emits no decision and the
+            # environment reports the spawn as a rejection. Redrawing is correct, but silently
+            # dropping these would bias a both-chair run toward exactly the fights where the
+            # defending side is not hopeless, so the count is kept and reported.
+            self.skipped_resets += 1
+            try:
+                self._env.close()
+            except Exception:
+                pass
+            self._env, self._mode = None, None
+            if _attempt >= 24:
+                raise
+            return self.reset(_attempt + 1)
         if self._mode == "both":
             observation, mask, terminal = self._advance_to_learner(observation, mask)
             if terminal is not None:
