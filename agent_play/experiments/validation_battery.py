@@ -120,13 +120,19 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=24)
     parser.add_argument("--eval-seeds", type=int, default=4)
     parser.add_argument("--fresh", type=int, default=24)
+    parser.add_argument("--reward-margin", default="two_sided",
+                        choices=("hit_points", "strength", "two_sided"),
+                        help="which objective the rw column reports; stamped into the report")
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
     suites = build_suites(args.fresh)
     started = time.time()
     report = {"suites": {name: {"matchups": len(ms)} for name, ms in suites.items()},
-              "episodes": args.episodes, "eval_seeds": args.eval_seeds, "results": {}}
+              "episodes": args.episodes, "eval_seeds": args.eval_seeds,
+              # Self-describing: reports without this key predate 2026-08-08 and their rw column
+              # is the hit-point margin whatever the checkpoint trained on.
+              "reward_margin": args.reward_margin, "results": {}}
 
     for path in args.checkpoints:
         name = pathlib.Path(path).name
@@ -137,7 +143,8 @@ def main() -> None:
         report.setdefault("quality", {})[name] = {}
         for suite, matchups in suites.items():
             side = SUITE_SIDE.get(suite, "attacker")
-            measured = [measure(model, args.worker, m, episodes=args.episodes, seeds=args.eval_seeds, side=side)
+            measured = [measure(model, args.worker, m, episodes=args.episodes, seeds=args.eval_seeds,
+                                side=side, reward_margin=args.reward_margin)
                         for m in matchups]
             rates = [m["win_rate"] for m in measured]
             report["results"][name][suite] = rates

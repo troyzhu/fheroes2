@@ -10,6 +10,16 @@ AI over many battlefields and count how often the measured side wins.
 The teacher is deterministic per battlefield, so the rate comes from battlefield variety rather
 than from resampling; the suites and episode counts otherwise match `validation_battery.py`.
 
+The baseline carries the same quality columns the battery reports for policies, added 2026-08-08
+because the convention of quoting the AI column beside every claim could otherwise be honored on
+win rate alone. Definitions match `scenarios.measure` exactly: win quality is engine strength kept
+on wins, loss quality is the fraction of the enemy destroyed on losses, the margin is own kept
+minus enemy kept over every episode, and the reward is the trained two-sided objective. Two
+columns do not transfer and are named apart rather than silently mismatched: the battery's `len`
+counts the learner's own decisions, so the AI reports `mean_rounds` (engine rounds) and
+`mean_decisions_both_sides` instead, and the historical rate counts a side's win as clearing the
+board, so the termination-based rate the battery uses is reported beside it.
+
 Usage:
     ./builtin_ai_baseline.py WORKER [--episodes 24] [--report builtin_ai_baseline.json]
 """
@@ -29,11 +39,12 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+from fheroes2_agent.env import terminal_reward_two_sided  # noqa: E402
 from validation_battery import SUITE_SIDE, build_suites  # noqa: E402
 
 
-def ai_win_rate(worker: str, matchup, side: str, episodes: int) -> float:
-    """Fraction of battlefields the given side wins with the built-in AI commanding both armies."""
+def ai_win_rate(worker: str, matchup, side: str, episodes: int) -> dict:
+    """The measured side's rate and quality columns, with the AI commanding both armies."""
     with tempfile.TemporaryDirectory(prefix="ai_baseline_") as tmp:
         cmd = [worker, "--attacker", matchup.attacker, "--defender", matchup.defender,
                "--seeds", str(episodes), "--fixture", "m1_tiny_melee",
@@ -49,16 +60,42 @@ def ai_win_rate(worker: str, matchup, side: str, episodes: int) -> float:
             detail = (run.stderr or "").strip().splitlines()
             raise RuntimeError(detail[-1] if detail else f"worker exited {run.returncode}")
 
-        wins = total = 0
+        wins = wins_by_termination = total = 0
+        survival, damage, margins, rewards, rounds, decisions = [], [], [], [], [], []
+        own_key, foe_key = ("attacker", "defender") if side == "attacker" else ("defender", "attacker")
+        won_termination = "victory" if side == "attacker" else "defeat"
         for path in sorted(pathlib.Path(tmp).rglob("*.jsonl")):
             for line in path.read_text().splitlines():
                 record = json.loads(line)
                 if record.get("record") != "terminal":
                     continue
                 total += 1
-                own, foe = ("attacker", "defender") if side == "attacker" else ("defender", "attacker")
-                wins += record[own]["live_stacks"] > 0 and record[foe]["live_stacks"] == 0
-        return wins / total if total else float("nan")
+                own, foe = record[own_key], record[foe_key]
+                cleared = own["live_stacks"] > 0 and foe["live_stacks"] == 0
+                wins += cleared
+                won = record["termination"] == won_termination
+                wins_by_termination += won
+                own_initial = float(own.get("initial_strength", 0.0))
+                foe_initial = float(foe.get("initial_strength", 0.0))
+                own_kept = float(own.get("strength", 0.0)) / own_initial if own_initial > 0 else 0.0
+                foe_kept = float(foe.get("strength", 0.0)) / foe_initial if foe_initial > 0 else 0.0
+                margins.append(own_kept - foe_kept)
+                (survival if won else damage).append(own_kept if won else 1.0 - foe_kept)
+                rewards.append(terminal_reward_two_sided(record, side))
+                rounds.append(record.get("rounds", 0))
+                decisions.append(record.get("decision_count", 0))
+    if not total:
+        return {"win_rate": float("nan")}
+    return {
+        "win_rate": wins / total,
+        "win_rate_by_termination": wins_by_termination / total,
+        "surviving_strength": float(np.mean(survival)) if survival else None,
+        "loss_damage": float(np.mean(damage)) if damage else None,
+        "strength_margin": float(np.mean(margins)),
+        "mean_reward": float(np.mean(rewards)),
+        "mean_rounds": float(np.mean(rounds)),
+        "mean_decisions_both_sides": float(np.mean(decisions)),
+    }
 
 
 def main() -> None:
@@ -71,24 +108,34 @@ def main() -> None:
 
     suites = build_suites(args.fresh)
     started = time.time()
-    results = {}
+    results, quality = {}, {}
+    columns = ("surviving_strength", "loss_damage", "strength_margin", "mean_reward",
+               "mean_rounds", "mean_decisions_both_sides", "win_rate_by_termination")
     for suite, matchups in suites.items():
         side = SUITE_SIDE.get(suite, "attacker")
-        rates = []
+        measured = []
         for m in matchups:
             try:
-                rates.append(ai_win_rate(args.worker, m, side, args.episodes))
+                measured.append(ai_win_rate(args.worker, m, side, args.episodes))
             except RuntimeError as error:
                 print(f"  {suite}: matchup rejected ({error})", flush=True)
+        rates = [d["win_rate"] for d in measured]
         results[suite] = rates
+        quality[suite] = {c: [d.get(c) for d in measured] for c in columns}
         if rates:
-            print(f"built-in AI  {suite:22s} mean {np.mean(rates):.3f}  " +
-                  " ".join(f"{r:.2f}" for r in rates[:8]) + (" ..." if len(rates) > 8 else ""), flush=True)
+            def column(name):
+                vals = [v for v in quality[suite][name] if isinstance(v, (int, float))]
+                return float(np.mean(vals)) if vals else float("nan")
+            print(f"built-in AI  {suite:22s} mean {np.mean(rates):.3f}  "
+                  f"wq {column('surviving_strength'):.2f} lq {column('loss_damage'):.2f} "
+                  f"mg {column('strength_margin'):+.2f} rw {column('mean_reward'):+.2f} "
+                  f"rounds {column('mean_rounds'):.0f}", flush=True)
 
     print(f"\ntotal {round(time.time() - started)}s")
     if args.report:
         pathlib.Path(args.report).write_text(json.dumps(
-            {"results": {"builtin_ai": results}, "episodes": args.episodes}, indent=2))
+            {"results": {"builtin_ai": results}, "quality": {"builtin_ai": quality},
+             "episodes": args.episodes}, indent=2))
 
 
 if __name__ == "__main__":

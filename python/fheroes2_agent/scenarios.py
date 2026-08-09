@@ -240,7 +240,7 @@ def sample_matchups(n: int, seed: int = 0, max_stacks: int = 3) -> list[Matchup]
 
 @torch.no_grad()
 def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 16, side: str = "attacker",
-            seeds: int = 1) -> dict:
+            seeds: int = 1, reward_margin: str = "two_sided") -> dict:
     """Win rate and mean reward for one matchup, which is what makes difficulty a number.
 
     With seeds above one the episodes rotate over that many battlefield variants, so the number
@@ -248,9 +248,14 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
     # A planes-built policy declares itself on the model; the env then asks the worker for the
     # obstacle layer and the loop feeds the tensor beside the flat vector.
     wants_planes = bool(getattr(model, "planes", False))
+    # The reward column has to name its own objective. Until 2026-08-08 this call omitted
+    # `reward_margin`, so every battery report's `rw` was the hit-point margin regardless of what
+    # the checkpoint trained on, while the ledger claimed it was the trained reward; the default
+    # here is now the owner's two-sided objective and every report stamps which margin it used.
     env = BattleEnv(worker, side=side, attacker=matchup.attacker, defender=matchup.defender,
                     attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
-                    allow_wide=matchup.allow_wide, seeds=seeds, planes=wants_planes)
+                    allow_wide=matchup.allow_wide, seeds=seeds, planes=wants_planes,
+                    reward_margin=reward_margin)
     wins, rewards, lengths, survival, damage, margins = [], [], [], [], [], []
     try:
         for _ in range(episodes):
