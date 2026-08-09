@@ -63,6 +63,14 @@ namespace fheroes2::agent
         // stats. A sampler pricing stacks by this rather than by hit points weighs damage and
         // abilities the way the game itself does.
         double strength{ 0.0 };
+        // Base attack and defense, and the strength they price at, so a consumer outside the
+        // engine can reprice a stack under a commander: strength is
+        // (1 + attack * 0.1 + defense * 0.05) * baseStrength, so the commander's additive stat
+        // bonus is a multiplier that depends on the creature's own stats, worth far more to a
+        // Peasant than to a Titan. Without these a Python-side pricing cannot see that at all.
+        uint32_t attack{ 0 };
+        uint32_t defense{ 0 };
+        double baseStrength{ 0.0 };
         std::string reason;
     };
 

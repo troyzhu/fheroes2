@@ -125,6 +125,33 @@ def _side_from(rng: random.Random, roster, total_hit_points: float, max_stacks: 
     return ",".join(parts)
 
 
+def commanded_strength(attack: int, defense: int, base_strength: float,
+                       hero_attack: int = 0, hero_defense: int = 0) -> float:
+    """One creature's engine strength under a commander, `Monster::GetMonsterStrength`'s formula.
+
+    Strength is `(1 + attack * 0.1 + defense * 0.05) * baseStrength`, so a commander's additive
+    stat bonus is a multiplier that depends on the creature it leads: the same ten-attack
+    ten-defense hero multiplies a Peasant stack by 2.30 and a Titan stack by 1.46. Matching
+    commanders between two sides therefore does not equalize them unless the armies are also
+    matched, which is why the budget has to price the commander per stack rather than treat it
+    as a side-level constant.
+    """
+    return (1.0 + (attack + hero_attack) * 0.1 + (defense + hero_defense) * 0.05) * base_strength
+
+
+def load_statted_roster() -> list[tuple[int, int, int, float]]:
+    """Every wide_v1 creature as (id, attack, defense, base strength), for commander pricing."""
+    import json
+    import pathlib
+
+    path = pathlib.Path(__file__).parent / "data" / "monster_capabilities_v1.json"
+    records = json.loads(path.read_text())
+    roster = [(r["monster_id"], int(r["attack"]), int(r["defense"]), float(r["base_strength"]))
+              for r in records if r["wide_v1_supported"]]
+    roster.sort()
+    return roster
+
+
 def load_valued_roster() -> list[tuple[int, float]]:
     """Every wide_v1 creature as (id, engine strength), from the capability audit.
 
@@ -156,15 +183,22 @@ def sample_budget_matchup(rng: random.Random, budget_range: tuple[float, float] 
     """
     import math
 
-    roster = load_valued_roster()
+    roster = load_statted_roster()
 
-    def side(budget: float) -> str:
+    def side(budget: float, hero_attack: int, hero_defense: int) -> str:
+        """Counts priced at the commanded strength, so the budget means the same on both sides.
+
+        Before 2026-08-09 this priced at base stats and the commanders were drawn afterwards, so
+        a matchup the budget called even could carry a hero on one side only; measured on
+        identical armies that decides the battle outright.
+        """
         stacks = rng.randint(1, max_stacks)
         weights = [rng.gammavariate(alpha, 1.0) for _ in range(stacks)]
         total = sum(weights)
         parts = []
         for w in weights:
-            monster, strength = rng.choice(roster)
+            monster, attack, defense, base = rng.choice(roster)
+            strength = commanded_strength(attack, defense, base, hero_attack, hero_defense)
             count = max(1, min(500, int(round(budget * (w / total) / max(strength, 0.1)))))
             parts.append(f"{monster}:{count}")
         return ",".join(parts)
@@ -174,11 +208,19 @@ def sample_budget_matchup(rng: random.Random, budget_range: tuple[float, float] 
     sigma = sigma_close if rng.random() < close_weight else sigma_wide
     ratio = math.exp(rng.gauss(0.0, sigma))
 
+    # The commanders are drawn first so their stats enter the pricing above; the budget ratio
+    # then remains the only intended asymmetry.
     heroes = {}
+    stats = {}
     for key in ("attacker_hero", "defender_hero"):
         if rng.random() < 0.5:
-            heroes[key] = f"{rng.randint(0, 25)}:{rng.randint(0, 20)}"
-    return Matchup(side(budget), side(budget * ratio), allow_wide=True, **heroes)
+            hero_attack, hero_defense = rng.randint(0, 25), rng.randint(0, 20)
+            heroes[key] = f"{hero_attack}:{hero_defense}"
+            stats[key] = (hero_attack, hero_defense)
+        else:
+            stats[key] = (0, 0)
+    return Matchup(side(budget, *stats["attacker_hero"]),
+                   side(budget * ratio, *stats["defender_hero"]), allow_wide=True, **heroes)
 
 
 def sample_diverse_matchup(rng: random.Random, horde_total_range: tuple[int, int] = (60, 900),

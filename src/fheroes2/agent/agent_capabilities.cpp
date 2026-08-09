@@ -44,6 +44,9 @@ fheroes2::agent::MonsterCapability fheroes2::agent::auditMonster( const int mons
 
     record.hitPoints = monster.GetHitPoints();
     record.strength = monster.GetMonsterStrength();
+    record.attack = monster.GetAttack();
+    record.defense = monster.GetDefense();
+    record.baseStrength = data.battleStats.monsterBaseStrength;
     record.isWide = monster.isWide();
     record.isFlying = monster.isFlying();
     record.isShooter = ( data.battleStats.shots > 0 );
@@ -304,6 +307,9 @@ bool fheroes2::agent::writeCapabilityAudit( const std::string & filePath )
             << ", \"simple_v1_supported\": " << boolText( r.simpleV1Supported ) //
             << ", \"wide_v1_supported\": " << boolText( r.wideV1Supported ) //
             << ", \"hit_points\": " << r.hitPoints //
+            << ", \"attack\": " << r.attack //
+            << ", \"defense\": " << r.defense //
+            << ", \"base_strength\": " << r.baseStrength //
             << ", \"strength\": " << r.strength;
 
         // The raw engine ability and weakness records, exported without interpretation: the
