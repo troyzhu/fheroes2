@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from .env import BattleEnv
+from .env import BattleEnv, terminal_reward_two_sided
 from .policy import BattlePolicy
 
 
@@ -304,6 +304,7 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
     # the policy is on the states it actually plays; rounds are the engine's own unit, distinct
     # from `mean_length`, which counts the learner's own decisions.
     normalized_entropies, perplexities, supports, legal_counts, rounds = [], [], [], [], []
+    reward_wins, reward_losses, rewards_commanded = [], [], []
     try:
         for _ in range(episodes):
             observation, mask = env.reset()
@@ -345,6 +346,14 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
                     rewards.append(step.reward)
                     lengths.append(steps)
                     rounds.append(int(step.info.get("rounds", 0)))
+                    # The reward split by outcome, the evaluation-side counterpart of the
+                    # per-iteration split the heartbeats carry: a mean reward can hold still
+                    # while cheap wins turn into expensive ones and vice versa.
+                    (reward_wins if won else reward_losses).append(step.reward)
+                    # Both pricings of the same battle, so the commander's contribution to the
+                    # score is visible rather than only its contribution to the outcome.
+                    both = terminal_reward_two_sided(step.info, side, commanded=True)
+                    rewards_commanded.append(both)
                     own = step.info["attacker" if side == "attacker" else "defender"]
                     foe = step.info["defender" if side == "attacker" else "attacker"]
                     own_initial = float(own.get("initial_strength", 0.0))
@@ -380,6 +389,9 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
         "support_at_1pct": float(np.mean(supports)),
         "legal_actions": float(np.mean(legal_counts)),
         "mean_rounds": float(np.mean(rounds)) if rounds else float("nan"),
+        "reward_on_wins": float(np.mean(reward_wins)) if reward_wins else None,
+        "reward_on_losses": float(np.mean(reward_losses)) if reward_losses else None,
+        "mean_reward_commanded": float(np.mean(rewards_commanded)) if rewards_commanded else float("nan"),
         "surviving_strength": float(np.mean(survival)) if survival else None,
         "loss_damage": float(np.mean(damage)) if damage else None,
         "strength_margin": float(np.mean(margins)),

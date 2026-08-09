@@ -151,3 +151,12 @@ Against the regret-band arm it trades rather than settles anything. The Thunk la
 The comparison confounds three changes at once and should not be read as a verdict on parity. The parity corpus is half the size, 2,640 labels against 5,143; it is drawn from the budget sampler rather than the standing pool, which is a different distribution entirely; and only then is it priced differently. Any of the three could produce this trade. The clean test, still owed, holds the sampler and the label count fixed and varies only the pricing, which is a cheap run now that both pricings exist behind a flag.
 
 What the retraining does establish is that the whole path works end to end: the engine emits both pricings, the reward selects between them, the collector scores rollouts under either, and a corpus collected this way trains and evaluates without special handling (`battery_parity.json`, `parity_distill_s*.json`, `parity_shard*_manifest.json`).
+
+
+## The commander cancels in the reward, which corrects the section above
+
+Adding both pricings as evaluation columns exposed that they agree to three decimals on every suite, and the reason is structural rather than a fallback. The two-sided reward is a ratio within one side, so a side-wide multiplier cancels. Measured over 320 side-episodes on mixed armies with a large commander on one side, 160 of them ending in partial survival, which is the only case where a per-creature multiplier can fail to cancel, the two pricings differ by at most 0.004 and by 0.002 on average.
+
+So the earlier claim here and in the commit message, that the reward was denominated in a currency missing its largest term, is wrong and is retracted. The commander is a cross-side quantity: it distorts the budget the sampler matches armies with, which was real and is fixed, and it distorts the difficulty weighting, which is still owed. It does not distort the two-sided margin. The `two_sided_commanded` option stays because it costs nothing and would matter for any reward form that compares the two sides directly, but it is not a fix to anything currently in use.
+
+The same block of columns corrects a second claim. With the per-seed spread now printed, the parity-corpus arm and the regret-band arm are not separable anywhere: held-out 0.546 against 0.571 at seed standard errors of 0.022 and 0.015, and the Thunk ladder 0.771 against 0.708 at 0.083 and 0.075, so the ladder difference reported as an improvement is inside one standard error and should not have been stated as a trade in its favour.

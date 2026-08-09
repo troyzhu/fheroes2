@@ -6,7 +6,7 @@ Provenance, not a reading path: every number these files carry is already quoted
 |---|---|---|---|
 | `heartbeat_*` | 38 | `the trainers themselves` | One JSON line per training iteration or epoch: losses decomposed, per-term per-module gradient norms, reward split over wins and losses, terminations, and any armed mechanism's own column |
 | `*distill*` | 24 | `soft_distill.py, awr_distill.py` | A paired distillation run: the arm, its twin, target entropy and per-epoch history |
-| `battery_*` | 13 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
+| `battery_*` | 14 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
 | `coverage_*_manifest*` | 12 | `search_teacher.py` | Which matchups a coverage-forced collection shard kept or dropped, with the flags it ran under |
 | `convergence_*` | 8 | `convergence_report.py` | Per-metric settlement verdicts over a run's heartbeat: converged, trending or oscillating |
 | `parity_*` | 7 | `search_teacher.py under commander-priced sampling` | A corpus collected on matchups whose budget prices the commander, with search scoring the

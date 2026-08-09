@@ -26,8 +26,9 @@ import pathlib
 import numpy as np
 
 COLUMNS = (("win_rate", "rate"), ("surviving_strength", "wq"), ("loss_damage", "lq"),
-           ("strength_margin", "mg"), ("mean_reward", "rw"), ("mean_length", "dec"),
-           ("mean_rounds", "rnds"), ("normalized_entropy", "Hnorm"),
+           ("strength_margin", "mg"), ("mean_reward", "rw"), ("reward_on_wins", "rwW"),
+           ("reward_on_losses", "rwL"), ("mean_reward_commanded", "rwC"),
+           ("mean_length", "dec"), ("mean_rounds", "rnds"), ("normalized_entropy", "Hnorm"),
            ("effective_actions", "effA"), ("legal_actions", "legal"))
 DEFAULT_SUITES = ("held_out_pool", "thunk_ladder", "held_out_as_defender", "mirrors_attacker",
                   "mirrors_defender", "stress_commanders", "stress_hordes", "fresh_sampled", "real_maps")
@@ -106,6 +107,18 @@ def main() -> None:
                 value = float(np.mean([column(report, n, suite, key) for n in members]))
                 row += f"{value:8.3f}" if value == value else f"{'--':>8s}"
             print(row)
+            # The two numbers that say whether a difference is readable at all: the spread of the
+            # arm's own seeds, and how many of the suite's matchups can discriminate anything.
+            if len(members) > 1:
+                seed_rates = [suite_rate(results, n, suite) for n in members]
+                spread = float(np.std(seed_rates, ddof=1) / np.sqrt(len(seed_rates)))
+                print(f"  {'':22s}seed SE {spread:.3f} over {len(members)} seeds "
+                      f"({', '.join(f'{r:.3f}' for r in sorted(seed_rates))})")
+            per_matchup = results.get(members[0], {}).get(suite)
+            if isinstance(per_matchup, list) and per_matchup and not isinstance(per_matchup[0], dict):
+                decided = sum(1 for r in per_matchup if r <= 0.1 or r >= 0.9)
+                print(f"  {'':22s}decided matchups {decided}/{len(per_matchup)} "
+                      f"(already at or beyond 0.9 or 0.1, so they cannot separate policies)")
             rungs = rungs_of(results, members[0], suite)
             if rungs and len(members) == 1:
                 print(f"  {'':22s}rungs " + "/".join(f"{r:.2f}" for r in rungs))

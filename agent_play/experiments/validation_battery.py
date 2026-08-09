@@ -178,6 +178,9 @@ def main() -> None:
                 "support_at_1pct": [m["support_at_1pct"] for m in measured],
                 "legal_actions": [m["legal_actions"] for m in measured],
                 "mean_rounds": [m["mean_rounds"] for m in measured],
+                "reward_on_wins": [m["reward_on_wins"] for m in measured],
+                "reward_on_losses": [m["reward_on_losses"] for m in measured],
+                "mean_reward_commanded": [m["mean_reward_commanded"] for m in measured],
             }
             surv_txt = f" wq {np.mean(survs):.2f}" if survs else " wq  --"
             dmg_txt = f" lq {np.mean(damages):.2f}" if damages else " lq  --"
