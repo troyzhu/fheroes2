@@ -6,8 +6,8 @@ Provenance, not a reading path: every number these files carry is already quoted
 |---|---|---|---|
 | `heartbeat_*` | 38 | `the trainers themselves` | One JSON line per training iteration or epoch: losses decomposed, per-term per-module gradient norms, reward split over wins and losses, terminations, and any armed mechanism's own column |
 | `*distill*` | 24 | `soft_distill.py, awr_distill.py` | A paired distillation run: the arm, its twin, target entropy and per-epoch history |
+| `battery_*` | 12 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
 | `coverage_*_manifest*` | 12 | `search_teacher.py` | Which matchups a coverage-forced collection shard kept or dropped, with the flags it ran under |
-| `battery_*` | 11 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
 | `convergence_*` | 8 | `convergence_report.py` | Per-metric settlement verdicts over a run's heartbeat: converged, trending or oscillating |
 | `*fidelity*` | 6 | `fidelity_report.py` | Top-k agreement with the teacher, the probability given to its move, entropy and the reliability table |
 | `mm_*` | 6 | `soft_distill.py at matched soft mass` | A corpus compared at identical total soft mass, so the arm differs only in which decisions carry the weight and not in how much weight there is |
@@ -21,6 +21,7 @@ Provenance, not a reading path: every number these files carry is already quoted
 | `builtin_ai_baseline*` | 1 | `builtin_ai_baseline.py` | The engine's own AI on every validation suite, the bar the policies must clear; the `_v2` form adds the quality columns |
 | `coverage_corpus_stats*` | 1 | `computed from the corpus` | Support completeness of a coverage-forced corpus: what fraction of decisions priced every candidate |
 | `deviation_probe*` | 1 | `deviation_probe.py` | How often search disagrees with the prior, split by whether the policy wins the matchup |
+| `hero_effect*` | 1 | `hero_effect.py` | What a commander is worth on identical armies, the term the army budget does not price |
 | `regret_density*` | 1 | `computed from the corpora` | Regret per decision in each corpus, which is what the collection screen was aimed at |
 | `*matchups*` | 1 | `the scenario generator` | The exact matchup list a round trained on, so the round re-creates |
 | `round*_bothchair*` | 1 | `selfplay_round.py` | A self-play round's configuration and per-seed outcome, including chair skips |

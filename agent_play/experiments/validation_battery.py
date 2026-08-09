@@ -173,6 +173,11 @@ def main() -> None:
                 "strength_margin": margins,
                 "mean_reward": rewards,
                 "mean_length": lens,
+                "normalized_entropy": [m["normalized_entropy"] for m in measured],
+                "effective_actions": [m["effective_actions"] for m in measured],
+                "support_at_1pct": [m["support_at_1pct"] for m in measured],
+                "legal_actions": [m["legal_actions"] for m in measured],
+                "mean_rounds": [m["mean_rounds"] for m in measured],
             }
             surv_txt = f" wq {np.mean(survs):.2f}" if survs else " wq  --"
             dmg_txt = f" lq {np.mean(damages):.2f}" if damages else " lq  --"

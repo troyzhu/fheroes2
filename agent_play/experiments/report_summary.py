@@ -26,7 +26,9 @@ import pathlib
 import numpy as np
 
 COLUMNS = (("win_rate", "rate"), ("surviving_strength", "wq"), ("loss_damage", "lq"),
-           ("strength_margin", "mg"), ("mean_reward", "rw"), ("mean_length", "len"))
+           ("strength_margin", "mg"), ("mean_reward", "rw"), ("mean_length", "dec"),
+           ("mean_rounds", "rnds"), ("normalized_entropy", "Hnorm"),
+           ("effective_actions", "effA"), ("legal_actions", "legal"))
 DEFAULT_SUITES = ("held_out_pool", "thunk_ladder", "held_out_as_defender", "mirrors_attacker",
                   "mirrors_defender", "stress_commanders", "stress_hordes", "fresh_sampled", "real_maps")
 
@@ -89,26 +91,27 @@ def main() -> None:
         if not any(suite in results[n] for n in names):
             continue
         print(f"\n{suite}")
-        header = f"  {'arm':26s}" + "".join(f"{tag:>9s}" for _, tag in COLUMNS)
+        header = f"  {'arm':22s}" + "".join(f"{tag:>8s}" for _, tag in COLUMNS)
         print(header)
         if ai is not None and suite in ai["results"]["builtin_ai"]:
-            row = f"  {'built-in AI':26s}"
+            row = f"  {'built-in AI':22s}"
             for key, _ in COLUMNS:
                 value = mean_of(ai["results"]["builtin_ai"][suite]) if key == "win_rate" else \
                     mean_of(ai.get("quality", {}).get("builtin_ai", {}).get(suite, {}).get(key, []))
-                row += f"{value:9.3f}" if value == value else f"{'--':>9s}"
+                row += f"{value:8.3f}" if value == value else f"{'--':>8s}"
             print(row)
         for group, members in groups.items():
-            row = f"  {group:26s}"
+            row = f"  {group:22s}"
             for key, _ in COLUMNS:
-                row += f"{float(np.mean([column(report, n, suite, key) for n in members])):9.3f}"
+                value = float(np.mean([column(report, n, suite, key) for n in members]))
+                row += f"{value:8.3f}" if value == value else f"{'--':>8s}"
             print(row)
             rungs = rungs_of(results, members[0], suite)
             if rungs and len(members) == 1:
-                print(f"  {'':26s}rungs " + "/".join(f"{r:.2f}" for r in rungs))
+                print(f"  {'':22s}rungs " + "/".join(f"{r:.2f}" for r in rungs))
             elif rungs:
                 stacked = np.array([rungs_of(results, n, suite) for n in members], dtype=float)
-                print(f"  {'':26s}rungs " + "/".join(f"{r:.2f}" for r in stacked.mean(axis=0)))
+                print(f"  {'':22s}rungs " + "/".join(f"{r:.2f}" for r in stacked.mean(axis=0)))
 
     if len(groups) == 2:
         a, b = list(groups)

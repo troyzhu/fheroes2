@@ -257,6 +257,11 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
                     allow_wide=matchup.allow_wide, seeds=seeds, planes=wants_planes,
                     reward_margin=reward_margin)
     wins, rewards, lengths, survival, damage, margins = [], [], [], [], [], []
+    # Deployment-side diagnostics, owner-requested 2026-08-09. Normalized entropy and support are
+    # computed at training time and were never carried to evaluation, where they say how decided
+    # the policy is on the states it actually plays; rounds are the engine's own unit, distinct
+    # from `mean_length`, which counts the learner's own decisions.
+    normalized_entropies, perplexities, supports, legal_counts, rounds = [], [], [], [], []
     try:
         for _ in range(episodes):
             observation, mask = env.reset()
@@ -264,7 +269,31 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
             while True:
                 plane_arg = (torch.from_numpy(env.last_planes).unsqueeze(0),) if wants_planes else ()
                 logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0), *plane_arg)
-                action = int(torch.distributions.Categorical(logits=logits).sample())
+                distribution = torch.distributions.Categorical(logits=logits)
+                # The diagnostics describe the policy, not the deployment rule wrapped around it:
+                # under a greedy rule the acting distribution is one-hot by construction and its
+                # entropy is zero for every checkpoint, which measures the wrapper rather than the
+                # network. `Sampler` keeps the wrapped model, so read the distribution from it.
+                inner = getattr(model, "model", model)
+                if inner is not model:
+                    with torch.no_grad():
+                        raw_logits, _ = inner(torch.from_numpy(observation).unsqueeze(0),
+                                              torch.from_numpy(mask).unsqueeze(0), *plane_arg)
+                    diagnostic = torch.distributions.Categorical(logits=raw_logits)
+                else:
+                    diagnostic = distribution
+                probabilities = diagnostic.probs.squeeze(0)
+                legal = int(mask.sum())
+                entropy = float(diagnostic.entropy())
+                legal_counts.append(legal)
+                # Against the uniform maximum over this state's legal set, so a five-action state
+                # and a thirty-action state read on one scale.
+                normalized_entropies.append(entropy / float(np.log(max(legal, 2))))
+                # Perplexity is the effective number of actions the policy is really choosing
+                # among; the one-percent count is the blunter version of the same question.
+                perplexities.append(float(np.exp(entropy)))
+                supports.append(int((probabilities >= 0.01).sum()))
+                action = int(distribution.sample())
                 step = env.step(action)
                 steps += 1
                 if step.done:
@@ -273,6 +302,7 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
                     wins.append(won)
                     rewards.append(step.reward)
                     lengths.append(steps)
+                    rounds.append(int(step.info.get("rounds", 0)))
                     own = step.info["attacker" if side == "attacker" else "defender"]
                     foe = step.info["defender" if side == "attacker" else "attacker"]
                     own_initial = float(own.get("initial_strength", 0.0))
@@ -301,6 +331,13 @@ def measure(model: BattlePolicy, worker: str, matchup: Matchup, episodes: int = 
         "mean_reward": float(np.mean(rewards)),
         "reward_std": float(np.std(rewards)),
         "mean_length": float(np.mean(lengths)),
+        # The owner's 2026-08-09 additions: how decided the policy is where it plays, how many
+        # actions it is really choosing among, and the battle's length in the engine's own unit.
+        "normalized_entropy": float(np.mean(normalized_entropies)),
+        "effective_actions": float(np.mean(perplexities)),
+        "support_at_1pct": float(np.mean(supports)),
+        "legal_actions": float(np.mean(legal_counts)),
+        "mean_rounds": float(np.mean(rounds)) if rounds else float("nan"),
         "surviving_strength": float(np.mean(survival)) if survival else None,
         "loss_damage": float(np.mean(damage)) if damage else None,
         "strength_margin": float(np.mean(margins)),

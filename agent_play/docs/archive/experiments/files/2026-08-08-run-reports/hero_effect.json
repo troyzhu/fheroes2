@@ -1,0 +1,63 @@
+{
+ "army": "62:3,30:6,15:10",
+ "episodes": 24,
+ "ladder": [
+  {
+   "attacker_hero": null,
+   "defender_hero": null,
+   "attacker_win_rate": 0.375,
+   "mean_reward": 0.24961693257291362,
+   "strength_margin": -0.12538306742708635,
+   "mean_rounds": 6.583333333333333
+  },
+  {
+   "attacker_hero": "0:0",
+   "defender_hero": null,
+   "attacker_win_rate": 0.4166666666666667,
+   "mean_reward": 0.3487292104973667,
+   "strength_margin": -0.06793745616929994,
+   "mean_rounds": 6.291666666666667
+  },
+  {
+   "attacker_hero": "5:5",
+   "defender_hero": null,
+   "attacker_win_rate": 1.0,
+   "mean_reward": 1.698804560627312,
+   "strength_margin": 0.698804560627312,
+   "mean_rounds": 4.375
+  },
+  {
+   "attacker_hero": "10:10",
+   "defender_hero": null,
+   "attacker_win_rate": 1.0,
+   "mean_reward": 1.85491651540778,
+   "strength_margin": 0.8549165154077802,
+   "mean_rounds": 3.5833333333333335
+  },
+  {
+   "attacker_hero": "15:15",
+   "defender_hero": null,
+   "attacker_win_rate": 1.0,
+   "mean_reward": 1.9399772939785216,
+   "strength_margin": 0.9399772939785213,
+   "mean_rounds": 3.2083333333333335
+  },
+  {
+   "attacker_hero": "20:20",
+   "defender_hero": null,
+   "attacker_win_rate": 1.0,
+   "mean_reward": 1.9911032273146045,
+   "strength_margin": 0.9911032273146047,
+   "mean_rounds": 3.0416666666666665
+  },
+  {
+   "attacker_hero": "25:20",
+   "defender_hero": null,
+   "attacker_win_rate": 1.0,
+   "mean_reward": 1.9911032273146045,
+   "strength_margin": 0.9911032273146047,
+   "mean_rounds": 3.0833333333333335
+  }
+ ],
+ "swing": 0.625
+}

@@ -55,6 +55,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `deviation_probe.py` | Does coverage-forced search disagree with the policy where the policy loses, or only where it already wins? The statistic the distillation program rests on, measured off the win filter | about 40 min for six matchups |
 | `index_run_reports.py` | Regenerate the readable index of every vendored run-report directory, so hundreds of artifacts stay findable and the gate can fail on an unexplained one | seconds |
 | `report_summary.py` | Print the canonical multi-metric block for a battery report, every column and per-rung ladder beside the built-in AI's own, so a human summary cannot collapse to the win rate | seconds |
+| `hero_effect.py` | What a commander is worth on identical armies with the engine on both sides, the term the army-strength budget does not price | about 3 min |
 
 ## Conventions
 

@@ -164,6 +164,16 @@ A pool records the policy that calibrated it, and this matters more than it look
 
 What calibration cannot do is rescue a matchup whose win rate is a step function, and those exist: `calibrate` reports `calibrated: false` when no scale inside its range lands in band, rather than returning the least-bad probe. Roughly three in five sampled compositions are like this, which is why the hit rate is 39 percent rather than higher.
 
+## The commander is not priced, and it decides identical armies
+
+The owner asked on 2026-08-09 whether army-strength pricing accounts for hero stats. It does not, and the hole is larger than the pricing it sits inside. The engine's own scalar, `Monster::GetMonsterStrength()` recorded per creature in the capability audit, is taken at base stats, and the budget sampler matches both sides from that table and only afterwards gives each side a commander on an independent coin flip, attack drawn from 0 to 25 and defense from 0 to 20. Nothing in the budget knows a commander was added.
+
+Measured with the engine playing both sides so no policy is involved, on identical armies over 24 battlefields (`hero_effect.py`, `hero_effect.json`): with neither side commanded the attacker wins 0.375, which is the defending-side advantage the mirror suites also show; a commander with zero stats lifts that to 0.417; and a commander at 5 attack and 5 defense, the smallest the sampler can draw above zero, wins **every battle**, as does every larger one. The strength margin moves from $-0.125$ to $+0.699$ and battles shorten from 6.6 rounds to 4.4. So across the range the sampler itself draws from, the commander alone swings the attacker's win rate by 0.625 and saturates almost immediately.
+
+Two consequences, stated at the size the evidence supports. The pricing gap is real and total in isolation: a commander is worth more than any army-budget difference the sampler is willing to draw, so a matchup the budget calls balanced can be decided before the first turn. In the standing pool it is one cause among several rather than the dominant one, because the budget ratio varies independently and can offset or compound it: 43 of the pool's 60 matchups and 12 of the 20 held-out ones carry a commander on one side only, yet grouping the held-out suite by commander asymmetry does not separate cleanly, the attacker-commanded group averaging 0.713 against 0.740 for the uncommanded one.
+
+What the same measurement does say plainly is that **9 of the 20 held-out matchups are already decided**, the engine winning at or above 0.9 or at or below 0.1 from both chairs, which caps the resolution of the project's headline suite whatever the cause. The fixes are separable and both owed: price the commander into the budget, or assign commanders symmetrically so the budget stays meaningful, and re-calibrate the evaluation pool so its matchups sit inside the band the acceptance criterion at the top of this page asks for.
+
 ## What is decided and what is open
 
 Decided. The acceptance criterion for the generator, in [[../decisions/0005-training-and-reward]], that a scenario carries gradient only when the policy neither always wins nor always loses it. The held-out seed set, fixed in advance and excluded from training, before any headline number is quoted.
