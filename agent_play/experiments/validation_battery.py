@@ -126,7 +126,7 @@ def main() -> None:
                         help="how the policy acts at evaluation; every historical number is `sample`, "
                              "which pays a stochasticity penalty the deterministic engine does not")
     parser.add_argument("--reward-margin", default="two_sided",
-                        choices=("hit_points", "strength", "two_sided"),
+                        choices=("hit_points", "strength", "two_sided", "two_sided_commanded"),
                         help="which objective the rw column reports; stamped into the report")
     parser.add_argument("--report", default=None)
     args = parser.parse_args()

@@ -212,6 +212,8 @@ class BattleEnv:
             reward = terminal_reward_strength(record, self.side)
         elif self._reward_margin == "two_sided":
             reward = terminal_reward_two_sided(record, self.side)
+        elif self._reward_margin == "two_sided_commanded":
+            reward = terminal_reward_two_sided(record, self.side, commanded=True)
         else:
             reward = terminal_reward(record, self.side, self._own_initial_hp)
         if self._reward_weighting == "difficulty":
@@ -270,7 +272,7 @@ def terminal_reward(record: dict, side: str, own_initial_hit_points: float) -> f
     return (1.0 if won else -1.0) + survived
 
 
-def terminal_reward_two_sided(record: dict, side: str) -> float:
+def terminal_reward_two_sided(record: dict, side: str, commanded: bool = False) -> float:
     """The owner's piecewise form, directed 2026-08-07: wins graded by own strength kept, losses
     graded by the damage dealt to the enemy, both priced by engine creature strength.
 
@@ -286,12 +288,18 @@ def terminal_reward_two_sided(record: dict, side: str) -> float:
     own = record["attacker" if side == "attacker" else "defender"]
     foe = record["defender" if side == "attacker" else "attacker"]
     won = _side_won(record, side)
+    # `commanded` prices each stack at its effective attack and defense, which include the
+    # commander's. The base pricing calls two identical armies equal when one of them is led by a
+    # hero worth more than any budget difference the sampler draws, so on those matchups the
+    # ratio the reward sees and the ratio the battle plays out at are different numbers.
+    now, start = ("strength_commanded", "initial_strength_commanded") if commanded \
+        else ("strength", "initial_strength")
     if won:
-        initial = float(own.get("initial_strength", 0.0))
-        kept = float(own.get("strength", 0.0)) / initial if initial > 0 else 0.0
+        initial = float(own.get(start, own.get("initial_strength", 0.0)))
+        kept = float(own.get(now, own.get("strength", 0.0))) / initial if initial > 0 else 0.0
         return 1.0 + kept
-    foe_initial = float(foe.get("initial_strength", 0.0))
-    destroyed = 1.0 - (float(foe.get("strength", 0.0)) / foe_initial if foe_initial > 0 else 0.0)
+    foe_initial = float(foe.get(start, foe.get("initial_strength", 0.0)))
+    destroyed = 1.0 - (float(foe.get(now, foe.get("strength", 0.0))) / foe_initial if foe_initial > 0 else 0.0)
     if record["termination"] == "stalemate" and side == "attacker":
         destroyed = 0.0
     return -1.0 + destroyed

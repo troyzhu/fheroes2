@@ -69,6 +69,13 @@ namespace fheroes2::agent
         // and the difficulty weight use, so losing a Champion costs what a Champion is worth
         // rather than what its hit points weigh. Commander bonuses are not priced in.
         double strength{ 0.0 };
+        // The same sum priced at each stack's effective attack and defense, which include the
+        // commander's, matching what Troop::GetStrength does for the engine's own valuations.
+        // Kept beside the base figure rather than replacing it, because every reward and report
+        // before 2026-08-09 is denominated in the base one: a commander at five attack and five
+        // defense decides an otherwise identical battle, so a reward that cannot see it prices
+        // two very different armies the same.
+        double strengthCommanded{ 0.0 };
     };
 
     struct EpisodeOutcome
@@ -83,6 +90,9 @@ namespace fheroes2::agent
         // armies, so a strength-weighted survival margin has its denominator engine-computed.
         double attackerInitialStrength{ 0.0 };
         double defenderInitialStrength{ 0.0 };
+        // The same denominators priced with the commander's attack and defense included.
+        double attackerInitialStrengthCommanded{ 0.0 };
+        double defenderInitialStrengthCommanded{ 0.0 };
         Termination termination{ Termination::EngineDraw };
         SideSummary attacker;
         SideSummary defender;

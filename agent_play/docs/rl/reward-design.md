@@ -131,6 +131,14 @@ Prefer the terminal candidates until learning demonstrably stalls, which has not
 - [[rlhf-transfer]], for over-optimization and the proxy-against-gold protocol.
 
 
+## The commander the pricing could not see, 2026-08-09
+
+Every strength figure this page uses came from `Monster::GetMonsterStrength()` at base creature stats, and the owner asked whether that accounts for hero stats. It does not, and the consequence lands on the reward rather than on the observation. The observation is fine: the worker records each unit's `GetAttack()` and `GetDefense()`, which reach `ArmyTroop::GetAttack()` and already add the commander's, so a policy sees the commander's entire combat contribution on every stack of both sides, which is exactly where it acts. The reward did not: the terminal record's per-side strength summed base-stat pricing, so two identical armies priced identically even when one was led.
+
+The size of that hole, measured on identical armies with a ten-attack ten-defense commander on one side: base pricing calls both sides 387.9, and pricing each stack at its effective attack and defense calls the commanded side 708.0 against 387.9. The battle agrees with the second number, the engine winning every one of twenty-four such fights from the commanded side. So the two-sided margin, whose whole purpose is to grade a win by what it kept and a loss by what it destroyed, was denominating both in a currency that ignored the single largest term.
+
+The runner now emits `strength_commanded` and `initial_strength_commanded` beside the base figures, and `reward_margin="two_sided_commanded"` prices the margin in them. It is offered rather than defaulted, on this project's usual staging rule: every reward, report and checkpoint before 2026-08-09 is denominated in the base pricing, and a silent switch would make the new numbers incomparable with all of them without saying so. What is owed next is the measurement that decides adoption, a paired run under each pricing on matchups that carry commanders, and the same question asked of the difficulty weighting, which prices its enemy-to-own ratio the same way.
+
 ## Stalls, and the evasion exploit the owner predicted
 
 A battle nobody finishes is a possibility the reward has to price, because a policy that cannot win can always try not to lose. The owner raised the flying version, a fast unit that simply keeps its distance forever; the measured facts as of 2026-08-06 are that `simple_v1` rejects flying movement outright (deferred to Phase 1b), so the flying exploit cannot be fielded yet, that the runner already stops any battle after forty consecutive no-death rounds with a `stalemate` termination (61 of 16,060 recorded episodes) and hard-caps at 100 rounds, and that the walking version of the exploit works today: `evasion_stalemate.py` commands fast Rogues to always move to the cell farthest from slow Zombies, and every episode ends in `stalemate` at exactly round 40, none looping.

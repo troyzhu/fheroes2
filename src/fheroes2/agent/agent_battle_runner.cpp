@@ -200,17 +200,32 @@ namespace
                 summary.liveCreatures += state.count;
                 summary.hitPoints += state.hitPoints;
                 summary.strength += Monster( state.monsterId ).GetMonsterStrength() * state.count;
+                // Battle::Unit::GetAttack reaches ArmyTroop::GetAttack, which adds the
+                // commander's attack and defense, so this is the stack's worth as the battle
+                // actually values it. Spell modifiers would also land here; simple_v1 commanders
+                // carry no spellbook, so today the difference is exactly the commander.
+                summary.strengthCommanded += Monster( state.monsterId )
+                                                 .GetMonsterStrength( static_cast<int>( unit->GetAttack() ),
+                                                                      static_cast<int>( unit->GetDefense() ) )
+                                             * state.count;
             }
         }
     }
 
-    double armyStrength( const Army & army )
+    double armyStrength( const Army & army, const bool commanded = false )
     {
+        const HeroBase * commander = army.GetCommander();
+        const int attackBonus = ( commanded && commander != nullptr ) ? commander->GetAttack() : 0;
+        const int defenseBonus = ( commanded && commander != nullptr ) ? commander->GetDefense() : 0;
         double total = 0.0;
         for ( size_t i = 0; i < army.Size(); ++i ) {
             const Troop * troop = army.GetTroop( i );
             if ( troop != nullptr && troop->isValid() ) {
-                total += Monster( troop->GetID() ).GetMonsterStrength() * troop->GetCount();
+                const Monster monster( troop->GetID() );
+                total += ( commanded ? monster.GetMonsterStrength( static_cast<int>( monster.GetAttack() ) + attackBonus,
+                                                                   static_cast<int>( monster.GetDefense() ) + defenseBonus )
+                                     : monster.GetMonsterStrength() )
+                         * troop->GetCount();
             }
         }
         return total;
@@ -331,6 +346,8 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
 
     outcome.attackerInitialStrength = armyStrength( attackingArmy );
     outcome.defenderInitialStrength = armyStrength( defendingArmy );
+    outcome.attackerInitialStrengthCommanded = armyStrength( attackingArmy, true );
+    outcome.defenderInitialStrengthCommanded = armyStrength( defendingArmy, true );
 
     outcome.combatSeed = Battle::computeBattleSeed( scenario.tileIndex, outcome.mapSeed, attackingArmy, defendingArmy );
 

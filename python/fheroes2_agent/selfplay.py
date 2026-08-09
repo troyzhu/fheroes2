@@ -180,7 +180,8 @@ class SelfPlayEnv:
         if self._reward_margin == "strength":
             reward = terminal_reward_strength(record, self._learner_side)
         else:
-            reward = terminal_reward_two_sided(record, self._learner_side)
+            reward = terminal_reward_two_sided(
+                record, self._learner_side, commanded=self._reward_margin == "two_sided_commanded")
         return Step(step.observation, step.mask, reward, True, record)
 
     def close(self) -> None:

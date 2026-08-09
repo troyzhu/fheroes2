@@ -26,6 +26,14 @@ def record(termination, own_strength, own_initial, foe_strength, foe_initial):
             "defender": {"strength": foe_strength, "initial_strength": foe_initial}}
 
 
+def commanded_record(termination, own, own_initial, own_c, own_initial_c, foe, foe_initial, foe_c, foe_initial_c):
+    return {"termination": termination,
+            "attacker": {"strength": own, "initial_strength": own_initial,
+                         "strength_commanded": own_c, "initial_strength_commanded": own_initial_c},
+            "defender": {"strength": foe, "initial_strength": foe_initial,
+                         "strength_commanded": foe_c, "initial_strength_commanded": foe_initial_c}}
+
+
 # The win branch prices own strength kept and never reads the foe.
 clean = record("victory", 100.0, 100.0, 0.0, 50.0)
 pyrrhic = record("victory", 10.0, 100.0, 0.0, 50.0)
@@ -67,6 +75,20 @@ check("mixed chairs score losses per episode",
 check("a chair list of the wrong length falls back to the run side",
       win_rate(outcomes, "attacker", ["attacker"]) == 0.5)
 check("no outcomes is zero, not an error", win_rate([], "attacker") == 0.0)
+
+# The commander-aware pricing, added 2026-08-09. Identical armies price identically at base
+# stats and differently once the commander is counted, which is the whole point: the base
+# valuation called an army led by a hero equal to one that is not.
+led = commanded_record("victory", 200.0, 400.0, 360.0, 720.0, 0.0, 400.0, 0.0, 400.0)
+check("base pricing keeps half", abs(terminal_reward_two_sided(led, "attacker") - 1.5) < 1e-9)
+check("commanded pricing keeps the same fraction of a larger base",
+      abs(terminal_reward_two_sided(led, "attacker", commanded=True) - 1.5) < 1e-9)
+lopsided = commanded_record("defeat", 0.0, 400.0, 0.0, 720.0, 200.0, 400.0, 360.0, 720.0)
+check("commanded loss prices the enemy's commanded remainder",
+      abs(terminal_reward_two_sided(lopsided, "attacker", commanded=True) + 0.5) < 1e-9)
+check("a record without commanded fields falls back to the base pricing",
+      terminal_reward_two_sided(record("victory", 50.0, 100.0, 0.0, 100.0), "attacker", commanded=True)
+      == terminal_reward_two_sided(record("victory", 50.0, 100.0, 0.0, 100.0), "attacker"))
 
 failed = [name for name, ok in CHECKS if not ok]
 for name, ok in CHECKS:

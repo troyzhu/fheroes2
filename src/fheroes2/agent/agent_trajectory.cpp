@@ -188,9 +188,13 @@ void fheroes2::agent::TrajectoryWriter::writeTerminal( const EpisodeOutcome & ou
          << ",\"state_digest\":\"" << escapeJson( outcome.stateDigest ) << '"' //
          << ",\"attacker\":{\"live_stacks\":" << outcome.attacker.liveStacks << ",\"live_creatures\":" << outcome.attacker.liveCreatures
          << ",\"hit_points\":" << outcome.attacker.hitPoints << ",\"strength\":" << outcome.attacker.strength
+         << ",\"strength_commanded\":" << outcome.attacker.strengthCommanded
+         << ",\"initial_strength_commanded\":" << outcome.attackerInitialStrengthCommanded
          << ",\"initial_strength\":" << outcome.attackerInitialStrength << '}' //
          << ",\"defender\":{\"live_stacks\":" << outcome.defender.liveStacks << ",\"live_creatures\":" << outcome.defender.liveCreatures
          << ",\"hit_points\":" << outcome.defender.hitPoints << ",\"strength\":" << outcome.defender.strength
+         << ",\"strength_commanded\":" << outcome.defender.strengthCommanded
+         << ",\"initial_strength_commanded\":" << outcome.defenderInitialStrengthCommanded
          << ",\"initial_strength\":" << outcome.defenderInitialStrength << '}';
 
     // Per-unit terminal state. These fields were previously computed, folded into the state
