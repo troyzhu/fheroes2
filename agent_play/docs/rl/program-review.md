@@ -103,7 +103,7 @@ Two facts frame the ranking. No reinforcement configuration here has yet produce
 
 | Rank | Approach | Why, and what grounds it |
 |---|---|---|
-| 1 | Collect where the policy loses, distil weighted by regret | The deviation probe found the action-level signal three times denser and five times more valuable per instance on matchups the policy loses, and 93.2 percent of the current corpus carries no regret at all; the screen and the weighting are built and the first arms are measuring |
+| 1 | Collect where the policy loses, distil weighted by regret | Measured 2026-08-08: weighting soft rows by rank-transformed regret at equal soft mass beats its unweighted twin by $+0.063$ held-out and $+0.135$ on reward, paired positive on every seed, and beats the hard twin by $+0.102$; the deviation probe explains why, and collecting more of the 6.8 percent that carries regret is the untested half |
 | 2 | Chair-balanced training | Every round trained the attacker chair while the two mirror chairs carry the largest gaps and the engine's own split favours the defender; built, and the first round is measuring |
 | 3 | The deployment rule, measured at full power | Every weights-only headline was sampled against a deterministic planner while greedy read higher on the half-slice that was tried; recovered reporting rather than earned play, and it must be labelled as such with the engine re-measured under the same protocol |
 | 4 | Anchored reinforcement at longer budgets | The leash makes reinforcement non-destructive; whether budget on that base climbs rather than holds is the open question, and the 4000-iteration pair is measuring |

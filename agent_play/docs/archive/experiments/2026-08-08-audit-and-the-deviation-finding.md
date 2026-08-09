@@ -39,3 +39,21 @@ So the 96 percent figure is a win-filter artifact, and the reading it supported 
 ## What this does not say
 
 It does not say the gap is closable. It says the gap has an action-level component that is measurable and has never been in a training corpus, which is a different and weaker claim. The deviation rates are single-checkpoint and single-suite, the four losing matchups are four, and the two search modes disagree by a factor of two on the same positions, so the absolute numbers are soft even where the contrast is stable. What licenses acting on it is the direction and the size of the value gaps, not the precision.
+
+## Weighting the loss by regret, which is what the finding predicts
+
+If 93.2 percent of a corpus carries no regret, an unweighted loss spends almost all of its gradient teaching the policy choices it already makes. The arm that follows is cheap and paired: the same relabeled corpus, the same soft value targets, the same three seeds, with soft rows weighted by rank-transformed measured regret and the multiplier renormalized to mean one, so the weighted arm carries exactly the soft mass of its unweighted twin and the only difference is where that mass sits.
+
+| Suite | Regret-weighted | Uniform soft | Hard twin |
+|---|---|---|---|
+| Held-out pool | 0.535 / $+0.64$ | 0.472 / $+0.50$ | 0.433 / $+0.42$ |
+| Thunk ladder | 0.767 / $+1.20$ | 0.747 / $+1.12$ | 0.632 / $+0.88$ |
+| Mirrors as defender | 0.336 / $+0.17$ | 0.303 / $+0.12$ | 0.275 / $+0.07$ |
+| Held-out as defender | 0.266 / $-0.07$ | 0.274 / $-0.05$ | 0.260 / $-0.08$ |
+| Commanders | 0.962 / $+1.75$ | 0.958 / $+1.75$ | 0.962 / $+1.76$ |
+| Fresh sampled | 0.380 / $+0.14$ | 0.385 / $+0.16$ | 0.376 / $+0.14$ |
+| Real maps | 0.560 / $+0.64$ | 0.566 / $+0.64$ | 0.560 / $+0.63$ |
+
+The held-out gain over the unweighted twin is $+0.063$ on rate and $+0.135$ on the trained reward, and it is paired per seed at $+0.079$, $+0.035$ and $+0.075$, every seed the same sign, against a same-checkpoint band of about $\pm 0.03$. The ordering regret-weighted above uniform above hard holds on held-out, on the ladder and on the defender mirror, and the three suites that do not move are the ones already at par with the engine. Against the hard twin the total is $+0.102$ on held-out, which is the largest paired distillation effect this project has measured.
+
+Read carefully, this is not a crossing and not a new best policy: at 0.535 the arm sits where the supervised anchor already sits, inside its re-evaluation band. What it establishes is mechanism. The soft-target program was not weak because search had nothing to teach, it was weak because the corpus was overwhelmingly composed of decisions where search had nothing to teach, and pointing the same gradient at the 6.8 percent that carry regret recovers an effect three times the noise band from data already on disk. The next question is whether collecting more of that 6.8 percent, rather than reweighting what exists, compounds it (`battery_regret.json`, `regw_distill_s*.json`).
