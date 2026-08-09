@@ -234,6 +234,22 @@ if os.environ.get("FACTS") == "1":
         if module.name != "__init__.py" and module.name not in lib_readme:
             facts.append(f"python/fheroes2_agent/README.md: does not index module {module.name}")
 
+    # 3d. Vendored artifacts must be explained. Each dated directory under archive/experiments/
+    # files/ carries a generated README indexing its files by family; a file matching no family
+    # is an artifact nobody can interpret, which the owner met as a hundred unreadable JSONs.
+    import fnmatch as _fnmatch
+    for directory in sorted((DOCS / "archive" / "experiments" / "files").glob("*/")):
+        readme = directory / "README.md"
+        if not readme.exists():
+            continue
+        patterns = re.findall(r"\| `([^`]+)` \|", readme.read_text(encoding="utf-8"))
+        for artifact in sorted(directory.iterdir()):
+            if artifact.name == "README.md" or artifact.name.startswith("."):
+                continue
+            if not any(_fnmatch.fnmatch(artifact.name, pattern) for pattern in patterns):
+                facts.append(f"{rel(readme)}: does not explain {artifact.name}; "
+                             f"add a family to experiments/index_run_reports.py and regenerate")
+
     # 4. Declared claims, the verify_memory.sh grammar.
     DECL = re.compile(r"<!--\s*verify\s*\n(.*?)-->", re.S)
     for f in files:
