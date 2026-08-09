@@ -1,0 +1,252 @@
+{
+  "matchups": [
+    {
+      "attacker": "25:3",
+      "defender": "52:1,4:1,42:1",
+      "attacker_hero": null,
+      "defender_hero": "16:2",
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "34:1,22:1",
+      "defender": "18:1,65:1,28:1,30:2",
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "19:1,47:1,17:1,14:1",
+      "defender": "34:1,28:1,42:1,52:1,65:3",
+      "attacker_hero": "19:8",
+      "defender_hero": null,
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "1:4,15:1,7:1,10:1,64:1",
+      "defender": "66:1,51:1",
+      "attacker_hero": null,
+      "defender_hero": "3:4",
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "19:1,14:1",
+      "defender": "65:1,48:1,10:1,24:1,1:2",
+      "attacker_hero": "14:18",
+      "defender_hero": null,
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "65:1,62:1,26:1,66:1",
+      "defender": "39:2,10:1",
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": true,
+      "wins": 8,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "15:3,17:1",
+      "defender": "49:14,65:2,62:1,22:13,18:3",
+      "attacker_hero": "25:19",
+      "defender_hero": "7:3",
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "8:1,58:1,33:1",
+      "defender": "1:153",
+      "attacker_hero": "23:14",
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": true,
+      "wins": 8,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "39:35,51:2,26:9",
+      "defender": "42:2,63:8,17:2,4:1,18:2",
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "49:37",
+      "defender": "33:4,64:5,8:5,18:1",
+      "attacker_hero": "16:7",
+      "defender_hero": null,
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "52:1,17:1",
+      "defender": "48:7,26:1",
+      "attacker_hero": "12:17",
+      "defender_hero": null,
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "64:1,28:1,49:1,58:1",
+      "defender": "5:1,14:1,2:1,14:1",
+      "attacker_hero": "6:18",
+      "defender_hero": "21:7",
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "48:109",
+      "defender": "65:21,25:7,51:1,23:2,1:171",
+      "attacker_hero": "1:12",
+      "defender_hero": null,
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 0.75
+    },
+    {
+      "attacker": "16:3,51:10,4:2",
+      "defender": "40:1,48:19,48:21",
+      "attacker_hero": null,
+      "defender_hero": "4:3",
+      "allow_wide": true,
+      "prior_win_rate": 0.25,
+      "kept": true,
+      "wins": 8,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "40:20,19:2",
+      "defender": "24:9,65:3",
+      "attacker_hero": null,
+      "defender_hero": "4:2",
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "34:1,34:2,59:5,48:16,4:14",
+      "defender": "65:14",
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 1,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "26:2,14:1,34:1,3:4",
+      "defender": "14:10",
+      "attacker_hero": "20:15",
+      "defender_hero": "18:16",
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "11:1,58:5,3:1,65:1",
+      "defender": "25:1,5:2",
+      "attacker_hero": "3:2",
+      "defender_hero": "16:14",
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    },
+    {
+      "attacker": "4:15,48:13,8:1,10:1,22:14",
+      "defender": "7:1,45:3,6:13,2:14",
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "34:1,15:3",
+      "defender": "10:1",
+      "attacker_hero": null,
+      "defender_hero": null,
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "15:2,66:19",
+      "defender": "62:2,24:3,49:37,27:4,27:10",
+      "attacker_hero": null,
+      "defender_hero": "0:6",
+      "allow_wide": true,
+      "prior_win_rate": 0.0,
+      "kept": false,
+      "wins": 0,
+      "episodes": 8,
+      "side": "attacker"
+    },
+    {
+      "attacker": "40:1,23:1,7:1",
+      "defender": "6:1",
+      "attacker_hero": "10:15",
+      "defender_hero": "20:16",
+      "allow_wide": true,
+      "kept": false,
+      "screened_out": true,
+      "prior_win_rate": 1.0
+    }
+  ],
+  "side": "attacker",
+  "sample_seed": 302,
+  "simulations": 48,
+  "coverage_forced": true,
+  "policy_max_win": 0.55,
+  "min_win": 0.35
+}

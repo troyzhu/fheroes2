@@ -32,6 +32,8 @@ FAMILIES: list[tuple[str, str, str]] = [
      "The same checkpoints under sampled, greedy and entropy-adaptive action rules, which is how the deployment rule was settled"),
     ("battery_greedy_*", "validation_battery.py --deployment greedy",
      "Greedy evaluation across seeds, the three-seed confirmation of a single-seed reading"),
+    ("parity_*", "search_teacher.py under commander-priced sampling",
+     "A corpus collected on matchups whose budget prices the commander, with search scoring the\n      commander-aware reward, and the distillation arms trained on it"),
     ("hero_effect*", "hero_effect.py",
      "What a commander is worth on identical armies, the term the army budget does not price"),
     ("mm_*", "soft_distill.py at matched soft mass",

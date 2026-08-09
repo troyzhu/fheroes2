@@ -6,9 +6,11 @@ Provenance, not a reading path: every number these files carry is already quoted
 |---|---|---|---|
 | `heartbeat_*` | 38 | `the trainers themselves` | One JSON line per training iteration or epoch: losses decomposed, per-term per-module gradient norms, reward split over wins and losses, terminations, and any armed mechanism's own column |
 | `*distill*` | 24 | `soft_distill.py, awr_distill.py` | A paired distillation run: the arm, its twin, target entropy and per-epoch history |
-| `battery_*` | 12 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
+| `battery_*` | 13 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
 | `coverage_*_manifest*` | 12 | `search_teacher.py` | Which matchups a coverage-forced collection shard kept or dropped, with the flags it ran under |
 | `convergence_*` | 8 | `convergence_report.py` | Per-metric settlement verdicts over a run's heartbeat: converged, trending or oscillating |
+| `parity_*` | 7 | `search_teacher.py under commander-priced sampling` | A corpus collected on matchups whose budget prices the commander, with search scoring the
+      commander-aware reward, and the distillation arms trained on it |
 | `*fidelity*` | 6 | `fidelity_report.py` | Top-k agreement with the teacher, the probability given to its move, entropy and the reliability table |
 | `mm_*` | 6 | `soft_distill.py at matched soft mass` | A corpus compared at identical total soft mass, so the arm differs only in which decisions carry the weight and not in how much weight there is |
 | `symmetry_*` | 5 | `symmetry_gap.py` | The same army from either chair against the engine's own asymmetry, which is the neutral point |
