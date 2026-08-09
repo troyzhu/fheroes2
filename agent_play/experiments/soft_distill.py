@@ -31,11 +31,11 @@ from fheroes2_agent.encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, encode_
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 
 
-def load_soft(roots, lam: float, target_kind: str = "values") -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Soft rows: (observations, masks, hard argmax actions, dense pi_bar targets)."""
+def load_soft(roots, lam: float, target_kind: str = "values") -> tuple:
+    """Soft rows: (observations, masks, hard argmax actions, dense targets, measured regret)."""
     if isinstance(roots, str):
         roots = [roots]
-    observations, masks, actions, targets = [], [], [], []
+    observations, masks, actions, targets, regrets = [], [], [], [], []
     for path in sorted(q for root in roots for q in pathlib.Path(root).rglob("*.jsonl")):
         for line in path.read_text().splitlines():
             record = json.loads(line)
@@ -60,10 +60,21 @@ def load_soft(roots, lam: float, target_kind: str = "values") -> tuple[np.ndarra
                     dense[a] = np.exp(l - peak)
             dense /= dense.sum()
             targets.append(dense)
-    return (np.stack(observations), np.stack(masks), np.asarray(actions), np.stack(targets))
+            # Measured regret: what the labeled action is worth over the one the prior would have
+            # taken unaided, in the reward units the rollouts measured. On the first scaled corpus
+            # 93.2 percent of decisions carry none, so an unweighted loss spends almost all of its
+            # gradient confirming choices the policy already makes.
+            values = {int(a): v for a, v in record["search_values"].items()}
+            priors = {int(a): v for a, v in record["prior"].items()}
+            prior_pick = max(priors, key=priors.get) if priors else None
+            regrets.append(max(values.get(int(record["teacher_action"]), 0.0)
+                               - values.get(prior_pick, 0.0), 0.0) if prior_pick is not None else 0.0)
+    return (np.stack(observations), np.stack(masks), np.asarray(actions), np.stack(targets),
+            np.asarray(regrets, dtype=np.float32))
 
 
-def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, seed: int, out: str) -> dict:
+def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, seed: int, out: str,
+              regret_weighted: bool = False) -> dict:
     """soft_as='distribution' trains on pi_bar; soft_as='argmax' trains the same rows one-hot."""
     torch.manual_seed(seed)
     train_s, holdout_s = split_by_episode(hard, 0.2, seed)
@@ -74,6 +85,17 @@ def train_arm(hard, soft_rows, soft_as: str, soft_weight: float, epochs: int, se
     n_hard = len(train_s.actions)
     weights = torch.ones(len(actions))
     weights[n_hard:] = soft_weight
+    if regret_weighted:
+        # Rank-transformed, because a maximum over about thirty candidates each priced by one
+        # rollout is upward biased, and renormalized to mean one so the arm carries exactly the
+        # same total soft mass as its unweighted twin: the comparison isolates where the mass
+        # sits, not how much of it there is.
+        regret = soft_rows[4]
+        order = np.argsort(np.argsort(regret))
+        percentile = order / max(len(order) - 1, 1)
+        multiplier = 0.25 + 1.5 * percentile
+        multiplier = multiplier / multiplier.mean()
+        weights[n_hard:] = torch.from_numpy((soft_weight * multiplier).astype(np.float32))
 
     model = BattlePolicy()
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-2)
@@ -149,6 +171,8 @@ def main() -> None:
     parser.add_argument("--target", default="values", choices=("values", "visits"),
                         help="visits builds AlphaZero-style pi proportional to N^(1/lam)")
     parser.add_argument("--soft-weight", type=float, default=2.0)
+    parser.add_argument("--regret-weighted", action="store_true",
+                        help="weight soft rows by rank-transformed measured regret at equal total mass")
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--out", required=True)
@@ -163,7 +187,8 @@ def main() -> None:
     print(f"{len(hard.actions)} hard decisions + {len(soft_rows[2])} soft decisions; "
           f"target entropy {entropy:.3f} nats at lambda {args.lam}", flush=True)
 
-    soft = train_arm(hard, soft_rows, "distribution", args.soft_weight, args.epochs, args.seed, args.out)
+    soft = train_arm(hard, soft_rows, "distribution", args.soft_weight, args.epochs, args.seed,
+                     args.out, regret_weighted=args.regret_weighted)
     print(f"soft-target arm: best agreement {soft['agreement']:.4f} at epoch {soft['epoch']}", flush=True)
     hard_arm = train_arm(hard, soft_rows, "argmax", args.soft_weight, args.epochs, args.seed, args.hard_out)
     print(f"hard-label twin: best agreement {hard_arm['agreement']:.4f} at epoch {hard_arm['epoch']}", flush=True)

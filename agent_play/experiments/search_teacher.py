@@ -51,6 +51,24 @@ POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "ar
 SHARE2_EVALS = POOL.parent / "dagger_share2.json"
 
 
+def prior_win_rate(worker: str, model, entry: dict, side: str, episodes: int, seeds: int) -> float:
+    """The policy's own rate on this matchup, no search: the screen that aims collection.
+
+    The deviation probe of 2026-08-08 showed search disagreeing with the prior about three times
+    as often, and each disagreement worth about five times as much, on matchups the policy loses
+    than on matchups it wins. Every corpus before that was filtered only on search winning, which
+    selects matchups the prior usually wins too, so the labels concentrated where the teacher had
+    least to say. Screening on the prior's own rate is what aims collection at the band where the
+    two disagree.
+    """
+    from fheroes2_agent.scenarios import Matchup, measure
+
+    matchup = Matchup(entry["attacker"], entry["defender"], attacker_hero=entry.get("attacker_hero"),
+                      defender_hero=entry.get("defender_hero"), allow_wide=bool(entry.get("allow_wide")))
+    return measure(model, worker, matchup, episodes=episodes, seeds=seeds, side=side,
+                   reward_margin="two_sided")["win_rate"]
+
+
 def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: pathlib.Path,
                     episodes: int, simulations: int, c_puct: float, side: str = "attacker",
                     min_win_fraction: float = 0.0, seed_offset: int = 0,
@@ -136,6 +154,11 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=8, help="episodes per sampled matchup")
     parser.add_argument("--min-win", type=float, default=0.5,
                         help="fresh mode: drop matchups where search wins less than this fraction")
+    parser.add_argument("--policy-max-win", type=float, default=1.0,
+                        help="fresh mode: drop matchups where the prior itself already wins more than this, "
+                             "which is where the 2026-08-08 deviation probe found search has least to teach")
+    parser.add_argument("--screen-episodes", type=int, default=8,
+                        help="episodes per matchup for the prior screen, no search")
     parser.add_argument("--planes", action="store_true",
                         help="collect with the planes_v1 obstacle layer on every observation")
     parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"),
@@ -173,6 +196,18 @@ def main() -> None:
             m = sample_budget_matchup(rng)
             entry = {"attacker": m.attacker, "defender": m.defender, "attacker_hero": m.attacker_hero,
                      "defender_hero": m.defender_hero, "allow_wide": m.allow_wide}
+            if args.policy_max_win < 1.0:
+                try:
+                    screen = prior_win_rate(args.worker, model, entry, args.side,
+                                            args.screen_episodes, 2)
+                except Exception as error:  # a rejected scenario is data, not a crash
+                    manifest.append(entry | {"kept": False, "error": str(error)[:120]})
+                    continue
+                if screen > args.policy_max_win:
+                    manifest.append(entry | {"kept": False, "screened_out": True,
+                                             "prior_win_rate": round(screen, 3)})
+                    continue
+                entry = entry | {"prior_win_rate": round(screen, 3)}
             try:
                 decisions, wins = collect_matchup(args.worker, model, entry,
                                                   out_root / f"shard{args.shard}_matchup_{index:03d}",
@@ -197,7 +232,8 @@ def main() -> None:
         out_root.mkdir(parents=True, exist_ok=True)
         (out_root / f"shard{args.shard}_manifest.json").write_text(json.dumps(
             {"matchups": manifest, "side": args.side, "sample_seed": args.sample_seed,
-             "simulations": args.simulations, "coverage_forced": args.coverage_forced}, indent=2))
+             "simulations": args.simulations, "coverage_forced": args.coverage_forced,
+             "policy_max_win": args.policy_max_win, "min_win": args.min_win}, indent=2))
     else:
         entries = json.loads(POOL.read_text())["matchups"][:40]
         rates = json.loads(SHARE2_EVALS.read_text())["evals"]["train"]
