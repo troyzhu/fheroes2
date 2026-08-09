@@ -52,6 +52,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `rounds_probe.py` | Round-count histograms and stalemate incidence per checkpoint on the training and held-out matchup slices, from exact terminal records | about 2 min per checkpoint |
 | `selfplay_round.py` | One self-play training round with the pool, leash, budget, chair and matchup source as flags, matchups validated per chair | about 15 min per seed at 1000 iterations |
 | `search_agent_battery.py` | The searching agent on the battery's suites from either chair, with the quality columns, against its own unsearched control | about 20 min for four suites at 8 episodes |
+| `deviation_probe.py` | Does coverage-forced search disagree with the policy where the policy loses, or only where it already wins? The statistic the distillation program rests on, measured off the win filter | about 40 min for six matchups |
 
 ## Conventions
 
