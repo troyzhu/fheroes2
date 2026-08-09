@@ -10,12 +10,14 @@ Provenance, not a reading path: every number these files carry is already quoted
 | `battery_*` | 11 | `validation_battery.py` | A report card over the suites for a named arm: rates per suite, per-rung ladders, and the quality columns |
 | `convergence_*` | 8 | `convergence_report.py` | Per-metric settlement verdicts over a run's heartbeat: converged, trending or oscillating |
 | `*fidelity*` | 6 | `fidelity_report.py` | Top-k agreement with the teacher, the probability given to its move, entropy and the reliability table |
+| `mm_*` | 6 | `soft_distill.py at matched soft mass` | A corpus compared at identical total soft mass, so the arm differs only in which decisions carry the weight and not in how much weight there is |
 | `symmetry_*` | 5 | `symmetry_gap.py` | The same army from either chair against the engine's own asymmetry, which is the neutral point |
 | `duels_*` | 4 | `selfplay_probe.py duel tables` | Head-to-head rates against each pool opponent and the built-in AI |
 | `regret_band_shard*` | 4 | `search_teacher.py --policy-max-win` | The screened collection's manifest, recording each matchup's prior win rate and why it was kept |
 | `battery_deploy_*` | 3 | `validation_battery.py --deployment` | The same checkpoints under sampled, greedy and entropy-adaptive action rules, which is how the deployment rule was settled |
 | `battery_band*` | 1 | `validation_battery.py` | The regret-band corpus against the unscreened one and their combination |
 | `battery_greedy_*` | 1 | `validation_battery.py --deployment greedy` | Greedy evaluation across seeds, the three-seed confirmation of a single-seed reading |
+| `battery_massmatched*` | 1 | `validation_battery.py` | Corpora compared at identical total soft mass, so the arm differs only in which decisions carry the weight |
 | `builtin_ai_baseline*` | 1 | `builtin_ai_baseline.py` | The engine's own AI on every validation suite, the bar the policies must clear; the `_v2` form adds the quality columns |
 | `coverage_corpus_stats*` | 1 | `computed from the corpus` | Support completeness of a coverage-forced corpus: what fraction of decisions priced every candidate |
 | `deviation_probe*` | 1 | `deviation_probe.py` | How often search disagrees with the prior, split by whether the policy wins the matchup |

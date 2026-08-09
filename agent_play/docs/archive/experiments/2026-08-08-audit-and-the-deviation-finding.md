@@ -109,4 +109,23 @@ Distilled with the same regret weighting, three seeds, evaluated greedily agains
 
 A third of the data, targeted, beats three times as much of it collected the old way on held-out, on both defender suites and on fresh samples, and the per-seed held-out values are 0.600, 0.562 and 0.550, every one of them above the unscreened arm's mean. The defender mirror moves furthest, $+0.125$, which is the suite carrying the largest gap to the engine. At 0.571 held-out against 0.660 this is the best weights-only reading this project has produced, and the shortfall is 0.089 where it has sat near 0.13 all week.
 
-Two things keep it honest. The targeted arm loses the Thunk ladder, 0.708 against 0.771, and the attacker mirror, and those are real regressions rather than noise at this spread, so the arm trades rather than dominates. And the combined corpus is worse than either of its parts on held-out, which is almost certainly the soft-mass confound the scale test already flagged: more soft rows at a fixed per-row weight is more total soft mass against a fixed hard set, so that arm needs a mass-matched rerun before it means anything at all (`battery_band.json`, `band_distill_s*.json`).
+Two things keep it honest. The targeted arm loses the Thunk ladder, 0.708 against 0.771, and the attacker mirror, and those are real regressions rather than noise at this spread, so the arm trades rather than dominates. And the combined corpus reads worse than either of its parts on held-out, which is most likely the soft-mass confound the scale test already flagged, since more soft rows at a fixed per-row weight is more total soft mass against a fixed hard set; the mass-matched rerun below settles it (`battery_band.json`, `band_distill_s*.json`).
+
+## Matching the soft mass reverses one claim and shrinks the other
+
+Comparing corpora of different sizes at a fixed per-row weight compares two things at once, how much soft mass the loss carries and which decisions carry it. The rerun fixes the first: the per-row weight is set inversely to row count so every arm carries exactly 10,286 units of soft mass, 2.0 on the 5,143-row band, 0.685 on the 15,007-row unscreened corpus and 0.511 on their 20,150-row union. Three seeds, greedy evaluation, everything else identical.
+
+| Suite | Built-in AI | Band, 5k | Unscreened, 15k | Combined, 20k |
+|---|---|---|---|---|
+| Held-out pool | 0.660 / $+0.87$ | 0.571 / $+0.73$ | 0.550 / $+0.64$ | 0.579 / $+0.71$ |
+| Thunk ladder | 0.969 / $+1.63$ | 0.708 / $+1.03$ | 0.729 / $+1.09$ | 0.729 / $+1.14$ |
+| Held-out as defender | 0.338 / $+0.13$ | 0.283 / $-0.04$ | 0.275 / $-0.06$ | 0.250 / $-0.11$ |
+| Mirrors as attacker | 0.361 / $+0.25$ | 0.167 / $-0.14$ | 0.222 / $-0.06$ | 0.208 / $-0.07$ |
+| Mirrors as defender | 0.639 / $+0.75$ | 0.375 / $+0.25$ | 0.278 / $+0.10$ | 0.306 / $+0.13$ |
+| Commanders | 0.958 / $+1.72$ | 0.917 / $+1.68$ | 0.979 / $+1.80$ | 0.958 / $+1.78$ |
+| Fresh sampled | 0.446 / $+0.31$ | 0.417 / $+0.23$ | 0.410 / $+0.21$ | 0.372 / $+0.13$ |
+| Real maps | 0.568 / $+0.66$ | 0.562 / $+0.64$ | 0.562 / $+0.64$ | 0.562 / $+0.64$ |
+
+The claim that the combination is worse than its parts is retracted: it was the mass confound, and at matched mass the union reads 0.579 on held-out, nominally the highest of the three. Its per-seed values are 0.562, 0.525 and 0.650, the widest spread in the table, so the mean rests on one high seed and the arm is not separable from the band at this power.
+
+The targeting effect survives and shrinks. Band against the unscreened corpus at matched mass is $+0.021$ on held-out rather than the $+0.025$ measured against the unmatched arm, positive on all three paired seeds but inside the band, so held-out no longer carries the claim on its own. What does carry it is the defender mirror, where the band reads 0.375 against 0.278 and 0.306, the largest and most consistent separation in the table and the suite with the largest gap to the engine. The band also keeps its ladder and attacker-mirror regressions, so the honest summary is narrower than the first reading: targeted collection buys the defender mirror clearly and held-out marginally, at a cost on the flagship ladder, and the union of the corpora is at least as good as either and needs more seeds to rank (`battery_massmatched.json`, `mm_comb_s*.json`, `mm_xl_s*.json`).
