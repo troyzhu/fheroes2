@@ -1,8 +1,8 @@
 ---
 title: "The program review: every approach, its verdict, and what remains"
 type: review
-updated: 2026-08-07
-related_concepts: ["[[training-design]]", "[[rl-methods]]", "[[value-estimation-lab]]", "[[off-support-and-offline-improvement]]"]
+updated: 2026-08-09
+related_concepts: ["[[training-design]]", "[[rl-methods]]", "[[value-estimation-lab]]", "[[off-support-and-offline-improvement]]", "[[transfer-and-llm-policies]]", "[[../decisions/0007-anchored-ppo]]"]
 tags: [agent-env, rl, review, roadmap]
 ---
 
@@ -19,15 +19,33 @@ exists  agent_play/docs/archive/experiments/files/2026-08-07-run-reports/converg
 exists  agent_play/experiments/trust_region_rematch.py
 grep    python/fheroes2_agent/train_ppo.py :: trust_region
 grep    python/fheroes2_agent/selfplay.py :: OpponentPool
+grep    python/fheroes2_agent/train_ppo.py :: anchor_kl_coef
+exists  agent_play/docs/archive/experiments/files/2026-08-08-run-reports/battery_round4.json
+exists  agent_play/docs/archive/experiments/files/2026-08-08-run-reports/deviation_probe.json
+exists  agent_play/docs/decisions/0007-anchored-ppo.md
+exists  agent_play/experiments/deviation_probe.py
 -->
 
-| Regime | Best measured | Built-in AI | Standing |
-|---|---|---|---|
-| Weights only, held-out pool | $0.555 \pm 0.043$ (owner-objective labels), $0.526 \pm 0.013$ replicated champion | 0.660 | About 0.13 short, unmoved by every supervised lever |
-| Agent (policy plus search), same pool | $0.963 \pm 0.027$ | 0.660 | Past the baseline decisively |
-| Commander extremes | 0.976 to 1.000 across strong arms | 0.958 | Past the baseline |
+| Suite | Built-in AI | `policy_gen1.pt` | Leashed self-play | Standing |
+|---|---|---|---|---|
+| Held-out pool | 0.660 / $+0.87$ | 0.525 / $+0.59$ | 0.499 / $+0.57$ | Short by 0.13 on rate |
+| Thunk ladder | 0.969 / $+1.63$ | 0.875 / $+1.47$ | 0.892 / $+1.48$ | Short by 0.08 |
+| Held-out as defender | 0.338 / $+0.13$ | 0.271 / $-0.06$ | 0.258 / $-0.10$ | Short by 0.08 |
+| Mirrors as attacker | 0.361 / $+0.25$ | 0.194 / $-0.11$ | 0.162 / $-0.15$ | Short by 0.17 |
+| Mirrors as defender | 0.639 / $+0.75$ | 0.250 / $+0.04$ | 0.324 / $+0.17$ | Short by 0.32, the largest gap left |
+| Commanders | 0.958 / $+1.72$ | 0.958 / $+1.78$ | 0.976 / $+1.79$ | At par or ahead |
+| Hordes | 0.192 / $-0.33$ | 0.175 / $-0.36$ | 0.167 / $-0.37$ | At par |
+| Fresh sampled | 0.446 / $+0.31$ | 0.372 / $+0.13$ | 0.372 / $+0.14$ | Short by 0.07 |
+| Real maps | 0.568 / $+0.66$ | 0.564 / $+0.64$ | 0.564 / $+0.64$ | At par |
+| Held-out pool, agent regime | 0.660 | search over the prior: $0.963 \pm 0.027$ | | Past the baseline decisively |
 
-The distillation gap is the program's central number: the same prior that searches to 0.963 plays 0.526 raw, so about 0.44 of win rate exists in the search process and has resisted transfer into the weights. The archive log [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the full-apparatus verdicts behind every row, and [[../archive/experiments/2026-08-06-night-block-search-generations]] the search-agent measurement. Both continuation rounds have since been judged in [[../archive/experiments/2026-08-08-selfplay-round2-and-trust-region]]: self-play round two converged and traded training-distribution mastery for held-out erosion in every seed of both arms, with self-play paying less than fixed-opponent training, and the trust-region rematch measured all three divergence gates as outcome-indistinguishable from the ratio clip at this budget.
+Cells are win rate over the trained two-sided reward, measured on one scale on 2026-08-08 with the built-in AI carrying quality columns for the first time. Three suites are already at par or ahead, so the standing goal reduces to the held-out pool, the two mirror chairs and fresh samples. 
+
+Two cautions ride with the table. The mirror suites are the same six symmetric matchups from either chair and the engine's own two numbers sum to 1.000, so 0.361 and 0.639 are the game's equilibrium split rather than two independent bars. And the frozen anchor re-evaluates to held-out 0.498 through 0.533 across the day's four batteries, so a difference under about 0.03 on one suite is not a result.
+
+The distillation gap is the program's central number: the same prior that searches to 0.963 plays about 0.53 raw, so roughly 0.44 of win rate exists in the search process and has resisted transfer into the weights. 
+
+Two facts measured on 2026-08-08 locate it. Within an outcome the policy plays as well as the engine, its wins keeping as much strength (wq 0.47 against 0.45) and its losses destroying as much (lq 0.63 against 0.63), so the deficit is entirely in how often the outcome falls the right way rather than in fight quality. And the deviation probe found the action-level signal concentrated where no corpus has ever collected: search disagrees with the prior 0.145 of the time on matchups the policy loses against 0.052 where it wins, and each disagreement there is worth $+0.787$ against $+0.152$. The archive log [[../archive/experiments/2026-08-07-overnight-champion-mixture]] carries the full-apparatus verdicts behind every row, and [[../archive/experiments/2026-08-06-night-block-search-generations]] the search-agent measurement. The 2026-08-08 rounds are judged in [[../archive/experiments/2026-08-08-selfplay-round2-and-trust-region]] and the audit that followed them in [[../archive/experiments/2026-08-08-audit-and-the-deviation-finding]].
 
 ## Imitation: measured to its ceiling
 
@@ -59,15 +77,19 @@ Verdict: closed as built, reopened by coverage-forced data. The lab's conclusion
 
 PPO from cloned anchors erodes more than it earns at every budget tried, and the instrumentation built at the owner's prompting turned that from an impression into a mechanism. The per-term per-module gradient norms exposed the critic slamming the shared trunk, fixed by the head-only value warmup; the normalized-entropy floor works as a controller and bought nothing against a fixed opponent, so it stays as insurance; and the long-budget experiment resolved the training-cost illusion, 400 iterations of pure training cost about eight minutes once calibration evaluations were dropped. The full apparatus then overturned the long-budget headline itself: the converged 400-iteration control had relocated erosion into the Thunk ladder, 0.58 to 0.12, while its held-out number stood still, and the convergence report proves it had settled, so the collapse is a property of the optimum, not of under-training ([[../archive/experiments/2026-08-07-overnight-champion-mixture]]).
 
-The trust-region question reopened tonight on the owner's push: [[../research/works/dppo-trust-region|DPPO]] replaces the clip's sampled-ratio gate with a real divergence gate, our group-relative era measured it as a slower starter with a small late edge that never moved the default, and the actor-critic rematch, exact total variation and the paper's binary form against the clip, is running as task 48 with run-identity stamps in every artifact.
+The trust-region question closed measured on 2026-08-08. [[../research/works/dppo-trust-region|DPPO]] replaces the clip's sampled-ratio gate with a real divergence gate, and nine runs at matched budget showed the gates provably differing, blocking 7 to 13 percent of samples against 5 to 7 and under 1, while their outcomes stayed indistinguishable. The step constraint was not the binding one, which is what pointed at the destination constraint instead.
 
-Verdict: open, with rules. No reinforcement conclusion without the full battery, symmetry gauge, and convergence verdict; the single-suite reads that produced two dead headlines are recorded in the conventions as the reason.
+That is the leash, and it is the first configuration here that trains without eroding its anchor. A forward KL to the checkpoint frozen before the first update, at $\beta = 0.5$, returns the Thunk ladder to anchor level and matches the anchor's reward columns at zero cost on the training distribution, with the leash tension itself converging at KL 0.11. [[../decisions/0007-anchored-ppo]] records it as the standing recipe and states plainly what it is not: retention, not climbing, since no reinforcement run here has yet beaten the supervised anchor it started from.
+
+Verdict: open, with the platform now stable. No reinforcement conclusion without the full battery, symmetry gauge, and convergence verdict; the single-suite reads that produced two dead headlines are recorded in the conventions as the reason.
 
 ## Self-play: the current phase, and the first structural finding
 
-The foundation is deliberately small, an `OpponentPool` over frozen checkpoints with the built-in AI as anchor and a `SelfPlayEnv` that answers the opponent's turns internally, the league-lite shape [[../research/works/alphastar-unplugged|AlphaStar's population]] and [[../research/works/openai-five|OpenAI Five's self-play]] both argue for against latest-self overfitting. The 400-iteration round traded rather than won, more ladder kept than the control at matched budget, held-out 0.448, and produced the first attacker-favored policy measured here, symmetry excess $+0.087$. The owner then supplied the reading the gauge lacked: the engine grants the attacker initiative on speed ties, its own gap is $+0.071$ attacker-favored, so the neutral point is the engine's gap and the anchor's defender lean was the anomaly all along. The convergence report says the run stopped mid-climb, which is what justifies the continuation round now in flight.
+The foundation is deliberately small, an `OpponentPool` over frozen checkpoints with the built-in AI as anchor and a `SelfPlayEnv` that answers the opponent's turns internally, the league-lite shape [[../research/works/alphastar-unplugged|AlphaStar's population]] and [[../research/works/openai-five|OpenAI Five's self-play]] both argue for against latest-self overfitting.
 
-Verdict: the owner's declared phase, alive and measurably unfinished. Judged from round two onward by full battery, symmetry against the engine's structural lean, convergence, and duel counts that clear the measured $\pm 0.06$ evaluation noise.
+Four rounds are measured. Round two at 1000 iterations converged and bought training-distribution mastery with held-out and ladder erosion in every seed. Round three changed one variable, 200 generator-sampled matchups instead of twelve, and removed the specialization pathology without removing the erosion, which relocated the problem from the data distribution to the optimization and set up the leash. Round four is the leash itself. Through all of them the chair was the attacker's, which the scoreboard says is the wrong one to train alone, since the two mirror chairs carry the largest remaining gaps and the engine's own split favours the defender on symmetric armies; `learner_side="alternate"` exists for that and its first round is the current measurement.
+
+Verdict: alive, and now on a non-destructive base. Judged by full battery, symmetry against the engine's structural lean, convergence, and duel counts that clear the measured noise, which forty episodes does not: the frozen anchor's own duel rate against the engine moves 0.20 between report files.
 
 ## Reward, sampling, calibration, and the instruments
 
@@ -77,18 +99,29 @@ The instrument stack is the quiet result of the week: the thirteen-column batter
 
 ## What still shows promise, in order
 
+Two facts frame the ranking. No reinforcement configuration here has yet produced a policy better than its own supervised anchor on held-out, so reinforcement is currently a retention mechanism. And almost every candidate's forecast sits inside the three-seed suite band of about $\pm 0.03$ that the scale test priced, at which power two suite signs flipped outright, so a lever whose expected effect is a suite delta cannot be verdicted at this power.
+
 | Rank | Approach | Why, and what grounds it |
 |---|---|---|
-| 1 | Anchored reinforcement at longer budgets | Measured 2026-08-08: the KL leash recovers about two thirds of held-out erosion and all of the ladder's at zero on-distribution cost, every run converged; beta 0.5 is the standing recipe and longer budgets on the stable base are the open move |
-| 2 | Self-play continuation at settled budgets | The one line whose convergence read says it was still climbing when stopped; league structure from the literature already in place |
-| 3 | Value-softmax distillation, scale-balanced | The twice-replicated small held-out tendency on support-complete data; a soft-mass-balanced scale test and the rollout-value and calibration consumers are what remain |
-| 4 | Expert iteration resumed on coverage-forced targets | The operator that built the champion, rerun only once its labels carry spread |
-| 5 | Exploring starts by prefix replay | The endorsed exploration family; the deterministic engine makes mid-battle starts replayable at no engine cost |
-| 6 | Outcome-grounded calibration | The owner-requested metric still unbuilt; pairs naturally with rank 1's data |
-| 7 | Larger-n deployment sampling | The adaptive nucleus read positive inside noise; cheap to settle properly |
+| 1 | Collect where the policy loses, distil weighted by regret | The deviation probe found the action-level signal three times denser and five times more valuable per instance on matchups the policy loses, and 93.2 percent of the current corpus carries no regret at all; the screen and the weighting are built and the first arms are measuring |
+| 2 | Chair-balanced training | Every round trained the attacker chair while the two mirror chairs carry the largest gaps and the engine's own split favours the defender; built, and the first round is measuring |
+| 3 | The deployment rule, measured at full power | Every weights-only headline was sampled against a deterministic planner while greedy read higher on the half-slice that was tried; recovered reporting rather than earned play, and it must be labelled as such with the engine re-measured under the same protocol |
+| 4 | Anchored reinforcement at longer budgets | The leash makes reinforcement non-destructive; whether budget on that base climbs rather than holds is the open question, and the 4000-iteration pair is measuring |
+| 5 | Group-relative advantages with shared starts | The repository's own strongest precedent for the wide distribution's problem: groups sharing one matchup transferred fivefold better than groups spanning eight, and the wide arm's advantage spread looks difficulty-inflated rather than starved |
+| 6 | The deployment compute ladder | Only 32 and 48 simulations have ever been run; if the crossing survives at eight the agent regime becomes shippable rather than an oracle |
+| 7 | Search-teacher DAgger at learner-reached states | Every corpus was collected from the teacher's own state distribution; gated on the deviation finding, which now supports it |
+| 8 | Outcome-grounded calibration | The owner-requested metric still unbuilt; pairs naturally with the support-complete corpora |
 
-Closed lines, not to revisit without new evidence: label smoothing (harmful), softplus as default (flagship collapse), visit-temperature targets at current coverage, value networks as leaves at current data, tabula rasa at this budget, AWR against a deterministic teacher, the entropy floor as a benefit rather than insurance against fixed opponents, and the trust-region choice at narrow-range budgets, where the 2026-08-08 rematch measured ratio clip, binary difference and exact total variation as outcome-indistinguishable while their gate fractions differed as theory requires.
+Closed lines, not to revisit without new evidence: label smoothing (harmful), softplus as default (flagship collapse), visit-temperature targets at current coverage, value networks as leaves at current data, tabula rasa at this budget, AWR against a deterministic teacher, the entropy floor as a benefit rather than insurance against fixed opponents, the trust-region choice at narrow-range budgets where the rematch measured all three gates indistinguishable, cross-game weight or representation transfer and the small language model as policy ([[transfer-and-llm-policies]]), and the engine's own difficulty setting as an opponent axis, which returns a non-default only on the easiest setting and gates valuations unreachable under `simple_v1`.
+
+## The honest ceiling
+
+The weights-only regime has not crossed the built-in AI and nothing measured says it is about to. The gap has held near 0.13 on held-out through every architecture and data lever tried, the leash buys retention rather than height, and every remaining forecast is at or inside the noise band. There is no single lever on the list sized to 0.13.
+
+Two things could still move it, and neither is a modelling result. The deployment rule is one: every headline was measured under sampling against a deterministic planner, and if greedy holds at full power against a re-measured engine baseline then part of the gap was self-inflicted reporting. The other is that the gap is not diffuse. It concentrates in a handful of positions the policy loses badly and search wins outright, and the 2026-08-08 probe showed those positions carry an action-level signal that no corpus has ever contained. A lever aimed there is the only kind with the right magnitude, which is why it is ranked first.
+
+The agent regime is a different matter and should be stated as such rather than as a consolation. Root search over the cloned prior reads 0.963 against the engine's 0.660 on the same slice, which is a decisive crossing of the standing goal at about fifteen seconds an episode. Whether that is a deliverable or an oracle is a compute question, not a strength question, and the simulation ladder is what turns it into a measurement.
 
 ## The remaining experiments, concretely
 
-The queue that follows from the verdicts: evaluate the in-flight self-play and trust-region rounds by the full apparatus with forty-episode duels; build coverage-forced collection into the search collector and re-vendor a candidate-complete corpus; rerun soft-target distillation, rollout-value fitting, and outcome-grounded calibration on that corpus; take the strongest surviving arm into the next self-play generation; and keep layer 3 of the ability program, per-candidate effect summaries of task 33, moving underneath, since richer candidate features feed every consumer above. Each lands in the day log with its reports vendored, per the conventions in `agent_play/experiments/README.md`.
+In flight or immediately next: the both-chair round and the 4000-iteration leashed pair, both judged by the full apparatus; the regret-weighted distillation arm against its unweighted and hard twins on the relabeled corpus; and the deployment-rule rerun with the engine baseline measured under the identical protocol. Then, gated on those: search-teacher collection at learner-reached states in the losing band, the group-relative advantage arms inside `train_ppo` so their runs are readable by the convergence report, and the simulation ladder from 0 to 32. Layer 3 of the ability program, task 33, continues underneath since richer candidate features feed several of these. Each lands in a dated log with its reports vendored, per the conventions in `agent_play/experiments/README.md`.

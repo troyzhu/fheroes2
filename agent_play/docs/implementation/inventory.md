@@ -88,7 +88,8 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | `wide_v1` profile (`allowWideUnits` in `agent_scenario`, `wide_v1_supported` in the audit) | Admits two-cell walkers, nothing else; opt-in per scenario, worker `--allow-wide` | §4.2, §11.1 | Teacher coverage 1,238/1,238 over wide fixtures; `test_protocol.py` wide checks; goldens unchanged when off |
 | `src/agent_worker/main.cpp` flags `--protocol`, `--side`, `--attacker`, `--defender`, `--dump-map` | Line protocol for external control, army overrides, and reading a real map through the engine's own loader | §13 subset | `test_protocol.py`, `verify_agent.sh` |
 | `python/fheroes2_agent/{encoding,dataset,policy}.py` | 634-wide observation encoding, episode-split loader with discounted returns, 396,570-parameter masked policy | ADR 0001, 0002 | `test_encoding.py` (32), `test_policy.py` (11) |
-| `python/fheroes2_agent/train_{bc,critic,ppo,rloo,group}.py` | Stage 1 cloning, stage 2b critic pre-fitting, stage 3 PPO, and the group-relative trainer covering leave-one-out, GRPO and Dr. GRPO under either trust region | ADR 0005 | `verify_agent.sh` |
+| `python/fheroes2_agent/train_{bc,critic,ppo,rloo,group}.py` | Stage 1 cloning, stage 2b critic pre-fitting, stage 3 PPO, and the group-relative trainer covering leave-one-out, GRPO and Dr. GRPO under either trust region. PPO carries the ratio clip and DPPO's divergence gates (`trust_region`, `divergence_kind`, `gate_fraction`), the anchored KL leash of ADR 0007 (`anchor_kl_coef`, `kl_to_anchor`), the head-only value warmup, the normalized-entropy floor, and per-iteration heartbeats with per-term per-module gradient norms, win and loss reward decompositions and termination counts | ADR 0005, 0007 | `verify_agent.sh` |
+| `python/fheroes2_agent/selfplay.py` | `OpponentPool` drawing a frozen checkpoint or the built-in AI per episode, and `SelfPlayEnv` answering the opponent's decisions internally so any trainer sees the ordinary reset and step contract; rewards re-perspectived to the learner's chair, and `learner_side="alternate"` drawing the chair per episode | ADR 0005, 0007 | `verify_agent.sh`, chair alternation smoke-tested against a pairing where one chair never acts |
 | `python/fheroes2_agent/{objectives,env,scenarios,render,watch}.py` | Advantage estimators and trust regions, the Gym-shaped environment and matchup pool, calibrated scenario generation, and a battle viewer | ADR 0005 | `test_objectives.py` (28), `test_ppo.py` (27) |
 | `agent_play/verify_agent.sh` | Training gate: 11 checks, unit tests, recording, sample consistency, cloning against trivial baselines, critic fit with the policy frozen, external control, PPO closing the loop, encoding stamp | ADR 0005 | self |
 | `agent_play/experiments/` | Measurements too slow for a gate: generalization on a calibrated pool, critic pre-fitting, the advantage floor | — | results in [[../archive/experiments/2026-08-03-training-runs]] |
@@ -130,3 +131,15 @@ Milestones 4 and 5 were partly overtaken. Blocking external control, the observa
 - M5: golden-trajectory replay across fresh and reused workers, and a worker pool. The Python package and its policies exist.
 - M6: hardening and benchmark modes B and C.
 - Runbook §6.3 human item: one Battle Only battle through the real UI, accepted-risk optional QA (battle path digest-proven unchanged; both binaries launch); not a training or data prerequisite. Teacher demonstrations come from the built-in AI, automated, at M2.
+
+<!-- verify
+# Invalidators for the trainer-library rows above; the engine ledger has its own checks in lint_docs.
+exists  python/fheroes2_agent/selfplay.py
+grep    python/fheroes2_agent/train_ppo.py :: anchor_kl_coef
+grep    python/fheroes2_agent/train_ppo.py :: trust_region
+grep    python/fheroes2_agent/train_ppo.py :: terminations
+grep    python/fheroes2_agent/selfplay.py :: alternate
+grep    python/fheroes2_agent/policy.py :: plane_conv
+exists  agent_play/experiments/selfplay_round.py
+exists  agent_play/experiments/deviation_probe.py
+-->
