@@ -79,3 +79,11 @@ The honest form of the rule is per checkpoint and stated: measure both, adopt th
 
 
 Two things survive the trim. Greedy helps every distilled arm and hurts the supervised anchor, so the rule really is checkpoint-dependent rather than universal. And the best weights-only reading this project has, 0.546 on held-out under a stated deployment rule, is still 0.11 short of the engine's 0.660, which is the number that matters and which no amount of deployment bookkeeping closes (`battery_deploy_*.json`, `battery_greedy_3seed.json`).
+
+## Four times the budget climbs back to the anchor and stops
+
+The leash made reinforcement non-destructive, which left the obvious question of whether budget on that base climbs. Two runs at 4000 iterations against the 1000-iteration pair, same wide recipe, same $\beta = 0.5$, budget the only variable. Both converged, the leash tension included at KL 0.10.
+
+The extra budget buys recovery and not height. Held-out reads 0.507 against the shorter runs' 0.482 and the anchor's 0.498; the Thunk ladder reads 0.906, which is the anchor's number to three decimals; commanders return to the anchor's 0.958. The only suite that moves materially the other way is mirrors as attacker, down 0.045. Quadrupling the budget therefore moves a leashed run from slightly below its anchor to level with it, and nothing in the table suggests a further quadrupling would cross it.
+
+Taken with the leash result this closes a question the erosion verdicts had left open. Reinforcement here is a retention mechanism: the leash stops it destroying the anchor, budget lets it finish returning to the anchor, and neither produces a policy better than the supervised checkpoint it started from. Any crossing has to come from somewhere other than more of this, which is what makes the regret-band data the live line rather than the optimizer (`battery_long4k.json`, `convergence_long4k.json`).
