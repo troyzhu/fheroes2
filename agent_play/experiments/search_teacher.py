@@ -161,8 +161,10 @@ def main() -> None:
                         help="episodes per matchup for the prior screen, no search")
     parser.add_argument("--planes", action="store_true",
                         help="collect with the planes_v1 obstacle layer on every observation")
-    parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"),
-                        help="what search rollouts score by; two_sided is the owner objective")
+    parser.add_argument("--reward-margin", default="hit_points",
+                        choices=("hit_points", "strength", "two_sided", "two_sided_commanded"),
+                        help="what search rollouts score by; two_sided is the owner objective and "
+                             "two_sided_commanded prices the commander into it")
     parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
     parser.add_argument("--coverage-forced", action="store_true",
                         help="visit every root candidate once, widest-prior-first, before UCB takes "

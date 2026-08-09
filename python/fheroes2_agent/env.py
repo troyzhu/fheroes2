@@ -90,9 +90,13 @@ class BattleEnv:
                  allow_wide: bool = False, probe_teacher: bool = False,
                  reward_weighting: str = "none", reward_margin: str = "hit_points",
                  seed_offset: int = 0, planes: bool = False):
+        # Set before any validation can raise: a caller's `finally: env.close()` would otherwise
+        # report a missing attribute instead of the constructor's real error, which is exactly
+        # how an unrecognised reward margin surfaced as an AttributeError on 2026-08-09.
+        self._proc = None
         if reward_weighting not in ("none", "difficulty"):
             raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
-        if reward_margin not in ("hit_points", "strength", "two_sided"):
+        if reward_margin not in ("hit_points", "strength", "two_sided", "two_sided_commanded"):
             raise ValueError(f"unknown reward_margin {reward_margin!r}")
         self._reward_margin = reward_margin
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
