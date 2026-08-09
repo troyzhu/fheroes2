@@ -238,18 +238,42 @@ def main() -> None:
         entries = json.loads(POOL.read_text())["matchups"][:40]
         rates = json.loads(SHARE2_EVALS.read_text())["evals"]["train"]
         hard = set(np.argsort(rates)[:15].tolist())
+        manifest = []
         for index, entry in enumerate(entries):
             if index % args.shards != args.shard:
                 continue
             episodes = args.hard_episodes if index in hard else args.easy_episodes
+            if args.policy_max_win < 1.0:
+                # The regret screen applies to the pool path too: the 2026-08-08 probe put the
+                # teachable disagreements on the matchups the policy loses, and the pool is the
+                # distribution where those matchups actually occur, the budget sampler's fights
+                # being far more polarized.
+                try:
+                    screen = prior_win_rate(args.worker, model, entry, args.side,
+                                            args.screen_episodes, 2)
+                except Exception as error:
+                    manifest.append(entry | {"kept": False, "error": str(error)[:120]})
+                    continue
+                if screen > args.policy_max_win:
+                    manifest.append(entry | {"kept": False, "screened_out": True,
+                                             "prior_win_rate": round(screen, 3)})
+                    continue
+                entry = entry | {"prior_win_rate": round(screen, 3)}
             decisions, wins = collect_matchup(args.worker, model, entry, out_root / f"matchup_{index:03d}",
                                               episodes, args.simulations, args.c_puct,
                                               record_candidates=args.record_candidates,
-                                              coverage_forced=args.coverage_forced)
+                                              coverage_forced=args.coverage_forced,
+                                              min_win_fraction=args.min_win)
+            manifest.append(entry | {"kept": decisions > 0, "wins": wins, "episodes": episodes})
             total_decisions += decisions
             total_wins += wins
             total_eps += episodes
             print(f"shard {args.shard}: matchup {index} done, {decisions} labeled, {wins}/{episodes} won", flush=True)
+        out_root.mkdir(parents=True, exist_ok=True)
+        (out_root / f"shard{args.shard}_manifest.json").write_text(json.dumps(
+            {"matchups": manifest, "side": args.side, "source": "pool", "simulations": args.simulations,
+             "coverage_forced": args.coverage_forced, "policy_max_win": args.policy_max_win,
+             "min_win": args.min_win}, indent=2))
 
     print(f"shard {args.shard}: {total_eps} episodes kept, {total_decisions} labels, "
           f"{total_wins} wins, {round(time.time() - started)}s")
