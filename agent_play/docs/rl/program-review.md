@@ -38,7 +38,7 @@ exists  agent_play/experiments/deviation_probe.py
 | Fresh sampled | 0.446 / $+0.31$ | 0.372 / $+0.13$ | 0.372 / $+0.14$ | 0.417 / $+0.23$ | Short by 0.07 |
 | Real maps | 0.568 / $+0.66$ | 0.564 / $+0.64$ | 0.564 / $+0.64$ | 0.562 / $+0.64$ | At par |
 
-The agent regime sits outside this table because it is a different kind of measurement: root search over the same prior reads $0.963 \pm 0.027$ on the held-out pool against the engine's 0.660, at about fifteen seconds an episode against milliseconds for the rows above.
+The agent regime sits outside this table because it is a different kind of measurement, and its cost is now measured rather than assumed. Root search over the regret-band prior crosses the engine between one and four simulations and reads 0.708, 0.725, 0.842 and 0.883 at four, eight, sixteen and thirty-two, against the engine's 0.660, at 0.81 to 6.27 seconds an episode; the earlier 0.963 belongs to the planes champion at thirty-two simulations and is a different measurement. Cost is linear in the budget, so the fifteen-seconds-an-episode figure quoted before was the budget's property and not search's.
 
 Cells are win rate over the trained two-sided reward, measured on one scale on 2026-08-08 with the built-in AI carrying quality columns for the first time. Three suites are already at par or ahead, so the standing goal reduces to the held-out pool, the two mirror chairs and fresh samples. 
 
@@ -109,7 +109,7 @@ Two facts frame the ranking. No reinforcement configuration here has yet produce
 | 3 | Search-teacher collection in the regret band | Measured twice, the second time at matched soft mass: the screened corpus carries 3.7 times the regret per label, buys the defender mirror clearly (0.375 against 0.278), and leads every arm on the trained reward on both held-out and the defender mirror even where the union edges it on rate; its wins keep more strength than the engine's and its losses destroy more, so the residual gap is conversion rather than fighting |
 | 4 | Anchored reinforcement, closed as retention | Measured 2026-08-08: four times the budget on the leashed base climbs back to the anchor and stops there, held-out 0.507 and the ladder 0.906 against the anchor's 0.498 and 0.906, both runs converged; reinforcement here retains rather than climbs, so a crossing must come from elsewhere |
 | 5 | Group-relative advantages with shared starts | Groups sharing one matchup reach held-out 0.682 to 0.708 after training against 0.514 for groups spanning eight, three seeds ([[../archive/experiments/2026-08-03-training-runs]]; the fivefold ratio that log also reports is retracted there as an artifact, so the after-training rates are the claim). The wide round's advantage spread looks difficulty-inflated rather than starved, which is the same diagnosis |
-| 6 | The deployment compute ladder | Only 32 and 48 simulations have ever been run; if the crossing survives at eight the agent regime becomes shippable rather than an oracle |
+| 6 | The deployment compute ladder, measured | The crossing survives at four simulations and 0.81 seconds an episode, so the agent regime is affordable; what remains is measuring it on the suites other than held-out and deciding how the two regimes are reported |
 | 7 | Search-teacher DAgger at learner-reached states | Every corpus was collected from the teacher's own state distribution; gated on the deviation finding, which now supports it |
 | 8 | Outcome-grounded calibration | The owner-requested metric still unbuilt; pairs naturally with the support-complete corpora |
 
@@ -127,7 +127,7 @@ The weights-only regime has not crossed the built-in AI and nothing measured say
 
 Two things could still move it, and neither is a modelling result. The deployment rule is one: every headline was measured under sampling against a deterministic planner, and if greedy holds at full power against a re-measured engine baseline then part of the gap was self-inflicted reporting. The other is that the gap is not diffuse. It concentrates in a handful of positions the policy loses badly and search wins outright, and the 2026-08-08 probe showed those positions carry an action-level signal that no corpus has ever contained. A lever aimed there is the only kind with the right magnitude, which is why it is ranked first.
 
-The agent regime is a different matter and should be stated as such rather than as a consolation. Root search over the cloned prior reads 0.963 against the engine's 0.660 on the same slice, which is a decisive crossing of the standing goal at about fifteen seconds an episode. Whether that is a deliverable or an oracle is a compute question, not a strength question, and the simulation ladder is what turns it into a measurement.
+The agent regime is a different matter and should be stated as such rather than as a consolation. Root search over the cloned prior crosses the engine decisively, and the ladder has now answered the compute question that hung over it: the crossing survives at four simulations and 0.81 seconds an episode, and sixteen simulations reads 0.842 against 0.660 at 3.23 seconds. That is a deliverable rather than an oracle. What it is not yet is a full scoreboard, since every rung was measured on the held-out pool alone.
 
 ## The remaining experiments, concretely
 

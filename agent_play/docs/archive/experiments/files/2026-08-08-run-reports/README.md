@@ -13,6 +13,7 @@ Provenance, not a reading path: every number these files carry is already quoted
       commander-aware reward, and the distillation arms trained on it |
 | `*fidelity*` | 6 | `fidelity_report.py` | Top-k agreement with the teacher, the probability given to its move, entropy and the reliability table |
 | `mm_*` | 6 | `soft_distill.py at matched soft mass` | A corpus compared at identical total soft mass, so the arm differs only in which decisions carry the weight and not in how much weight there is |
+| `search_*` | 5 | `search_probe.py, search_teacher.py, search_agent_battery.py` | What root search measures or plays: per-candidate values, agreement, or suite results |
 | `symmetry_*` | 5 | `symmetry_gap.py` | The same army from either chair against the engine's own asymmetry, which is the neutral point |
 | `duels_*` | 4 | `selfplay_probe.py duel tables` | Head-to-head rates against each pool opponent and the built-in AI |
 | `regret_band_shard*` | 4 | `search_teacher.py --policy-max-win` | The screened collection's manifest, recording each matchup's prior win rate and why it was kept |

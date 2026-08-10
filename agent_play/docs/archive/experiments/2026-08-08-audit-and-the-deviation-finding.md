@@ -160,3 +160,24 @@ Adding both pricings as evaluation columns exposed that they agree to three deci
 So the earlier claim here and in the commit message, that the reward was denominated in a currency missing its largest term, is wrong and is retracted. The commander is a cross-side quantity: it distorts the budget the sampler matches armies with, which was real and is fixed, and it distorts the difficulty weighting, which is still owed. It does not distort the two-sided margin. The `two_sided_commanded` option stays because it costs nothing and would matter for any reward form that compares the two sides directly, but it is not a fix to anything currently in use.
 
 The same block of columns corrects a second claim. With the per-seed spread now printed, the parity-corpus arm and the regret-band arm are not separable anywhere: held-out 0.546 against 0.571 at seed standard errors of 0.022 and 0.015, and the Thunk ladder 0.771 against 0.708 at 0.083 and 0.075, so the ladder difference reported as an improvement is inside one standard error and should not have been stated as a trade in its favour.
+
+## The searching agent measured across budgets, which retires a claim about its cost
+
+Root search had only ever been measured at one budget on one suite, and the fifteen-seconds-an-episode figure that came with it has been quoted all week as the reason the agent regime is an oracle rather than a deliverable. `search_agent_battery.py` measured the ladder properly, the regret-band arm as prior, held-out pool, twenty matchups by six episodes over three battlefield seeds, coverage-forced search at each budget.
+
+| Simulations | Win rate | wq | lq | Margin | Reward | Seconds per episode |
+|---|---|---|---|---|---|---|
+| policy alone | 0.575 | 0.49 | 0.68 | | $+0.72$ | about 0.02 |
+| 1 | 0.633 | 0.53 | 0.72 | | $+0.88$ | 0.20 |
+| 4 | 0.708 | 0.47 | 0.67 | $+0.26$ | $+0.97$ | 0.81 |
+| 8 | 0.725 | 0.48 | 0.72 | $+0.29$ | $+1.01$ | 1.63 |
+| 16 | 0.842 | 0.46 | 0.73 | $+0.36$ | $+1.20$ | 3.23 |
+| 32 | 0.883 | 0.52 | 0.63 | $+0.43$ | $+1.31$ | 6.27 |
+
+The built-in AI reads 0.660 on this suite. Search crosses it somewhere between one and four simulations, is 0.18 clear by sixteen, and has not plateaued by thirty-two. Cost is linear in the budget at about 0.2 seconds per simulation per episode, so the fifteen-second figure was a property of the budget chosen rather than of search, and the claim that the agent regime is unaffordable is withdrawn: it beats the engine at 0.81 seconds an episode, which is roughly forty times the raw policy's cost and nothing at all in absolute terms.
+
+The marginal returns are not smooth, and the mechanism explains it. Four to eight simulations buys $+0.017$ for 0.82 seconds, eight to sixteen buys $+0.117$ for 1.60, and sixteen to thirty-two buys $+0.042$ for 3.04. With coverage forcing sweeping every candidate once before UCB begins, and a held-out state carrying about 27 legal actions, budgets below the candidate count are spent entirely on the sweep: the agent is then a one-rollout-per-candidate argmax rather than a search. The jump between eight and sixteen is where a second visit starts landing on the candidates that matter, which is the first point at which the thing is actually searching.
+
+The quality columns say what the extra budget buys. Win quality is flat across the ladder, 0.46 to 0.53, while the unconditional margin climbs steadily from $+0.26$ to $+0.43$ and the reward from $+0.97$ to $+1.31$. Search does not win its wins more cleanly; it converts battles the policy loses. That is the same finding the deviation probe reached from the other direction, and it is why the regret band is where collection belongs (`search_ladder_*.json`, `search_baseline.json`).
+
+One comparability note: the 0.963 reading quoted elsewhere used the planes champion as prior at thirty-two simulations, not this arm, so the two are not the same measurement and the ladder should be read internally.
