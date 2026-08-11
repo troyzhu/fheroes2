@@ -118,6 +118,25 @@ It does not overturn the supervised plateau recorded in [[../../rl/program-revie
 
 The general form of this is documented outside the project. Codevilla et al. (ICCV 2019) report that offline prediction error is not necessarily correlated with driving quality, and that two models with identical prediction error can differ dramatically in what they do. This program had already met its own version of it, in the 2026-08-07 sharpness sweep where the arm with the worst agreement was the only one with a positive held-out delta afterwards. That reading is now three measurements old rather than one.
 
+## Where the labels sit, which is why the gap survives every budget
+
+The budget arms all treat the loss as one thing, and it is not. The hard rows carry `nll_loss` against a single recorded action, plain log loss on an argmax, and that action is `AI::BattlePlanner`'s. The soft rows carry cross-entropy against $\bar\pi$, which is KL up to the target's own entropy. On the standing recipe that is 242,570 hard rows at weight 1.0 against 5,143 soft rows at weight 2.0, so the search-taught term is 4.1 percent of the loss mass and the other 95.9 percent instructs the student to imitate the engine.
+
+Asking where those labels sit under the policy that has to learn them (`distillation_support.py`) explains the gap without needing another training run:
+
+| | informative, search overruled | confirming, search agreed |
+|---|---|---|
+| decisions | 619, 12.0 percent | 4,524, 88.0 percent |
+| prior probability on the labeled action | mean 0.0705, median 0.0002 | mean 0.8623, median 0.9786 |
+| its rank under the prior | mean 12.4, median 8, p95 41 | 1.00 |
+| below the one percent support threshold | 63.3 percent | 0.0 percent |
+
+Three causes compound, and none of them is a bad label. Most of the corpus is redundant, 88 percent of it naming a move the policy already ranks first, which contributes no gradient. The informative remainder is largely off-support: at the median it names an action carrying two parts in ten thousand, ranked eighth of some thirty-three legal moves. And the soft target barely asks for movement anyway, $D_{\mathrm{KL}}(\bar\pi \,\|\, \text{prior})$ having mean 0.0541 but median 0.0003, so only the top few percent of rows request anything at all.
+
+The student behaves exactly as that predicts. On the informative rows its probability on the labeled action moves from the prior's 0.0705 to 0.0872, a gain of 0.0166, while its rank on those same rows drifts from 12.43 to 13.20 and the share below support rises from 63.3 to 64.0 percent. Four percent of the loss mass, pulling toward actions the policy holds almost no mass on, against ninety-six percent pulling toward the engine that does not play them, moves the student essentially nowhere on the only decisions that carried information.
+
+This is also why the 2026-08-09 regret weighting was the largest paired distillation effect on record at $+0.063$ held out. Reweighting the informative rows at equal total mass attacks the redundancy and leaves the support problem and the mass ratio untouched.
+
 ## What changed in the code
 
 The trainer's heartbeat carries four more columns per epoch: `holdout_loss`, `holdout_entropy`, `holdout_normalized_entropy` and `holdout_effective_actions`. `convergence_report.py` reads them, so a supervised run's verdict is no longer a single agreement trend.
@@ -134,6 +153,7 @@ The corpus the band run used no longer exists. Its matchup directories survive i
 
 <!-- verify
 exists  agent_play/experiments/distillation_budget.py
+exists  agent_play/experiments/distillation_support.py
 exists  agent_play/experiments/soft_distill.py
 grep    agent_play/experiments/soft_distill.py :: entropy_bonus
 grep    agent_play/experiments/soft_distill.py :: checkpoint_every
