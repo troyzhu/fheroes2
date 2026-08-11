@@ -115,10 +115,58 @@ def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) 
     return step.reward
 
 
+
+def _sequential_halving(sim, model, prefix: list[int], prior: dict[int, float], simulations: int,
+                        visits: dict[int, int], total_return: dict[int, float],
+                        candidates: int = 0) -> None:
+    """Spend the budget by Sequential Halving (Karnin et al. 2013) instead of by UCB.
+
+    PUCB minimises cumulative regret, which is the right objective when a node's estimate feeds a
+    parent. The root has no parent: only the action finally returned matters, never the ones tried
+    on the way, so the root is a simple-regret problem (Bubeck et al. 2011, and Danihelka et al.
+    2022 for the AlphaZero-specific argument). This search is a single ply, so the root is the
+    whole search and the mismatch is total rather than partial.
+
+    Coverage forcing, which this replaces, is the first phase of this algorithm with the rest
+    missing: it buys one rollout for every candidate and then hands the remainder to UCB, paying
+    the full breadth cost without the schedule that makes breadth pay. Here the budget is split
+    evenly across ceil(log2(m)) phases, every survivor in a phase is measured equally often, and
+    the worse half is dropped at the end of each phase.
+
+    `candidates` caps how many of the prior's top actions enter phase one, which is the paper's
+    `m`; zero admits every legal action.
+    """
+    survivors = sorted(prior, key=prior.get, reverse=True)
+    if candidates:
+        survivors = survivors[:candidates]
+    if len(survivors) <= 1:
+        survivors = list(prior)[:1]
+    phases = max(1, math.ceil(math.log2(max(len(survivors), 2))))
+    spent = 0
+    while spent < simulations:
+        # Equal visits per survivor within a phase is what makes the comparison at the end of the
+        # phase fair; a floor of one keeps a wide phase from being skipped entirely on a small budget.
+        per = max(1, (simulations - spent) // max(phases * len(survivors), 1)) if len(survivors) > 1 else \
+            simulations - spent
+        for a in list(survivors):
+            for _ in range(per):
+                if spent >= simulations:
+                    break
+                total_return[a] += rollout(sim, model, prefix, a)
+                visits[a] += 1
+                spent += 1
+        if len(survivors) <= 1:
+            break
+        means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in survivors}
+        survivors = sorted(survivors, key=lambda a: means[a], reverse=True)[:max(1, len(survivors) // 2)]
+        phases = max(1, phases - 1)
+
+
 def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                          observation: np.ndarray, mask: np.ndarray, simulations: int,
                          c_puct: float, live: BattleEnv | None = None,
-                         coverage_forced: bool = False) -> tuple[int, dict, dict, dict]:
+                         coverage_forced: bool = False, allocator: str = "puct",
+                         candidates: int = 0) -> tuple[int, dict, dict, dict]:
     """The search decision plus its whole measurement: per-candidate mean rollout values, visit
     counts, and the prior. The values are the counterfactuals only search produces (a real
     playout per candidate it tried), which is what makes them valid soft-distillation targets
@@ -146,6 +194,12 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
         return top, {a: 0.0 for a in actions}, {a: 0 for a in actions}, prior
     visits = {a: 0 for a in actions}
     total_return = {a: 0.0 for a in actions}
+    if allocator == "sequential_halving":
+        _sequential_halving(sim, model, prefix, prior, simulations, visits, total_return, candidates)
+        means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
+        return max(actions, key=lambda a: (visits[a], means[a])), means, visits, prior
+    if allocator != "puct":
+        raise ValueError(f"unknown allocator {allocator!r}")
     sweep = sorted(actions, key=lambda a: -prior[a]) if coverage_forced else []
     for n in range(simulations):
         unvisited = [a for a in sweep if visits[a] == 0]

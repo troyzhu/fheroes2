@@ -45,6 +45,7 @@ DEFAULT_SUITES = ("held_out_pool", "mirrors_attacker", "mirrors_defender", "held
 
 def play_episodes(worker: str, matchup, side: str, model, episodes: int, simulations: int,
                   c_puct: float, seeds: int, searched: bool, reward_margin: str = "two_sided",
+                  allocator: str = "puct", candidates: int = 0,
                   combat_seed_offset: int = 0, report_margin: str = "two_sided") -> dict:
     """One matchup, measured with the same columns `scenarios.measure` reports for policies."""
     kwargs = dict(side=side, attacker=matchup.attacker, defender=matchup.defender,
@@ -92,7 +93,8 @@ def play_episodes(worker: str, matchup, side: str, model, episodes: int, simulat
                 legal_counts.append(legal)
                 if searched:
                     action, _, visits, _ = search_action_detail(
-                        sim, model, prefix, observation, mask, simulations, c_puct, live=env)
+                        sim, model, prefix, observation, mask, simulations, c_puct, live=env,
+                        allocator=allocator, candidates=candidates)
                     # How decided the search itself was, which is a different question from how
                     # decided the network was, and the one that says whether the budget resolved
                     # anything. Zero means every playout went to one candidate.
@@ -150,6 +152,14 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=8)
     parser.add_argument("--seeds", type=int, default=4)
     parser.add_argument("--simulations", type=int, default=32)
+    parser.add_argument("--allocator", default="puct", choices=("puct", "sequential_halving"),
+                        help="how the root spends its budget. puct optimises cumulative regret, "
+                             "which the root does not need; sequential_halving optimises simple "
+                             "regret, which is what only-the-final-action-matters means")
+    parser.add_argument("--candidates", type=int, default=0,
+                        help="cap the candidate set entering sequential halving (the paper's m). "
+                             "Zero admits every legal action, which at this budget leaves one visit "
+                             "per candidate in phase one and degenerates into uniform coverage")
     parser.add_argument("--c-puct", type=float, default=1.5)
     parser.add_argument("--deployment", default="sample", choices=("sample", "greedy", "adaptive"),
                         help="how the network acts, both on its own and as the search prior. The policy "
@@ -202,7 +212,8 @@ def main() -> None:
               "dice": ("shared-with-live (CEILING, not comparable to the built-in AI)"
                        if args.simulations > 0 and args.search_combat_offset == 0
                        else "independent-of-live" if args.simulations > 0 else "unsearched"),
-              "deployment": args.deployment,
+              "deployment": args.deployment, "allocator": args.allocator,
+              "candidates": args.candidates,
               "simulations": args.simulations, "reward_margin": args.report_margin, "arms": {}}
 
     arms = [("search", True)] + ([("policy", False)] if args.baseline else [])
@@ -225,8 +236,10 @@ def main() -> None:
                 try:
                     measured.append(play_episodes(args.worker, m, side, model, args.episodes,
                                                   args.simulations, args.c_puct, args.seeds, searched,
-                                                  args.reward_margin, args.search_combat_offset,
-                                                  args.report_margin))
+                                                  args.reward_margin,
+                                                  allocator=args.allocator, candidates=args.candidates,
+                                                  combat_seed_offset=args.search_combat_offset,
+                                                  report_margin=args.report_margin))
                 except ScenarioRejected as error:
                     print(f"  {suite}: matchup rejected ({str(error)[:70]})", flush=True)
             if not measured:

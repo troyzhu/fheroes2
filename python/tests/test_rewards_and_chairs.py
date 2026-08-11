@@ -155,18 +155,36 @@ _stall = lambda a, d: {"termination": "stalemate",
                        "defender": {"strength": d, "initial_strength": 100.0, "hit_points": d}}
 check("two_sided pays a pure stall the maximum, which is the defect",
       reward_from_record(_stall(100, 100), "defender", "two_sided") == 2.0)
-check("contested puts a pure stall at the middle of the losing band",
-      reward_from_record(_stall(100, 100), "defender", "contested") == -0.5)
-check("contested prices a stall the same for either chair",
+check("contested scores a pure stall at zero, not at either range's maximum",
+      reward_from_record(_stall(100, 100), "defender", "contested") == 0.0)
+check("two_sided and balanced both pay a pure stall their own maximum, which is the defect",
+      reward_from_record(_stall(100, 100), "defender", "two_sided") == 2.0
+      and reward_from_record(_stall(100, 100), "defender", "balanced") == 1.0)
+check("contested prices a stall the same for either chair, with opposite sign",
       reward_from_record(_stall(100, 100), "defender", "contested")
-      == reward_from_record(_stall(100, 100), "attacker", "contested"))
-check("contested lets a one percent chip move a stall, without converting it to a win",
-      -0.5 < reward_from_record(_stall(99, 100), "defender", "contested") < 0.0)
-check("every contested stalemate stays below every decided win",
-      max(reward_from_record(_stall(x, 100), "defender", "contested") for x in (0, 50, 99, 100)) < 1.0)
-check("contested leaves decided battles identical to two_sided",
-      all(reward_from_record(r, c, "contested") == reward_from_record(r, c, "two_sided")
+      == -reward_from_record(_stall(100, 100), "attacker", "contested"))
+check("contested makes damage the reward rather than a threshold",
+      abs(reward_from_record(_stall(99, 100), "defender", "contested") - 0.01) < 1e-9
+      and abs(reward_from_record(_stall(60, 100), "defender", "contested") - 0.40) < 1e-9)
+check("contested is zero-sum at every terminal, which self-play wants",
+      all(abs(reward_from_record(r, "attacker", "contested")
+              + reward_from_record(r, "defender", "contested")) < 1e-9
+          for r in (clean, led, _stall(100, 100), _stall(60, 100))))
+check("contested carries no outcome branch, so the sign is the outcome",
+      reward_from_record(clean, "attacker", "contested") > 0
+      > reward_from_record(clean, "defender", "contested"))
+# On a decided battle the loser is wiped out, so kept(foe) is zero and the difference collapses
+# to balanced's win branch. That is the case the two forms were always meant to agree on, and the
+# stalemate, where both sides still hold force, is the case they were always going to diverge on.
+check("contested agrees with balanced wherever the loser is wiped out",
+      all(abs(reward_from_record(r, c, "contested") - reward_from_record(r, c, "balanced")) < 1e-9
           for r in (clean, led) for c in ("attacker", "defender")))
+check("contested and balanced diverge exactly at the stalemate",
+      reward_from_record(_stall(100, 100), "defender", "contested")
+      != reward_from_record(_stall(100, 100), "defender", "balanced"))
+check("contested differs from two_sided by exactly the outcome bit on a decided win",
+      abs((reward_from_record(clean, "attacker", "two_sided")
+           - reward_from_record(clean, "attacker", "contested")) - 1.0) < 1e-9)
 
 failed = [name for name, ok in CHECKS if not ok]
 for name, ok in CHECKS:

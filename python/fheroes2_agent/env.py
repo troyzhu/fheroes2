@@ -376,54 +376,49 @@ def reward_from_record(record: dict, side: str, margin: str) -> float:
 
 
 def terminal_reward_contested(record: dict, side: str, commanded: bool = False) -> float:
-    """Two-sided on a decided battle; a stalemate is graded rather than won, so evading stops paying.
+    r"""The strength margin with no outcome branch at all: own fraction kept minus the foe's.
 
-    The defect this answers, raised by the owner on 2026-08-10 and priced on 2026-08-11. A stalemate
-    flips a discrete win bit and the survival term stacks on top of it, so a side that never engages
-    banks $1.0 + 1.0 = 2.0$, the maximum the reward can return, against $-1.0$ for fighting and
-    losing. Evasion therefore weakly dominates fighting everywhere and strictly dominates it in any
-    fight that costs a casualty, which is nearly all of them. It is not an artifact of flight: walking
-    Rogues reach it too, at $+2.958$, and flying only makes it reachable more often.
+    This is what `terminal_reward_balanced` says it is and is not. That function keeps a branch,
+    returning `kept(own)` when `_side_won` says the side won and `-kept(foe)` when it did not, and
+    the two forms agree only when the loser is wiped out. In a decided battle the loser usually is,
+    which is why the discrepancy went unnoticed. At a stalemate both sides still hold force, the
+    branch fires on the engine's resolution that the defender outlasted the attacker, and the
+    evading defender collects `kept(own)` = 1.0, the top of the function's range, for never
+    fighting. Under `two_sided` the same stall collects 2.0. The defect is scale-independent
+    because it is the branch, not the range.
 
-    The owner's first proposal was to break the tie on retained strength, so whoever dealt more damage
-    wins the stall. That relocates the cliff rather than removing it. A comparison of two fractions is
-    settled by an epsilon: a side that lands one hit and takes none retains 1.000 against 0.999 and
-    wins outright, so the strategy stays "engage once, then evade" and the magnitude of the damage
-    never matters. Any rule that ends in a discrete win bit inherits this.
+    Removing the branch removes it. The outcome is already carried by the sign of the margin, since
+    a side holding force against one that does not has won, so the explicit win term only steepened
+    a step the quantity takes on its own. With the difference taken directly:
 
-    So the win bit is dropped at a stalemate and the outcome is scored continuously, by the damage
-    differential, then placed inside the losing band:
+    - a standoff nobody contests reads $0.0$ for both sides, not $+2.0$ for one of them;
+    - one percent of damage dealt reads $\pm 0.01$, so the magnitude is the reward rather than a
+      threshold that converts a stall into a victory;
+    - a decided win keeping 80 percent against a wiped-out foe reads $+0.8$, unchanged;
+    - the function is zero-sum, $r(\text{attacker}) = -r(\text{defender})$ at every terminal, which
+      neither `two_sided` nor `balanced` is, and which self-play wants.
 
-    $$r_{\\text{stall}} = -1 + \\tfrac{1}{2}\\bigl(1 + k_{\\text{own}} - k_{\\text{foe}}\\bigr) \\in [-1, 0]$$
+    Difficulty weighting still supplies the scale the outcome bit used to: `apply_difficulty`
+    multiplies by the opponent-to-own strength ratio on a win and its inverse on a loss, and the
+    sign split it needs is exactly the sign of this margin.
 
-    A standoff where nobody lands a blow reads $-0.5$ instead of $+2.0$. One peasant killed moves it
-    to about $-0.495$ rather than converting it to a win. Every stalemate stays below every decided
-    win, which begins at $+1.0$, so engaging a winnable fight strictly dominates stalling it.
-
-    The band matters for the attacker as much as the defender, which the naive continuous form gets
-    wrong. Scoring a stalemate at the bare differential would hand a stalling attacker roughly $0.0$
-    against $-1.0 + \\text{destroyed}$ for fighting and losing, so it would fix the defender's
-    exploit by handing the same one to the attacker. Anchoring the band at $-1$ keeps a stall
-    comparable to a loss for whichever chair takes it, which is the property the owner asked for:
-    what matters is the side the learner occupies, not attacker against defender.
-
-    Evasion is still preferred to being routed, $-0.5$ against $-1.0$, and that is deliberate. A
-    hopeless fight is one the engine's own AI would also decline, so the reward should rank
-    withdrawal above annihilation. What it must not do is rank it above winning, and it no longer
-    does.
+    One consequence is deliberate and should be measured rather than assumed. A side that would
+    lose now prefers a standoff at $0.0$ to fighting at $-0.8$, so stalling remains the best reply
+    to a hopeless matchup. That is correct play, and it is not the earlier defect, where stalling
+    beat *winning*. What it does mean is that a policy behind on material has a floor at zero, and
+    whether that suppresses learning to fight losing battles is an empirical question about the
+    training distribution, not something this docstring can settle.
     """
-    if record["termination"] != "stalemate":
-        return terminal_reward_two_sided(record, side, commanded=commanded)
     own = record["attacker" if side == "attacker" else "defender"]
     foe = record["defender" if side == "attacker" else "attacker"]
     now, start = ("strength_commanded", "initial_strength_commanded") if commanded \
         else ("strength", "initial_strength")
 
-    def kept(rec: dict) -> float:
-        initial = float(rec.get(start, rec.get("initial_strength", 0.0)))
-        return float(rec.get(now, rec.get("strength", 0.0))) / initial if initial > 0 else 0.0
+    def kept(entry: dict) -> float:
+        initial = float(entry.get(start, entry.get("initial_strength", 0.0)))
+        return float(entry.get(now, entry.get("strength", 0.0))) / initial if initial > 0 else 0.0
 
-    return -1.0 + 0.5 * (1.0 + kept(own) - kept(foe))
+    return kept(own) - kept(foe)
 
 
 def terminal_reward_balanced(record: dict, side: str, commanded: bool = False) -> float:
