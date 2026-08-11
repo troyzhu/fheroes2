@@ -33,8 +33,13 @@ import numpy as np
 METRICS = ("mean_terminal_reward", "reward_on_wins", "reward_on_losses", "value_loss",
            "loss_policy", "loss_total", "entropy", "normalized_entropy", "raw_advantage_std",
            "win_rate",
-           # Supervised heartbeats (train_bc, soft_distill) carry these instead.
+           # Supervised heartbeats (train_bc, soft_distill) carry these instead. Agreement cannot
+           # referee a supervised run by itself, so the held-out loss and both entropy forms sit
+           # beside it: a run whose agreement still climbs while its held-out loss has turned is
+           # overfitting, and one whose entropy keeps falling is buying confidence rather than skill.
            "train_loss", "train_loss_hard", "train_loss_soft", "holdout_agreement",
+           "holdout_loss", "holdout_entropy", "holdout_normalized_entropy",
+           "holdout_effective_actions",
            # Optional reinforcement columns, present when their mechanisms are armed.
            "kl_to_anchor", "gate_fraction")
 
