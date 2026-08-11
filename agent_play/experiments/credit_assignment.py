@@ -36,7 +36,7 @@ from fheroes2_agent.env import BattleEnv  # noqa: E402
 from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from search_probe import policy_action, priors, rollout  # noqa: E402
+from fheroes2_agent.search import policy_action, priors, rollout  # noqa: E402
 
 POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive" / "experiments" / "files" \
     / "2026-08-05-run-reports" / "pool_value.json"

@@ -22,7 +22,7 @@ import random
 import numpy as np
 import torch
 
-from .env import BattleEnv, ScenarioRejected, Step, terminal_reward_strength, terminal_reward_two_sided
+from .env import BattleEnv, ScenarioRejected, Step, reward_from_record
 from .policy import load_policy
 
 
@@ -177,11 +177,10 @@ class SelfPlayEnv:
         if not step.done:
             return step
         record = step.info
-        if self._reward_margin == "strength":
-            reward = terminal_reward_strength(record, self._learner_side)
-        else:
-            reward = terminal_reward_two_sided(
-                record, self._learner_side, commanded=self._reward_margin == "two_sided_commanded")
+        # `hit_points` keeps its historical reading here: self-play has no per-episode starting
+        # hit-point total to divide by, and this branch has always resolved it two-sided.
+        margin = "two_sided" if self._reward_margin == "hit_points" else self._reward_margin
+        reward = reward_from_record(record, self._learner_side, margin)
         return Step(step.observation, step.mask, reward, True, record)
 
     def close(self) -> None:

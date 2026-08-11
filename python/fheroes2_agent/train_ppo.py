@@ -23,7 +23,7 @@ import numpy as np
 import torch
 
 from .encoding import ACTION_SPACE_SIZE, ENCODING_VERSION, OBSERVATION_SIZE
-from .env import BattleEnv
+from .env import BattleEnv, _side_won
 from .objectives import surrogate as trust_surrogate, total_variation
 from .objectives import normalize_advantages
 from .policy import BattlePolicy
@@ -100,12 +100,26 @@ def compute_gae(rewards, values, dones, truncated, gamma=0.99, lam=0.95) -> tupl
 
 
 def win_rate(outcomes: list[dict], side: str, sides: list | None = None) -> float:
-    """The learner's win rate, scored per episode against the chair it actually held."""
+    """The learner's win rate, scored per episode against the chair it actually held.
+
+    Winning is delegated to `_side_won` so the metric and the reward cannot disagree about the
+    same episode. They did until 2026-08-09: this compared the termination string directly, which
+    reads a `stalemate` as a loss for both chairs, while the reward pays the outlasting defender
+    its win branch because the engine's own breaker forfeits that battle to it. A defending run
+    therefore reported a win rate below the rate its own reward was scoring. The correction is
+    bounded by the stalemate incidence, 0.473 percent of 384,000 measured training episodes, so no
+    reported figure moves by more than half a point, and it moves only for defender-side runs.
+
+    `scenarios.measure` deliberately does not follow. The battery column counts only outright
+    destruction, so a stalling policy cannot inflate an evaluation number, and that conservatism is
+    the point of it (`agent_play/docs/rl/reward-design.md`, the stalls section). This is the
+    training-side monitor, whose job is to agree with what the run is actually optimizing, so the
+    two differ on purpose and only on stalemates.
+    """
     if not outcomes:
         return 0.0
     seats = sides if sides and len(sides) == len(outcomes) else [side] * len(outcomes)
-    return float(np.mean([o["termination"] == ("victory" if (seat or side) == "attacker" else "defeat")
-                          for o, seat in zip(outcomes, seats)]))
+    return float(np.mean([_side_won(o, seat or side) for o, seat in zip(outcomes, seats)]))
 
 
 def train(

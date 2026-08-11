@@ -1,0 +1,179 @@
+"""Root search over the real engine: the primitives every search harness shares.
+
+Lifted out of `agent_play/experiments/search_probe.py` on 2026-08-10, where nine scripts had been
+reaching for them across a `sys.path` insert. The probe that first hosted them is still an
+experiment and still lives there; what moved is only the machinery its callers depend on.
+
+The method is one ply of explicit branching with Monte Carlo playouts, not a tree. At a decision,
+candidate actions are scored by PUCT (Q from playout returns, prior from the policy, exploration
+bonus from visit counts) over a budget of simulations, and the most-visited action plays. Playouts
+run on the real engine by reset-continuation: a persistent side environment replays the action
+prefix, applies the candidate, and samples the policy to termination. Increasing the budget
+sharpens each candidate's estimate and covers more of them; it never looks further ahead, because
+a playout already runs to the end of the battle.
+
+Two properties of the side environment decide what the numbers mean, and both were configuration
+accidents until 2026-08-09. What `rollout` returns is that environment's terminal reward, so its
+`reward_margin` is the quantity search maximizes. And its world seed fixes both the battlefield and
+the combat dice, so pinning it to the live episode is required for the prefix replay to reproduce
+the live position, but pinning it without a `combat_seed_offset` also hands search the live
+battle's actual dice. See `agent_play/docs/rl/reward-design.md`.
+"""
+
+from __future__ import annotations
+
+import math
+
+import numpy as np
+import torch
+
+from .env import BattleEnv
+from .policy import BattlePolicy
+
+def _plane_arg(model: BattlePolicy, source) -> tuple:
+    """The planes tensor for a planes-built policy, from whichever env presented the state.
+
+    A planes policy hard-fails without its tensor rather than silently reading zeros, so every
+    search path threads the presenting environment through; entity policies get an empty tuple
+    and are untouched."""
+    if not getattr(model, "planes", False):
+        return ()
+    planes = getattr(source, "last_planes", None)
+    if planes is None:
+        raise ValueError("planes policy searched through an env constructed without planes=True")
+    return (torch.from_numpy(planes).unsqueeze(0),)
+
+
+def policy_action(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, sample: bool = True,
+                  env=None) -> int:
+    with torch.no_grad():
+        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0),
+                          *_plane_arg(model, env))
+        if sample:
+            return int(torch.distributions.Categorical(logits=logits).sample())
+        return int(logits.argmax())
+
+
+def priors(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, env=None) -> dict[int, float]:
+    with torch.no_grad():
+        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0),
+                          *_plane_arg(model, env))
+        probs = torch.softmax(logits, dim=-1).squeeze(0).numpy()
+    legal = np.flatnonzero(mask)
+    return {int(a): float(probs[a]) for a in legal}
+
+
+def sync_side_environment(sim: BattleEnv | None, live: BattleEnv, worker: str,
+                          combat_seed_offset: int = 0, **kwargs) -> BattleEnv:
+    """Rebuild the side environment when the live episode moves to a different battlefield.
+
+    `rollout` replays the action prefix in `sim` and relies on that replay reproducing the live
+    state exactly, which holds only when both are on the same world seed, since the obstacle layout
+    and the combat seed both derive from it. Built with the harness default `seeds=4`, the side
+    environment resets to variant zero on every rollout while the live episode rotates over four,
+    so most episodes were searched against a battlefield the battle was not on. Rebuilding at
+    `seeds=1` pinned to the live variant is what makes the prefix guarantee true.
+
+    Cheap in the only place it is called, once per episode rather than once per rollout, and a
+    no-op when the variant has not moved.
+
+    `combat_seed_offset` decides what kind of model the search is given, and it is the difference
+    between an upper bound and an honest number. The battle's random stream is derived from the same
+    world seed as the battlefield, so pinning the variant alone hands the side environment the live
+    battle's actual dice, and search then reads outcomes instead of estimating them. A nonzero offset
+    keeps the battlefield and makes the randomness independent, which is what a perfect dynamics
+    model with unknown randomness looks like. Measured on the mirror suite 2026-08-10, the searching
+    agent reads 0.927 with the live dice and 0.604 without them (`search_leakage.py`), so which one
+    is passed changes the conclusion and neither should be chosen by default.
+    """
+    wanted = live.current_battlefield
+    pin = (wanted, combat_seed_offset)
+    if sim is not None and getattr(sim, "_pinned_battlefield", None) == pin:
+        return sim
+    if sim is not None:
+        sim.close()
+    fresh = BattleEnv(worker, seeds=1, seed_offset=wanted,
+                      combat_seed_offset=combat_seed_offset, **kwargs)
+    fresh._pinned_battlefield = pin
+    return fresh
+
+
+def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float:
+    """Replay the prefix, apply the candidate, sample the policy to terminal; the return is the
+    episode's terminal reward. Deterministic engine plus identical action sequence reproduces
+    the prefix state exactly (the replay-rendering machinery's own guarantee)."""
+    observation, mask = sim.reset()
+    for action in prefix:
+        step = sim.step(action)
+        if step.done:
+            return step.reward  # prefix ended the battle; cannot happen when called mid-episode
+        observation, mask = step.observation, step.mask
+    step = sim.step(first)
+    while not step.done:
+        action = policy_action(model, step.observation, step.mask, env=sim)
+        step = sim.step(action)
+    return step.reward
+
+
+def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
+                         observation: np.ndarray, mask: np.ndarray, simulations: int,
+                         c_puct: float, live: BattleEnv | None = None,
+                         coverage_forced: bool = False) -> tuple[int, dict, dict, dict]:
+    """The search decision plus its whole measurement: per-candidate mean rollout values, visit
+    counts, and the prior. The values are the counterfactuals only search produces (a real
+    playout per candidate it tried), which is what makes them valid soft-distillation targets
+    where fitted state values and behavior Q measured 0.00; the prior anchors the target on
+    support per Grill et al.
+
+    `coverage_forced` is the demonstrated prerequisite from the soft-target program: UCB left
+    alone visits about two candidates per state, which starves every downstream consumer of
+    support, so the forced variant spends the first rollouts visiting every candidate once, in
+    descending prior order, before UCB takes over. With more candidates than simulations the
+    sweep is truncated at the simulation budget, still widest-support-first."""
+    # The observation is the live environment's state, so a planes policy needs the live
+    # env's tensor here; the sim's belongs to whatever state its own replay last presented.
+    prior = priors(model, observation, mask, env=live if live is not None else sim)
+    actions = list(prior)
+    if len(actions) == 1:
+        return actions[0], {actions[0]: 0.0}, {actions[0]: 1}, prior
+    if simulations <= 0:
+        # No budget means no search, so the prior's own pick stands. Without this the tie-break
+        # below sees an all-zero visit count and an all-zero value, ties on every candidate, and
+        # returns the lowest legal action index: not the policy, not an error, just array order.
+        # `search_strength.py` sidesteps it by branching to `policy_action` before calling here,
+        # but a harness that simply passes `--simulations 0` would otherwise measure nothing.
+        top = max(prior, key=prior.get)
+        return top, {a: 0.0 for a in actions}, {a: 0 for a in actions}, prior
+    visits = {a: 0 for a in actions}
+    total_return = {a: 0.0 for a in actions}
+    sweep = sorted(actions, key=lambda a: -prior[a]) if coverage_forced else []
+    for n in range(simulations):
+        unvisited = [a for a in sweep if visits[a] == 0]
+        if unvisited:
+            chosen = unvisited[0]
+        else:
+            scores = {}
+            for a in actions:
+                q = total_return[a] / visits[a] if visits[a] else 0.0
+                u = c_puct * prior[a] * math.sqrt(n + 1) / (1 + visits[a])
+                scores[a] = q + u
+            chosen = max(scores, key=scores.get)
+        value = rollout(sim, model, prefix, chosen)
+        visits[chosen] += 1
+        total_return[chosen] += value
+    means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
+    # Ties on visit count are broken by the mean rollout value, not by action index. `visits` is
+    # keyed in ascending legal-action order, so a plain argmax over it returns the lowest index,
+    # and under coverage forcing ties are the common case rather than the rare one: 11.12 percent
+    # of the 15,007 decisions in the first scaled corpus tied at the top and every one of them
+    # was labeled by array position. The value is the signal the search actually measured.
+    best = max(actions, key=lambda a: (visits[a], means[a]))
+    return best, means, visits, prior
+
+
+def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
+                  observation: np.ndarray, mask: np.ndarray, simulations: int, c_puct: float,
+                  live: BattleEnv | None = None, coverage_forced: bool = False) -> int:
+    action, _, _, _ = search_action_detail(sim, model, prefix, observation, mask, simulations, c_puct,
+                                           live=live, coverage_forced=coverage_forced)
+    return action

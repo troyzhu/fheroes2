@@ -42,110 +42,11 @@ THUNK = {"attacker": "11:1,11:1,11:1,10:2,9:2", "defender": "1:334,1:333,1:333",
          "attacker_hero": "13:12", "allow_wide": True, "label": "thunk_1000"}
 
 
-def _plane_arg(model: BattlePolicy, source) -> tuple:
-    """The planes tensor for a planes-built policy, from whichever env presented the state.
-
-    A planes policy hard-fails without its tensor rather than silently reading zeros, so every
-    search path threads the presenting environment through; entity policies get an empty tuple
-    and are untouched."""
-    if not getattr(model, "planes", False):
-        return ()
-    planes = getattr(source, "last_planes", None)
-    if planes is None:
-        raise ValueError("planes policy searched through an env constructed without planes=True")
-    return (torch.from_numpy(planes).unsqueeze(0),)
-
-
-def policy_action(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, sample: bool = True,
-                  env=None) -> int:
-    with torch.no_grad():
-        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0),
-                          *_plane_arg(model, env))
-        if sample:
-            return int(torch.distributions.Categorical(logits=logits).sample())
-        return int(logits.argmax())
-
-
-def priors(model: BattlePolicy, observation: np.ndarray, mask: np.ndarray, env=None) -> dict[int, float]:
-    with torch.no_grad():
-        logits, _ = model(torch.from_numpy(observation).unsqueeze(0), torch.from_numpy(mask).unsqueeze(0),
-                          *_plane_arg(model, env))
-        probs = torch.softmax(logits, dim=-1).squeeze(0).numpy()
-    legal = np.flatnonzero(mask)
-    return {int(a): float(probs[a]) for a in legal}
-
-
-def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float:
-    """Replay the prefix, apply the candidate, sample the policy to terminal; the return is the
-    episode's terminal reward. Deterministic engine plus identical action sequence reproduces
-    the prefix state exactly (the replay-rendering machinery's own guarantee)."""
-    observation, mask = sim.reset()
-    for action in prefix:
-        step = sim.step(action)
-        if step.done:
-            return step.reward  # prefix ended the battle; cannot happen when called mid-episode
-        observation, mask = step.observation, step.mask
-    step = sim.step(first)
-    while not step.done:
-        action = policy_action(model, step.observation, step.mask, env=sim)
-        step = sim.step(action)
-    return step.reward
-
-
-def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
-                         observation: np.ndarray, mask: np.ndarray, simulations: int,
-                         c_puct: float, live: BattleEnv | None = None,
-                         coverage_forced: bool = False) -> tuple[int, dict, dict, dict]:
-    """The search decision plus its whole measurement: per-candidate mean rollout values, visit
-    counts, and the prior. The values are the counterfactuals only search produces (a real
-    playout per candidate it tried), which is what makes them valid soft-distillation targets
-    where fitted state values and behavior Q measured 0.00; the prior anchors the target on
-    support per Grill et al.
-
-    `coverage_forced` is the demonstrated prerequisite from the soft-target program: UCB left
-    alone visits about two candidates per state, which starves every downstream consumer of
-    support, so the forced variant spends the first rollouts visiting every candidate once, in
-    descending prior order, before UCB takes over. With more candidates than simulations the
-    sweep is truncated at the simulation budget, still widest-support-first."""
-    # The observation is the live environment's state, so a planes policy needs the live
-    # env's tensor here; the sim's belongs to whatever state its own replay last presented.
-    prior = priors(model, observation, mask, env=live if live is not None else sim)
-    actions = list(prior)
-    if len(actions) == 1:
-        return actions[0], {actions[0]: 0.0}, {actions[0]: 1}, prior
-    visits = {a: 0 for a in actions}
-    total_return = {a: 0.0 for a in actions}
-    sweep = sorted(actions, key=lambda a: -prior[a]) if coverage_forced else []
-    for n in range(simulations):
-        unvisited = [a for a in sweep if visits[a] == 0]
-        if unvisited:
-            chosen = unvisited[0]
-        else:
-            scores = {}
-            for a in actions:
-                q = total_return[a] / visits[a] if visits[a] else 0.0
-                u = c_puct * prior[a] * math.sqrt(n + 1) / (1 + visits[a])
-                scores[a] = q + u
-            chosen = max(scores, key=scores.get)
-        value = rollout(sim, model, prefix, chosen)
-        visits[chosen] += 1
-        total_return[chosen] += value
-    means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
-    # Ties on visit count are broken by the mean rollout value, not by action index. `visits` is
-    # keyed in ascending legal-action order, so a plain argmax over it returns the lowest index,
-    # and under coverage forcing ties are the common case rather than the rare one: 11.12 percent
-    # of the 15,007 decisions in the first scaled corpus tied at the top and every one of them
-    # was labeled by array position. The value is the signal the search actually measured.
-    best = max(actions, key=lambda a: (visits[a], means[a]))
-    return best, means, visits, prior
-
-
-def search_action(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
-                  observation: np.ndarray, mask: np.ndarray, simulations: int, c_puct: float,
-                  live: BattleEnv | None = None, coverage_forced: bool = False) -> int:
-    action, _, _, _ = search_action_detail(sim, model, prefix, observation, mask, simulations, c_puct,
-                                           live=live, coverage_forced=coverage_forced)
-    return action
+# The primitives moved to `fheroes2_agent.search` on 2026-08-10, where nine scripts can import them
+# without a path insert. They are re-exported here unchanged so every existing caller, and every
+# vendored command line in the archive, keeps working against the same names.
+from fheroes2_agent.search import (  # noqa: E402,F401
+    policy_action, priors, rollout, search_action, search_action_detail, sync_side_environment)
 
 
 def play(env: BattleEnv, sim: BattleEnv | None, model: BattlePolicy, simulations: int, c_puct: float) -> tuple[bool, int]:

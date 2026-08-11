@@ -80,7 +80,9 @@ opt-in render seam for replay videos (a null-by-default render observer on the d
 defaulted `showInterface` on the runner, a `Race::NONE` art case in `battle_interface.cpp`; see
 `agent_play/docs/implementation/replay-rendering.md`), and the entry-point-free library under
 `src/fheroes2/agent/` that both build systems compile into the normal executable without
-behavior change. Verify with:
+behavior change. That library gained a `combatSeedOffset` on the scenario on 2026-08-10, default
+zero and golden digests bit-identical, so a search side environment can be put on the live
+battlefield without also inheriting the live battle's dice (ADR 0008). Verify with:
 
 ```bash
 make -C src/dist -j"$(sysctl -n hw.ncpu)" && ./agent_play/spike/build_spike.sh \

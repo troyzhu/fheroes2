@@ -1,0 +1,33 @@
+{
+ "checkpoint": "band_soft_s0.pt",
+ "episodes": 8,
+ "battlefields": 4,
+ "margin": "hit_points",
+ "sides": [
+  "attacker",
+  "defender"
+ ],
+ "combat_seed_offset": 987631,
+ "armies": [
+  "9:2,11:2,6:12,1:30",
+  "62:3,30:6,15:10",
+  "13:3,48:12,12:20",
+  "10:4,7:8",
+  "28:3,40:8,2:15",
+  "51:4,50:4,12:16"
+ ],
+ "cells": {
+  "64|1.5|0": {
+   "n": 96,
+   "win_rate": 0.6979166666666666,
+   "mean_reward": 0.6240598841287519,
+   "win_quality": 0.3567183524167948,
+   "loss_quality": 0.7335304283733838,
+   "margin": 0.168463667028681,
+   "decisions": 16.291666666666668,
+   "candidates_touched": 5.375,
+   "overruled": 0.17961853458879473
+  }
+ },
+ "seconds": 2193.9
+}

@@ -1,0 +1,44 @@
+{
+ "episodes": 8,
+ "simulations": 16,
+ "battlefields": 4,
+ "cells": [
+  {
+   "army": "10:4,7:8",
+   "margin": "hit_points",
+   "synced": 1.0,
+   "desynced": 0.88
+  },
+  {
+   "army": "10:4,7:8",
+   "margin": "two_sided",
+   "synced": 0.25,
+   "desynced": 0.12
+  },
+  {
+   "army": "62:3,30:6,15:10",
+   "margin": "hit_points",
+   "synced": 0.62,
+   "desynced": 0.38
+  },
+  {
+   "army": "62:3,30:6,15:10",
+   "margin": "two_sided",
+   "synced": 1.0,
+   "desynced": 0.38
+  },
+  {
+   "army": "13:3,48:12,12:20",
+   "margin": "hit_points",
+   "synced": 1.0,
+   "desynced": 0.88
+  },
+  {
+   "army": "13:3,48:12,12:20",
+   "margin": "two_sided",
+   "synced": 0.88,
+   "desynced": 0.25
+  }
+ ],
+ "mean_cost_of_desync": -0.31
+}

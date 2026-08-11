@@ -1,0 +1,20 @@
+{
+ "checkpoint": "band_soft_s0.pt",
+ "simulations": 16,
+ "coverage_forced": true,
+ "combat_seed_offset": 987631,
+ "margin": "hit_points",
+ "decisions": 800,
+ "agreement": 0.2675,
+ "informative_decisions": 527,
+ "agreement_on_informative": 0.17077798861480076,
+ "agreement_control": 0.35125,
+ "agreement_on_informative_control": 0.2827324478178368,
+ "mean_value_gap": -0.5723673624654991,
+ "value_gap_sem": 0.03347768142615113,
+ "mean_value_gap_control": -0.5720557610908794,
+ "value_gap_control_sem": 0.033728925252582295,
+ "paired_gap_difference": -0.0003116013746198254,
+ "paired_gap_difference_sem": 0.03235577516549717,
+ "seconds": 769.0
+}

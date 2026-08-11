@@ -175,7 +175,7 @@ Until that sweep is run and consolidated, no adventure-map design decision shoul
 
 ## Sequencing
 
-The battle environment is finished as a substrate only when Milestones 4 through 6 are done, meaning the protocol, the Python client, and the hardening and benchmark work. Training a battle policy ran ahead of that ordering: the reward and algorithm choices of [[decisions/0005-training-and-reward]] met reality across 2026-08-03 to 08-07, and the measured residue is that supervised imitation converges to the teacher while the search agent already exceeds it.
+The battle environment is finished as a substrate only when Milestones 4 through 6 are done, meaning the protocol, the Python client, and the hardening and benchmark work. Training a battle policy ran ahead of that ordering: the reward and algorithm choices of [[decisions/0005-training-and-reward]] met reality across 2026-08-03 to 08-07, and the measured residue is that supervised imitation converges to the teacher while search, and only search, carries the agent past it. How far past is narrower than it looked before 2026-08-10: measured with the side environment's dice made independent of the live battle, the searching agent clears the built-in AI on five of nine suites against seed spread, is beaten on the freshly sampled suite, and separates from it on none once matchup spread is counted, so the benchmark is passed and generalisation is not shown ([[decisions/0008-search-configuration]]).
 
 Phase 1b and Phase 2 both wait on that, for the same reason the battle came first. A second environment built before the first one has trained anything would be a second untested substrate.
 

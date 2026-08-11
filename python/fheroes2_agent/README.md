@@ -18,6 +18,8 @@ This file exists for one reason beyond orientation: two families of training met
 | `train_critic.py` | Family A, the value head fitted on recorded returns |
 | `train_ppo.py` | Family B with a critic: masked PPO with GAE, ratio clip or DPPO divergence gates |
 | `selfplay.py` | `OpponentPool` (checkpoints plus the built-in AI as anchor) and `SelfPlayEnv`, the learner's reset/step view of a both-sides battle |
+| `search.py` | Root search over the real engine: one ply of branching, playouts to termination, PUCT over candidates, and the side-environment pinning that decides whether search sees the live battlefield and the live dice |
+| `suites.py` | The fixed evaluation suites and the chair each is played from, shared by the battery, the search harnesses and the built-in AI baseline |
 | `train_rloo.py`, `train_group.py` | Family B without a critic: leave-one-out, GRPO and Dr. GRPO group baselines |
 | `render.py`, `watch.py` | Human-readable boards and action descriptions |
 

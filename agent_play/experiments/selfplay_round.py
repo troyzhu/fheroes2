@@ -31,7 +31,7 @@ import time
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
 from fheroes2_agent import train_ppo  # noqa: E402
-from fheroes2_agent.env import BattleEnv, ScenarioRejected  # noqa: E402
+from fheroes2_agent.env import REWARD_MARGINS, BattleEnv, ScenarioRejected  # noqa: E402
 from fheroes2_agent.scenarios import sample_matchups  # noqa: E402
 from fheroes2_agent.selfplay import OpponentPool, SelfPlayEnv  # noqa: E402
 
@@ -90,6 +90,10 @@ def main() -> None:
     parser.add_argument("--pool", default="anchor", choices=("anchor", "ai-only"),
                         help="anchor: share2 and clone v4 beside the built-in AI; ai-only: the AI alone")
     parser.add_argument("--anchor", default=str(ANCHOR))
+    parser.add_argument("--reward-margin", default="two_sided", choices=REWARD_MARGINS,
+                        help="the objective the round trains on; every round through 2026-08-08 was "
+                             "two_sided, and it is written into the report so an arm cannot be "
+                             "mistaken for one trained on another")
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
@@ -118,7 +122,7 @@ def main() -> None:
             continue
         started = time.time()
         env = SelfPlayEnv(args.worker, matchups, OpponentPool(pool_paths, seed=seed),
-                          learner_side=args.chair, reward_margin="two_sided", rotation_seed=seed)
+                          learner_side=args.chair, reward_margin=args.reward_margin, rotation_seed=seed)
         try:
             result = train_ppo.train(args.worker, checkpoint=args.anchor, iterations=args.iterations,
                                      seed=seed, env=env, quiet=True, out=str(out),
@@ -135,7 +139,8 @@ def main() -> None:
     if args.report:
         pathlib.Path(args.report).write_text(json.dumps(
             {"tag": args.tag, "beta": args.beta, "iterations": args.iterations, "chair": args.chair,
-             "pool": args.pool, "matchup_stats": stats, "matchups": len(matchups), "runs": runs}, indent=1))
+             "pool": args.pool, "reward_margin": args.reward_margin, "matchup_stats": stats,
+             "matchups": len(matchups), "runs": runs}, indent=1))
     print(f"ROUND {args.tag} COMPLETE", flush=True)
 
 

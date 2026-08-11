@@ -38,7 +38,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 from fheroes2_agent.env import BattleEnv, ScenarioRejected  # noqa: E402
 from fheroes2_agent.policy import load_policy  # noqa: E402
-from search_probe import search_action_detail  # noqa: E402
+from fheroes2_agent.search import search_action_detail, sync_side_environment  # noqa: E402
 from validation_battery import SUITE_SIDE, build_suites  # noqa: E402
 
 
@@ -51,15 +51,21 @@ def probe_matchup(worker: str, matchup, model, episodes: int, simulations: int, 
     opponent's agreement and the opponent's win rate."""
     kwargs = dict(side=side, attacker=matchup.attacker, defender=matchup.defender,
                   attacker_hero=matchup.attacker_hero, defender_hero=matchup.defender_hero,
-                  allow_wide=matchup.allow_wide, seeds=seeds, reward_margin="two_sided")
-    env = BattleEnv(worker, **kwargs)
-    sim = BattleEnv(worker, **kwargs)
+                  allow_wide=matchup.allow_wide, reward_margin="two_sided")
+    env = BattleEnv(worker, seeds=seeds, **kwargs)
+    # Handing the side environment the live `seeds` left it on variant zero while the live episode
+    # rotated, so it searched terrain the battle was not on and the prefix replay stopped
+    # reproducing the live state. Measured at -0.310 win rate in `search_sync.py`; the figures this
+    # probe reported before 2026-08-09 were collected that way and are being re-measured.
+    sim = None
     agree = decisions = wins = played = 0
     won_termination = "victory" if side == "attacker" else "defeat"
     value_gaps = []
     try:
         for _ in range(episodes):
             observation, mask = env.reset()
+            # After the reset, so `current_battlefield` names the episode that has just started.
+            sim = sync_side_environment(sim, env, worker, **kwargs)
             prefix = []
             while True:
                 action, means, visits, prior = search_action_detail(
@@ -81,7 +87,8 @@ def probe_matchup(worker: str, matchup, model, episodes: int, simulations: int, 
                 observation, mask = step.observation, step.mask
     finally:
         env.close()
-        sim.close()
+        if sim is not None:
+            sim.close()
     return {"decisions": decisions, "agreement": agree / decisions if decisions else float("nan"),
             "search_win_rate": wins / played if played else float("nan"),
             "mean_value_gap_on_disagreement": float(np.mean(value_gaps)) if value_gaps else 0.0,

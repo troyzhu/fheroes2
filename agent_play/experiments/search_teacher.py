@@ -40,11 +40,11 @@ import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
-from fheroes2_agent.env import BattleEnv  # noqa: E402
+from fheroes2_agent.env import REWARD_MARGINS, BattleEnv  # noqa: E402
 from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from search_probe import policy_action, search_action, search_action_detail  # noqa: E402
+from fheroes2_agent.search import policy_action, search_action, search_action_detail  # noqa: E402
 
 POOL = pathlib.Path(__file__).resolve().parents[2] / "agent_play" / "docs" / "archive" / "experiments" / "files" \
     / "2026-08-05-run-reports" / "pool_value.json"
@@ -74,7 +74,7 @@ def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: path
                     min_win_fraction: float = 0.0, seed_offset: int = 0,
                     record_candidates: bool = False, planes: bool = False,
                     reward_margin: str = "hit_points", reward_weighting: str = "none",
-                    coverage_forced: bool = False) -> tuple[int, int]:
+                    coverage_forced: bool = False, search_combat_offset: int = 0) -> tuple[int, int]:
     """Returns (decisions, wins) actually written; (0, wins) when the win filter drops the
     matchup, since labels from fights search cannot win teach the least-bad line of a lost
     position, which the credit measurement showed is exactly the poison. A nonzero seed offset
@@ -85,7 +85,15 @@ def collect_matchup(worker: str, model: BattlePolicy, entry: dict, out_dir: path
                   allow_wide=bool(entry.get("allow_wide")), side=side, seed_offset=seed_offset, planes=planes,
                   reward_margin=reward_margin, reward_weighting=reward_weighting)
     env = BattleEnv(worker, **kwargs)
-    sim = BattleEnv(worker, **kwargs)
+    # `search_combat_offset` decides what the labels mean. The side environment shares the live
+    # world seed so its prefix replay reproduces the live position, but the combat stream derives
+    # from that same seed, so at zero the teacher chooses knowing the rolls the battle is about to
+    # make. Every corpus collected before 2026-08-10 was labelled that way, and its advice is
+    # therefore conditioned on a realization the student will never see. Nonzero keeps the
+    # battlefield and makes the dice independent, which is the teacher a student can actually
+    # imitate. Measured on the mirror suite, the searching agent reads 0.927 with the live dice and
+    # 0.604 without (`search_leakage.py`), so the two label very different play.
+    sim = BattleEnv(worker, combat_seed_offset=search_combat_offset, **kwargs)
     decisions = 0
     wins = 0
     episodes_out = []
@@ -162,10 +170,15 @@ def main() -> None:
     parser.add_argument("--planes", action="store_true",
                         help="collect with the planes_v1 obstacle layer on every observation")
     parser.add_argument("--reward-margin", default="hit_points",
-                        choices=("hit_points", "strength", "two_sided", "two_sided_commanded"),
+                        choices=REWARD_MARGINS,
                         help="what search rollouts score by; two_sided is the owner objective and "
                              "two_sided_commanded prices the commander into it")
     parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
+    parser.add_argument("--search-combat-offset", type=int, default=0,
+                        help="perturbs the side environment's dice while keeping its battlefield. "
+                             "Zero, the historical default, lets the teacher choose knowing the rolls "
+                             "the battle will make, so its labels are conditioned on a realization the "
+                             "student never sees. Stamped into the manifest either way")
     parser.add_argument("--coverage-forced", action="store_true",
                         help="visit every root candidate once, widest-prior-first, before UCB takes "
                              "over: the demonstrated prerequisite for support-complete soft targets")
@@ -219,7 +232,8 @@ def main() -> None:
                                                   record_candidates=args.record_candidates, planes=args.planes,
                                                   reward_margin=args.reward_margin,
                                                   reward_weighting=args.reward_weighting,
-                                                  coverage_forced=args.coverage_forced)
+                                                  coverage_forced=args.coverage_forced,
+                                                  search_combat_offset=args.search_combat_offset)
             except Exception as error:  # a rejected scenario is data, not a crash
                 manifest.append(entry | {"kept": False, "error": str(error)[:120]})
                 continue
@@ -235,6 +249,7 @@ def main() -> None:
         (out_root / f"shard{args.shard}_manifest.json").write_text(json.dumps(
             {"matchups": manifest, "side": args.side, "sample_seed": args.sample_seed,
              "simulations": args.simulations, "coverage_forced": args.coverage_forced,
+             "search_combat_offset": args.search_combat_offset,
              "policy_max_win": args.policy_max_win, "min_win": args.min_win}, indent=2))
     else:
         entries = json.loads(POOL.read_text())["matchups"][:40]
@@ -265,6 +280,7 @@ def main() -> None:
                                               episodes, args.simulations, args.c_puct,
                                               record_candidates=args.record_candidates,
                                               coverage_forced=args.coverage_forced,
+                                              search_combat_offset=args.search_combat_offset,
                                               min_win_fraction=args.min_win)
             manifest.append(entry | {"kept": decisions > 0, "wins": wins, "episodes": episodes})
             total_decisions += decisions
@@ -274,7 +290,8 @@ def main() -> None:
         out_root.mkdir(parents=True, exist_ok=True)
         (out_root / f"shard{args.shard}_manifest.json").write_text(json.dumps(
             {"matchups": manifest, "side": args.side, "source": "pool", "simulations": args.simulations,
-             "coverage_forced": args.coverage_forced, "policy_max_win": args.policy_max_win,
+             "coverage_forced": args.coverage_forced, "search_combat_offset": args.search_combat_offset,
+             "policy_max_win": args.policy_max_win,
              "min_win": args.min_win}, indent=2))
 
     print(f"shard {args.shard}: {total_eps} episodes kept, {total_decisions} labels, "

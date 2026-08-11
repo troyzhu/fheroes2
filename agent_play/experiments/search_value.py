@@ -39,7 +39,7 @@ from fheroes2_agent import train_critic  # noqa: E402
 from fheroes2_agent.dataset import load_dir, split_by_episode  # noqa: E402
 from fheroes2_agent.env import BattleEnv  # noqa: E402
 from fheroes2_agent.policy import load_policy  # noqa: E402
-from search_probe import policy_action, priors  # noqa: E402
+from fheroes2_agent.search import policy_action, priors  # noqa: E402
 
 THUNK = dict(attacker="11:1,11:1,11:1,10:2,9:2", defender="1:334,1:333,1:333",
              attacker_hero="13:12", allow_wide=True)

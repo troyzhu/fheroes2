@@ -26,7 +26,7 @@ import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
-from fheroes2_agent.env import MatchupPool  # noqa: E402
+from fheroes2_agent.env import REWARD_MARGINS, MatchupPool  # noqa: E402
 from fheroes2_agent.policy import load_policy, BattlePolicy  # noqa: E402
 from fheroes2_agent.scenarios import Matchup, measure  # noqa: E402
 from fheroes2_agent import train_ppo  # noqa: E402
@@ -49,7 +49,7 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, default=3)
     parser.add_argument("--eval-episodes", type=int, default=24)
     parser.add_argument("--eval-seeds", type=int, default=4)
-    parser.add_argument("--reward-margin", default="hit_points", choices=("hit_points", "strength", "two_sided"))
+    parser.add_argument("--reward-margin", default="hit_points", choices=REWARD_MARGINS)
     parser.add_argument("--reward-weighting", default="none", choices=("none", "difficulty"))
     parser.add_argument("--value-warmup", type=int, default=0)
     parser.add_argument("--entropy-floor", type=float, default=0.0)

@@ -1,0 +1,1007 @@
+{
+ "checkpoint": "/private/tmp/claude-501/-Volumes-External-Drive-GitHub-fheroes2/f819124c-6010-4c4d-80fe-e094e5e9e0b0/scratchpad/work/band_soft_s0.pt",
+ "episodes": 8,
+ "eval_seeds": 4,
+ "search_objective": "hit_points",
+ "simulations": 16,
+ "reward_margin": "two_sided",
+ "arms": {
+  "search": {
+   "held_out_pool": {
+    "per_matchup": [
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.1633928571428571,
+      "mean_length": 37.75,
+      "strength_margin": 0.3715332863270463,
+      "surviving_strength": 0.3715332863270463,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4959459459459459,
+      "mean_length": 12.0,
+      "strength_margin": 0.8126939135522304,
+      "surviving_strength": 0.8126939135522304,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4529411764705882,
+      "mean_length": 22.875,
+      "strength_margin": 0.3952607514769994,
+      "surviving_strength": 0.3952607514769994,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.348507462686567,
+      "mean_length": 20.25,
+      "strength_margin": 0.43110554574942933,
+      "surviving_strength": 0.43110554574942933,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.33125,
+      "mean_length": 5.25,
+      "strength_margin": 0.3749974305741125,
+      "surviving_strength": 0.3749974305741125,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.376923076923077,
+      "mean_length": 21.75,
+      "strength_margin": 0.6602107998605184,
+      "surviving_strength": 0.6602107998605184,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3868518518518518,
+      "mean_length": 17.0,
+      "strength_margin": 0.46765246736450716,
+      "surviving_strength": 0.46765246736450716,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2092391304347827,
+      "mean_length": 18.125,
+      "strength_margin": 0.626340741774851,
+      "surviving_strength": 0.626340741774851,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.5788888888888888,
+      "mean_length": 8.125,
+      "strength_margin": 0.7264256014256014,
+      "surviving_strength": 0.7264256014256014,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2442708333333334,
+      "mean_length": 22.75,
+      "strength_margin": 0.6644501796924502,
+      "surviving_strength": 0.6644501796924502,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.75,
+      "mean_reward": 0.6037775891341256,
+      "mean_length": 20.875,
+      "strength_margin": 0.10380335454413889,
+      "surviving_strength": 0.24625676985883949,
+      "loss_damage": 0.6764431086000371
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2708333333333333,
+      "mean_length": 7.125,
+      "strength_margin": 0.2850171359096957,
+      "surviving_strength": 0.2850171359096957,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4725609756097562,
+      "mean_length": 30.625,
+      "strength_margin": 0.6150118222786103,
+      "surviving_strength": 0.6150118222786103,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3778409090909092,
+      "mean_length": 24.5,
+      "strength_margin": 0.5820003561312675,
+      "surviving_strength": 0.5820003561312675,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.32516077170418,
+      "mean_length": 25.5,
+      "strength_margin": 0.4319934244796071,
+      "surviving_strength": 0.4319934244796071,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.505232558139535,
+      "mean_length": 23.125,
+      "strength_margin": 0.9754575273995783,
+      "surviving_strength": 0.9754575273995783,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.75,
+      "mean_reward": 0.6394366197183099,
+      "mean_length": 13.375,
+      "strength_margin": 0.23226735546334998,
+      "surviving_strength": 0.5208527879606405,
+      "loss_damage": 0.3665110579714784
+     },
+     {
+      "win_rate": 0.5,
+      "mean_reward": 0.11875000000000002,
+      "mean_length": 13.75,
+      "strength_margin": -0.04526794030247927,
+      "surviving_strength": 0.2857142857142857,
+      "loss_damage": 0.6237498336807559
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2708333333333335,
+      "mean_length": 8.0,
+      "strength_margin": 0.5822070981487523,
+      "surviving_strength": 0.5822070981487523,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.1875,
+      "mean_length": 15.875,
+      "strength_margin": 0.5520542041754453,
+      "surviving_strength": 0.5520542041754453,
+      "loss_damage": null
+     }
+    ],
+    "win_rate": 0.95,
+    "mean_reward": 1.2180068656870686,
+    "surviving_strength": 0.5303618064927234,
+    "loss_damage": 0.5555680000840905,
+    "strength_margin": 0.49226075280128556,
+    "mean_length": 18.43125
+   },
+   "held_out_as_defender": {
+    "per_matchup": [
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2822916666666666,
+      "mean_length": 10.125,
+      "strength_margin": 0.39583026428213663,
+      "surviving_strength": 0.39583026428213663,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.375,
+      "mean_reward": -0.18901869158878504,
+      "mean_length": 10.875,
+      "strength_margin": -0.2898469337927434,
+      "surviving_strength": 0.21039015182630558,
+      "loss_damage": 0.4100108148358272
+     },
+     {
+      "win_rate": 0.125,
+      "mean_reward": -0.7165354330708662,
+      "mean_length": 11.5,
+      "strength_margin": -0.44164544071531653,
+      "surviving_strength": 0.29418460193083157,
+      "loss_damage": 0.4532359817638052
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.1313472111629317,
+      "mean_length": 7.125,
+      "strength_margin": 0.12384291067577574,
+      "surviving_strength": 0.12384291067577574,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2000000000000002,
+      "mean_length": 10.5,
+      "strength_margin": 0.31434755368229195,
+      "surviving_strength": 0.31434755368229195,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.5,
+      "mean_reward": 0.08575581395348836,
+      "mean_length": 11.375,
+      "strength_margin": -0.060829683305324206,
+      "surviving_strength": 0.44178815343983063,
+      "loss_damage": 0.43655247994952096
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.383248730964467,
+      "mean_length": 11.5,
+      "strength_margin": 0.4102385154767908,
+      "surviving_strength": 0.4102385154767908,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.375,
+      "mean_reward": -0.1236262250619811,
+      "mean_length": 7.375,
+      "strength_margin": -0.37319884663761954,
+      "surviving_strength": 0.33932755396291975,
+      "loss_damage": 0.19928531300205696
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3666666666666667,
+      "mean_length": 5.375,
+      "strength_margin": 0.541666224082257,
+      "surviving_strength": 0.541666224082257,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 34.75,
+      "strength_margin": -0.7070611601646672,
+      "surviving_strength": null,
+      "loss_damage": 0.29293883983533275
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4448333333333334,
+      "mean_length": 9.125,
+      "strength_margin": 0.3666974744733817,
+      "surviving_strength": 0.3666974744733817,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4466594827586208,
+      "mean_length": 4.5,
+      "strength_margin": 0.45043144149186387,
+      "surviving_strength": 0.45043144149186387,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 8.75,
+      "strength_margin": -0.5028814229574645,
+      "surviving_strength": null,
+      "loss_damage": 0.4971185770425355
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3319120287253141,
+      "mean_length": 12.875,
+      "strength_margin": 0.2738953510630152,
+      "surviving_strength": 0.2738953510630152,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3990632318501173,
+      "mean_length": 9.125,
+      "strength_margin": 0.4057377688629507,
+      "surviving_strength": 0.4057377688629507,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.25,
+      "mean_reward": -0.42447916666666663,
+      "mean_length": 18.875,
+      "strength_margin": -0.4863141253705556,
+      "surviving_strength": 0.35746219618089503,
+      "loss_damage": 0.2324271007789608
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4736607142857143,
+      "mean_length": 8.25,
+      "strength_margin": 0.49345540462070947,
+      "surviving_strength": 0.49345540462070947,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2294270833333334,
+      "mean_length": 43.0,
+      "strength_margin": 0.2894994345145696,
+      "surviving_strength": 0.2894994345145696,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2188856082913184,
+      "mean_length": 5.375,
+      "strength_margin": 0.2625000095013032,
+      "surviving_strength": 0.2625000095013032,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.25,
+      "mean_reward": -0.45625,
+      "mean_length": 8.0,
+      "strength_margin": -0.44791656037957245,
+      "surviving_strength": 0.20833375848171015,
+      "loss_damage": 0.3333333333333333
+     }
+    ],
+    "win_rate": 0.69375,
+    "mean_reward": 0.6041921027801836,
+    "surviving_strength": 0.3433127093638632,
+    "loss_damage": 0.3568628050676716,
+    "strength_margin": 0.050922408970189126,
+    "mean_length": 12.41875
+   },
+   "mirrors_attacker": {
+    "per_matchup": [
+     {
+      "win_rate": 0.75,
+      "mean_reward": 0.6798611111111111,
+      "mean_length": 16.25,
+      "strength_margin": 0.07919237679823163,
+      "surviving_strength": 0.26005995090448436,
+      "loss_damage": 0.5365896544794733
+     },
+     {
+      "win_rate": 0.5,
+      "mean_reward": 0.10970149253731343,
+      "mean_length": 11.25,
+      "strength_margin": -0.14441184357080977,
+      "surviving_strength": 0.2939808846582237,
+      "loss_damage": 0.41719542820015687
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.394927536231884,
+      "mean_length": 17.75,
+      "strength_margin": 0.40084839336380285,
+      "surviving_strength": 0.40084839336380285,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3136363636363635,
+      "mean_length": 10.5,
+      "strength_margin": 0.289049458956139,
+      "surviving_strength": 0.289049458956139,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4900641025641024,
+      "mean_length": 18.875,
+      "strength_margin": 0.49944765277229874,
+      "surviving_strength": 0.49944765277229874,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2023026315789473,
+      "mean_length": 20.5,
+      "strength_margin": 0.2567463276870694,
+      "surviving_strength": 0.2567463276870694,
+      "loss_damage": null
+     }
+    ],
+    "win_rate": 0.875,
+    "mean_reward": 1.0317488729432869,
+    "surviving_strength": 0.3333554447236697,
+    "loss_damage": 0.47689254133981507,
+    "strength_margin": 0.23014539433445533,
+    "mean_length": 15.854166666666666
+   },
+   "mirrors_defender": {
+    "per_matchup": [
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3509869724859465,
+      "mean_length": 16.875,
+      "strength_margin": 0.3466218881875244,
+      "surviving_strength": 0.3466218881875244,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.875,
+      "mean_reward": 1.0727611940298507,
+      "mean_length": 13.0,
+      "strength_margin": 0.32173570861350603,
+      "surviving_strength": 0.42508670375455987,
+      "loss_damage": 0.5982787426261293
+     },
+     {
+      "win_rate": 0.875,
+      "mean_reward": 1.1068840579710146,
+      "mean_length": 14.5,
+      "strength_margin": 0.345413679120019,
+      "surviving_strength": 0.41191304816614055,
+      "loss_damage": 0.8799180957971683
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3,
+      "mean_length": 8.0,
+      "strength_margin": 0.44531711071977265,
+      "surviving_strength": 0.44531711071977265,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.4506410256410258,
+      "mean_length": 15.125,
+      "strength_margin": 0.48848736808442594,
+      "surviving_strength": 0.48848736808442594,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3081140350877192,
+      "mean_length": 19.5,
+      "strength_margin": 0.37529036182139386,
+      "surviving_strength": 0.37529036182139386,
+      "loss_damage": null
+     }
+    ],
+    "win_rate": 0.9583333333333334,
+    "mean_reward": 1.2648978808692595,
+    "surviving_strength": 0.41545274678896954,
+    "loss_damage": 0.7390984192116488,
+    "strength_margin": 0.38714435275777365,
+    "mean_length": 14.5
+   },
+   "thunk_ladder": {
+    "per_matchup": [
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.7266666666666666,
+      "mean_length": 14.0,
+      "strength_margin": 0.9353729186941646,
+      "surviving_strength": 0.9353729186941646,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.486,
+      "mean_length": 15.75,
+      "strength_margin": 0.7693163527538379,
+      "surviving_strength": 0.7693163527538379,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2316666666666665,
+      "mean_length": 16.5,
+      "strength_margin": 0.3961454008103781,
+      "surviving_strength": 0.3961454008103781,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2266666666666666,
+      "mean_length": 16.0,
+      "strength_margin": 0.4643469103438589,
+      "surviving_strength": 0.4643469103438589,
+      "loss_damage": null
+     }
+    ],
+    "win_rate": 1.0,
+    "mean_reward": 1.4177499999999998,
+    "surviving_strength": 0.6412953956505598,
+    "loss_damage": NaN,
+    "strength_margin": 0.6412953956505598,
+    "mean_length": 15.5625
+   },
+   "real_maps": {
+    "per_matchup": [
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 4.5,
+      "strength_margin": -0.8014710294505917,
+      "surviving_strength": null,
+      "loss_damage": 0.1985289705494083
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 2.0,
+      "mean_length": 3.25,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.8316666666666666,
+      "mean_length": 3.25,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.9995953757225433,
+      "mean_length": 10.0,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 2.0,
+      "mean_length": 3.0,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.9592592592592593,
+      "mean_length": 5.75,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.8888888888888888,
+      "mean_length": 5.0,
+      "strength_margin": 0.862046158176189,
+      "surviving_strength": 0.862046158176189,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3115079365079365,
+      "mean_length": 3.875,
+      "strength_margin": 0.32738322885315685,
+      "surviving_strength": 0.32738322885315685,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 5.25,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 3.0,
+      "strength_margin": -0.9659083672527158,
+      "surviving_strength": null,
+      "loss_damage": 0.034091632747284245
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.6896135265700483,
+      "mean_length": 7.75,
+      "strength_margin": 0.6994493153132457,
+      "surviving_strength": 0.6994493153132457,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.777777777777778,
+      "mean_length": 7.5,
+      "strength_margin": 0.8138277788355724,
+      "surviving_strength": 0.8138277788355724,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 4.75,
+      "strength_margin": -0.8145175620446603,
+      "surviving_strength": null,
+      "loss_damage": 0.1854824379553397
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 2.0,
+      "mean_length": 3.0,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 2.25,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.8363636363636364,
+      "mean_length": 5.0,
+      "strength_margin": 0.7833498678872769,
+      "surviving_strength": 0.7833498678872769,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 1.0,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.3210565476190474,
+      "mean_length": 9.625,
+      "strength_margin": 0.2511417180674109,
+      "surviving_strength": 0.2511417180674109,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.8763333333333334,
+      "mean_length": 5.0,
+      "strength_margin": 0.8762256307339449,
+      "surviving_strength": 0.8762256307339449,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 4.0,
+      "strength_margin": -0.8513484453315836,
+      "surviving_strength": null,
+      "loss_damage": 0.14865155466841648
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.9933333333333332,
+      "mean_length": 3.0,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 3.5,
+      "strength_margin": -0.9991666721714627,
+      "surviving_strength": null,
+      "loss_damage": 0.0008333278285372336
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 5.75,
+      "strength_margin": -0.8300007566040093,
+      "surviving_strength": null,
+      "loss_damage": 0.16999924339599068
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 1.25,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     }
+    ],
+    "win_rate": 0.5833333333333334,
+    "mean_reward": 0.6452248450851029,
+    "surviving_strength": 0.8295302641333426,
+    "loss_damage": 0.07375871671449766,
+    "strength_margin": 0.0979587860421572,
+    "mean_length": 4.59375
+   },
+   "stress_commanders": {
+    "per_matchup": [
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.364423076923077,
+      "mean_length": 23.0,
+      "strength_margin": 0.6167535659133554,
+      "surviving_strength": 0.6167535659133554,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.9365384615384618,
+      "mean_length": 11.25,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.6384615384615384,
+      "mean_length": 13.25,
+      "strength_margin": 0.778583348554539,
+      "surviving_strength": 0.778583348554539,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.898076923076923,
+      "mean_length": 17.0,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     }
+    ],
+    "win_rate": 1.0,
+    "mean_reward": 1.709375,
+    "surviving_strength": 0.8488342286169737,
+    "loss_damage": NaN,
+    "strength_margin": 0.8488342286169737,
+    "mean_length": 16.125
+   },
+   "stress_hordes": {
+    "per_matchup": [
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 11.75,
+      "strength_margin": -0.6876666666666666,
+      "surviving_strength": null,
+      "loss_damage": 0.31233333333333335
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 11.5,
+      "strength_margin": -0.793625,
+      "surviving_strength": null,
+      "loss_damage": 0.20637499999999998
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 11.25,
+      "strength_margin": -0.8777499999999999,
+      "surviving_strength": null,
+      "loss_damage": 0.12225000000000003
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.358717105263158,
+      "mean_length": 12.25,
+      "strength_margin": 0.32922417563035217,
+      "surviving_strength": 0.32922417563035217,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 8.25,
+      "strength_margin": -0.6551,
+      "surviving_strength": null,
+      "loss_damage": 0.3449
+     }
+    ],
+    "win_rate": 0.2,
+    "mean_reward": -0.5282565789473684,
+    "surviving_strength": 0.32922417563035217,
+    "loss_damage": 0.24646458333333332,
+    "strength_margin": -0.536983498207263,
+    "mean_length": 11.0
+   },
+   "fresh_sampled": {
+    "per_matchup": [
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 7.5,
+      "strength_margin": -0.8836121792332678,
+      "surviving_strength": null,
+      "loss_damage": 0.11638782076673221
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2876050420168066,
+      "mean_length": 31.125,
+      "strength_margin": 0.7629056895855928,
+      "surviving_strength": 0.7629056895855928,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 30.25,
+      "strength_margin": -0.8361026198508668,
+      "surviving_strength": null,
+      "loss_damage": 0.16389738014913327
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.1666666666666665,
+      "mean_length": 18.125,
+      "strength_margin": 0.4226493576196706,
+      "surviving_strength": 0.4226493576196706,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 7.75,
+      "strength_margin": -0.7142806338729408,
+      "surviving_strength": null,
+      "loss_damage": 0.2857193661270591
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 15.5,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 10.5,
+      "strength_margin": -0.65625,
+      "surviving_strength": null,
+      "loss_damage": 0.34374999999999994
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 1.0,
+      "strength_margin": -0.9920929382649353,
+      "surviving_strength": null,
+      "loss_damage": 0.007907061735064724
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.8744462712774972,
+      "mean_length": 23.375,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.7786184210526317,
+      "mean_length": 18.25,
+      "strength_margin": 0.9559788726973573,
+      "surviving_strength": 0.9559788726973573,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 19.375,
+      "strength_margin": -0.6299118983019847,
+      "surviving_strength": null,
+      "loss_damage": 0.3700881016980153
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 9.0,
+      "strength_margin": -0.5460260845243066,
+      "surviving_strength": null,
+      "loss_damage": 0.45397391547569343
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.7854838709677419,
+      "mean_length": 12.375,
+      "strength_margin": 0.9658438354535728,
+      "surviving_strength": 0.9658438354535728,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.6264705882352941,
+      "mean_length": 10.0,
+      "strength_margin": 1.0,
+      "surviving_strength": 1.0,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.5454826732673266,
+      "mean_length": 10.75,
+      "strength_margin": 0.7640206614697647,
+      "surviving_strength": 0.7640206614697647,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.836842105263158,
+      "mean_length": 19.25,
+      "strength_margin": 0.9700990171399922,
+      "surviving_strength": 0.9700990171399922,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.2792929292929294,
+      "mean_length": 27.875,
+      "strength_margin": 0.3358254859042067,
+      "surviving_strength": 0.3358254859042067,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 7.25,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 4.75,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 1.0,
+      "mean_reward": 1.6771604938271605,
+      "mean_length": 17.0,
+      "strength_margin": 0.9347725119015959,
+      "surviving_strength": 0.9347725119015959,
+      "loss_damage": null
+     },
+     {
+      "win_rate": 0.875,
+      "mean_reward": 0.9333700440528634,
+      "mean_length": 32.625,
+      "strength_margin": 0.14027928392096806,
+      "surviving_strength": 0.2526381258422308,
+      "loss_damage": 0.35376739047212924
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 1.0,
+      "strength_margin": -0.9710807139380644,
+      "surviving_strength": null,
+      "loss_damage": 0.028919286061935612
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 5.0,
+      "strength_margin": -1.0,
+      "surviving_strength": null,
+      "loss_damage": 0.0
+     },
+     {
+      "win_rate": 0.0,
+      "mean_reward": -1.0,
+      "mean_length": 2.5,
+      "strength_margin": -0.9647000098426581,
+      "surviving_strength": null,
+      "loss_damage": 0.03529999015734192
+     }
+    ],
+    "win_rate": 0.453125,
+    "mean_reward": 0.15797662941333654,
+    "surviving_strength": 0.7604303234194529,
+    "loss_damage": 0.15426502233165038,
+    "strength_margin": -0.12257009842234597,
+    "mean_length": 14.255208333333334
+   }
+  }
+ },
+ "seconds": 3392.9
+}

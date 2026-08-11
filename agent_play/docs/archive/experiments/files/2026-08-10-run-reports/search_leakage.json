@@ -1,0 +1,392 @@
+{
+ "checkpoint": "band_soft_s0.pt",
+ "episodes": 8,
+ "battlefields": 4,
+ "simulations": 16,
+ "margin": "hit_points",
+ "combat_seed_offset": 987631,
+ "armies": [
+  "9:2,11:2,6:12,1:30",
+  "62:3,30:6,15:10",
+  "13:3,48:12,12:20",
+  "10:4,7:8",
+  "28:3,40:8,2:15",
+  "51:4,50:4,12:16"
+ ],
+ "sides": [
+  "attacker",
+  "defender"
+ ],
+ "summary": {
+  "shared": {
+   "n": 96,
+   "win_rate": 0.9270833333333334,
+   "mean_reward": 1.1584984657142865,
+   "win_quality": 0.3593145490138026,
+   "loss_quality": 0.4905615104988715,
+   "margin": 0.29596797328875557,
+   "decisions": 16.177083333333332
+  },
+  "terrain": {
+   "n": 96,
+   "win_rate": 0.6041666666666666,
+   "mean_reward": 0.4092208070631019,
+   "win_quality": 0.37025947315036606,
+   "loss_quality": 0.6495078744050024,
+   "margin": 0.08496196531365952,
+   "decisions": 15.604166666666666
+  },
+  "desynced": {
+   "n": 96,
+   "win_rate": 0.5729166666666666,
+   "mean_reward": 0.34887858512255515,
+   "win_quality": 0.36801691983331375,
+   "loss_quality": 0.5972061074752979,
+   "margin": 0.03881646872207787,
+   "decisions": 15.197916666666666
+  }
+ },
+ "paired_vs_shared": {
+  "terrain": {
+   "mean_delta": -0.3229166666666667,
+   "sem": 0.04732006722973101
+  },
+  "desynced": {
+   "mean_delta": -0.3541666666666667,
+   "sem": 0.05064296195879143
+  }
+ },
+ "cells": {
+  "shared": {
+   "attacker|9:2,11:2,6:12,1:30": {
+    "n": 8,
+    "win_rate": 0.875,
+    "mean_reward": 0.9703703703703703,
+    "win_quality": 0.2572115019276266,
+    "loss_quality": 0.715855763206733,
+    "margin": 0.18954203458751495,
+    "decisions": 18.375
+   },
+   "attacker|62:3,30:6,15:10": {
+    "n": 8,
+    "win_rate": 0.625,
+    "mean_reward": 0.4940298507462687,
+    "win_quality": 0.4507203704467638,
+    "loss_quality": 0.4223534851422522,
+    "margin": 0.06508278845757191,
+    "decisions": 13.5
+   },
+   "attacker|13:3,48:12,12:20": {
+    "n": 8,
+    "win_rate": 0.875,
+    "mean_reward": 1.1204710144927537,
+    "win_quality": 0.4314945819830721,
+    "loss_quality": 0.3915747690329434,
+    "margin": 0.301504605364306,
+    "decisions": 18.75
+   },
+   "attacker|10:4,7:8": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.2553977272727272,
+    "win_quality": 0.24530294975309286,
+    "loss_quality": NaN,
+    "margin": 0.24530294975309286,
+    "decisions": 10.25
+   },
+   "attacker|28:3,40:8,2:15": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.451602564102564,
+    "win_quality": 0.431423159251072,
+    "loss_quality": NaN,
+    "margin": 0.431423159251072,
+    "decisions": 21.0
+   },
+   "attacker|51:4,50:4,12:16": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.231907894736842,
+    "win_quality": 0.2910151354919952,
+    "loss_quality": NaN,
+    "margin": 0.2910151354919952,
+    "decisions": 20.25
+   },
+   "defender|9:2,11:2,6:12,1:30": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.350809882062395,
+    "win_quality": 0.3867309863233921,
+    "loss_quality": NaN,
+    "margin": 0.3867309863233921,
+    "decisions": 17.625
+   },
+   "defender|62:3,30:6,15:10": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.737686567164179,
+    "win_quality": 0.35556753021740023,
+    "loss_quality": 0.5297197929128337,
+    "margin": 0.1491055958912586,
+    "decisions": 15.25
+   },
+   "defender|13:3,48:12,12:20": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.3768115942028987,
+    "win_quality": 0.3875712818147512,
+    "loss_quality": NaN,
+    "margin": 0.3875712818147512,
+    "decisions": 13.375
+   },
+   "defender|10:4,7:8": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.2511363636363635,
+    "win_quality": 0.3234364789666133,
+    "loss_quality": NaN,
+    "margin": 0.3234364789666133,
+    "decisions": 9.125
+   },
+   "defender|28:3,40:8,2:15": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.3657051282051282,
+    "win_quality": 0.4056110658521612,
+    "loss_quality": NaN,
+    "margin": 0.4056110658521612,
+    "decisions": 15.75
+   },
+   "defender|51:4,50:4,12:16": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.2960526315789473,
+    "win_quality": 0.3752895977113375,
+    "loss_quality": NaN,
+    "margin": 0.3752895977113375,
+    "decisions": 20.875
+   }
+  },
+  "terrain": {
+   "attacker|9:2,11:2,6:12,1:30": {
+    "n": 8,
+    "win_rate": 0.375,
+    "mean_reward": -0.18055555555555555,
+    "win_quality": 0.2112850731507422,
+    "loss_quality": 0.68033795524664,
+    "margin": -0.12055687553932172,
+    "decisions": 17.125
+   },
+   "attacker|62:3,30:6,15:10": {
+    "n": 8,
+    "win_rate": 0.25,
+    "mean_reward": -0.43395522388059704,
+    "win_quality": 0.38949249205890846,
+    "loss_quality": 0.4417485699159826,
+    "margin": -0.32131544954828595,
+    "decisions": 11.375
+   },
+   "attacker|13:3,48:12,12:20": {
+    "n": 8,
+    "win_rate": 0.375,
+    "mean_reward": -0.06612318840579712,
+    "win_quality": 0.5200614048574131,
+    "loss_quality": 0.6735572420926105,
+    "margin": -0.009003696870588551,
+    "decisions": 16.625
+   },
+   "attacker|10:4,7:8": {
+    "n": 8,
+    "win_rate": 0.625,
+    "mean_reward": 0.4883522727272727,
+    "win_quality": 0.3574876704656031,
+    "loss_quality": 0.6666666666666666,
+    "margin": 0.09842979404100194,
+    "decisions": 9.25
+   },
+   "attacker|28:3,40:8,2:15": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.7990384615384616,
+    "win_quality": 0.4171321595055077,
+    "loss_quality": 0.685093802739969,
+    "margin": 0.23412257031412304,
+    "decisions": 20.625
+   },
+   "attacker|51:4,50:4,12:16": {
+    "n": 8,
+    "win_rate": 0.5,
+    "mean_reward": 0.13103070175438591,
+    "win_quality": 0.3118501243971172,
+    "loss_quality": 0.814379328683469,
+    "margin": 0.06311472654029307,
+    "decisions": 19.75
+   },
+   "defender|9:2,11:2,6:12,1:30": {
+    "n": 8,
+    "win_rate": 1.0,
+    "mean_reward": 1.2844040502448908,
+    "win_quality": 0.3187570555102427,
+    "loss_quality": NaN,
+    "margin": 0.3187570555102427,
+    "decisions": 18.25
+   },
+   "defender|62:3,30:6,15:10": {
+    "n": 8,
+    "win_rate": 0.5,
+    "mean_reward": 0.10522388059701493,
+    "win_quality": 0.22603749845303414,
+    "loss_quality": 0.4860573253991171,
+    "margin": -0.14395258807392436,
+    "decisions": 14.0
+   },
+   "defender|13:3,48:12,12:20": {
+    "n": 8,
+    "win_rate": 0.875,
+    "mean_reward": 1.1721014492753623,
+    "win_quality": 0.4906904352583417,
+    "loss_quality": 0.7602205543209359,
+    "margin": 0.399381700141166,
+    "decisions": 14.25
+   },
+   "defender|10:4,7:8": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.7545454545454546,
+    "win_quality": 0.43438092842145565,
+    "loss_quality": 0.9562528974603611,
+    "margin": 0.314848920681182,
+    "decisions": 9.0
+   },
+   "defender|28:3,40:8,2:15": {
+    "n": 8,
+    "win_rate": 0.5,
+    "mean_reward": 0.1663461538461538,
+    "win_quality": 0.37710113702412934,
+    "loss_quality": 0.6495626740491924,
+    "margin": 0.013331905536660929,
+    "decisions": 15.375
+   },
+   "defender|51:4,50:4,12:16": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.6902412280701755,
+    "win_quality": 0.32677726905028254,
+    "loss_quality": 0.7092102769746133,
+    "margin": 0.1723855210313652,
+    "decisions": 21.625
+   }
+  },
+  "desynced": {
+   "attacker|9:2,11:2,6:12,1:30": {
+    "n": 8,
+    "win_rate": 0.375,
+    "mean_reward": -0.17569444444444443,
+    "win_quality": 0.23230285943946005,
+    "loss_quality": 0.6236890788089411,
+    "margin": -0.14808075345461424,
+    "decisions": 16.375
+   },
+   "attacker|62:3,30:6,15:10": {
+    "n": 8,
+    "win_rate": 0.25,
+    "mean_reward": -0.4298507462686567,
+    "win_quality": 0.39861314508477375,
+    "loss_quality": 0.429626373361935,
+    "margin": -0.32812693370735535,
+    "decisions": 9.375
+   },
+   "attacker|13:3,48:12,12:20": {
+    "n": 8,
+    "win_rate": 0.5,
+    "mean_reward": 0.14764492753623193,
+    "win_quality": 0.31084287251736625,
+    "loss_quality": 0.6328619648622583,
+    "margin": -0.0281475813101877,
+    "decisions": 18.5
+   },
+   "attacker|10:4,7:8": {
+    "n": 8,
+    "win_rate": 0.875,
+    "mean_reward": 1.0633522727272726,
+    "win_quality": 0.41338856675420926,
+    "loss_quality": 0.5437463114241818,
+    "margin": 0.30468328483795587,
+    "decisions": 8.75
+   },
+   "attacker|28:3,40:8,2:15": {
+    "n": 8,
+    "win_rate": 0.875,
+    "mean_reward": 1.1096153846153847,
+    "win_quality": 0.3468101999704548,
+    "loss_quality": 0.6692265854962314,
+    "margin": 0.26211224816117684,
+    "decisions": 22.625
+   },
+   "attacker|51:4,50:4,12:16": {
+    "n": 8,
+    "win_rate": 0.625,
+    "mean_reward": 0.45504385964912275,
+    "win_quality": 0.3526374022703238,
+    "loss_quality": 0.7133507346663488,
+    "margin": 0.11290490191883318,
+    "decisions": 19.125
+   },
+   "defender|9:2,11:2,6:12,1:30": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.7524913599882902,
+    "win_quality": 0.3392141565303734,
+    "loss_quality": 0.8401686821045664,
+    "margin": 0.21445278792392167,
+    "decisions": 18.75
+   },
+   "defender|62:3,30:6,15:10": {
+    "n": 8,
+    "win_rate": 0.25,
+    "mean_reward": -0.3977611940298508,
+    "win_quality": 0.4235489460005775,
+    "loss_quality": 0.5770457764393658,
+    "margin": -0.21132843117033123,
+    "decisions": 12.5
+   },
+   "defender|13:3,48:12,12:20": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.8460144927536233,
+    "win_quality": 0.45110789644103416,
+    "loss_quality": 0.7714963590367171,
+    "margin": 0.28120501208995485,
+    "decisions": 14.375
+   },
+   "defender|10:4,7:8": {
+    "n": 8,
+    "win_rate": 0.75,
+    "mean_reward": 0.7786931818181818,
+    "win_quality": 0.3666574897273658,
+    "loss_quality": 0.6562674539847695,
+    "margin": 0.1890599807917167,
+    "decisions": 8.625
+   },
+   "defender|28:3,40:8,2:15": {
+    "n": 8,
+    "win_rate": 0.25,
+    "mean_reward": -0.4016025641025641,
+    "win_quality": 0.3979024227414163,
+    "loss_quality": 0.6034588471650649,
+    "margin": -0.1979302589408472,
+    "decisions": 16.375
+   },
+   "defender|51:4,50:4,12:16": {
+    "n": 8,
+    "win_rate": 0.625,
+    "mean_reward": 0.4385964912280702,
+    "win_quality": 0.3668131720347945,
+    "loss_quality": 0.42862702667457264,
+    "margin": 0.01499336752471131,
+    "decisions": 17.0
+   }
+  }
+ },
+ "seconds": 1387.3
+}

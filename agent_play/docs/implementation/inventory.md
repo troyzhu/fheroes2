@@ -65,9 +65,9 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | Path | Purpose | Spec § | Tested by |
 |---|---|---|---|
 | `src/fheroes2/battle/battle_seed.{h,cpp}` | One combat-seed implementation for engine + agent; trajectory-compatibility contract | §7.3 | `test_battle_seed` (14 checks, 4 golden values); digest invariance |
-| `src/fheroes2/agent/agent_scenario.{h,cpp}` | C++ scenario struct, §11.1-subset validation, optional per-side commanders, 5-fixture M1 suite | §11 | `test_agent_scenario` (15 checks) |
+| `src/fheroes2/agent/agent_scenario.{h,cpp}` | C++ scenario struct, §11.1-subset validation, optional per-side commanders, 5-fixture M1 suite; since 2026-08-10 an `allowFlyingUnits` flag opening the `flying_v1` profile beside `wide_v1`, off by default and admitting the six creatures excluded for flight alone, and a `combatSeedOffset` defaulting to zero, which perturbs only the battle's random stream and leaves the map, obstacles and armies untouched, so a search side environment can sit on the live battlefield without inheriting the live dice | §11 | `test_agent_scenario` (15 checks), golden digests unchanged at the default |
 | `src/fheroes2/agent/agent_digest.{h,cpp}` | `DigestWriter` (LE fixed-width, length-prefixed) + self-contained SHA-256 | §12.5 | `test_agent_digest` (11 checks incl. FIPS vectors, 1M-byte input) |
-| `src/fheroes2/agent/agent_battle_runner.{h,cpp}` | Headless AI-vs-AI episode lifecycle; terminal state read pre-destruction; canonical digest `agent_terminal_v1`; per-side strength summaries at base creature stats and, since 2026-08-09, additionally at each stack's effective attack and defense so the commander is priced | §7.2, §8 | `verify_m1.sh` ten-run + cross-process checks |
+| `src/fheroes2/agent/agent_battle_runner.{h,cpp}` | Headless AI-vs-AI episode lifecycle; terminal state read pre-destruction; canonical digest `agent_terminal_v1`; per-side strength summaries at base creature stats and, since 2026-08-09, additionally at each stack's effective attack and defense so the commander is priced; since 2026-08-10 the computed combat seed takes the scenario's `combatSeedOffset`, zero by default | §7.2, §8 | `verify_m1.sh` ten-run + cross-process checks |
 | `src/agent_worker/main.cpp` + `build_worker.sh` | `fheroes2_agent_worker` CLI (`--runs/--fixture/--list/--quiet`); JSONL protocol replaces it at M4 | §6.1 | `verify_m1.sh` |
 | `agent_play/tests/` + `build_and_run_tests.sh` | 36 assert-based checks, relink strategy, sanitizer-aware | §18.2 | self |
 | `agent_play/verify_m1.sh` | M1 gate: unit tests + worker build + ten-run determinism + cross-process byte-identity | §20-M1 | self |
@@ -90,6 +90,8 @@ Everything else on the branch is docs, scripts under `agent_play/`, or tests.
 | `python/fheroes2_agent/{encoding,dataset,policy}.py` | 634-wide observation encoding, episode-split loader with discounted returns, 396,570-parameter masked policy | ADR 0001, 0002 | `test_encoding.py` (32), `test_policy.py` (11) |
 | `python/fheroes2_agent/train_{bc,critic,ppo,rloo,group}.py` | Stage 1 cloning, stage 2b critic pre-fitting, stage 3 PPO, and the group-relative trainer covering leave-one-out, GRPO and Dr. GRPO under either trust region. PPO carries the ratio clip and DPPO's divergence gates (`trust_region`, `divergence_kind`, `gate_fraction`), the anchored KL leash of ADR 0007 (`anchor_kl_coef`, `kl_to_anchor`), the head-only value warmup, the normalized-entropy floor, and per-iteration heartbeats with per-term per-module gradient norms, win and loss reward decompositions and termination counts | ADR 0005, 0007 | `verify_agent.sh` |
 | `python/fheroes2_agent/selfplay.py` | `OpponentPool` drawing a frozen checkpoint or the built-in AI per episode, and `SelfPlayEnv` answering the opponent's decisions internally so any trainer sees the ordinary reset and step contract; rewards re-perspectived to the learner's chair, and `learner_side="alternate"` drawing the chair per episode | ADR 0005, 0007 | `verify_agent.sh`, chair alternation smoke-tested against a pairing where one chair never acts |
+| `python/fheroes2_agent/search.py` | Root search over the real engine, one ply of branching with playouts to termination: `priors`, `rollout` by reset-continuation, `search_action_detail` scoring candidates by PUCT, and `sync_side_environment` pinning the side environment to the live battlefield. Lifted out of `search_probe.py` 2026-08-10, which still re-exports every name | ADR 0005 | `verify_agent.sh`, suites verified matchup-identical across the move |
+| `python/fheroes2_agent/suites.py` | The evaluation suites and the chair each is played from, one definition shared by the battery, the search harnesses and the built-in AI baseline. Lifted out of `validation_battery.py` 2026-08-10, which still re-exports every name | ADR 0005 | matchup-by-matchup equality against the pre-move lists |
 | `python/fheroes2_agent/{objectives,env,scenarios,render,watch}.py` | Advantage estimators and trust regions, the Gym-shaped environment and matchup pool, calibrated scenario generation, and a battle viewer | ADR 0005 | `test_objectives.py` (28), `test_ppo.py` (27) |
 | `agent_play/verify_agent.sh` | Training gate: 11 checks, unit tests, recording, sample consistency, cloning against trivial baselines, critic fit with the policy frozen, external control, PPO closing the loop, encoding stamp | ADR 0005 | self |
 | `agent_play/experiments/` | Measurements too slow for a gate: generalization on a calibrated pool, critic pre-fitting, the advantage floor | — | results in [[../archive/experiments/2026-08-03-training-runs]] |
@@ -135,6 +137,12 @@ Milestones 4 and 5 were partly overtaken. Blocking external control, the observa
 <!-- verify
 # Invalidators for the trainer-library rows above; the engine ledger has its own checks in lint_docs.
 exists  python/fheroes2_agent/selfplay.py
+exists  python/fheroes2_agent/search.py
+grep    src/fheroes2/agent/agent_scenario.h :: allowFlyingUnits
+grep    src/fheroes2/agent/agent_capabilities.h :: flyingV1Supported
+exists  python/fheroes2_agent/suites.py
+grep    python/fheroes2_agent/search.py :: def sync_side_environment
+grep    python/fheroes2_agent/suites.py :: def build_suites
 grep    python/fheroes2_agent/train_ppo.py :: anchor_kl_coef
 grep    python/fheroes2_agent/train_ppo.py :: trust_region
 grep    python/fheroes2_agent/train_ppo.py :: terminations
