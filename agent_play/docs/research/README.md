@@ -28,6 +28,7 @@ For what each codebase actually contains and where to look inside it, read [[pri
 | [[works/pysc2]] | project | 2017 | primary | The shipped observer for SC2LE: independently toggleable observation modalities behind one API | ADR 0001, ADR 0004 |
 | [[works/alphastar-unplugged]] | paper | 2023 | primary | One-step improvement against the behavior value is the recipe that works offline at scale; MCTS at training time collapses, at inference improves | training program after the 2026-08-05 review |
 | [[works/uct]] | paper | 2006 | primary | The UCB variant of Monte-Carlo planning: bandit selection per node, rollout values, anytime convergence | search probe |
+| [[works/gumbel-alphazero]] | paper | 2022 | primary | The root is a simple-regret problem, so PUCB is the wrong bandit there; Sequential Halving replaces it, and visit counts are replaced as the policy target by completed Q-values, which assign unvisited actions the policy's own value | reframes coverage forcing and the soft-target null |
 | [[works/alphazero]] | paper | 2017 | primary | PUCT search as the improvement operator, distilled back each iteration with a re-grounded value | search-as-teacher design |
 | [[works/one-step-offline-rl]] | paper | 2021 | primary | One improvement step against the behavior value beats iterating, because iteration queries the value off-data | improvement-step discipline |
 | [[works/bcq-extrapolation]] | paper | 2019 | primary | Extrapolation error: value estimates queried off-data, then maximized into | the critic calibration result |

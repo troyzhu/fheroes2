@@ -85,7 +85,7 @@ class Step:
 #: choices from here so a margin added to the environment is offerable everywhere without a sweep
 #: through the experiment directory, and so no script can advertise one the environment rejects.
 REWARD_MARGINS = ("hit_points", "strength", "two_sided", "two_sided_commanded",
-                  "balanced", "balanced_commanded")
+                  "balanced", "balanced_commanded", "contested", "contested_commanded")
 
 
 class BattleEnv:
@@ -259,6 +259,10 @@ class BattleEnv:
             reward = terminal_reward_balanced(record, self.side)
         elif self._reward_margin == "balanced_commanded":
             reward = terminal_reward_balanced(record, self.side, commanded=True)
+        elif self._reward_margin == "contested":
+            reward = terminal_reward_contested(record, self.side)
+        elif self._reward_margin == "contested_commanded":
+            reward = terminal_reward_contested(record, self.side, commanded=True)
         else:
             reward = terminal_reward(record, self.side, self._own_initial_hp)
         if self._reward_weighting == "difficulty":
@@ -363,10 +367,63 @@ def reward_from_record(record: dict, side: str, margin: str) -> float:
         return terminal_reward_balanced(record, side, commanded=margin.endswith("_commanded"))
     if margin in ("two_sided", "two_sided_commanded"):
         return terminal_reward_two_sided(record, side, commanded=margin.endswith("_commanded"))
+    if margin in ("contested", "contested_commanded"):
+        return terminal_reward_contested(record, side, commanded=margin.endswith("_commanded"))
     if margin == "strength":
         return terminal_reward_strength(record, side)
     raise ValueError(f"reward margin {margin!r} has no record-only form; "
                      f"hit_points needs the episode's starting hit points")
+
+
+def terminal_reward_contested(record: dict, side: str, commanded: bool = False) -> float:
+    """Two-sided on a decided battle; a stalemate is graded rather than won, so evading stops paying.
+
+    The defect this answers, raised by the owner on 2026-08-10 and priced on 2026-08-11. A stalemate
+    flips a discrete win bit and the survival term stacks on top of it, so a side that never engages
+    banks $1.0 + 1.0 = 2.0$, the maximum the reward can return, against $-1.0$ for fighting and
+    losing. Evasion therefore weakly dominates fighting everywhere and strictly dominates it in any
+    fight that costs a casualty, which is nearly all of them. It is not an artifact of flight: walking
+    Rogues reach it too, at $+2.958$, and flying only makes it reachable more often.
+
+    The owner's first proposal was to break the tie on retained strength, so whoever dealt more damage
+    wins the stall. That relocates the cliff rather than removing it. A comparison of two fractions is
+    settled by an epsilon: a side that lands one hit and takes none retains 1.000 against 0.999 and
+    wins outright, so the strategy stays "engage once, then evade" and the magnitude of the damage
+    never matters. Any rule that ends in a discrete win bit inherits this.
+
+    So the win bit is dropped at a stalemate and the outcome is scored continuously, by the damage
+    differential, then placed inside the losing band:
+
+    $$r_{\\text{stall}} = -1 + \\tfrac{1}{2}\\bigl(1 + k_{\\text{own}} - k_{\\text{foe}}\\bigr) \\in [-1, 0]$$
+
+    A standoff where nobody lands a blow reads $-0.5$ instead of $+2.0$. One peasant killed moves it
+    to about $-0.495$ rather than converting it to a win. Every stalemate stays below every decided
+    win, which begins at $+1.0$, so engaging a winnable fight strictly dominates stalling it.
+
+    The band matters for the attacker as much as the defender, which the naive continuous form gets
+    wrong. Scoring a stalemate at the bare differential would hand a stalling attacker roughly $0.0$
+    against $-1.0 + \\text{destroyed}$ for fighting and losing, so it would fix the defender's
+    exploit by handing the same one to the attacker. Anchoring the band at $-1$ keeps a stall
+    comparable to a loss for whichever chair takes it, which is the property the owner asked for:
+    what matters is the side the learner occupies, not attacker against defender.
+
+    Evasion is still preferred to being routed, $-0.5$ against $-1.0$, and that is deliberate. A
+    hopeless fight is one the engine's own AI would also decline, so the reward should rank
+    withdrawal above annihilation. What it must not do is rank it above winning, and it no longer
+    does.
+    """
+    if record["termination"] != "stalemate":
+        return terminal_reward_two_sided(record, side, commanded=commanded)
+    own = record["attacker" if side == "attacker" else "defender"]
+    foe = record["defender" if side == "attacker" else "attacker"]
+    now, start = ("strength_commanded", "initial_strength_commanded") if commanded \
+        else ("strength", "initial_strength")
+
+    def kept(rec: dict) -> float:
+        initial = float(rec.get(start, rec.get("initial_strength", 0.0)))
+        return float(rec.get(now, rec.get("strength", 0.0))) / initial if initial > 0 else 0.0
+
+    return -1.0 + 0.5 * (1.0 + kept(own) - kept(foe))
 
 
 def terminal_reward_balanced(record: dict, side: str, commanded: bool = False) -> float:

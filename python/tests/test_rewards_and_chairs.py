@@ -147,6 +147,27 @@ try:
 except ValueError:
     check("reward_from_record refuses a margin it cannot compute", True)
 
+# The stall correction (2026-08-11). Under two_sided a side that never engages banks the maximum
+# the reward can return; under contested every stalemate falls inside the losing band, so engaging
+# a winnable fight strictly dominates stalling it, for whichever chair the learner occupies.
+_stall = lambda a, d: {"termination": "stalemate",
+                       "attacker": {"strength": a, "initial_strength": 100.0, "hit_points": a},
+                       "defender": {"strength": d, "initial_strength": 100.0, "hit_points": d}}
+check("two_sided pays a pure stall the maximum, which is the defect",
+      reward_from_record(_stall(100, 100), "defender", "two_sided") == 2.0)
+check("contested puts a pure stall at the middle of the losing band",
+      reward_from_record(_stall(100, 100), "defender", "contested") == -0.5)
+check("contested prices a stall the same for either chair",
+      reward_from_record(_stall(100, 100), "defender", "contested")
+      == reward_from_record(_stall(100, 100), "attacker", "contested"))
+check("contested lets a one percent chip move a stall, without converting it to a win",
+      -0.5 < reward_from_record(_stall(99, 100), "defender", "contested") < 0.0)
+check("every contested stalemate stays below every decided win",
+      max(reward_from_record(_stall(x, 100), "defender", "contested") for x in (0, 50, 99, 100)) < 1.0)
+check("contested leaves decided battles identical to two_sided",
+      all(reward_from_record(r, c, "contested") == reward_from_record(r, c, "two_sided")
+          for r in (clean, led) for c in ("attacker", "defender")))
+
 failed = [name for name, ok in CHECKS if not ok]
 for name, ok in CHECKS:
     print(f"  {'PASS' if ok else 'FAIL'}  {name}")

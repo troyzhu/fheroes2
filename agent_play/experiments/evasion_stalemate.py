@@ -31,7 +31,7 @@ import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 
-from fheroes2_agent.env import BattleEnv, terminal_reward_strength  # noqa: E402
+from fheroes2_agent.env import REWARD_MARGINS, BattleEnv, reward_from_record, terminal_reward_strength  # noqa: E402
 
 BOARD_WIDTH = 11
 
@@ -65,6 +65,9 @@ def main() -> None:
     parser.add_argument("--allow-flying", action="store_true",
                         help="flying_v1, opened 2026-08-10. The flying version of this exploit could "
                              "not be fielded before it, which the docstring records as its own finding")
+    parser.add_argument("--margins", nargs="+", default=["hit_points"],
+                        help="price the demonstrated stall under each of these, so a proposed "
+                             "correction is read against the one it replaces on the same episodes")
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
@@ -88,6 +91,13 @@ def main() -> None:
                         "decisions": decisions,
                         "defender_reward": terminal_reward_strength(record, "defender"),
                         "attacker_reward": terminal_reward_strength(record, "attacker"),
+                        # Priced under every requested margin on the identical episode, which is
+                        # what lets a proposed correction be read against the one it replaces
+                        # without rerunning the battle.
+                        "by_margin": {m: {c: reward_from_record(record, c, m)
+                                          for c in ("attacker", "defender")}
+                                      for m in args.margins if m in REWARD_MARGINS
+                                      and m not in ("hit_points",)},
                         "defender_survival": record["defender"]["strength"] / max(record["defender"]["initial_strength"], 1e-9),
                     })
                     break
@@ -99,6 +109,9 @@ def main() -> None:
         print(f"episode {index}: {episode['termination']} after {episode['rounds']} rounds, "
               f"{episode['decisions']} evasive decisions, defender survival {episode['defender_survival']:.2f}, "
               f"rewards defender {episode['defender_reward']:+.2f} / attacker {episode['attacker_reward']:+.2f}", flush=True)
+        for margin, cells in episode.get("by_margin", {}).items():
+            print(f"        under {margin:22s} defender {cells['defender']:+.3f} / "
+                  f"attacker {cells['attacker']:+.3f}", flush=True)
     terminations = {e["termination"] for e in episodes}
     print(f"\nall episodes terminated ({', '.join(sorted(terminations))}); none looped. total {round(time.time() - started)}s")
 
