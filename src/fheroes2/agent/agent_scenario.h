@@ -80,6 +80,15 @@ namespace fheroes2::agent
         // Fixed by the battle profile; anything except 1 is rejected (agent spec, section 7.5).
         int32_t tileIndex{ 1 };
         uint32_t worldSeed{ 0 };
+        // Added 2026-08-10 to make one ablation expressible and nothing else. The battle's random
+        // stream is seeded from computeBattleSeed( tileIndex, mapSeed, armies ), all of which the
+        // world seed fixes, so a search side environment pinned to the live world seed inherits the
+        // live battle's exact combat rolls. That is indistinguishable from a perfect model unless
+        // the two can be separated, and separating them is the only way to tell whether root search
+        // is planning or reading the future. Nonzero perturbs the combat stream while leaving the
+        // map, the obstacle layout and the armies identical. Zero is the shipped behaviour and every
+        // existing transcript and digest is bit-identical under it.
+        uint32_t combatSeedOffset{ 0 };
         int32_t maxRounds{ 100 };
         // ADR 0004's planes_v1 obstacle layer on every serialized observation, off by default
         // so all existing transcripts and digests stay byte-identical.
@@ -91,6 +100,8 @@ namespace fheroes2::agent
         // Admits wide (two-cell) walkers on either side, the wide_v1 profile. Off by default,
         // which keeps every existing scenario and its golden digests bit-identical.
         bool allowWideUnits{ false };
+        // flying_v1, off by default so every existing scenario and its golden digests are unchanged.
+        bool allowFlyingUnits{ false };
     };
 
     // Returns an empty string when the scenario is valid, otherwise a human-readable reason for

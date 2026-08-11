@@ -61,7 +61,7 @@ fheroes2::agent::MonsterCapability fheroes2::agent::auditMonster( const int mons
         record.reason = "wide (two-cell) unit - deferred to Phase 1b";
     }
     else if ( record.isFlying ) {
-        record.reason = "flying movement - deferred to Phase 1b";
+        record.reason = "flying movement - needs the flying_v1 profile";
     }
     else if ( record.hasTwoCellMeleeAttack ) {
         record.reason = "two-cell melee attack changes targeting semantics";
@@ -78,6 +78,10 @@ fheroes2::agent::MonsterCapability fheroes2::agent::auditMonster( const int mons
     }
 
     record.wideV1Supported = record.isValid && !record.isFlying && !record.hasTwoCellMeleeAttack && !record.hasAllAdjacentMeleeAttack && !record.hasAreaShot;
+    // simple_v1's criteria with the flight exclusion lifted and nothing else: still no wide
+    // bodies and no attack shape that changes targeting semantics. A creature that is both
+    // wide and flying is admitted by neither profile and waits for a combined one.
+    record.flyingV1Supported = record.isValid && !record.isWide && !record.hasTwoCellMeleeAttack && !record.hasAllAdjacentMeleeAttack && !record.hasAreaShot;
 
     return record;
 }
@@ -306,6 +310,7 @@ bool fheroes2::agent::writeCapabilityAudit( const std::string & filePath )
             << ", \"has_area_or_multi_target_attack\": " << boolText( r.hasAllAdjacentMeleeAttack || r.hasAreaShot ) //
             << ", \"simple_v1_supported\": " << boolText( r.simpleV1Supported ) //
             << ", \"wide_v1_supported\": " << boolText( r.wideV1Supported ) //
+            << ", \"flying_v1_supported\": " << boolText( r.flyingV1Supported ) //
             << ", \"hit_points\": " << r.hitPoints //
             << ", \"attack\": " << r.attack //
             << ", \"defense\": " << r.defense //

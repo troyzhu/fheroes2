@@ -125,6 +125,8 @@ int main( int argc, char ** argv )
     std::string defenderHeroSpec;
     // Admits wide (two-cell) walkers, the wide_v1 profile. Off by default.
     bool allowWideUnits = false;
+    // flying_v1, off by default so existing scenarios and golden digests are untouched.
+    bool allowFlyingUnits = false;
     // Dump a map's starting heroes and neutral stacks, so a real scenario can be reproduced as a
     // fixture instead of guessed at. Uses the engine's own loader, because monster counts are
     // computed during load rather than stored verbatim.
@@ -135,6 +137,11 @@ int main( int argc, char ** argv )
     // are playing: a search side-environment replays the live environment's battlefield only if
     // both start their cycle at the same offset.
     int seedOffset = 0;
+    // Perturbs only the battle's random stream, leaving the map and the obstacle layout alone.
+    // Exists so a search side environment can be put on the live battlefield without also
+    // inheriting the live battle's exact combat rolls, which is the one ablation that separates
+    // planning from reading the future.
+    uint32_t combatSeedOffset = 0;
     std::string onlyFixture;
     std::string trajectoryDir;
     std::string capabilityAuditPath;
@@ -163,6 +170,9 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--seed-offset" ) == 0 ) {
             seedOffset = std::atoi( next( "--seed-offset" ) );
         }
+        else if ( std::strcmp( argv[i], "--combat-seed-offset" ) == 0 ) {
+            combatSeedOffset = static_cast<uint32_t>( std::atoll( next( "--combat-seed-offset" ) ) );
+        }
         else if ( std::strcmp( argv[i], "--protocol" ) == 0 ) {
             protocolMode = true;
         }
@@ -189,7 +199,10 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--defender-hero" ) == 0 ) {
             defenderHeroSpec = next( "--defender-hero" );
         }
-        else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
+        else if ( std::strcmp( argv[i], "--allow-flying" ) == 0 ) {
+            allowFlyingUnits = true;
+        }
+                else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
             allowWideUnits = true;
         }
         else if ( std::strcmp( argv[i], "--dump-map" ) == 0 ) {
@@ -218,7 +231,7 @@ int main( int argc, char ** argv )
         }
         else {
             std::fprintf( stderr,
-                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--probe-teacher] [--planes] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--fixture ID] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
+                          "usage: fheroes2_agent_worker [--runs N] [--seeds N] [--protocol] [--probe-teacher] [--planes] [--side attacker|defender|both]\n       [--attacker id:count,...] [--defender id:count,...]\n       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--allow-flying] [--fixture ID] [--seed-offset N] [--combat-seed-offset N] [--trajectory-dir DIR] [--audit-coverage] [--capability-audit PATH] [--list] "
                           "[--quiet]\n"
                           "unknown argument: %s\n",
                           argv[i] );
@@ -340,6 +353,8 @@ int main( int argc, char ** argv )
                 return 2;
             }
             variant.allowWideUnits = allowWideUnits;
+            variant.allowFlyingUnits = allowFlyingUnits;
+            variant.combatSeedOffset = combatSeedOffset;
             const int seedIndex = seedOffset + s;
             if ( seedIndex > 0 ) {
                 variant.worldSeed = scenario.worldSeed + static_cast<uint32_t>( seedIndex );

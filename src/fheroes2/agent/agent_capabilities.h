@@ -55,6 +55,11 @@ namespace fheroes2::agent
         // case, and the enumeration risk this opens, melee from a wide attacker, is adjudicated
         // by teacher coverage rather than assumed either way.
         bool wideV1Supported{ false };
+        // flying_v1, opened 2026-08-10. The action space was already generic over flight: moves come
+        // from the arena's own pathfinder and every candidate is re-checked by the engine's move
+        // validator, both of which handle fliers natively. What kept flying creatures out was this
+        // roster gate alone, exactly as it kept two-cell walkers out before wide_v1.
+        bool flyingV1Supported{ false };
         // Engine hit points per creature, so a sampler can size stacks of different creatures to
         // comparable strength without a hand-maintained table, which is the defect class the
         // audit exists to prevent.

@@ -10,7 +10,8 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from fheroes2_agent.env import terminal_reward_two_sided, _side_won
+from fheroes2_agent.env import (reward_from_record, terminal_reward_balanced,
+                                terminal_reward_two_sided, _side_won)
 from fheroes2_agent.train_ppo import win_rate
 
 CHECKS = []
@@ -89,6 +90,62 @@ check("commanded loss prices the enemy's commanded remainder",
 check("a record without commanded fields falls back to the base pricing",
       terminal_reward_two_sided(record("victory", 50.0, 100.0, 0.0, 100.0), "attacker", commanded=True)
       == terminal_reward_two_sided(record("victory", 50.0, 100.0, 0.0, 100.0), "attacker"))
+
+# The balanced margin, added 2026-08-09. Its whole claim is that it equals the two-sided form with
+# the flat win bonus removed, so the checks pin that identity, the zero-sum property the identity
+# buys, and the stalemate case where the two deliberately part company.
+check("balanced clean win is the fraction kept",
+      abs(terminal_reward_balanced(clean, "attacker") - 1.0) < 1e-9)
+check("balanced pyrrhic win is 0.1", abs(terminal_reward_balanced(pyrrhic, "attacker") - 0.1) < 1e-9)
+for name, r in (("clean", clean), ("pyrrhic", pyrrhic),
+                ("rout", record("defeat", 0.0, 100.0, 45.0, 50.0)),
+                ("near-win loss", record("defeat", 0.0, 100.0, 2.0, 50.0))):
+    for side in ("attacker", "defender"):
+        two = terminal_reward_two_sided(r, side)
+        check(f"balanced equals two-sided minus the win bonus, {name} as {side}",
+              abs(terminal_reward_balanced(r, side) - (two - (1.0 if _side_won(r, side) else 0.0))) < 1e-9)
+    check(f"balanced is zero sum on a decided battle, {name}",
+          abs(terminal_reward_balanced(r, "attacker") + terminal_reward_balanced(r, "defender")) < 1e-9)
+check("balanced still ranks every win above every loss on decided battles",
+      min(terminal_reward_balanced(r, "attacker") for r in (clean, pyrrhic))
+      > max(terminal_reward_balanced(record("defeat", 0.0, 100.0, f, 50.0), "attacker") for f in (1.0, 45.0)))
+
+# The two unfinished terminations are where a bare margin would read the outcome off material and
+# get it wrong, so these pin that the branch is decided by `_side_won` first. Both fixtures put the
+# attacker well ahead on strength, which is precisely when the exploit would pay.
+stalled_ahead = record("stalemate", 70.0, 100.0, 6.0, 50.0)
+check("balanced stalemate still costs the attacker a flat -1",
+      abs(terminal_reward_balanced(stalled_ahead, "attacker") + 1.0) < 1e-9)
+check("balanced stalemate pays the outlasting defender its own strength kept",
+      abs(terminal_reward_balanced(stalled_ahead, "defender") - 0.12) < 1e-9)
+truncated = record("round_limit", 70.0, 100.0, 6.0, 50.0)
+for side in ("attacker", "defender"):
+    check(f"balanced scores a round-limit truncation a loss for the {side}, as _side_won does",
+          terminal_reward_balanced(truncated, side) < 0.0)
+check("balanced never lets the material leader profit from a truncation",
+      terminal_reward_balanced(truncated, "attacker") < 0.0
+      and terminal_reward_two_sided(truncated, "attacker") < 0.0)
+# The identity has to survive the unfinished terminations too, not only the decided ones.
+for name, r in (("stalemate", stalled_ahead), ("round limit", truncated)):
+    for side in ("attacker", "defender"):
+        two = terminal_reward_two_sided(r, side)
+        check(f"balanced equals two-sided minus the win bonus, {name} as {side}",
+              abs(terminal_reward_balanced(r, side) - (two - (1.0 if _side_won(r, side) else 0.0))) < 1e-9)
+check("balanced commanded pricing reads the commanded fields",
+      abs(terminal_reward_balanced(led, "attacker", commanded=True) - 0.5) < 1e-9)
+
+# The dispatch is the guard against a new margin silently training the old objective.
+for margin, fn in (("balanced", terminal_reward_balanced), ("two_sided", terminal_reward_two_sided)):
+    check(f"reward_from_record routes {margin} to its own function",
+          reward_from_record(clean, "attacker", margin) == fn(clean, "attacker"))
+check("reward_from_record routes the commanded balanced variant",
+      reward_from_record(led, "attacker", "balanced_commanded")
+      == terminal_reward_balanced(led, "attacker", commanded=True))
+try:
+    reward_from_record(clean, "attacker", "hit_points")
+    check("reward_from_record refuses a margin it cannot compute", False)
+except ValueError:
+    check("reward_from_record refuses a margin it cannot compute", True)
 
 failed = [name for name, ok in CHECKS if not ok]
 for name, ok in CHECKS:

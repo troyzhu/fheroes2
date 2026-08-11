@@ -38,7 +38,7 @@
 //
 // usage: fheroes2_agent_replay --actions FILE [--render] [--frames-dir DIR] [--fixture ID]
 //        [--speed 1..10] [--attacker id:count,...] [--defender id:count,...]
-//        [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide]
+//        [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--allow-flying]
 //        [--side attacker|defender|both]
 //
 // Play mode (a person battles a checkpoint): --play attacker|defender names the HUMAN side,
@@ -211,6 +211,10 @@ int runTool( int argc, char ** argv )
 {
     std::string actionsPath;
     std::string fixtureId = "m1_tiny_melee";
+    // Which world seed the recording was made under. The worker derives the obstacle layout from
+    // it, so a replay of a battle fought on another variant reaches a different board and the
+    // recorded action stream stops matching part-way through.
+    int seedOffset = 0;
     std::string attackerSpec;
     std::string defenderSpec;
     std::string attackerHeroSpec;
@@ -219,6 +223,8 @@ int runTool( int argc, char ** argv )
     std::string framesDir;
     std::string playSide;
     bool allowWideUnits = false;
+    // flying_v1, off by default so existing scenarios and golden digests are untouched.
+    bool allowFlyingUnits = false;
     bool render = false;
     int battleSpeed = 10;
 
@@ -258,7 +264,13 @@ int runTool( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--frames-dir" ) == 0 ) {
             framesDir = value( "--frames-dir" );
         }
-        else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
+        else if ( std::strcmp( argv[i], "--seed-offset" ) == 0 ) {
+            seedOffset = std::atoi( value( "--seed-offset" ) );
+        }
+        else if ( std::strcmp( argv[i], "--allow-flying" ) == 0 ) {
+            allowFlyingUnits = true;
+        }
+                else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
             allowWideUnits = true;
         }
         else if ( std::strcmp( argv[i], "--render" ) == 0 ) {
@@ -272,7 +284,7 @@ int runTool( int argc, char ** argv )
             std::fprintf( stderr,
                           "usage: fheroes2_agent_replay --actions FILE [--render] [--frames-dir DIR] [--fixture ID]\n"
                           "       [--speed 1..10] [--attacker id:count,...] [--defender id:count,...]\n"
-                          "       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide]\n"
+                          "       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--seed-offset N]\n"
                           "       [--side attacker|defender|both]\n" );
             return 2;
         }
@@ -343,6 +355,13 @@ int runTool( int argc, char ** argv )
         return 2;
     }
     scenario.allowWideUnits = allowWideUnits;
+    scenario.allowFlyingUnits = allowFlyingUnits;
+    // Matches the worker's own rule in src/agent_worker/main.cpp: seed index zero keeps the
+    // fixture's seed untouched, so recordings made before --seed-offset existed replay unchanged.
+    if ( seedOffset > 0 ) {
+        scenario.worldSeed = scenario.worldSeed + static_cast<uint32_t>( seedOffset );
+        scenario.scenarioId = scenario.scenarioId + "-seed" + std::to_string( seedOffset );
+    }
 
     const std::string problem = fheroes2::agent::validateScenario( scenario );
     if ( !problem.empty() ) {

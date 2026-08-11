@@ -81,22 +81,29 @@ class Step:
     info: dict | None = None
 
 
+#: Every terminal reward the trainer can be asked for, oldest first. Scripts take their argparse
+#: choices from here so a margin added to the environment is offerable everywhere without a sweep
+#: through the experiment directory, and so no script can advertise one the environment rejects.
+REWARD_MARGINS = ("hit_points", "strength", "two_sided", "two_sided_commanded",
+                  "balanced", "balanced_commanded")
+
+
 class BattleEnv:
     """One battle per reset, driven through the worker's JSONL protocol."""
 
     def __init__(self, worker: str, fixture: str = "m1_tiny_melee", side: str = "attacker", seeds: int = 1, home: str = "/tmp",
                  attacker: str | None = None, defender: str | None = None,
                  attacker_hero: str | None = None, defender_hero: str | None = None,
-                 allow_wide: bool = False, probe_teacher: bool = False,
+                 allow_wide: bool = False, allow_flying: bool = False, probe_teacher: bool = False,
                  reward_weighting: str = "none", reward_margin: str = "hit_points",
-                 seed_offset: int = 0, planes: bool = False):
+                 seed_offset: int = 0, combat_seed_offset: int = 0, planes: bool = False):
         # Set before any validation can raise: a caller's `finally: env.close()` would otherwise
         # report a missing attribute instead of the constructor's real error, which is exactly
         # how an unrecognised reward margin surfaced as an AttributeError on 2026-08-09.
         self._proc = None
         if reward_weighting not in ("none", "difficulty"):
             raise ValueError(f"unknown reward_weighting {reward_weighting!r}")
-        if reward_margin not in ("hit_points", "strength", "two_sided", "two_sided_commanded"):
+        if reward_margin not in REWARD_MARGINS:
             raise ValueError(f"unknown reward_margin {reward_margin!r}")
         self._reward_margin = reward_margin
         self._cmd = [worker, "--protocol", "--fixture", fixture, "--side", side, "--seeds", str(seeds)]
@@ -105,6 +112,11 @@ class BattleEnv:
         # battlefield-varied search labels possible without a sync protocol.
         if seed_offset:
             self._cmd += ["--seed-offset", str(seed_offset)]
+        # Perturbs the battle's random stream while leaving the battlefield alone. Only an ablation
+        # uses it: a side environment pinned to the live world seed inherits the live combat rolls,
+        # and this is how that is separated from merely being on the right terrain.
+        if combat_seed_offset:
+            self._cmd += ["--combat-seed-offset", str(combat_seed_offset)]
         # DAgger relabeling: each decision record then carries "teacher_action", the planner's
         # own choice at the same state, when it resolves inside simple_v1.
         if probe_teacher:
@@ -129,6 +141,11 @@ class BattleEnv:
             self._cmd += ["--defender-hero", defender_hero]
         if allow_wide:
             self._cmd += ["--allow-wide"]
+        # flying_v1, opened 2026-08-10. Off by default, so every scenario built before it is
+        # byte-identical; the six creatures it admits are Sprite, Gargoyle, Vampire, Vampire Lord,
+        # Ghost and Genie, the ones excluded for flight and nothing else.
+        if allow_flying:
+            self._cmd += ["--allow-flying"]
         self._env = dict(os.environ, HOME=home)
         self._attacker = attacker
         self._defender = defender
@@ -196,6 +213,26 @@ class BattleEnv:
                     self._difficulty = difficulty_weight(record["observation"], self.side)
                 return encode_observation(record["observation"]), encode_mask(record["legal_actions"])
 
+    @property
+    def current_battlefield(self) -> int:
+        """Which world-seed variant the episode in progress is being fought on.
+
+        Read from the worker's own `scenario_id` stamp rather than counted here, because the
+        rotation lives in the worker's scenario list and a reset that abandons a battle restarts
+        it. `main.cpp` appends "-seedN" for every index above zero and leaves index zero bare.
+
+        This exists for search. `rollout` replays the action prefix in a side environment, and that
+        replay only reproduces the live state when both are on the same battlefield, which the
+        obstacle layout and the combat seed both derive from. A side environment built with the
+        harness default `seeds=4` resets to variant zero on every rollout while the live episode
+        rotates, so three episodes in four were searched against terrain the battle was not being
+        fought on. Measured on 2026-08-09 that cost between 0.12 and 0.62 win rate, negative in
+        every one of six cells (`agent_play/experiments/search_sync.py`).
+        """
+        identifier = self.scenario_id or ""
+        _, separator, tail = identifier.rpartition("-seed")
+        return int(tail) if separator and tail.isdigit() else 0
+
     def step(self, action: int) -> Step:
         assert self._proc is not None and self._pending is not None
         self._proc.stdin.write(f"{int(action)}\n")
@@ -218,6 +255,10 @@ class BattleEnv:
             reward = terminal_reward_two_sided(record, self.side)
         elif self._reward_margin == "two_sided_commanded":
             reward = terminal_reward_two_sided(record, self.side, commanded=True)
+        elif self._reward_margin == "balanced":
+            reward = terminal_reward_balanced(record, self.side)
+        elif self._reward_margin == "balanced_commanded":
+            reward = terminal_reward_balanced(record, self.side, commanded=True)
         else:
             reward = terminal_reward(record, self.side, self._own_initial_hp)
         if self._reward_weighting == "difficulty":
@@ -307,6 +348,67 @@ def terminal_reward_two_sided(record: dict, side: str, commanded: bool = False) 
     if record["termination"] == "stalemate" and side == "attacker":
         destroyed = 0.0
     return -1.0 + destroyed
+
+
+def reward_from_record(record: dict, side: str, margin: str) -> float:
+    """The one dispatch from a margin name to the reward it means, for every caller that has a
+    terminal record and nothing else.
+
+    It exists because there were two dispatches. `BattleEnv` matched on the name and `SelfPlayEnv`
+    matched on `strength` and sent everything else to the two-sided branch, so a margin the latter
+    had never heard of trained the old objective and reported the new name. Anything not listed
+    here raises rather than defaulting, which is the property that makes adding a margin safe.
+    """
+    if margin in ("balanced", "balanced_commanded"):
+        return terminal_reward_balanced(record, side, commanded=margin.endswith("_commanded"))
+    if margin in ("two_sided", "two_sided_commanded"):
+        return terminal_reward_two_sided(record, side, commanded=margin.endswith("_commanded"))
+    if margin == "strength":
+        return terminal_reward_strength(record, side)
+    raise ValueError(f"reward margin {margin!r} has no record-only form; "
+                     f"hit_points needs the episode's starting hit points")
+
+
+def terminal_reward_balanced(record: dict, side: str, commanded: bool = False) -> float:
+    """The owner's balanced form, directed 2026-08-09: the same two-sided pricing with the flat
+    win bonus removed, so the reward is the strength margin, own fraction kept minus the foe's.
+
+    The observation behind it is that a side with force remaining has won, so the outcome bit is
+    already carried by the sign of the margin and the extra plus one only steepens a step the
+    quantity takes on its own. Measured on the battery, the outcome bit carries 95 percent of the
+    reward's variance under the current form and 82 percent under this one, a 4.8-fold cut in its
+    squared weight, which is the whole point: the graded terms that were designed to say how a
+    battle was won or lost get room to matter.
+
+    Algebraically this is `terminal_reward_two_sided` minus one on the win branch, and identical
+    on the loss branch, since -1 + (1 - foe_kept) is already -own_kept's mirror. That makes it
+    exactly zero sum between the two chairs on every decided battle, which the current form is
+    not, and which is worth something to self play.
+
+    The outcome still comes from `_side_won` rather than from the sign of the margin, which is
+    what keeps the two unfinished terminations resolved the way they already were. A pure margin
+    reads them off material and gets both wrong: at the forty-deathless-round `stalemate` it would
+    pay an attacker ahead on material for refusing to engage, when the engine's own breaker
+    forfeits that battle, and at the hundred-round `round_limit`, which `_side_won` scores as a
+    loss for both sides because truncation is an artifact rather than a result, it would hand the
+    leader a positive score. Deciding the branch first and only then dropping the bonus means this
+    is exactly `terminal_reward_two_sided` minus one on wins for every termination, not just the
+    decided ones, so no case can drift between the two.
+    """
+    own = record["attacker" if side == "attacker" else "defender"]
+    foe = record["defender" if side == "attacker" else "attacker"]
+    now, start = ("strength_commanded", "initial_strength_commanded") if commanded \
+        else ("strength", "initial_strength")
+
+    def kept(entry: dict) -> float:
+        initial = float(entry.get(start, entry.get("initial_strength", 0.0)))
+        return float(entry.get(now, entry.get("strength", 0.0))) / initial if initial > 0 else 0.0
+
+    if _side_won(record, side):
+        return kept(own)
+    if record["termination"] == "stalemate" and side == "attacker":
+        return -1.0
+    return -kept(foe)
 
 
 def terminal_reward_strength(record: dict, side: str) -> float:

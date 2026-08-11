@@ -26,7 +26,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "python"))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 from fheroes2_agent import encoding as enc  # noqa: E402
-from fheroes2_agent.env import BattleEnv  # noqa: E402
+from fheroes2_agent.env import REWARD_MARGINS, BattleEnv, _side_won  # noqa: E402
 from fheroes2_agent.policy import BattlePolicy  # noqa: E402
 from fheroes2_agent.render import describe_action, monster_name  # noqa: E402
 
@@ -64,7 +64,8 @@ def load_model(checkpoint: str):
 
 
 def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None,
-            search_simulations: int = 0, **env_kwargs) -> dict:
+            search_simulations: int = 0, coverage_forced: bool = False,
+            search_objective: str | None = None, search_combat_offset: int = 0, **env_kwargs) -> dict:
     """One policy per side when a defender checkpoint is given: the worker runs side=both and
     each decision routes to the model owning the active side, which is what lets two checkpoints
     fight each other on the record."""
@@ -79,7 +80,16 @@ def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None
     # A searched capture plays the same position the policy would, with root search choosing:
     # recorded against a policy capture on the same matchup it shows what the 2026-08-08 deviation
     # probe measured, since the positions where the two disagree are the ones that decide battles.
-    sim = BattleEnv(worker, planes=wants_planes, **env_kwargs) if search_simulations else None
+    # The side environment gets its own objective and its own dice, for the same reasons the
+    # battery does. Sharing the live environment's settings, which this did until 2026-08-10, meant
+    # the filmed agent both maximized whatever the reward column happened to report and planned
+    # against the rolls the battle was about to make: a stronger agent than any measurement
+    # describes, so the footage showed something the numbers did not.
+    sim_kwargs = dict(env_kwargs)
+    if search_objective is not None:
+        sim_kwargs["reward_margin"] = search_objective
+    sim = (BattleEnv(worker, planes=wants_planes, combat_seed_offset=search_combat_offset, **sim_kwargs)
+           if search_simulations else None)
     prefix: list[int] = []
     frames = []
     try:
@@ -96,9 +106,14 @@ def capture(worker: str, checkpoint: str, defender_checkpoint: str | None = None
                 plane_arg = (torch.from_numpy(env.last_planes).unsqueeze(0),)
             if sim is not None:
                 from search_probe import search_action_detail
+                # Plain UCB by default, because that is the rule the playing measurements use:
+                # `search_agent_battery.py` and the simulation ladder both take the default, and a
+                # replay filmed under forced coverage would not be the agent those numbers describe.
+                # Forcing belongs to the soft-target collector, which needs support on every
+                # candidate rather than a good move, so it stays available behind the flag.
                 action, means, _, prior = search_action_detail(
                     sim, model, prefix, encode(observation), mask, search_simulations, 1.5,
-                    live=env, coverage_forced=True)
+                    live=env, coverage_forced=coverage_forced)
                 greedy = max(prior, key=prior.get)
                 caption = describe_action(action)
                 if action != greedy:
@@ -136,25 +151,62 @@ def main() -> None:
     parser.add_argument("--defender-checkpoint", default=None,
                         help="a second policy controlling the defender, so two checkpoints battle each other")
     parser.add_argument("--want", default="any", choices=("victory", "defeat", "any"),
-                        help="retry until an episode ends this way, so a replay shows what the win rate says")
+                        help="retry until the recorded side ends the battle this way, so a replay shows "
+                             "what the win rate says; read from --side, not from the engine's "
+                             "attacker-perspective termination string")
     parser.add_argument("--tries", type=int, default=6)
     parser.add_argument("--search-simulations", type=int, default=0,
                         help="record the searching agent instead of the raw policy, captioning every "
                              "decision where search overrules the policy and what it was worth")
+    parser.add_argument("--reward-margin", default="two_sided", choices=REWARD_MARGINS,
+                        help="the objective the recorded battle is scored by, and the one root search "
+                             "maximizes, since `rollout` returns the side environment's reward. This "
+                             "defaulted to hit_points until 2026-08-09 while every battery measurement "
+                             "used two_sided, so a filmed agent searched by a different rule than the "
+                             "one its win rates were measured under")
+    parser.add_argument("--search-objective", default=None, choices=REWARD_MARGINS,
+                        help="what root search maximizes, separate from what --reward-margin reports. "
+                             "Defaults to following --reward-margin, which is what it silently did before")
+    parser.add_argument("--search-combat-offset", type=int, default=0,
+                        help="perturbs the side environment's dice while keeping its battlefield. Zero "
+                             "lets the filmed agent plan against the rolls the battle will make, which "
+                             "is a ceiling rather than the agent the win rates describe")
+    parser.add_argument("--coverage-forced", action="store_true",
+                        help="visit every candidate once before UCB takes over; this is the soft-target "
+                             "collector's rule, not the playing rule the win rates were measured under")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--battlefield", type=int, default=None,
+                        help="which obstacle variant to fight on; by default every try replays variant 0, "
+                             "so a near-deterministic agent returns the same outcome however many times "
+                             "it retries, and --want cannot be satisfied. Given a number, each try steps "
+                             "to the next variant from there.")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
     kwargs = dict(side=args.side, attacker=args.attacker, defender=args.defender,
                   attacker_hero=args.attacker_hero, defender_hero=args.defender_hero,
-                  allow_wide=args.allow_wide)
+                  allow_wide=args.allow_wide, reward_margin=args.reward_margin)
     replay = None
+    # `--want` is read from the chair being recorded, not from the engine's `termination` string,
+    # which is written from the attacker's seat whoever is playing. Compared raw, `--want victory
+    # --side defender` retried until the recorded agent *lost*, and the line below then announced
+    # that loss as a victory; the 2026-08-09 mirror captures came back labelled "victory ... reward
+    # -1.00" and "defeat ... reward +1.54", which is what exposed it. Attacker-side captures, which
+    # is every replay recorded before that date, are unaffected either way.
+    wanted_win = {"victory": True, "defeat": False}.get(args.want)
+    satisfied = wanted_win is None
     for attempt in range(args.tries):
+        if args.battlefield is not None:
+            kwargs["seed_offset"] = args.battlefield + attempt
         candidate = capture(args.worker, args.checkpoint, defender_checkpoint=args.defender_checkpoint,
-                            search_simulations=args.search_simulations, **kwargs)
+                            search_simulations=args.search_simulations,
+                            coverage_forced=args.coverage_forced,
+                            search_objective=args.search_objective,
+                            search_combat_offset=args.search_combat_offset, **kwargs)
         replay = candidate
-        if args.want == "any" or candidate["termination"] == args.want:
+        if wanted_win is None or _side_won(candidate, args.side) == wanted_win:
+            satisfied = True
             break
     replay["checkpoint"] = pathlib.Path(args.checkpoint).name
     if args.defender_checkpoint:
@@ -169,9 +221,23 @@ def main() -> None:
     # its replay desynchronize at the first defender decision (#43).
     replay["side"] = "both" if args.defender_checkpoint else args.side
     replay["allow_wide"] = args.allow_wide
+    # The world seed the battle was actually fought under, so `render_replay.py` can reproduce it.
+    # Without the stamp a capture made on any variant but the default replays on the default and
+    # fails verification part-way through the action stream.
+    replay["battlefield"] = kwargs.get("seed_offset", 0)
+    replay["reward_margin"] = args.reward_margin
+    replay["search_objective"] = args.search_objective or args.reward_margin
+    replay["search_combat_offset"] = args.search_combat_offset
+    replay["search_simulations"] = args.search_simulations
     pathlib.Path(args.out).write_text(json.dumps(replay))
-    print(f"{replay['checkpoint']}: {replay['termination']} in {len(replay['frames'])} decisions "
-          f"(reward {replay['reward']:+.2f}) -> {args.out}")
+    outcome = "won" if _side_won(replay, args.side) else "lost"
+    if not satisfied:
+        # Silence here is how a replay ends up captioned as the outcome that was asked for rather
+        # than the one that happened, which is the same mislabelling `--want` itself had.
+        print(f"WARNING: wanted the {args.side} to have {args.want} but it {outcome} every one of "
+              f"{args.tries} tries; keeping the last. Vary --battlefield to search more positions.")
+    print(f"{replay['checkpoint']}: {args.side} {outcome} ({replay['termination']}) in "
+          f"{len(replay['frames'])} decisions (reward {replay['reward']:+.2f}) -> {args.out}")
 
 
 if __name__ == "__main__":

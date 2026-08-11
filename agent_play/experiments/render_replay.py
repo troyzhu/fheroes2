@@ -48,6 +48,13 @@ def run_replay(args: argparse.Namespace, replay: dict, actions_path: pathlib.Pat
         cmd += ["--side", side]
     if replay.get("allow_wide", args.allow_wide):
         cmd.append("--allow-wide")
+    # Which world seed the battle was fought under. Obstacles derive from it, so replaying a
+    # recording made on another variant reaches a different board and the action stream stops
+    # matching; the 2026-08-09 loss capture failed verification here for exactly that reason,
+    # rejecting 7 of its actions. Recordings without the stamp predate `--battlefield` and were
+    # all made on variant 0, which is the default the worker uses when the flag is absent.
+    if replay.get("battlefield"):
+        cmd += ["--seed-offset", str(replay["battlefield"])]
     if render:
         cmd.append("--render")
     if frames_dir is not None:

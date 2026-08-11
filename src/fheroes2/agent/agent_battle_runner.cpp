@@ -349,7 +349,7 @@ fheroes2::agent::EpisodeOutcome fheroes2::agent::runEpisode( const Scenario & sc
     outcome.attackerInitialStrengthCommanded = armyStrength( attackingArmy, true );
     outcome.defenderInitialStrengthCommanded = armyStrength( defendingArmy, true );
 
-    outcome.combatSeed = Battle::computeBattleSeed( scenario.tileIndex, outcome.mapSeed, attackingArmy, defendingArmy );
+    outcome.combatSeed = Battle::computeBattleSeed( scenario.tileIndex, outcome.mapSeed, attackingArmy, defendingArmy ) + scenario.combatSeedOffset;
 
     Rand::PCG32 randomGenerator( outcome.combatSeed );
 

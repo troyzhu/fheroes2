@@ -4,8 +4,10 @@
 The owner's cavity: a fast flyer that simply avoids confrontation could in principle loop a
 battle indefinitely, and nothing had demonstrated what actually happens. This script commands
 the most evasive policy expressible, always move to the reachable cell farthest from every
-enemy and never attack, with fast Rogues defending against slow Zombies, flyers being unavailable because simple_v1 rejects flying movement outright (deferred to Phase 1b), which is itself the first finding: the flying version of this exploit cannot even be fielded today, and reports how the
-episode ends.
+enemy and never attack, with fast Rogues defending against slow Zombies by default. Flyers were unavailable until
+flying_v1 opened on 2026-08-10, and that absence was itself the original finding: the flying
+version of this exploit could not be fielded at all. It can now, so `--allow-flying` with an
+evading Sprite is the case this script exists to check, and it reports how the episode ends.
 
 Two protections should catch it. The runner stops after forty consecutive rounds without a
 death (`stalemate`), a margin under the engine AI's own fifty-turn breaker, which would force
@@ -58,10 +60,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("worker")
     parser.add_argument("--episodes", type=int, default=3)
+    parser.add_argument("--attacker", default="49:20")
+    parser.add_argument("--defender", default="58:8", help="the evading side")
+    parser.add_argument("--allow-flying", action="store_true",
+                        help="flying_v1, opened 2026-08-10. The flying version of this exploit could "
+                             "not be fielded before it, which the docstring records as its own finding")
     parser.add_argument("--report", default=None)
     args = parser.parse_args()
 
-    env = BattleEnv(args.worker, attacker="49:20", defender="58:8", side="defender", seeds=args.episodes)
+    env = BattleEnv(args.worker, attacker=args.attacker, defender=args.defender, side="defender",
+                    seeds=args.episodes, allow_flying=args.allow_flying)
     episodes = []
     started = time.time()
     try:
