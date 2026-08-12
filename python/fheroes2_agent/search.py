@@ -194,6 +194,13 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
         return top, {a: 0.0 for a in actions}, {a: 0 for a in actions}, prior
     visits = {a: 0 for a in actions}
     total_return = {a: 0.0 for a in actions}
+    if candidates and allocator == "puct":
+        # The control that separates the two things a capped halving arm changes at once. Sequential
+        # halving with a cap both restricts the candidate set and reallocates the budget within it,
+        # so a gain over plain PUCT is not attributable until PUCT has been run on the same
+        # restricted set. Without this arm the 2026-08-11 result would repeat the terrain-versus-dice
+        # attribution error: two variables moved, one credited.
+        actions = sorted(prior, key=prior.get, reverse=True)[:candidates]
     if allocator == "sequential_halving":
         _sequential_halving(sim, model, prefix, prior, simulations, visits, total_return, candidates)
         means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}

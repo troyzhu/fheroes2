@@ -62,6 +62,13 @@ def apply_difficulty(reward: float, weight: float) -> float:
     the gradient stops over-rewarding easy victories and over-penalizing lopsided losses. The
     sign split is well defined because the margin-weighted terminal reward never lands strictly
     between 0 and 1: a win is at least 1 and everything else is at most 0.
+
+    That justification is specific to the margins carrying an explicit outcome term. Under
+    `contested`, which is the plain strength difference, the reward is continuous across zero and a
+    narrow win really can read $+0.05$. The split stays well defined for a better reason there: the
+    sign of the difference IS the outcome, since a side holding force against one that does not has
+    won, so no interval needs reserving. A standoff reads exactly zero and is therefore unweighted,
+    which is the right treatment for a battle whose difficulty was never tested.
     """
     return reward * (weight if reward > 0 else 1.0 / weight)
 
