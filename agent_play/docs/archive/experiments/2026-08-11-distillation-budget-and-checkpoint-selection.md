@@ -1,8 +1,5 @@
 ---
-title: "The distillation budget, and the metric that was choosing checkpoints, 2026-08-11"
-type: experiment-log
-updated: 2026-08-11
-tags: [agent-env, archive, experiment, distillation, training, measurement]
+title: "The distillation budget, and the metric that was choosing checkpoints, 2026-08-11" type: experiment-log updated: 2026-08-11 tags: [agent-env, archive, experiment, distillation, training, measurement]
 ---
 
 # The distillation budget, and the metric that was choosing checkpoints, 2026-08-11
@@ -137,6 +134,26 @@ The student behaves exactly as that predicts. On the informative rows its probab
 
 This is also why the 2026-08-09 regret weighting was the largest paired distillation effect on record at $+0.063$ held out. Reweighting the informative rows at equal total mass attacks the redundancy and leaves the support problem and the mass ratio untouched.
 
+## The allocator, and a result that did not survive its own budget sweep
+
+Root search spends its playouts by PUCT, which minimises cumulative regret. That is the right objective when a node's estimate feeds a parent, and the root has no parent: only the action finally played matters, so the root is a simple-regret problem (Bubeck et al. 2011, and [[../../research/works/gumbel-alphazero|Danihelka et al. 2022]] for the AlphaZero-specific form). This search is a single ply, so the root is the whole search and the mismatch is total. Sequential Halving was built beside PUCT to test it, with a candidate cap, because uncapped at 26 legal actions and 48 playouts the schedule affords one visit per candidate in phase one and the winner ends on four, which is the uniform coverage that already measured negative.
+
+At thirty-two playouts it looked like a result. Across three seeds on the mirror suites with independent dice, halving at a cap of eight read $+0.088$ win rate over PUCT, and a control running PUCT on the same restricted candidate set attributed all of it to the allocation: the cap alone contributes $+0.0000$, because PUCT's bonus is prior-weighted and a concentrated prior makes it self-restrict. Search visit entropy confirms the mechanism on the engine, 0.52, 0.49 and 0.42 for capped PUCT against 0.67, 0.60 and 0.46 uncapped, against 1.67, 1.68 and 1.68 for halving.
+
+It does not survive a budget sweep. Eighteen runs over budgets 64 and 128, three allocators and three seeds, same suites and dice:
+
+| budget | PUCT | halving, cap 8 | halving, cap 16 |
+|---|---|---|---|
+| 32 | 0.597 | 0.685 | not run |
+| 64 | 0.620 | 0.606 | 0.630 |
+| 128 | 0.671 | 0.630 | 0.639 |
+
+Paired within seed at matched budget, all four comparisons are null: $-0.0139$, $+0.0093$, $-0.0417$ and $-0.0139$ win rate at 0.3, 0.2, 1.0 and 0.3 standard errors, two of them nominally negative. Halving's own curve is non-monotonic, 0.685 falling to 0.606 before recovering to 0.630, which is the shape of a lucky point rather than a trend.
+
+Two of this project's claims are corrected by that table. The sweep was built on the hypothesis that ADR 0008's saturation was a property of PUCT's allocation rather than of search, and PUCT does not saturate here at all: it improves monotonically, 0.597 to 0.620 to 0.671, with the strength margin running $+0.095$ to $+0.147$ from 64 to 128. And the thirty-two-playout result was reported as $+0.088$ at 3.1 standard errors, which overstated it. Three seeds give a paired $t$ with two degrees of freedom, whose 95 percent critical value is 4.30 rather than about 2, so that reading corresponds to $p$ of roughly 0.09. It was marginal, and quoting it in standard errors borrowed the authority of a normal approximation three seeds do not earn.
+
+What survives is narrower and still worth keeping. The mechanism is real and reproducible: the allocation rule, not the candidate restriction, is what changes how widely the search looks, and halving roughly triples the visit entropy at every budget measured. What is not established is that looking more widely pays. PUCT stays the default on evidence rather than on caution, and this is recorded as a case where a correct theoretical framing did not survive contact with the measurement.
+
 ## What changed in the code
 
 The trainer's heartbeat carries four more columns per epoch: `holdout_loss`, `holdout_entropy`, `holdout_normalized_entropy` and `holdout_effective_actions`. `convergence_report.py` reads them, so a supervised run's verdict is no longer a single agreement trend.
@@ -154,6 +171,8 @@ The corpus the band run used no longer exists. Its matchup directories survive i
 <!-- verify
 exists  agent_play/experiments/distillation_budget.py
 exists  agent_play/experiments/distillation_support.py
+exists  agent_play/experiments/allocator_scaling.py
+grep    python/fheroes2_agent/search.py :: _sequential_halving
 exists  agent_play/experiments/soft_distill.py
 grep    agent_play/experiments/soft_distill.py :: entropy_bonus
 grep    agent_play/experiments/soft_distill.py :: checkpoint_every
