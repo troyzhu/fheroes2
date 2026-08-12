@@ -110,23 +110,37 @@ def main() -> None:
             print(f"  n={budget:<4d} {alloc} m={cap}: only {len(shared)} shared seed(s), not paired")
             continue
         line = []
-        for c in ("win_rate", "mean_reward", "strength_margin"):
+        # Every column, not a chosen three. Restricting the paired block to the rate and two
+        # companions is how a summary ends up quoting the rate again, which has happened on this
+        # project repeatedly; the strength margin has been the sharpest instrument at every dose
+        # measured and the rate the bluntest.
+        for c in COLUMNS:
             d = np.array([arms[(budget, alloc, cap)][s][c] - base[s][c] for s in shared])
             se = d.std(ddof=1) / np.sqrt(len(d))
-            line.append(f"{c.split('_')[0][:6]:>6s} {d.mean():+.4f} ({abs(d.mean())/se if se else 0:.1f}SE)")
+            line.append(f"{c[:11]:>11s} {d.mean():+.4f} ({abs(d.mean())/se if se else 0:.1f}t)")
             paired[f"n{budget}_{alloc}_m{cap}_{c}"] = {"delta": float(d.mean()), "se": float(se),
                                                        "seeds": len(shared)}
-        print(f"  n={budget:<4d} {alloc:>20s} m={cap:<3d} n_seeds={len(shared)}  " + "  ".join(line))
+        # Three seeds give a paired t with two degrees of freedom, whose 95 percent critical value
+        # is 4.30, not the ~2 a normal approximation suggests. The ratio is labelled t rather than
+        # SE so it is not read against the wrong distribution, which is an error this project made.
+        crit = {2: 4.30, 3: 3.18, 4: 2.78, 5: 2.57}.get(len(shared) - 1, 2.0)
+        print(f"  n={budget:<4d} {alloc:>20s} m={cap:<3d} seeds={len(shared)} "
+              f"(95% needs t>{crit})")
+        for chunk in [line[i:i + 3] for i in range(0, len(line), 3)]:
+            print("      " + "   ".join(chunk))
 
     # The question the sweep exists to answer: does each allocator's own curve still rise?
-    print("\nBudget response per allocator (win rate, then strength margin):")
+    print("\nBudget response per allocator, every column, so a flat rate cannot hide a moving margin:")
     for alloc, cap in sorted({(a, c) for (_, a, c) in arms}):
         pts = sorted((b, arms[(b, a, c)]) for (b, a, c) in arms if a == alloc and c == cap)
         if len(pts) < 2:
             continue
-        wr = [f"{b}:{np.mean([r['win_rate'] for r in d.values()]):.3f}" for b, d in pts]
-        mg = [f"{b}:{np.mean([r['strength_margin'] for r in d.values()]):+.3f}" for b, d in pts]
-        print(f"  {alloc:>20s} m={cap:<3d}  rate {' -> '.join(wr)}   margin {' -> '.join(mg)}")
+        print(f"  {alloc} m={cap if cap else 'all'}")
+        for c in COLUMNS:
+            series = [f"{b}:{np.mean([r[c] for r in d.values() if c in r]):+.3f}" for b, d in pts
+                      if any(c in r for r in d.values())]
+            if series:
+                print(f"      {c:>20s}  " + "  ->  ".join(series))
 
     if args.report:
         pathlib.Path(args.report).write_text(json.dumps(
