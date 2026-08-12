@@ -323,7 +323,7 @@ A pointer network selects an element of a variable-length input set by attending
 | Sparse or margin-weighted terminal reward | Decided and implemented | ADR [[../decisions/0005-training-and-reward]]; the two-sided strength-priced margin of [[reward-design]] threaded everywhere 2026-08-07 |
 | DQN and QR-DQN | Not first | Composes poorly with an imitation start |
 | IMPALA, Sample Factory | Rejected | Built for scales we do not have |
-| MCTS, AlphaZero, MuZero | Root search measured, full stack blocked on data | Root-PUCT with rollout leaves reaches 0.963 held-out; value leaves and visit targets both fail at current coverage, see [[value-estimation-lab]] |
+| MCTS, AlphaZero, MuZero | Root search measured, full stack blocked on data | Root-PUCT with rollout leaves reads 0.700 held-out against the engine's 0.660, the 0.963 of 2026-08-07 having been withdrawn with every figure that predates [[../decisions/0008-search-configuration]]; value leaves and visit targets both fail at current coverage, see [[value-estimation-lab]] |
 | Offline reinforcement learning | Measured | First arms run and recorded in [[off-support-and-offline-improvement]]; support constraints bind |
 | Inverse reinforcement learning | Rejected | Reward is ours to choose, not to infer |
 | Self-play, fictitious play, leagues | In progress | League-lite pool training runs as of 2026-08-07; first long-budget round judged by the full battery |
