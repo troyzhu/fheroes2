@@ -306,14 +306,14 @@ brew install cmake                           # not in the Brewfile; only for the
 git clone git@github.com:troyzhu/fheroes2.git && cd fheroes2
 git switch agent-env
 
-# Build, then run all four gates
+# Build, then run every gate
 make -C src/dist -j"$(sysctl -n hw.ncpu)"
 ./agent_play/spike/build_spike.sh
 ./agent_play/spike/verify_phase0.sh    # Phase 0 invariants
 ./agent_play/verify_m1.sh              # 5 passed, deterministic runner
 ./agent_play/verify_m2.sh              # 8 passed, hook inertness and passive logs
 ./agent_play/verify_m3.sh              # 9 passed, legal actions and full teacher coverage
-./agent_play/verify_agent.sh           # 11 passed, the Python training stack end to end
+./agent_play/verify_agent.sh           # 12 passed, the Python training stack end to end
 ./agent_play/lint_docs.sh              # docs: style, links, and fact checks
 ./agent_play/verify_memory.sh          # agent memory still describes reality
 ```
