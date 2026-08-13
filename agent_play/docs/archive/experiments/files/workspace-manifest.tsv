@@ -1,0 +1,75 @@
+# Artifacts referenced by vendored reports, parked in the durable workspace.
+# workspace root: /Volumes/External Drive/GitHub/fheroes2-workspace/work
+b100_s0_soft.pt.epoch025.pt	file	16f9e6b7a4578a91
+b100_s0_soft.pt.epoch050.pt	file	ea37d60e8857799e
+b100_s0_soft.pt.epoch075.pt	file	557a1a74c7f6132f
+b100_s0_soft.pt.epoch100.pt	file	adfef0743a306cbb
+b100_s1_soft.pt.epoch025.pt	file	0277705e72baed01
+b100_s1_soft.pt.epoch050.pt	file	6b8b11a3fa5a5583
+b100_s1_soft.pt.epoch075.pt	file	68563bc6cf35abeb
+b100_s1_soft.pt.epoch100.pt	file	3b3fdf805a5509bc
+b100_s2_soft.pt.epoch025.pt	file	a9aa7d47fc4de56e
+b100_s2_soft.pt.epoch050.pt	file	393b60d3bbba65dd
+b100_s2_soft.pt.epoch075.pt	file	f14d776d62f19441
+b100_s2_soft.pt.epoch100.pt	file	9fe4520ec1e410a3
+b10_s0_soft.pt	file	4ea50f886f810123
+b10_s1_soft.pt	file	1fe6cc84c02f7b8b
+b10_s2_soft.pt	file	c17efa440adaed3a
+b15_s0_soft.pt	file	1ddfc04e23d1f516
+b15_s1_soft.pt	file	ff14f9077b1b67ac
+b15_s2_soft.pt	file	345fe535a060a06b
+b5_s0_soft.pt	file	92c36ddcb45f76c2
+b5_s1_soft.pt	file	1c2b4fe97363674a
+b5_s2_soft.pt	file	42e9b03072843b07
+bothchair_s0.pt	file	6c474aae794c7d85
+bothchair_s1.pt	file	e05c56d0eae9cf8f
+bothchair_s2.pt	file	30b593960d96882b
+cov_hard_values_s0.pt	file	c634965b38cd8548
+cov_soft_values_s0.pt	file	4b1903337afec431
+cov_soft_values_s1.pt	file	96375082730e4840
+cov_soft_values_s2.pt	file	c84c592bad44d61c
+coverage_corpus	dir	480 episodes
+coverage_corpus_xl	dir	1192 episodes
+coverage_corpus_xl_relabeled	dir	1192 episodes
+covxl_hard_values_s0.pt	file	f104962b2ed1f1fe
+covxl_soft_values_s0.pt	file	4667f01abf042866
+data_dagger	dir	0 episodes
+data_dagger_planes	dir	0 episodes
+data_diverse	dir	0 episodes
+data_diverse_planes	dir	0 episodes
+data_gen1	dir	0 episodes
+data_search_owner	dir	0 episodes
+data_search_owner_def	dir	0 episodes
+data_search_planes	dir	0 episodes
+data_search_planes_def	dir	0 episodes
+data_searchp2	dir	0 episodes
+data_searchp2_def	dir	0 episodes
+data_soft	dir	0 episodes
+data_soft_gen	dir	0 episodes
+data_soft_gen_def	dir	0 episodes
+e0.05_s0_soft.pt	file	ae77bea1779bce30
+e0.05_s1_soft.pt	file	226d561f9b21f13e
+e0.05_s2_soft.pt	file	0b2e40d757d25d4f
+e0.15_s0_soft.pt	file	2c2eb043081e27e4
+e0.15_s1_soft.pt	file	39c4b47ab919259c
+e0.15_s2_soft.pt	file	651c6425710ff8c5
+e0.4_s0_soft.pt	file	4a4560b8bef42a8c
+e0.4_s1_soft.pt	file	6b36aaa53a078206
+e0.4_s2_soft.pt	file	63e6c3b3a3093aa8
+parity_corpus	dir	128 episodes
+policy_early8.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+policy_ent001.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+policy_ent005.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+policy_entity.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+policy_mean.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+policy_planes.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+policy_smooth005.pt	LOST	evicted before 2026-08-12; evidence JSONs remain
+pool140.json	LOST	evicted before 2026-08-12; evidence JSONs remain
+pool_diverse.json	LOST	evicted before 2026-08-12; evidence JSONs remain
+pool_smoke.json	LOST	evicted before 2026-08-12; evidence JSONs remain
+pool_wide.json	LOST	evicted before 2026-08-12; evidence JSONs remain
+r25x100_s0_soft.pt	file	159ed0e6b0894269
+r25x100_s1_soft.pt	file	8cfd6bc36e0e553d
+r25x100_s2_soft.pt	file	20d75080d1d30734
+regret_corpus	dir	272 episodes
+worker_planes	LOST	evicted before 2026-08-12; evidence JSONs remain

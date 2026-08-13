@@ -7,4 +7,6 @@ Provenance, not a reading path: every number these files carry is already quoted
 | `band_*.pt` | 6 | `soft_distill.py, the regret-band arms of 2026-08-09` | The six regret-band distillation checkpoints, soft and hard twins over three seeds. band_soft_s0
       is the weights behind the headline 0.700: the final_sweep reports name it from the scratchpad,
       and its training corpora were later evicted, so these vendored copies are the only exact artifact |
+| `b25_s*_soft.pt` | 3 | `soft_distill.py, the standing 25-epoch arms of 2026-08-11` | The standing-configuration distillation checkpoints over three seeds: the control every budget,
+      entropy and allocator arm was paired against, vendored so those comparisons stay re-runnable |
 

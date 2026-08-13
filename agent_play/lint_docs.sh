@@ -301,6 +301,41 @@ if os.environ.get("FACTS") == "1":
                 if not (REPO / expanded).exists():
                     facts.append(f"{rel(f)}: names `{braced}`, whose expansion `{expanded}` does not exist")
 
+    # 5b. Artifact reproducibility. A vendored report that references a scratchpad path depends
+    # on an artifact outside the repository, and the scratchpad silently evicted two corpora and
+    # seven checkpoints before this check existed; the flagship checkpoint survived by days. Every
+    # such reference must resolve to a vendored file or a line in the checked-in workspace
+    # manifest, so a new dependency fails loudly the day it is created rather than when the
+    # artifact is already gone.
+    import json as _json
+    manifest_path = DOCS / "archive" / "experiments" / "files" / "workspace-manifest.tsv"
+    manifest = set()
+    if manifest_path.exists():
+        for line in manifest_path.read_text().splitlines():
+            if line and not line.startswith("#"):
+                manifest.add(line.split("\t")[0])
+    vendored_artifacts = {q.name for q in (DOCS / "archive" / "experiments" / "files").rglob("*")
+                          if "checkpoints" in str(q.parent)}
+    for jf in sorted((DOCS / "archive" / "experiments" / "files").rglob("*.json")):
+        try:
+            blob = _json.loads(jf.read_text())
+        except Exception:
+            continue
+        found = set()
+        def _walk(x):
+            if isinstance(x, dict):
+                for v in x.values():
+                    _walk(v)
+            elif isinstance(x, list):
+                for v in x:
+                    _walk(v)
+            elif isinstance(x, str) and "/scratchpad/" in x:
+                found.add(x.rstrip("/").rsplit("/", 1)[-1])
+        _walk(blob)
+        for name in sorted(found):
+            if name not in manifest and name not in vendored_artifacts:
+                facts.append(f"{rel(jf)}: depends on scratchpad artifact `{name}`, neither vendored nor in workspace-manifest.tsv")
+
     # 6. Engine-surface completeness. Every file changed under src/ relative to master must be
     # matched in the inventory's ledger section, by path, by directory, or by stem (which is how
     # a brace form like screen.{h,cpp} matches screen.h). An unledgered engine touch fails here.
