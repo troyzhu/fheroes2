@@ -6,6 +6,28 @@ title: "The distillation budget, and the metric that was choosing checkpoints, 2
 
 Every distillation arm on record stopped at its final epoch and was saved by the epoch whose holdout agreement peaked. Both facts turn out to be problems, and they are the same problem seen from two sides.
 
+## The findings, in one screen
+
+- Training longer cannot help: 25 epochs is the measured optimum in both directions, the flat tail every run showed was the cosine schedule ending rather than convergence, and SGDR restarts bought the best offline numbers of twelve arms with the worst play.
+- Both offline selectors point away from play: across the design, teacher agreement correlates $-0.389$ with win rate and lower held-out loss goes with worse play, the signature of covariate shift, since the holdout is teacher-visited states.
+- The distillation gap has a mechanism: about 95 percent of the training loss imitates the engine, 88 percent of search's labels confirm the prior's own pick, and the informative rest sits at a median prior probability of 0.0002, off any gentle gradient's reach.
+- Softening the student fails both ways: the entropy bonus loses greedy at every dose and is null under search; the visit-count target transmits spread and does not help.
+- The Sequential Halving allocator's 32-playout advantage did not survive its own budget sweep; what replicates is tripled visit entropy, and PUCT, which pays monotonically through 256 playouts, stays the default.
+
+## Table of contents
+
+- [[#Why no run on record could evidence its own convergence]]
+- [[#The three selectors, and how far apart they sit]]
+- [[#What play says, which is the only column that decides]]
+- [[#The other direction, and whether the schedule was the problem]]
+- [[#Sharpness is a correlate of the damage, not its cause]]
+- [[#The same arms searched, where the mechanism is real and pays nothing]]
+- [[#What that does and does not license]]
+- [[#Where the labels sit, which is why the gap survives every budget]]
+- [[#The allocator, and a result that did not survive its own budget sweep]]
+- [[#What changed in the code]]
+- [[#Provenance, and one substitution]]
+
 ## Why no run on record could evidence its own convergence
 
 The trainer arms its schedule with `CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-5)`, so the learning rate reaches its floor exactly at whatever budget the run was given. A run annealed that way flattens at its own boundary, and a flat tail is a statement about the schedule rather than about the model. Reading the three arms of the 2026-08-09 band run confirms the shape: on seed 0 the holdout agreement gained $+0.0216$ over epochs 10 to 15, where the rate ran from $2.2 \times 10^{-4}$ down to $1.3 \times 10^{-4}$, and $+0.0025$ over epochs 20 to 24, where it ran from $4.9 \times 10^{-5}$ to $1.1 \times 10^{-5}$. The gain ratio is 8.6 against a rate ratio of 8. The curve decelerated in proportion to the step size, which is an unconverged model taking smaller steps.
