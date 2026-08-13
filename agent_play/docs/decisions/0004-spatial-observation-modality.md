@@ -2,7 +2,7 @@
 title: "ADR 0004, semantic spatial planes, pixels rejected"
 type: adr
 status: accepted
-updated: 2026-08-03
+updated: 2026-08-12
 related_concepts: ["[[../implementation/observation-design]]", "[[0001-observation-profiles]]", "[[../rl/training-design]]"]
 tags: [adr, observation, modality, agent-env]
 ---
@@ -10,7 +10,7 @@ tags: [adr, observation, modality, agent-env]
 # ADR 0004 — Semantic spatial-plane observation modality; true pixel rendering rejected
 
 - Status: accepted 2026-07-29, plane emitter lands with Milestone 4
-- Implementation: the engine half and the tensor builder landed 2026-08-06; the consuming network has not. The worker's `--planes` flag adds an `obstacles` layer to every serialized observation (`agent_observation.{h,cpp}`, off by default and byte-identical when off, verified against stripped transcripts), and `encode_planes` in `python/fheroes2_agent/encoding.py` rasterizes the committed channels from the units plus that layer, (7, 9, 11) channels-first in the engine's own cell indexing. Everything except the obstacle layer derives from the entity list, so the engine emits only what entities cannot carry. The convolutional fusion arm and its ablation remain unbuilt.
+- Implementation: built end to end as of 2026-08-06, engine half, tensor builder, and the consuming network. The worker's `--planes` flag adds an `obstacles` layer to every serialized observation (`agent_observation.{h,cpp}`, off by default and byte-identical when off, verified against stripped transcripts), and `encode_planes` in `python/fheroes2_agent/encoding.py` rasterizes the committed channels from the units plus that layer, (7, 9, 11) channels-first in the engine's own cell indexing. Everything except the obstacle layer derives from the entity list, so the engine emits only what entities cannot carry. The consuming network is the conv-fusion arm on `python/fheroes2_agent/policy.py`, built under `planes=True`, self-describing through its state dict, and ablated with a width-matched capacity control in `agent_play/experiments/planes_ablation.py`; the three-seed replication is in [[../archive/experiments/2026-08-06-offline-arms-and-planes]].
 - Evidence: user proposal 2026-07-29 (a coarse minimap view for the agent); [[../archive/research-runs/2026-07-29-spatial-observations]], 24 of 25 claims confirmed; [[../research/works/pysc2]], [[../research/works/griddly]], [[../research/works/alphastar]]
 - Extends: [[0001-observation-profiles]], orthogonally. A profile says what may be seen, a modality says how it is shaped.
 - Mechanism detail: [[../implementation/observation-design]]; encoder consequences in [[../rl/training-design]]

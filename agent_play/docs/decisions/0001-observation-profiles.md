@@ -10,7 +10,7 @@ tags: [adr, observation, observability, agent-env]
 # ADR 0001 — Dual observation profiles: `full_v1` and `observable_v1`
 
 - Status: accepted 2026-07-27
-- Implementation: not built. No occurrence of `full_v1`, `observable_v1`, or `observation_profile` exists in `src/fheroes2/agent/` or `python/` as of 2026-07-31. This record binds Milestone 4, which is where observation serialization lands.
+- Implementation: partly built. The serializer stamps every observation `"schema":"observation_full_v1"` (`src/fheroes2/agent/agent_observation.cpp`), and the encoding tests build their fixtures under that schema (`python/tests/test_encoding.py`). `observable_v1` and the `observation_profile` switch that would select between the two remain unbuilt, confirmed absent tree-wide, and stay owed to Milestone 4.
 - Evidence: spec §12 (observation schema), [[../archive/research-runs/2026-07-27-rl-approaches]] §2, [[../research/findings]], user requirement 2026-07-27 ("the more realistic agent mode should have a partially observable state")
 - Engine grounding: `src/fheroes2/battle/battle_interface.cpp`, the right-click information path, verified present
 - Mechanism detail: [[../implementation/observation-design]]
@@ -131,3 +131,7 @@ The asymmetric setup this enables, meaning a critic on `full_v1` and an actor on
 - Trajectory headers record the profile; BC/RL policies train on `observable_v1` while critics and teacher-matching may consume `full_v1` from the same worker without protocol changes.
 - Spec §12 needs a field-tag column (oracle vs observable) in the unit record table when Milestone 2 implements observation serialization.
 - The digest implementation from Milestone 1 (`agent_terminal_v1`) is unaffected.
+
+<!-- verify
+grep    src/fheroes2/agent/agent_observation.cpp :: observation_full_v1
+-->

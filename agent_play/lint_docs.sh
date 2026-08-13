@@ -281,6 +281,12 @@ if os.environ.get("FACTS") == "1":
     # has since been deleted, so they are exempt. The prefixes are this repository's actual
     # layout, so a path inside another project's tree (src/Griddly/...) is not claimed.
     CODE_PATH = re.compile(r"`((?:src/(?:fheroes2|engine|agent_\w+|dist|thirdparty)|python)/[A-Za-z0-9_./-]+)`")
+    # Braced forms like `agent_scenario.{h,cpp}` were invisible to CODE_PATH, whose character class
+    # excludes braces, so a rename behind a braced mention rotted silently (2026-08-11 audit,
+    # finding f: ADR 0001's proof paths went unchecked for eleven days). Expand and check each.
+    BRACED_PATH = re.compile(
+        r"`((?:src/(?:fheroes2|engine|agent_\w+|dist|thirdparty)|python)/[A-Za-z0-9_./-]*"
+        r"\{[A-Za-z0-9_.,-]+\}[A-Za-z0-9_./-]*)`")
     for f in files:
         if "archive" in f.parts:
             continue
@@ -288,6 +294,12 @@ if os.environ.get("FACTS") == "1":
         for path in sorted(set(CODE_PATH.findall(text))):
             if not (REPO / path.rstrip("/")).exists():
                 facts.append(f"{rel(f)}: names `{path}`, which does not exist")
+        for braced in sorted(set(BRACED_PATH.findall(text))):
+            m = re.match(r"(.*)\{([^}]*)\}(.*)", braced)
+            for piece in m.group(2).split(","):
+                expanded = m.group(1) + piece + m.group(3)
+                if not (REPO / expanded).exists():
+                    facts.append(f"{rel(f)}: names `{braced}`, whose expansion `{expanded}` does not exist")
 
     # 6. Engine-surface completeness. Every file changed under src/ relative to master must be
     # matched in the inventory's ledger section, by path, by directory, or by stem (which is how

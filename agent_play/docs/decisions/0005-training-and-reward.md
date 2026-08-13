@@ -67,7 +67,7 @@ Stage 1, behavior cloning from the built-in AI. The teacher is `AI::BattlePlanne
 
 Stage 2, DAgger-style correction. DAgger stands for dataset aggregation, and it exists to fix one specific failure of plain cloning. A cloned policy is trained on states the teacher visits, but once deployed it visits its own states, and its first mistake lands it somewhere the training data never covered, where its error is larger, which produces the next mistake. DAgger closes that loop by rolling out the student, asking the teacher what it would have done at each state the student actually reached, adding those answers to the dataset, and retraining on the union. The gain is not marginal: cloning error compounds as $O(\epsilon T^2)$ in the horizon while DAgger achieves $O(\epsilon T)$ (Ross, Gordon and Bagnell, 2011), where $\epsilon$ is the per-decision error rate. [[../rl/training-design#Stage 2, DAgger]] writes out the iteration with its mixing schedule and aggregation step.
 
-The precondition is an expert answerable at arbitrary student-visited states, which is a stronger requirement than an expert that plays. Whether `AI::BattlePlanner` can be queried without advancing the arena or consuming combat randomness is open and load-bearing, and it should be settled early, because the answer determines whether stage 2 is available at all.
+The precondition is an expert answerable at arbitrary student-visited states, which is a stronger requirement than an expert that plays. Whether `AI::BattlePlanner` could be queried without advancing the arena or consuming combat randomness was open and load-bearing when this was written, and it was settled affirmatively on 2026-08-05: the public `BattlePlanner::queryUnitTurn` seam answers at arbitrary states, `--probe-teacher` threads it through the worker, and one hundred paired episodes ran bit-identical digests with the probe on and off (`agent_play/experiments/planner_query.py`). The label resolves inside `simple_v1` only, spellbook decisions excluded, which is the scope stage 2 runs under.
 
 Stage 2b, critic pre-fitting. The teacher plays both sides of every episode, so each recorded battle supplies positive returns for the winner's decisions and negative ones for the loser's, and regressing a value head on them fits $V^{\pi^{*}}$ by Monte Carlo policy evaluation before any reinforcement learning starts. This costs no new data, since the recorded terminal state supports computing returns retroactively, and it removes the uninformative-critic window at the start of stage 3, which is when the cloned policy is most exposed. It needs the reward settled first. [[../rl/training-design#Pre-fitting the critic on teacher play]] gives the argument, including why the mismatch between $V^{\pi^{*}}$ and $V^{\pi_\theta}$ leaves the gradient unbiased.
 
@@ -131,7 +131,7 @@ Milestone 4's protocol must carry the termination reason and enough terminal sta
 
 The reward remains absent from the environment. It belongs to the training configuration under ADR 0003, so changing it is a configuration change with a recorded hash rather than a code change.
 
-Stage 2 depends on an unanswered engine question, so the DAgger feasibility check should happen during Milestone 4 while the protocol is being built, not after.
+Stage 2's engine question is answered, above, and its first round ran the same day (`agent_play/experiments/dagger_iteration.py`, $+0.094 \pm 0.036$ on the pool), so this feasibility caution is kept only as the record of what was once uncertain.
 
 ## What this record does not decide
 
