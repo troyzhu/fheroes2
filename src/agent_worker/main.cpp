@@ -202,7 +202,7 @@ int main( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--allow-flying" ) == 0 ) {
             allowFlyingUnits = true;
         }
-                else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
+        else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
             allowWideUnits = true;
         }
         else if ( std::strcmp( argv[i], "--dump-map" ) == 0 ) {
@@ -450,14 +450,23 @@ int main( int argc, char ** argv )
 
             const fheroes2::agent::EpisodeOutcome outcome = fheroes2::agent::runEpisode( scenario, &recording, &controller );
 
+            // Commanded strengths travel beside the base ones. EpisodeOutcome has carried them
+            // since the commander work, but the protocol record never emitted them, so every
+            // *_commanded reward margin computed from a protocol episode silently fell back to
+            // the un-commanded values through env.py's .get() chain and reported the plain
+            // number under the commanded name (2026-08-12 review panel, finding 15).
             std::printf( "{\"record\":\"terminal\",\"scenario_id\":\"%s\",\"termination\":\"%s\",\"rounds\":%d"
-                         ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u,\"strength\":%.3f,\"initial_strength\":%.3f}"
-                         ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u,\"strength\":%.3f,\"initial_strength\":%.3f}"
+                         ",\"attacker\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u,\"strength\":%.3f,\"initial_strength\":%.3f"
+                         ",\"strength_commanded\":%.3f,\"initial_strength_commanded\":%.3f}"
+                         ",\"defender\":{\"live_stacks\":%u,\"live_creatures\":%u,\"hit_points\":%u,\"strength\":%.3f,\"initial_strength\":%.3f"
+                         ",\"strength_commanded\":%.3f,\"initial_strength_commanded\":%.3f}"
                          ",\"decisions_seen\":%u,\"decisions_answered\":%u,\"rejected\":%u,\"client_closed\":%s",
                          scenario.scenarioId.c_str(), fheroes2::agent::terminationName( outcome.termination ), outcome.rounds, outcome.attacker.liveStacks,
                          outcome.attacker.liveCreatures, outcome.attacker.hitPoints, outcome.attacker.strength, outcome.attackerInitialStrength,
+                         outcome.attacker.strengthCommanded, outcome.attackerInitialStrengthCommanded,
                          outcome.defender.liveStacks, outcome.defender.liveCreatures, outcome.defender.hitPoints, outcome.defender.strength,
-                         outcome.defenderInitialStrength, controller.decisionsSeen(), controller.decisionsAnswered(), controller.rejectedSelections(),
+                         outcome.defenderInitialStrength, outcome.defender.strengthCommanded, outcome.defenderInitialStrengthCommanded,
+                         controller.decisionsSeen(), controller.decisionsAnswered(), controller.rejectedSelections(),
                          controller.isFinished() ? "true" : "false" );
             if ( probeTeacher ) {
                 std::printf( ",\"probes_resolved\":%u,\"probes_outside\":%u", controller.probesResolved(), controller.probesOutsideSchema() );

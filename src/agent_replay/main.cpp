@@ -270,7 +270,7 @@ int runTool( int argc, char ** argv )
         else if ( std::strcmp( argv[i], "--allow-flying" ) == 0 ) {
             allowFlyingUnits = true;
         }
-                else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
+        else if ( std::strcmp( argv[i], "--allow-wide" ) == 0 ) {
             allowWideUnits = true;
         }
         else if ( std::strcmp( argv[i], "--render" ) == 0 ) {
@@ -285,7 +285,7 @@ int runTool( int argc, char ** argv )
                           "usage: fheroes2_agent_replay --actions FILE [--render] [--frames-dir DIR] [--fixture ID]\n"
                           "       [--speed 1..10] [--attacker id:count,...] [--defender id:count,...]\n"
                           "       [--attacker-hero atk:def] [--defender-hero atk:def] [--allow-wide] [--seed-offset N]\n"
-                          "       [--side attacker|defender|both]\n" );
+                          "       [--side attacker|defender|both] [--allow-flying] [--play attacker|defender]\n" );
             return 2;
         }
     }

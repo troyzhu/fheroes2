@@ -10,7 +10,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from fheroes2_agent.env import (reward_from_record, terminal_reward_balanced,
+from fheroes2_agent.env import (_side_won, reward_from_record, terminal_reward_balanced,
                                 terminal_reward_two_sided, _side_won)
 from fheroes2_agent.train_ppo import win_rate
 
@@ -147,9 +147,11 @@ try:
 except ValueError:
     check("reward_from_record refuses a margin it cannot compute", True)
 
-# The stall correction (2026-08-11). Under two_sided a side that never engages banks the maximum
-# the reward can return; under contested every stalemate falls inside the losing band, so engaging
-# a winnable fight strictly dominates stalling it, for whichever chair the learner occupies.
+# The stall correction (2026-08-11, made the plain difference 2026-08-12). Under two_sided a side
+# that never engages banks the maximum the reward can return; under contested a pure standoff pays
+# zero, damage is the reward rather than a threshold, and engaging a winnable fight strictly
+# dominates stalling it. At a stalemate the SIGN follows damage, not the engine's defender-wins
+# resolution: that divergence is deliberate and pinned below, not an accident to be fixed.
 _stall = lambda a, d: {"termination": "stalemate",
                        "attacker": {"strength": a, "initial_strength": 100.0, "hit_points": a},
                        "defender": {"strength": d, "initial_strength": 100.0, "hit_points": d}}
@@ -182,6 +184,12 @@ check("contested agrees with balanced wherever the loser is wiped out",
 check("contested and balanced diverge exactly at the stalemate",
       reward_from_record(_stall(100, 100), "defender", "contested")
       != reward_from_record(_stall(100, 100), "defender", "balanced"))
+# The deliberate divergence: an attacker 40 percent ahead at the stall is paid +0.40 even though
+# _side_won scores the stalemate to the defender. The reward ranks harassment above annihilation;
+# the win-rate column must therefore come from _side_won, never from this reward's sign.
+check("contested pays an attacker-ahead stall by damage, diverging from _side_won on purpose",
+      abs(reward_from_record(_stall(100, 60), "attacker", "contested") - 0.40) < 1e-9
+      and not _side_won(_stall(100, 60), "attacker"))
 check("contested differs from two_sided by exactly the outcome bit on a decided win",
       abs((reward_from_record(clean, "attacker", "two_sided")
            - reward_from_record(clean, "attacker", "contested")) - 1.0) < 1e-9)

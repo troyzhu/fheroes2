@@ -1,0 +1,61 @@
+{
+ "informative": {
+  "n": 619,
+  "prior_on_label_mean": 0.07052521001615508,
+  "prior_on_label_percentiles": {
+   "p5": 0.0,
+   "p25": 0.0,
+   "p50": 0.000153,
+   "p75": 0.123175,
+   "p95": 0.335299
+  },
+  "rank_mean": 12.4281098546042,
+  "rank_percentiles": {
+   "p5": 2.0,
+   "p25": 2.0,
+   "p50": 8.0,
+   "p75": 19.0,
+   "p95": 41.0
+  },
+  "below_support": 0.6332794830371568
+ },
+ "confirming": {
+  "n": 4524,
+  "prior_on_label_mean": 0.8623046978337753,
+  "prior_on_label_percentiles": {
+   "p5": 0.4101121,
+   "p25": 0.768738,
+   "p50": 0.9786014999999999,
+   "p75": 0.999554,
+   "p95": 0.999999
+  },
+  "rank_mean": 1.0,
+  "rank_percentiles": {
+   "p5": 1.0,
+   "p25": 1.0,
+   "p50": 1.0,
+   "p75": 1.0,
+   "p95": 1.0
+  },
+  "below_support": 0.0
+ },
+ "target": {
+  "kl_bar_prior_mean": 0.05406094477118022,
+  "kl_bar_prior_percentiles": {
+   "p5": 3.066793153334388e-08,
+   "p25": 3.8232935935296525e-06,
+   "p50": 0.00026615966766304136,
+   "p75": 0.008235546949309096,
+   "p95": 0.3106055176877639
+  },
+  "kl_prior_bar_mean": 0.07527986542310286,
+  "bar_on_label_mean": 0.7864285437333917
+ },
+ "student": {
+  "checkpoint": "b25_s0_soft.pt",
+  "informative_prob_mean": 0.08716858923435211,
+  "informative_rank_mean": 13.197092084006462,
+  "informative_below_support": 0.6397415185783522,
+  "confirming_prob_mean": 0.840278148651123
+ }
+}

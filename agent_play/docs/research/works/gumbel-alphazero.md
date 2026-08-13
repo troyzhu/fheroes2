@@ -48,4 +48,9 @@ The paper's search has a learned value network at the leaves; ours rolls out the
 
 Their budgets are also spent on a tree. At one ply, Sequential Halving's phases and our rollout cost interact differently, and the halving schedule assumes candidates can be compared on equal visit counts, which coverage forcing already approximates badly.
 
-Nothing here has been run on this project. It is a reading that reframes three existing measurements and names two concrete arms, the Sequential Halving root and the completed-Q target, neither of which is yet built.
+The Sequential Halving root has since been built and measured: `_sequential_halving` in `python/fheroes2_agent/search.py` behind `--allocator`, swept against PUCT by `agent_play/experiments/allocator_scaling.py`, where a one-experiment advantage at thirty-two playouts did not survive its own budget sweep and PUCT stays the default; what replicates is the mechanism, roughly triple the visit entropy at every budget. The completed-Q target remains unbuilt. So the paper's root-bandit half is measured here and its policy-target half is not, and the budget log carries the sweep.
+
+<!-- verify
+grep    python/fheroes2_agent/search.py :: _sequential_halving
+exists  agent_play/experiments/allocator_scaling.py
+-->

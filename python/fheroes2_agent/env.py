@@ -65,9 +65,11 @@ def apply_difficulty(reward: float, weight: float) -> float:
 
     That justification is specific to the margins carrying an explicit outcome term. Under
     `contested`, which is the plain strength difference, the reward is continuous across zero and a
-    narrow win really can read $+0.05$. The split stays well defined for a better reason there: the
-    sign of the difference IS the outcome, since a side holding force against one that does not has
-    won, so no interval needs reserving. A standoff reads exactly zero and is therefore unweighted,
+    narrow win really can read $+0.05$. The split stays well defined for a better reason there: on
+    decided terminations the sign of the difference carries the outcome, since a side holding force
+    against one that does not has won, so no interval needs reserving; at a stalemate the sign
+    follows damage rather than the engine's defender-wins resolution, which `contested`'s own
+    docstring records as deliberate. A standoff reads exactly zero and is therefore unweighted,
     which is the right treatment for a battle whose difficulty was never tested.
     """
     return reward * (weight if reward > 0 else 1.0 / weight)
@@ -160,8 +162,11 @@ class BattleEnv:
         self._pending: dict | None = None
         # planes_v1 tensor of the latest presented state, None unless planes=True.
         self.last_planes = None
-        # Own hit points at the first decision, which is before any damage has been dealt, so it
-        # is the starting force. The terminal record carries no initial totals.
+        # Own hit points at the first PRESENTED decision. For an attacker that is before any
+        # damage; a defender's first decision can already sit behind an enemy opening (a Titan or
+        # Mage volley lands first in parts of held_out_as_defender), so this is the force at first
+        # sight rather than a guaranteed pristine total. The terminal record carries no initial
+        # hit-point totals, which is why it is captured here at all.
         self._own_initial_hp: float = 0.0
         self._reward_weighting = reward_weighting
         self._reward_margin = reward_margin
@@ -404,6 +409,17 @@ def terminal_reward_contested(record: dict, side: str, commanded: bool = False) 
     - a decided win keeping 80 percent against a wiped-out foe reads $+0.8$, unchanged;
     - the function is zero-sum, $r(\text{attacker}) = -r(\text{defender})$ at every terminal, which
       neither `two_sided` nor `balanced` is, and which self-play wants.
+
+    The sign carries the outcome only on decided terminations, where the loser is wiped out and the
+    difference collapses to the winner's kept fraction. At a stalemate the two part company on
+    purpose: the engine resolves a stall as a defender win, while this function pays whoever dealt
+    more damage, so an attacker that chips 40 percent and then evades collects $+0.40$ for a battle
+    the game scores against it. That is the price of removing the cliff, accepted with eyes open: a
+    losing attacker preferring harassment at $+0.40$ to annihilation at $-0.8$ is ranked correctly
+    for training even though the game's own scoreboard would read it a loss, and the same applies at
+    the `round_limit` termination, where both sides lose the battle and this margin still orders
+    them by damage. Anyone quoting win rates beside this reward should quote `_side_won`, not the
+    reward's sign.
 
     Difficulty weighting still supplies the scale the outcome bit used to: `apply_difficulty`
     multiplies by the opponent-to-own strength ratio on a win and its inverse on a loss, and the

@@ -15,9 +15,14 @@ a playout already runs to the end of the battle.
 Two properties of the side environment decide what the numbers mean, and both were configuration
 accidents until 2026-08-09. What `rollout` returns is that environment's terminal reward, so its
 `reward_margin` is the quantity search maximizes. And its world seed fixes both the battlefield and
-the combat dice, so pinning it to the live episode is required for the prefix replay to reproduce
-the live position, but pinning it without a `combat_seed_offset` also hands search the live
-battle's actual dice. See `agent_play/docs/rl/reward-design.md`.
+the combat dice, so pinning it to the live episode is required for the prefix replay to track the
+live position, but pinning it without a `combat_seed_offset` also hands search the live battle's
+actual dice. The replay is bit-exact only in that shared-dice configuration, which ADR 0008 labels
+a ceiling; under the nonzero offset the same ADR mandates for honest numbers, different rolls mean
+different casualties, a prefix action can name a unit that no longer exists, and the controller
+skips such stale actions silently (`agent_external_controller.cpp`), so the sim state is a
+resampled trajectory under the same action prefix rather than a copy of the live one. See
+`agent_play/docs/rl/reward-design.md`.
 """
 
 from __future__ import annotations
@@ -100,8 +105,10 @@ def sync_side_environment(sim: BattleEnv | None, live: BattleEnv, worker: str,
 
 def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float:
     """Replay the prefix, apply the candidate, sample the policy to terminal; the return is the
-    episode's terminal reward. Deterministic engine plus identical action sequence reproduces
-    the prefix state exactly (the replay-rendering machinery's own guarantee)."""
+    episode's terminal reward. With the side environment on the live dice, determinism plus the
+    identical action sequence reproduces the prefix state exactly (the replay-rendering machinery's
+    guarantee); on an offset combat stream the prefix yields a resampled position instead, stale
+    actions silently skipped, which is the price ADR 0008 accepts for honest value estimates."""
     observation, mask = sim.reset()
     for action in prefix:
         step = sim.step(action)
@@ -118,7 +125,7 @@ def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) 
 
 def _sequential_halving(sim, model, prefix: list[int], prior: dict[int, float], simulations: int,
                         visits: dict[int, int], total_return: dict[int, float],
-                        candidates: int = 0) -> None:
+                        candidates: int = 0) -> list[int]:
     """Spend the budget by Sequential Halving (Karnin et al. 2013) instead of by UCB.
 
     PUCB minimises cumulative regret, which is the right objective when a node's estimate feeds a
@@ -134,13 +141,18 @@ def _sequential_halving(sim, model, prefix: list[int], prior: dict[int, float], 
     the worse half is dropped at the end of each phase.
 
     `candidates` caps how many of the prior's top actions enter phase one, which is the paper's
-    `m`; zero admits every legal action.
+    `m`; zero admits every legal action. Returns the surviving arms, best mean first, because the
+    schedule's answer is its last survivor rather than the most-visited action.
     """
     survivors = sorted(prior, key=prior.get, reverse=True)
     if candidates:
         survivors = survivors[:candidates]
-    if len(survivors) <= 1:
-        survivors = list(prior)[:1]
+    if not survivors:
+        # Guard the empty case only. The earlier form also fired at candidates=1 and replaced the
+        # top-prior candidate with list(prior)[:1], which is legal-action insertion order, so a
+        # one-candidate search spent its whole budget measuring the lowest-indexed legal action
+        # (2026-08-12 panel, finding 17).
+        survivors = sorted(prior, key=prior.get, reverse=True)[:1]
     phases = max(1, math.ceil(math.log2(max(len(survivors), 2))))
     spent = 0
     while spent < simulations:
@@ -158,8 +170,12 @@ def _sequential_halving(sim, model, prefix: list[int], prior: dict[int, float], 
         if len(survivors) <= 1:
             break
         means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in survivors}
-        survivors = sorted(survivors, key=lambda a: means[a], reverse=True)[:max(1, len(survivors) // 2)]
+        # Ceil, not floor: Karnin's rule keeps the better HALF, so three survivors keep two.
+        # Floor division kept one, committing the remaining budget to an arm chosen on two
+        # samples each (2026-08-12 panel, finding 16).
+        survivors = sorted(survivors, key=lambda a: means[a], reverse=True)[:max(1, (len(survivors) + 1) // 2)]
         phases = max(1, phases - 1)
+    return survivors
 
 
 def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
@@ -202,9 +218,17 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
         # attribution error: two variables moved, one credited.
         actions = sorted(prior, key=prior.get, reverse=True)[:candidates]
     if allocator == "sequential_halving":
-        _sequential_halving(sim, model, prefix, prior, simulations, visits, total_return, candidates)
+        survivors = _sequential_halving(sim, model, prefix, prior, simulations, visits, total_return,
+                                        candidates)
         means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
-        return max(actions, key=lambda a: (visits[a], means[a])), means, visits, prior
+        # The answer is the best surviving arm, not the most-visited action overall. Under a
+        # truncated final phase the visit maximum can sit on whichever survivor the loop reached
+        # first, or on an arm eliminated earlier, so the (visits, means) rule returned an action
+        # the schedule never selected (2026-08-12 panel, finding 18). The visits>0 guard covers
+        # budgets smaller than the survivor count, where an unvisited survivor's 0.0 mean must not
+        # outrank a measured one.
+        best = max(survivors, key=lambda a: (visits[a] > 0, means[a]))
+        return best, means, visits, prior
     if allocator != "puct":
         raise ValueError(f"unknown allocator {allocator!r}")
     sweep = sorted(actions, key=lambda a: -prior[a]) if coverage_forced else []

@@ -26,6 +26,18 @@ FILES = pathlib.Path(__file__).resolve().parents[1] / "docs" / "archive" / "expe
 
 # Ordered: the first pattern that matches a file names it, so put specific prefixes first.
 FAMILIES: list[tuple[str, str, str]] = [
+    ("n*_puct_m*", "search_agent_battery.py --allocator puct, budget in the name",
+     "The PUCT half of the budget-scaling ladder, 32 through 512 playouts on the mirror suites with\n      independent dice; the curve that contradicted ADR 0008's saturation reading by rising through 256"),
+    ("n*_sequential_halving_m*", "search_agent_battery.py --allocator sequential_halving",
+     "The halving half of the same ladder, capped at 8 and 16 candidates; the 32-playout advantage that\n      did not replicate at any larger budget, kept beside the mechanism that did, tripled visit entropy"),
+    ("alloc_*", "search_agent_battery.py --allocator, 32-playout attribution set",
+     "PUCT, capped PUCT and halving on identical seeds and dice at 32 playouts; the three-way control\n      that attributed the apparent halving gain to allocation and then priced it as unreplicated"),
+    ("play_*", "distillation_budget.py --from-reports naming convention",
+     "Per-arm play reports for the budget, entropy-bonus and target-form distillation arms, network\n      alone on the five discriminating suites; the raw rows behind the budget log's every table"),
+    ("budget_arms_summary.json", "distillation_budget.py --report",
+     "The pooled arm table for the distillation budget sweep, seeds aggregated with spread"),
+    ("distillation_support.json", "distillation_support.py --report",
+     "Where search's labels sit under the prior that collected them: the 88/12 confirming split, the\n      median 0.0002 prior on informative labels, and what the trained student absorbed"),
     ("honest_sweep*", "search_agent_battery.py --search-combat-offset",
      "The searching agent on every suite with its side environment on the live battlefield but its dice\n      independent, beside a paired unsearched control; the honest reading of the goal-45 scoreboard"),
     ("push45_*", "search_agent_battery.py with the live dice",

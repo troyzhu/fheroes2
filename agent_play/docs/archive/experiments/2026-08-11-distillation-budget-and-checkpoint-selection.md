@@ -41,7 +41,7 @@ Each snapshot was played on the five suites that can separate players, network a
 | 100 epochs at 75 | 0.9100 | 0.4659 | 1.25 | 0.283 | 0.062 | $-0.221$ |
 | 100 epochs at 100 | 0.9144 | 0.4659 | 1.23 | 0.284 | 0.060 | $-0.224$ |
 
-Agreement rises by $0.064$ along that ladder and held-out loss improves by $0.098$, while every column describing play degrades. Paired within seed, the long budget costs $-0.0301$ win rate at a standard error of $0.0112$, $-0.0619$ mean reward at $0.0160$, and $-0.0317$ strength margin at $0.0089$. All three seeds carry the same sign. Two of the three effects clear three standard errors, and the win rate alone would have read as noise at 1.5, which is why the quality columns travel with it.
+Agreement rises by $0.064$ along that ladder and held-out loss improves by $0.098$, while every column describing play degrades. Paired within seed, the long budget costs $-0.0301$ win rate, $-0.0619$ mean reward and $-0.0317$ strength margin, at $t$ of 2.7, 3.9 and 3.6 on two degrees of freedom, where 95 percent needs 4.30. All three seeds carry the same sign, and the three columns agree, but by the same standard this log later applies to the allocator result none of the three clears the bar alone: this is the favoured reading of consistent evidence, not an established effect. Unpaired across seeds the win-rate difference carries a standard error of 0.0202 and sits at 1.5, which is noise; pairing within seed is what sharpens it to 2.7, and the quality columns travel with it because the rate is the bluntest of the three.
 
 Across the five budget arms above, fifteen arm-seeds in all, the correlation between held-out agreement and win rate is $-0.436$, and between effective actions in play and win rate is $+0.482$. Over the range explored, the metric the trainer selects on runs against the metric the project is trying to raise.
 
@@ -60,7 +60,7 @@ Two questions the 25-to-100 ladder could not settle. Nothing on this corpus had 
 
 Early stopping is now answered and the answer is no. Paired against the standing configuration, five epochs matches it on win rate at $+0.001$ and loses on everything else, $-0.031$ reward at 4.3 standard errors and $-0.031$ strength margin at 20.1. Ten and fifteen epochs lose on all three. The rate alone would have called five epochs a tie, and the quality columns are what separate them, so the 2026-08-07 hint does not survive contact with a fuller metric block. Twenty-five sits at the optimum of everything measured in both directions.
 
-The restart arm settles the mechanism question, by being the worst player of the twelve while holding the best offline numbers of the twelve. Restarts bought more effective optimization, the highest agreement at 0.9183 and the lowest held-out loss at 0.4061, and cost $-0.088$ win rate, $-0.211$ reward and $-0.123$ strength margin against the standing clone at 2.7, 3.5 and 4.0 standard errors. So the damage a long budget does is not the shape of the anneal. It is the fitting.
+The restart arm is the strongest evidence on the mechanism question, being the worst player of the twelve while holding the best offline numbers of the twelve, though its own paired ratios, $t$ of 2.7, 3.5 and 4.0 on two degrees of freedom, sit below the 4.30 bar and it reads as the favoured mechanism rather than a settled one. Restarts bought more effective optimization, the highest agreement at 0.9183 and the lowest held-out loss at 0.4061, and cost $-0.088$ win rate, $-0.211$ reward and $-0.123$ strength margin against the standing clone at 2.7, 3.5 and 4.0 standard errors. So the damage a long budget does is not the shape of the anneal. It is the fitting.
 
 That also names the mechanism the earlier sections left open. Held-out loss falling while play falls cannot be classical overfitting, because the holdout is drawn from the teacher's own episodes: the model is genuinely generalizing better on the states the teacher visits. It plays worse on the states it visits itself, which is covariate shift rather than overfitting, and it is the failure DAgger exists to address. Across all twelve arms agreement correlates $-0.389$ with play and held-out loss $+0.237$, meaning lower loss goes with worse play. Both offline instruments point the wrong way across the whole design.
 
@@ -77,7 +77,7 @@ Holding the budget at 25 epochs and paying the student to stay uncertain, throug
 | $\beta = 0.15$ | 4.62 | 0.264 | $-0.009$ | $-0.273$ |
 | $\beta = 0.40$ | 12.88 | 0.248 | $-0.049$ | $-0.297$ |
 
-Paired against the control at the same seed, $\beta = 0.05$ is not distinguishable from it at $-0.038$ win rate and 0.9 standard errors, one of its three seeds landing positive. The larger doses are distinguishable and get worse together: $\beta = 0.15$ reads $-0.050$ win rate, $-0.131$ reward and $-0.080$ strength margin at 1.8, 2.9 and 3.8 standard errors, and $\beta = 0.40$ reads $-0.066$, $-0.171$ and $-0.105$ at 2.7, 4.8 and 9.1. The strength margin is the sharpest instrument of the three at every dose, and the win rate the bluntest, which is the third time on this program that the rate alone would have called an effect noise.
+Paired against the control at the same seed, $\beta = 0.05$ is not distinguishable from it at $-0.038$ win rate and 0.9 standard errors, one of its three seeds landing positive. The larger doses get worse together: $\beta = 0.15$ reads $-0.050$ win rate, $-0.131$ reward and $-0.080$ strength margin at $t$ of 1.8, 2.9 and 3.8, below the 4.30 the two degrees of freedom demand, and $\beta = 0.40$ reads $-0.066$, $-0.171$ and $-0.105$ at 2.7, 4.8 and 9.1, whose last two clear it, so the heaviest dose is the one distinguishable arm. The strength margin is the sharpest instrument of the three at every dose, and the win rate the bluntest, which is the third time on this program that the rate alone would have called an effect noise.
 
 The correlation flips sign under intervention. Across the budget ladder, effective actions correlate $+0.482$ with win rate; within the entropy grid, where the budget is fixed and only the bonus moves, they correlate $-0.561$. Entropy travelled with the damage because the budget moved both, so it is not the mediator of what a long budget costs.
 
@@ -117,7 +117,7 @@ The general form of this is documented outside the project. Codevilla et al. (IC
 
 ## Where the labels sit, which is why the gap survives every budget
 
-The budget arms all treat the loss as one thing, and it is not. The hard rows carry `nll_loss` against a single recorded action, plain log loss on an argmax, and that action is `AI::BattlePlanner`'s. The soft rows carry cross-entropy against $\bar\pi$, which is KL up to the target's own entropy. On the standing recipe that is 242,570 hard rows at weight 1.0 against 5,143 soft rows at weight 2.0, so the search-taught term is 4.1 percent of the loss mass and the other 95.9 percent instructs the student to imitate the engine.
+The budget arms all treat the loss as one thing, and it is not. The hard rows carry `nll_loss` against a single recorded action, plain log loss on an argmax, and that action is `AI::BattlePlanner`'s. The soft rows carry cross-entropy against $\bar\pi$, which is KL up to the target's own entropy. On the standing recipe that is 242,570 hard rows at weight 1.0 against 5,143 soft rows at weight 2.0, a 4.1 percent search-taught share of the corpus; after the 80/20 episode split holds out a fifth of the hard rows the trained mixture is roughly 194,000 against 10,286 weighted, so about 5 percent of the training loss, and the other 95 percent instructs the student to imitate the engine.
 
 Asking where those labels sit under the policy that has to learn them (`distillation_support.py`) explains the gap without needing another training run:
 
@@ -148,7 +148,7 @@ It does not survive a budget sweep. Eighteen runs over budgets 64 and 128, three
 | 64 | 0.620 | 0.606 | 0.630 |
 | 128 | 0.671 | 0.630 | 0.639 |
 
-Paired within seed at matched budget, all four comparisons are null: $-0.0139$, $+0.0093$, $-0.0417$ and $-0.0139$ win rate at 0.3, 0.2, 1.0 and 0.3 standard errors, two of them nominally negative. Halving's own curve is non-monotonic, 0.685 falling to 0.606 before recovering to 0.630, which is the shape of a lucky point rather than a trend.
+Paired within seed at matched budget, all four comparisons are null: $-0.0139$, $+0.0093$, $-0.0417$ and $-0.0324$ win rate at $t$ of 0.3, 0.2, 1.0 and 1.1, three of them nominally negative. Halving's own curve is non-monotonic, 0.685 falling to 0.606 before recovering to 0.630, which is the shape of a lucky point rather than a trend.
 
 Two of this project's claims are corrected by that table. The sweep was built on the hypothesis that ADR 0008's saturation was a property of PUCT's allocation rather than of search, and PUCT does not saturate here at all: it improves monotonically, 0.597 to 0.620 to 0.671, with the strength margin running $+0.095$ to $+0.147$ from 64 to 128. And the thirty-two-playout result was reported as $+0.088$ at 3.1 standard errors, which overstated it. Three seeds give a paired $t$ with two degrees of freedom, whose 95 percent critical value is 4.30 rather than about 2, so that reading corresponds to $p$ of roughly 0.09. It was marginal, and quoting it in standard errors borrowed the authority of a normal approximation three seeds do not earn.
 
@@ -168,10 +168,13 @@ The trainer's heartbeat carries four more columns per epoch: `holdout_loss`, `ho
 
 The corpus the band run used no longer exists. Its matchup directories survive in the scratchpad with every episode removed, which is the failure the experiment-script convention was written against. The substitute is `data_diverse_planes` plus `data_dagger_planes` counted twice, 242,570 hard decisions against the band run's 247,937, with the identical `regret_corpus` soft set of 5,143 rows. All three load at 634-dimensional `obs_encoding_v3`, the planes layer being a field `load_dir` ignores. The arms here are matched against each other and are not comparable to the 0.512 held-out figure quoted elsewhere.
 
+The raw reports behind every table here are vendored under `files/2026-08-11-run-reports/`, the per-arm play reports, the allocator attribution set, the budget-ladder rungs through 512 playouts, and the support diagnosis, so the numbers survive the scratchpad that has already silently evicted two corpora this log depends on.
+
 <!-- verify
 exists  agent_play/experiments/distillation_budget.py
 exists  agent_play/experiments/distillation_support.py
 exists  agent_play/experiments/allocator_scaling.py
+exists  agent_play/docs/archive/experiments/files/2026-08-11-run-reports/README.md
 grep    python/fheroes2_agent/search.py :: _sequential_halving
 exists  agent_play/experiments/soft_distill.py
 grep    agent_play/experiments/soft_distill.py :: entropy_bonus

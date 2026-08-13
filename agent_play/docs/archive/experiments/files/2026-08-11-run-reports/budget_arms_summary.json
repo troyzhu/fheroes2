@@ -1,0 +1,854 @@
+{
+ "suites": [
+  "held_out_pool",
+  "held_out_as_defender",
+  "mirrors_attacker",
+  "mirrors_defender",
+  "fresh_sampled"
+ ],
+ "episodes": 8,
+ "simulations": 0,
+ "eval_seed": 17,
+ "budgets": [
+  25,
+  100
+ ],
+ "entropy_bonus": [
+  0.0
+ ],
+ "arms": {
+  "b100_at025": [
+   {
+    "checkpoint": "b100_at025_s0",
+    "play": {
+     "win_rate": 0.33125,
+     "mean_reward": 0.13619416158580472,
+     "reward_on_wins": 1.4401584812449575,
+     "reward_on_losses": -0.5054391833734876,
+     "strength_margin": -0.19505583841419524,
+     "entropy": 0.6432177921529005,
+     "normalized_entropy": 0.1997312123222121,
+     "effective_actions": 2.404427693455271,
+     "support_at_1pct": 3.482172630722258,
+     "mean_rounds": 7.140000000000001,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.5625,
+      "held_out_as_defender": 0.25,
+      "mirrors_attacker": 0.20833333333333334,
+      "mirrors_defender": 0.2916666666666667,
+      "fresh_sampled": 0.34375
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.87233,
+     "holdout_loss": 0.49623,
+     "holdout_normalized_entropy": 0.12485,
+     "holdout_effective_actions": 1.4887,
+     "epochs_run": 25,
+     "best_agreement_epoch": 23,
+     "best_agreement": 0.87374,
+     "best_loss_epoch": 24,
+     "best_loss": 0.49623,
+     "selector_disagreement_epochs": -1
+    }
+   },
+   {
+    "checkpoint": "b100_at025_s1",
+    "play": {
+     "win_rate": 0.2945833333333333,
+     "mean_reward": 0.06069483544177754,
+     "reward_on_wins": 1.4434184726629085,
+     "reward_on_losses": -0.5036755284060261,
+     "strength_margin": -0.2338884978915558,
+     "entropy": 0.6318925572644217,
+     "normalized_entropy": 0.19653915606291894,
+     "effective_actions": 2.3818602610980584,
+     "support_at_1pct": 3.495015172816091,
+     "mean_rounds": 7.351666666666667,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.5875,
+      "held_out_as_defender": 0.1875,
+      "mirrors_attacker": 0.16666666666666666,
+      "mirrors_defender": 0.25,
+      "fresh_sampled": 0.28125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.86533,
+     "holdout_loss": 0.5121,
+     "holdout_normalized_entropy": 0.12341,
+     "holdout_effective_actions": 1.4772,
+     "epochs_run": 25,
+     "best_agreement_epoch": 23,
+     "best_agreement": 0.86552,
+     "best_loss_epoch": 23,
+     "best_loss": 0.50773,
+     "selector_disagreement_epochs": 0
+    }
+   },
+   {
+    "checkpoint": "b100_at025_s2",
+    "play": {
+     "win_rate": 0.2920833333333333,
+     "mean_reward": 0.0778375030973608,
+     "reward_on_wins": 1.3930687844024894,
+     "reward_on_losses": -0.47250578760822926,
+     "strength_margin": -0.21424583023597252,
+     "entropy": 0.67091878436034,
+     "normalized_entropy": 0.20798715937927148,
+     "effective_actions": 2.5504262916811125,
+     "support_at_1pct": 3.6807994832836064,
+     "mean_rounds": 7.490833333333333,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.525,
+      "held_out_as_defender": 0.175,
+      "mirrors_attacker": 0.25,
+      "mirrors_defender": 0.20833333333333334,
+      "fresh_sampled": 0.3020833333333333
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.86966,
+     "holdout_loss": 0.50149,
+     "holdout_normalized_entropy": 0.12738,
+     "holdout_effective_actions": 1.4968,
+     "epochs_run": 25,
+     "best_agreement_epoch": 24,
+     "best_agreement": 0.86966,
+     "best_loss_epoch": 24,
+     "best_loss": 0.50149,
+     "selector_disagreement_epochs": 0
+    }
+   }
+  ],
+  "b100_at050": [
+   {
+    "checkpoint": "b100_at050_s0",
+    "play": {
+     "win_rate": 0.33375,
+     "mean_reward": 0.14178743083665285,
+     "reward_on_wins": 1.4312582324306624,
+     "reward_on_losses": -0.49835523158164075,
+     "strength_margin": -0.19196256916334714,
+     "entropy": 0.46398862104389255,
+     "normalized_entropy": 0.14373703273269803,
+     "effective_actions": 1.9390428145927157,
+     "support_at_1pct": 2.7706359674886434,
+     "mean_rounds": 7.429583333333333,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4625,
+      "held_out_as_defender": 0.2375,
+      "mirrors_attacker": 0.2916666666666667,
+      "mirrors_defender": 0.3333333333333333,
+      "fresh_sampled": 0.34375
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.90279,
+     "holdout_loss": 0.46311,
+     "holdout_normalized_entropy": 0.08102,
+     "holdout_effective_actions": 1.2901,
+     "epochs_run": 50,
+     "best_agreement_epoch": 49,
+     "best_agreement": 0.90279,
+     "best_loss_epoch": 49,
+     "best_loss": 0.46311,
+     "selector_disagreement_epochs": 0
+    }
+   },
+   {
+    "checkpoint": "b100_at050_s1",
+    "play": {
+     "win_rate": 0.2633333333333333,
+     "mean_reward": 0.019173326469991998,
+     "reward_on_wins": 1.454558413183463,
+     "reward_on_losses": -0.5074249232785986,
+     "strength_margin": -0.24416000686334133,
+     "entropy": 0.4581419711207085,
+     "normalized_entropy": 0.14213726500235777,
+     "effective_actions": 1.869459332918569,
+     "support_at_1pct": 2.6565296832945378,
+     "mean_rounds": 7.1875,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.5875,
+      "held_out_as_defender": 0.25,
+      "mirrors_attacker": 0.08333333333333333,
+      "mirrors_defender": 0.08333333333333333,
+      "fresh_sampled": 0.3125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.89581,
+     "holdout_loss": 0.4691,
+     "holdout_normalized_entropy": 0.08487,
+     "holdout_effective_actions": 1.3047,
+     "epochs_run": 50,
+     "best_agreement_epoch": 49,
+     "best_agreement": 0.89581,
+     "best_loss_epoch": 44,
+     "best_loss": 0.46431,
+     "selector_disagreement_epochs": 5
+    }
+   },
+   {
+    "checkpoint": "b100_at050_s2",
+    "play": {
+     "win_rate": 0.2991666666666667,
+     "mean_reward": 0.09382709804208808,
+     "reward_on_wins": 1.4174570434220748,
+     "reward_on_losses": -0.48313264269010736,
+     "strength_margin": -0.2053395686245786,
+     "entropy": 0.45749805082823586,
+     "normalized_entropy": 0.14141881881199342,
+     "effective_actions": 1.8814176982683868,
+     "support_at_1pct": 2.7426195961460165,
+     "mean_rounds": 7.291666666666667,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.5,
+      "held_out_as_defender": 0.225,
+      "mirrors_attacker": 0.25,
+      "mirrors_defender": 0.16666666666666666,
+      "fresh_sampled": 0.3541666666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.89608,
+     "holdout_loss": 0.47473,
+     "holdout_normalized_entropy": 0.08588,
+     "holdout_effective_actions": 1.3093,
+     "epochs_run": 50,
+     "best_agreement_epoch": 49,
+     "best_agreement": 0.89608,
+     "best_loss_epoch": 48,
+     "best_loss": 0.47043,
+     "selector_disagreement_epochs": 1
+    }
+   }
+  ],
+  "b100_at075": [
+   {
+    "checkpoint": "b100_at075_s0",
+    "play": {
+     "win_rate": 0.2841666666666666,
+     "mean_reward": 0.06825721241254527,
+     "reward_on_wins": 1.4637356389126022,
+     "reward_on_losses": -0.4910571904615738,
+     "strength_margin": -0.21590945425412142,
+     "entropy": 0.3748079020215421,
+     "normalized_entropy": 0.11663010656328576,
+     "effective_actions": 1.682721897167625,
+     "support_at_1pct": 2.3968571710740934,
+     "mean_rounds": 7.296250000000001,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.475,
+      "held_out_as_defender": 0.2375,
+      "mirrors_attacker": 0.25,
+      "mirrors_defender": 0.125,
+      "fresh_sampled": 0.3333333333333333
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.91538,
+     "holdout_loss": 0.4792,
+     "holdout_normalized_entropy": 0.06786,
+     "holdout_effective_actions": 1.2361,
+     "epochs_run": 75,
+     "best_agreement_epoch": 72,
+     "best_agreement": 0.91538,
+     "best_loss_epoch": 51,
+     "best_loss": 0.46307,
+     "selector_disagreement_epochs": 21
+    }
+   },
+   {
+    "checkpoint": "b100_at075_s1",
+    "play": {
+     "win_rate": 0.2758333333333333,
+     "mean_reward": 0.05326952670885369,
+     "reward_on_wins": 1.4213404454615213,
+     "reward_on_losses": -0.4735007757658175,
+     "strength_margin": -0.22256380662447964,
+     "entropy": 0.384279047261082,
+     "normalized_entropy": 0.11873878957757253,
+     "effective_actions": 1.6913679757418874,
+     "support_at_1pct": 2.3492859175981256,
+     "mean_rounds": 7.346666666666667,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.525,
+      "held_out_as_defender": 0.25,
+      "mirrors_attacker": 0.125,
+      "mirrors_defender": 0.16666666666666666,
+      "fresh_sampled": 0.3125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.90756,
+     "holdout_loss": 0.47287,
+     "holdout_normalized_entropy": 0.0719,
+     "holdout_effective_actions": 1.2506,
+     "epochs_run": 75,
+     "best_agreement_epoch": 74,
+     "best_agreement": 0.90756,
+     "best_loss_epoch": 44,
+     "best_loss": 0.46431,
+     "selector_disagreement_epochs": 30
+    }
+   },
+   {
+    "checkpoint": "b100_at075_s2",
+    "play": {
+     "win_rate": 0.2891666666666667,
+     "mean_reward": 0.06390306641389672,
+     "reward_on_wins": 1.4317727978401185,
+     "reward_on_losses": -0.48366556949285827,
+     "strength_margin": -0.22526360025276998,
+     "entropy": 0.3969324897076406,
+     "normalized_entropy": 0.12302927292010002,
+     "effective_actions": 1.70744248829679,
+     "support_at_1pct": 2.422241411518077,
+     "mean_rounds": 7.3083333333333345,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4375,
+      "held_out_as_defender": 0.2375,
+      "mirrors_attacker": 0.20833333333333334,
+      "mirrors_defender": 0.25,
+      "fresh_sampled": 0.3125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.907,
+     "holdout_loss": 0.4884,
+     "holdout_normalized_entropy": 0.07167,
+     "holdout_effective_actions": 1.2498,
+     "epochs_run": 75,
+     "best_agreement_epoch": 74,
+     "best_agreement": 0.907,
+     "best_loss_epoch": 48,
+     "best_loss": 0.47043,
+     "selector_disagreement_epochs": 26
+    }
+   }
+  ],
+  "b100_at100": [
+   {
+    "checkpoint": "b100_at100_s0",
+    "play": {
+     "win_rate": 0.2879166666666667,
+     "mean_reward": 0.07115506220052993,
+     "reward_on_wins": 1.4504410428106405,
+     "reward_on_losses": -0.4844567816058647,
+     "strength_margin": -0.21676160446613674,
+     "entropy": 0.35301480074210545,
+     "normalized_entropy": 0.10936161863700407,
+     "effective_actions": 1.63455999574782,
+     "support_at_1pct": 2.293790778858938,
+     "mean_rounds": 7.338333333333333,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.45,
+      "held_out_as_defender": 0.25,
+      "mirrors_attacker": 0.2916666666666667,
+      "mirrors_defender": 0.125,
+      "fresh_sampled": 0.3229166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.91952,
+     "holdout_loss": 0.48999,
+     "holdout_normalized_entropy": 0.06374,
+     "holdout_effective_actions": 1.2197,
+     "epochs_run": 100,
+     "best_agreement_epoch": 94,
+     "best_agreement": 0.92006,
+     "best_loss_epoch": 51,
+     "best_loss": 0.46307,
+     "selector_disagreement_epochs": 43
+    }
+   },
+   {
+    "checkpoint": "b100_at100_s1",
+    "play": {
+     "win_rate": 0.2658333333333333,
+     "mean_reward": 0.030502639961034084,
+     "reward_on_wins": 1.43650861578323,
+     "reward_on_losses": -0.487696303755325,
+     "strength_margin": -0.2353306933722993,
+     "entropy": 0.3641617960788064,
+     "normalized_entropy": 0.11221662577828787,
+     "effective_actions": 1.6348922746841872,
+     "support_at_1pct": 2.237827019271557,
+     "mean_rounds": 7.270416666666665,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.475,
+      "held_out_as_defender": 0.25,
+      "mirrors_attacker": 0.125,
+      "mirrors_defender": 0.16666666666666666,
+      "fresh_sampled": 0.3125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.91179,
+     "holdout_loss": 0.48107,
+     "holdout_normalized_entropy": 0.06822,
+     "holdout_effective_actions": 1.2357,
+     "epochs_run": 100,
+     "best_agreement_epoch": 98,
+     "best_agreement": 0.91206,
+     "best_loss_epoch": 44,
+     "best_loss": 0.46431,
+     "selector_disagreement_epochs": 54
+    }
+   },
+   {
+    "checkpoint": "b100_at100_s2",
+    "play": {
+     "win_rate": 0.2975,
+     "mean_reward": 0.07771877802340413,
+     "reward_on_wins": 1.4247466723623363,
+     "reward_on_losses": -0.4787378964756247,
+     "strength_margin": -0.21978122197659586,
+     "entropy": 0.37666456290797645,
+     "normalized_entropy": 0.11655323053537495,
+     "effective_actions": 1.6716034593155438,
+     "support_at_1pct": 2.36391117156266,
+     "mean_rounds": 7.334999999999999,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4875,
+      "held_out_as_defender": 0.1875,
+      "mirrors_attacker": 0.25,
+      "mirrors_defender": 0.25,
+      "fresh_sampled": 0.3125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.91092,
+     "holdout_loss": 0.4974,
+     "holdout_normalized_entropy": 0.06831,
+     "holdout_effective_actions": 1.2363,
+     "epochs_run": 100,
+     "best_agreement_epoch": 96,
+     "best_agreement": 0.91116,
+     "best_loss_epoch": 48,
+     "best_loss": 0.47043,
+     "selector_disagreement_epochs": 48
+    }
+   }
+  ],
+  "b25_standing": [
+   {
+    "checkpoint": "b25_standing_s0",
+    "play": {
+     "win_rate": 0.33958333333333335,
+     "mean_reward": 0.15395506070504553,
+     "reward_on_wins": 1.4175961810811362,
+     "reward_on_losses": -0.5022113083527304,
+     "strength_margin": -0.18562827262828782,
+     "entropy": 0.7078046814114274,
+     "normalized_entropy": 0.22021012554619007,
+     "effective_actions": 2.6307671238932455,
+     "support_at_1pct": 3.877912370824709,
+     "mean_rounds": 7.193333333333333,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.475,
+      "held_out_as_defender": 0.3375,
+      "mirrors_attacker": 0.20833333333333334,
+      "mirrors_defender": 0.2916666666666667,
+      "fresh_sampled": 0.3854166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.85351,
+     "holdout_loss": 0.55741,
+     "holdout_normalized_entropy": 0.15537,
+     "holdout_effective_actions": 1.643,
+     "epochs_run": 25,
+     "best_agreement_epoch": 24,
+     "best_agreement": 0.85351,
+     "best_loss_epoch": 24,
+     "best_loss": 0.55741,
+     "selector_disagreement_epochs": 0
+    }
+   },
+   {
+    "checkpoint": "b25_standing_s1",
+    "play": {
+     "win_rate": 0.2795833333333333,
+     "mean_reward": 0.06089075163653955,
+     "reward_on_wins": 1.4252089696736197,
+     "reward_on_losses": -0.48566902415418267,
+     "strength_margin": -0.2186925816967938,
+     "entropy": 0.750098886609831,
+     "normalized_entropy": 0.2319073244825102,
+     "effective_actions": 2.7650763093794186,
+     "support_at_1pct": 4.063460368820158,
+     "mean_rounds": 7.182916666666666,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4625,
+      "held_out_as_defender": 0.3,
+      "mirrors_attacker": 0.16666666666666666,
+      "mirrors_defender": 0.16666666666666666,
+      "fresh_sampled": 0.3020833333333333
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.84973,
+     "holdout_loss": 0.56709,
+     "holdout_normalized_entropy": 0.15903,
+     "holdout_effective_actions": 1.6585,
+     "epochs_run": 25,
+     "best_agreement_epoch": 24,
+     "best_agreement": 0.84973,
+     "best_loss_epoch": 24,
+     "best_loss": 0.56709,
+     "selector_disagreement_epochs": 0
+    }
+   },
+   {
+    "checkpoint": "b25_standing_s2",
+    "play": {
+     "win_rate": 0.3225,
+     "mean_reward": 0.15013253021802014,
+     "reward_on_wins": 1.4389432158159494,
+     "reward_on_losses": -0.4641457649802178,
+     "strength_margin": -0.1723674697819798,
+     "entropy": 0.7581135840017984,
+     "normalized_entropy": 0.2341089265677813,
+     "effective_actions": 2.7882037045395345,
+     "support_at_1pct": 4.095133697163355,
+     "mean_rounds": 7.285416666666667,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.5,
+      "held_out_as_defender": 0.2375,
+      "mirrors_attacker": 0.2916666666666667,
+      "mirrors_defender": 0.25,
+      "fresh_sampled": 0.3333333333333333
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.8495,
+     "holdout_loss": 0.56588,
+     "holdout_normalized_entropy": 0.16057,
+     "holdout_effective_actions": 1.6672,
+     "epochs_run": 25,
+     "best_agreement_epoch": 24,
+     "best_agreement": 0.8495,
+     "best_loss_epoch": 24,
+     "best_loss": 0.56588,
+     "selector_disagreement_epochs": 0
+    }
+   }
+  ],
+  "beta0.05": [
+   {
+    "checkpoint": "beta0.05_s0",
+    "play": {
+     "win_rate": 0.29375,
+     "mean_reward": 0.07822574383010868,
+     "reward_on_wins": 1.422708003130352,
+     "reward_on_losses": -0.48957810921239664,
+     "strength_margin": -0.21552425616989127,
+     "entropy": 0.7458082548239483,
+     "normalized_entropy": 0.23089739640183743,
+     "effective_actions": 2.754514433945693,
+     "support_at_1pct": 4.051626786582648,
+     "mean_rounds": 7.125,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.525,
+      "held_out_as_defender": 0.225,
+      "mirrors_attacker": 0.125,
+      "mirrors_defender": 0.20833333333333334,
+      "fresh_sampled": 0.3854166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.85964,
+     "holdout_loss": 0.53821,
+     "holdout_normalized_entropy": 0.16053,
+     "holdout_effective_actions": 1.6704,
+     "epochs_run": 25,
+     "best_agreement_epoch": 23,
+     "best_agreement": 0.85983,
+     "best_loss_epoch": 24,
+     "best_loss": 0.53821,
+     "selector_disagreement_epochs": -1
+    }
+   },
+   {
+    "checkpoint": "beta0.05_s1",
+    "play": {
+     "win_rate": 0.3154166666666666,
+     "mean_reward": 0.1272434286073256,
+     "reward_on_wins": 1.4673005676853539,
+     "reward_on_losses": -0.4893153323664151,
+     "strength_margin": -0.1881732380593411,
+     "entropy": 0.7531441858705772,
+     "normalized_entropy": 0.23503703789831848,
+     "effective_actions": 2.788348787355803,
+     "support_at_1pct": 4.066809134894056,
+     "mean_rounds": 7.2325,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.5125,
+      "held_out_as_defender": 0.325,
+      "mirrors_attacker": 0.20833333333333334,
+      "mirrors_defender": 0.20833333333333334,
+      "fresh_sampled": 0.3229166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.84827,
+     "holdout_loss": 0.56773,
+     "holdout_normalized_entropy": 0.16919,
+     "holdout_effective_actions": 1.7138,
+     "epochs_run": 25,
+     "best_agreement_epoch": 23,
+     "best_agreement": 0.84862,
+     "best_loss_epoch": 24,
+     "best_loss": 0.56773,
+     "selector_disagreement_epochs": -1
+    }
+   },
+   {
+    "checkpoint": "beta0.05_s2",
+    "play": {
+     "win_rate": 0.21916666666666665,
+     "mean_reward": -0.06934095662672643,
+     "reward_on_wins": 1.395153618720028,
+     "reward_on_losses": -0.5059245670125174,
+     "strength_margin": -0.2885076232933931,
+     "entropy": 1.0696842563294797,
+     "normalized_entropy": 0.32326031281156437,
+     "effective_actions": 4.309501883043228,
+     "support_at_1pct": 5.985894525059343,
+     "mean_rounds": 8.217083333333333,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.35,
+      "held_out_as_defender": 0.1,
+      "mirrors_attacker": 0.041666666666666664,
+      "mirrors_defender": 0.2916666666666667,
+      "fresh_sampled": 0.3125
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.81191,
+     "holdout_loss": 0.67081,
+     "holdout_normalized_entropy": 0.19668,
+     "holdout_effective_actions": 1.9201,
+     "epochs_run": 25,
+     "best_agreement_epoch": 21,
+     "best_agreement": 0.81385,
+     "best_loss_epoch": 23,
+     "best_loss": 0.67071,
+     "selector_disagreement_epochs": -2
+    }
+   }
+  ],
+  "beta0.15": [
+   {
+    "checkpoint": "beta0.15_s0",
+    "play": {
+     "win_rate": 0.26291666666666663,
+     "mean_reward": 0.009651255885195113,
+     "reward_on_wins": 1.5076714451571376,
+     "reward_on_losses": -0.530466675452592,
+     "strength_margin": -0.2532654107814715,
+     "entropy": 1.1696245692127094,
+     "normalized_entropy": 0.3564849253526181,
+     "effective_actions": 4.710587429484237,
+     "support_at_1pct": 6.519821403268017,
+     "mean_rounds": 7.745,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4375,
+      "held_out_as_defender": 0.1375,
+      "mirrors_attacker": 0.16666666666666666,
+      "mirrors_defender": 0.25,
+      "fresh_sampled": 0.3229166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.82382,
+     "holdout_loss": 0.62414,
+     "holdout_normalized_entropy": 0.21279,
+     "holdout_effective_actions": 2.001,
+     "epochs_run": 25,
+     "best_agreement_epoch": 22,
+     "best_agreement": 0.82448,
+     "best_loss_epoch": 24,
+     "best_loss": 0.62414,
+     "selector_disagreement_epochs": -2
+    }
+   },
+   {
+    "checkpoint": "beta0.15_s1",
+    "play": {
+     "win_rate": 0.28458333333333335,
+     "mean_reward": 0.014124907638124764,
+     "reward_on_wins": 1.417313448465348,
+     "reward_on_losses": -0.5364437575187735,
+     "strength_margin": -0.2704584256952086,
+     "entropy": 1.1438967940766802,
+     "normalized_entropy": 0.3521034599411616,
+     "effective_actions": 4.520494424312997,
+     "support_at_1pct": 6.324488846662497,
+     "mean_rounds": 8.17375,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4,
+      "held_out_as_defender": 0.075,
+      "mirrors_attacker": 0.3333333333333333,
+      "mirrors_defender": 0.2916666666666667,
+      "fresh_sampled": 0.3229166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.83132,
+     "holdout_loss": 0.59307,
+     "holdout_normalized_entropy": 0.21901,
+     "holdout_effective_actions": 2.0428,
+     "epochs_run": 25,
+     "best_agreement_epoch": 24,
+     "best_agreement": 0.83132,
+     "best_loss_epoch": 22,
+     "best_loss": 0.59284,
+     "selector_disagreement_epochs": 2
+    }
+   },
+   {
+    "checkpoint": "beta0.15_s2",
+    "play": {
+     "win_rate": 0.24375,
+     "mean_reward": -0.05041772925412926,
+     "reward_on_wins": 1.402455596137464,
+     "reward_on_losses": -0.5177838511840835,
+     "strength_margin": -0.29416772925412926,
+     "entropy": 1.165312868205603,
+     "normalized_entropy": 0.3549004690434267,
+     "effective_actions": 4.619903145112486,
+     "support_at_1pct": 6.5108270747797095,
+     "mean_rounds": 8.080416666666666,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.3,
+      "held_out_as_defender": 0.075,
+      "mirrors_attacker": 0.125,
+      "mirrors_defender": 0.375,
+      "fresh_sampled": 0.34375
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.81634,
+     "holdout_loss": 0.66488,
+     "holdout_normalized_entropy": 0.2248,
+     "holdout_effective_actions": 2.1045,
+     "epochs_run": 25,
+     "best_agreement_epoch": 21,
+     "best_agreement": 0.81742,
+     "best_loss_epoch": 23,
+     "best_loss": 0.66435,
+     "selector_disagreement_epochs": -2
+    }
+   }
+  ],
+  "beta0.4": [
+   {
+    "checkpoint": "beta0.4_s0",
+    "play": {
+     "win_rate": 0.22625,
+     "mean_reward": -0.08614305844480935,
+     "reward_on_wins": 1.3798962034913436,
+     "reward_on_losses": -0.5533157358526306,
+     "strength_margin": -0.31239305844480936,
+     "entropy": 2.3193444268596175,
+     "normalized_entropy": 0.702878515493026,
+     "effective_actions": 13.446857964049235,
+     "support_at_1pct": 16.255623311348664,
+     "mean_rounds": 7.975833333333332,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4125,
+      "held_out_as_defender": 0.125,
+      "mirrors_attacker": 0.16666666666666666,
+      "mirrors_defender": 0.08333333333333333,
+      "fresh_sampled": 0.34375
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.81905,
+     "holdout_loss": 0.87526,
+     "holdout_normalized_entropy": 0.53424,
+     "holdout_effective_actions": 5.5322,
+     "epochs_run": 25,
+     "best_agreement_epoch": 21,
+     "best_agreement": 0.82016,
+     "best_loss_epoch": 20,
+     "best_loss": 0.873,
+     "selector_disagreement_epochs": 1
+    }
+   },
+   {
+    "checkpoint": "beta0.4_s1",
+    "play": {
+     "win_rate": 0.24625,
+     "mean_reward": -0.059965901520965904,
+     "reward_on_wins": 1.429126293977951,
+     "reward_on_losses": -0.5255339525210412,
+     "strength_margin": -0.3062159015209659,
+     "entropy": 2.2264422582740147,
+     "normalized_entropy": 0.6850511139582807,
+     "effective_actions": 12.381271400010531,
+     "support_at_1pct": 15.586292169478316,
+     "mean_rounds": 7.9245833333333335,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4375,
+      "held_out_as_defender": 0.075,
+      "mirrors_attacker": 0.125,
+      "mirrors_defender": 0.3333333333333333,
+      "fresh_sampled": 0.2604166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.82734,
+     "holdout_loss": 0.85512,
+     "holdout_normalized_entropy": 0.5435,
+     "holdout_effective_actions": 5.7267,
+     "epochs_run": 25,
+     "best_agreement_epoch": 23,
+     "best_agreement": 0.82783,
+     "best_loss_epoch": 17,
+     "best_loss": 0.8521,
+     "selector_disagreement_epochs": 6
+    }
+   },
+   {
+    "checkpoint": "beta0.4_s2",
+    "play": {
+     "win_rate": 0.2704166666666667,
+     "mean_reward": -0.002177758012603381,
+     "reward_on_wins": 1.4661245564061876,
+     "reward_on_losses": -0.5173016679496584,
+     "strength_margin": -0.27259442467927003,
+     "entropy": 2.2509954609013905,
+     "normalized_entropy": 0.68811024528432,
+     "effective_actions": 12.825549473277785,
+     "support_at_1pct": 15.688816345325696,
+     "mean_rounds": 8.25875,
+     "per_suite_win_rate": {
+      "held_out_pool": 0.4125,
+      "held_out_as_defender": 0.1375,
+      "mirrors_attacker": 0.125,
+      "mirrors_defender": 0.4166666666666667,
+      "fresh_sampled": 0.2604166666666667
+     }
+    },
+    "train": {
+     "holdout_agreement": 0.81417,
+     "holdout_loss": 0.92125,
+     "holdout_normalized_entropy": 0.54903,
+     "holdout_effective_actions": 5.9597,
+     "epochs_run": 25,
+     "best_agreement_epoch": 22,
+     "best_agreement": 0.81515,
+     "best_loss_epoch": 21,
+     "best_loss": 0.91982,
+     "selector_disagreement_epochs": 1
+    }
+   }
+  ]
+ },
+ "seconds": 0.0
+}
