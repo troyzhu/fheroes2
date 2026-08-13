@@ -23,6 +23,7 @@ This tree lives under `agent_play/` rather than under the repository's `docs/` d
 | Build it and see the current state | [[overview]] |
 | Look up a symbol or a project term | [[overview#Notation]] |
 | Know how a policy will be trained and what it is rewarded for | [[decisions/0005-training-and-reward]] for the decisions, then [[rl/README]] for the mechanics |
+| Understand the codebase, as a new engineer | [[implementation/system-tour]], the pipeline end to end with code at every stage |
 | Understand what is implemented and how | [[implementation/inventory]] for what exists, then [[implementation/README]] for how each mechanism works |
 | Understand why an interface is the way it is | [[decisions/README]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] to look up a source |

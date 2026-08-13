@@ -21,6 +21,7 @@ Pick the row that matches why you are here.
 | Understand the problem, with no RL or fheroes2 background | [[rl/rl-and-the-battle-domain]], then this note |
 | Get it building and see the current state | This note, sections [[#Build and verify]] and [[#Where the project stands]] |
 | Understand the research and the evidence | [[research/findings]], then [[research/prior-art]] for the codebases, then [[research/README]] for a specific source |
+| Understand the codebase, as a new engineer | [[implementation/system-tour]], the pipeline end to end with code at every stage |
 | Understand what is implemented and how | [[implementation/inventory]] for the inventory, then [[implementation/README]] for how each mechanism works |
 | Understand why a decision was taken | `decisions/`, the accepted records amending the specification |
 | Follow one inference decision end to end | [[implementation/inference-walkthrough]], a real battle under the microscope |

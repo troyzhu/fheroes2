@@ -121,9 +121,10 @@ class BattleEnv:
         # battlefield-varied search labels possible without a sync protocol.
         if seed_offset:
             self._cmd += ["--seed-offset", str(seed_offset)]
-        # Perturbs the battle's random stream while leaving the battlefield alone. Only an ablation
-        # uses it: a side environment pinned to the live world seed inherits the live combat rolls,
-        # and this is how that is separated from merely being on the right terrain.
+        # Perturbs the battle's random stream while leaving the battlefield alone. ADR 0008
+        # mandates a nonzero offset on every search side-environment quoted against the built-in
+        # AI: pinned to the live world seed alone it inherits the live combat rolls, and search
+        # then reads outcomes instead of estimating them. Zero remains the labelled ceiling.
         if combat_seed_offset:
             self._cmd += ["--combat-seed-offset", str(combat_seed_offset)]
         # DAgger relabeling: each decision record then carries "teacher_action", the planner's
