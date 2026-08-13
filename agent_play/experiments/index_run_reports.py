@@ -26,6 +26,8 @@ FILES = pathlib.Path(__file__).resolve().parents[1] / "docs" / "archive" / "expe
 
 # Ordered: the first pattern that matches a file names it, so put specific prefixes first.
 FAMILIES: list[tuple[str, str, str]] = [
+    ("band_*.pt", "soft_distill.py, the regret-band arms of 2026-08-09",
+     "The six regret-band distillation checkpoints, soft and hard twins over three seeds. band_soft_s0\n      is the weights behind the headline 0.700: the final_sweep reports name it from the scratchpad,\n      and its training corpora were later evicted, so these vendored copies are the only exact artifact"),
     ("n*_puct_m*", "search_agent_battery.py --allocator puct, budget in the name",
      "The PUCT half of the budget-scaling ladder, 32 through 512 playouts on the mirror suites with\n      independent dice; the curve that contradicted ADR 0008's saturation reading by rising through 256"),
     ("n*_sequential_halving_m*", "search_agent_battery.py --allocator sequential_halving",

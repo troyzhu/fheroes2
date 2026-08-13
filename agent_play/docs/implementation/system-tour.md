@@ -130,4 +130,4 @@ Evaluation suites live in `python/fheroes2_agent/suites.py`, ten of them; the fi
 | What is the reward | `REWARD_MARGINS` and the `terminal_reward_*` functions in `python/fheroes2_agent/env.py`, [[../rl/reward-design]] |
 | Why was a design chosen | `../decisions/`, one accepted record per choice |
 | What has been measured | [[../rl/program-review]], verdict-first |
-| Reproduce the headline 0.700 | `search_agent_battery.py` at 16 playouts, offset 987631, seeds 11 to 13, per `files/2026-08-10-run-reports/`; the exact checkpoint (`band_soft_s0.pt`) was never committed and must be regenerated from the regret-band recipe |
+| Reproduce the headline 0.700 | `search_agent_battery.py` at 16 playouts, offset 987631, seeds 11 to 13, per `files/2026-08-10-run-reports/`; the checkpoint is vendored at `agent_play/docs/archive/experiments/files/2026-08-09-checkpoints/band_soft_s0.pt` |
