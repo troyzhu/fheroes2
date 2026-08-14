@@ -55,6 +55,11 @@ def main() -> None:
                              "rather than a copy of you; the further your play is from the AI's, "
                              "the staler its plan, which is the documented resampled semantics")
     parser.add_argument("--allow-flying", action="store_true")
+    parser.add_argument("--rollout-opponent", default="ai", choices=("ai", "policy"),
+                        help="who answers YOUR chair inside search playouts. 'ai' models you with "
+                             "the engine's planner; 'policy' is self-play search, the checkpoint "
+                             "modelling you with itself (scores playouts by the record-only "
+                             "'strength' margin)")
     args = parser.parse_args()
 
     if not TOOL.exists():
@@ -76,11 +81,13 @@ def main() -> None:
         # Same scenario flags as the play window, one battlefield, independent dice (ADR 0008's
         # honest configuration). The prefix holds only the checkpoint's own actions; your moves are
         # answered inside playouts by the built-in AI, which is what the --simulations help states.
-        sim = BattleEnv(str(worker), seeds=1, side=agent_side,
+        sim_side = "both" if args.rollout_opponent == "policy" else agent_side
+        sim_margin = {"reward_margin": "strength"} if args.rollout_opponent == "policy" else {}
+        sim = BattleEnv(str(worker), seeds=1, side=sim_side,
                         attacker=args.attacker, defender=args.defender,
                         attacker_hero=args.attacker_hero, defender_hero=args.defender_hero,
                         allow_wide=args.allow_wide, allow_flying=args.allow_flying,
-                        combat_seed_offset=987631)
+                        combat_seed_offset=987631, **sim_margin)
 
     cmd = [str(TOOL), "--play", args.human_side, "--speed", str(args.speed),
            "--attacker", args.attacker, "--defender", args.defender]
@@ -103,7 +110,8 @@ def main() -> None:
                 mask = enc.encode_mask(record["legal_actions"])
                 if sim is not None:
                     action, _, _, _ = search_action_detail(
-                        sim, model, prefix, encode(observation), mask, args.simulations, 1.5)
+                        sim, model, prefix, encode(observation), mask, args.simulations, 1.5,
+                        rollout_opponent=args.rollout_opponent, agent_side=agent_side)
                     prefix.append(action)
                 else:
                     with torch.no_grad():

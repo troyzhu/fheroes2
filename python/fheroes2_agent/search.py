@@ -103,6 +103,41 @@ def sync_side_environment(sim: BattleEnv | None, live: BattleEnv, worker: str,
     return fresh
 
 
+def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int,
+                      agent_side: str) -> float:
+    """A playout in which the policy answers BOTH chairs, the owner's 2026-08-13 direction for
+    self-play search: the opponent inside a playout should be the policy itself, not the engine's
+    built-in AI, so the value estimates match the self-play objective rather than the engine.
+
+    Needs a side environment built with side="both". The prefix holds only the agent's own live
+    actions, so during replay the opponent's interleaved decisions are answered by the policy; the
+    replayed position therefore tracks the live one only as far as the opponent model matches the
+    live opponent, the same resampled semantics the combat offset already carries. The terminal
+    reward is computed from the record for the agent's chair explicitly, because a side="both"
+    environment's own step reward is not perspectived to the agent, and only record-computable
+    margins are valid here (`hit_points` needs episode state a both-sides env does not keep per
+    chair; `strength` is the survival-graded record-only analogue)."""
+    from .env import reward_from_record
+    observation, mask = sim.reset()
+    i, applied = 0, False
+    while True:
+        ours = bool(sim._pending["observation"]["active_is_attacker"]) == (agent_side == "attacker")
+        if ours and i < len(prefix):
+            action = prefix[i]; i += 1
+        elif ours and not applied:
+            action = first; applied = True
+        else:
+            action = policy_action(model, observation, mask, env=sim)
+        if not mask[action]:
+            # A stale prefix or candidate action after divergence: skip to the policy's own choice
+            # rather than let the worker reject it, so the playout keeps its decision count aligned.
+            action = policy_action(model, observation, mask, env=sim)
+        step = sim.step(action)
+        if step.done:
+            return reward_from_record(step.info, agent_side, sim._reward_margin)
+        observation, mask = step.observation, step.mask
+
+
 def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float:
     """Replay the prefix, apply the candidate, sample the policy to terminal; the return is the
     episode's terminal reward. With the side environment on the live dice, determinism plus the
@@ -123,7 +158,7 @@ def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) 
 
 
 
-def _sequential_halving(sim, model, prefix: list[int], prior: dict[int, float], simulations: int,
+def _sequential_halving(do_rollout, prior: dict[int, float], simulations: int,
                         visits: dict[int, int], total_return: dict[int, float],
                         candidates: int = 0) -> list[int]:
     """Spend the budget by Sequential Halving (Karnin et al. 2013) instead of by UCB.
@@ -164,7 +199,7 @@ def _sequential_halving(sim, model, prefix: list[int], prior: dict[int, float], 
             for _ in range(per):
                 if spent >= simulations:
                     break
-                total_return[a] += rollout(sim, model, prefix, a)
+                total_return[a] += do_rollout(a)
                 visits[a] += 1
                 spent += 1
         if len(survivors) <= 1:
@@ -182,7 +217,8 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                          observation: np.ndarray, mask: np.ndarray, simulations: int,
                          c_puct: float, live: BattleEnv | None = None,
                          coverage_forced: bool = False, allocator: str = "puct",
-                         candidates: int = 0) -> tuple[int, dict, dict, dict]:
+                         candidates: int = 0, rollout_opponent: str = "ai",
+                         agent_side: str | None = None) -> tuple[int, dict, dict, dict]:
     """The search decision plus its whole measurement: per-candidate mean rollout values, visit
     counts, and the prior. The values are the counterfactuals only search produces (a real
     playout per candidate it tried), which is what makes them valid soft-distillation targets
@@ -198,6 +234,14 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
     # env's tensor here; the sim's belongs to whatever state its own replay last presented.
     prior = priors(model, observation, mask, env=live if live is not None else sim)
     actions = list(prior)
+    if rollout_opponent == "policy":
+        if agent_side not in ("attacker", "defender"):
+            raise ValueError("rollout_opponent='policy' needs agent_side, and a side='both' sim")
+        do_rollout = lambda a: rollout_self_play(sim, model, prefix, a, agent_side)  # noqa: E731
+    elif rollout_opponent == "ai":
+        do_rollout = lambda a: rollout(sim, model, prefix, a)  # noqa: E731
+    else:
+        raise ValueError(f"unknown rollout_opponent {rollout_opponent!r}")
     if len(actions) == 1:
         return actions[0], {actions[0]: 0.0}, {actions[0]: 1}, prior
     if simulations <= 0:
@@ -218,7 +262,7 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
         # attribution error: two variables moved, one credited.
         actions = sorted(prior, key=prior.get, reverse=True)[:candidates]
     if allocator == "sequential_halving":
-        survivors = _sequential_halving(sim, model, prefix, prior, simulations, visits, total_return,
+        survivors = _sequential_halving(do_rollout, prior, simulations, visits, total_return,
                                         candidates)
         means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
         # The answer is the best surviving arm, not the most-visited action overall. Under a
@@ -243,7 +287,7 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                 u = c_puct * prior[a] * math.sqrt(n + 1) / (1 + visits[a])
                 scores[a] = q + u
             chosen = max(scores, key=scores.get)
-        value = rollout(sim, model, prefix, chosen)
+        value = do_rollout(chosen)
         visits[chosen] += 1
         total_return[chosen] += value
     means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
