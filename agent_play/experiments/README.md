@@ -31,7 +31,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `search_teacher.py` | Collection half of a search-taught round: search plays and labels in the dataset schema, sharded across cores | about 30 min at 6 shards |
 | `validation_battery.py` | The report card: fresh generator samples, held-out pool, OOD stress suites, and the Thunk ladder, per checkpoint over battlefields | about 40 s per checkpoint |
 | `credit_assignment.py` | How often does trajectory-level credit mis-sign a decision, judged by search rollout values? The critique's two error rates, measured | about 2 min at 32 simulations |
-| `play_vs.py` | Battle a checkpoint yourself: you command one side in the real battle window, the policy answers the other over the line protocol | interactive, needs a display |
+| `play_vs.py` | Battle a checkpoint yourself: you command one side in the real battle window, the policy answers the other over the line protocol, optionally wrapped in root search (`--simulations`, honest dice; playouts model your chair with the built-in AI) | interactive, needs a display |
 | `ability_ablation.py` | Do explicit per-creature ability features earn their place, paired on one corpus and judged by the battery? | about 25 min for both arms |
 | `awr_distill.py` | Advantage-weighted distillation against its unweighted twin, one improvement step that never queries an unseen action | about 8 min for both arms |
 | `planes_ablation.py` | Do spatial planes earn their place, with capacity controlled? Entity, planes, and a width-matched control arm from one seed on a planes-recorded corpus | about 15 min for three arms |

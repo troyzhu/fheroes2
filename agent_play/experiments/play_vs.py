@@ -48,13 +48,39 @@ def main() -> None:
     parser.add_argument("--defender-hero", default=None)
     parser.add_argument("--allow-wide", action="store_true", default=True)
     parser.add_argument("--speed", type=int, default=5)
+    parser.add_argument("--simulations", type=int, default=0,
+                        help="wrap the checkpoint in root search at this playout budget; 16 is the "
+                             "deployment rung. The side environment models YOUR chair with the "
+                             "engine's built-in AI, so search plans against an AI-shaped opponent "
+                             "rather than a copy of you; the further your play is from the AI's, "
+                             "the staler its plan, which is the documented resampled semantics")
+    parser.add_argument("--allow-flying", action="store_true")
     args = parser.parse_args()
 
     if not TOOL.exists():
         raise SystemExit(f"{TOOL} not built; run src/agent_replay/build_replay.sh")
 
     model, encode, version = load_model(args.checkpoint)
-    print(f"you play {args.human_side}; {pathlib.Path(args.checkpoint).name} ({version}) plays the other side")
+    searched = f" + search at {args.simulations} playouts" if args.simulations else ""
+    print(f"you play {args.human_side}; {pathlib.Path(args.checkpoint).name} ({version}){searched} plays the other side")
+
+    sim = None
+    prefix: list[int] = []
+    if args.simulations:
+        from fheroes2_agent.env import BattleEnv
+        from fheroes2_agent.search import search_action_detail
+        agent_side = "defender" if args.human_side == "attacker" else "attacker"
+        worker = REPO / "src" / "agent_worker" / "fheroes2_agent_worker"
+        if not worker.exists():
+            raise SystemExit(f"{worker} not built; run src/agent_worker/build_worker.sh")
+        # Same scenario flags as the play window, one battlefield, independent dice (ADR 0008's
+        # honest configuration). The prefix holds only the checkpoint's own actions; your moves are
+        # answered inside playouts by the built-in AI, which is what the --simulations help states.
+        sim = BattleEnv(str(worker), seeds=1, side=agent_side,
+                        attacker=args.attacker, defender=args.defender,
+                        attacker_hero=args.attacker_hero, defender_hero=args.defender_hero,
+                        allow_wide=args.allow_wide, allow_flying=args.allow_flying,
+                        combat_seed_offset=987631)
 
     cmd = [str(TOOL), "--play", args.human_side, "--speed", str(args.speed),
            "--attacker", args.attacker, "--defender", args.defender]
@@ -64,6 +90,8 @@ def main() -> None:
         cmd += ["--defender-hero", args.defender_hero]
     if args.allow_wide:
         cmd.append("--allow-wide")
+    if args.allow_flying:
+        cmd.append("--allow-flying")
 
     env = dict(FHEROES2_DATA=str(REPO), PATH="/usr/bin:/bin", HOME=str(pathlib.Path.home()))
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1, env=env)
@@ -73,10 +101,15 @@ def main() -> None:
             if record.get("record") == "decision":
                 observation = record["observation"]
                 mask = enc.encode_mask(record["legal_actions"])
-                with torch.no_grad():
-                    logits, _ = model(torch.from_numpy(encode(observation)).unsqueeze(0),
-                                      torch.from_numpy(mask).unsqueeze(0))
-                    action = int(torch.distributions.Categorical(logits=logits).sample())
+                if sim is not None:
+                    action, _, _, _ = search_action_detail(
+                        sim, model, prefix, encode(observation), mask, args.simulations, 1.5)
+                    prefix.append(action)
+                else:
+                    with torch.no_grad():
+                        logits, _ = model(torch.from_numpy(encode(observation)).unsqueeze(0),
+                                          torch.from_numpy(mask).unsqueeze(0))
+                        action = int(torch.distributions.Categorical(logits=logits).sample())
                 proc.stdin.write(f"{action}\n")
                 proc.stdin.flush()
             elif record.get("record") == "replay_terminal":
@@ -84,6 +117,8 @@ def main() -> None:
                 print(f"battle over: {record['termination']} — {'you win' if human_won else 'the checkpoint wins'}")
     finally:
         proc.wait()
+        if sim is not None:
+            sim.close()
 
 
 if __name__ == "__main__":
