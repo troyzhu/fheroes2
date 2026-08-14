@@ -104,7 +104,7 @@ def sync_side_environment(sim: BattleEnv | None, live: BattleEnv, worker: str,
 
 
 def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int,
-                      agent_side: str) -> float:
+                      agent_side: str, full_prefix: bool = False) -> float:
     """A playout in which the policy answers BOTH chairs, the owner's 2026-08-13 direction for
     self-play search: the opponent inside a playout should be the policy itself, not the engine's
     built-in AI, so the value estimates match the self-play objective rather than the engine.
@@ -122,7 +122,10 @@ def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], fi
     i, applied = 0, False
     while True:
         ours = bool(sim._pending["observation"]["active_is_attacker"]) == (agent_side == "attacker")
-        if ours and i < len(prefix):
+        # full_prefix: the caller's prefix holds BOTH chairs' live actions (self-play collection,
+        # where the live episode is itself both-sides), so replay consumes it unconditionally;
+        # otherwise the prefix is the agent's own actions only (play_vs against a human).
+        if i < len(prefix) and (full_prefix or ours):
             action = prefix[i]; i += 1
         elif ours and not applied:
             action = first; applied = True
@@ -218,7 +221,8 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                          c_puct: float, live: BattleEnv | None = None,
                          coverage_forced: bool = False, allocator: str = "puct",
                          candidates: int = 0, rollout_opponent: str = "ai",
-                         agent_side: str | None = None) -> tuple[int, dict, dict, dict]:
+                         agent_side: str | None = None,
+                         full_prefix: bool = False) -> tuple[int, dict, dict, dict]:
     """The search decision plus its whole measurement: per-candidate mean rollout values, visit
     counts, and the prior. The values are the counterfactuals only search produces (a real
     playout per candidate it tried), which is what makes them valid soft-distillation targets
@@ -237,7 +241,7 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
     if rollout_opponent == "policy":
         if agent_side not in ("attacker", "defender"):
             raise ValueError("rollout_opponent='policy' needs agent_side, and a side='both' sim")
-        do_rollout = lambda a: rollout_self_play(sim, model, prefix, a, agent_side)  # noqa: E731
+        do_rollout = lambda a: rollout_self_play(sim, model, prefix, a, agent_side, full_prefix)  # noqa: E731
     elif rollout_opponent == "ai":
         do_rollout = lambda a: rollout(sim, model, prefix, a)  # noqa: E731
     else:
