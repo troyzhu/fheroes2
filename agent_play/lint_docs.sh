@@ -336,6 +336,23 @@ if os.environ.get("FACTS") == "1":
             if name not in manifest and name not in vendored_artifacts:
                 facts.append(f"{rel(jf)}: depends on scratchpad artifact `{name}`, neither vendored nor in workspace-manifest.tsv")
 
+    # 5c. Skill grounding. The tutor skill teaches from file citations, and a skill file is not
+    # otherwise linted, so a renamed doc or module would rot its lessons silently. Every backticked
+    # repo path in .claude/skills must exist, and doc-shorthand citations (rl/x, decisions/0002)
+    # must resolve under agent_play/docs, ADR numbers by prefix.
+    for skill in sorted((REPO / ".claude" / "skills").rglob("SKILL.md")):
+        text = skill.read_text(encoding="utf-8")
+        for path in sorted(set(re.findall(r"`((?:agent_play|src|python|\.claude)/[A-Za-z0-9_./-]+)`", text))):
+            if not (REPO / path.rstrip("/")).exists():
+                facts.append(f"{skill.relative_to(REPO)}: cites `{path}`, which does not exist")
+        for short in sorted(set(re.findall(r"`((?:rl|decisions|implementation|research)/[A-Za-z0-9_./-]+)`", text))):
+            base = DOCS / short
+            candidates = [base, base.with_suffix(".md") if not short.endswith("/") else base]
+            if short.startswith("decisions/") and "/" in short and not any(c.exists() for c in candidates):
+                candidates += list((DOCS / "decisions").glob(short.split("/", 1)[1].split(".")[0] + "-*.md"))
+            if not any(c.exists() for c in candidates):
+                facts.append(f"{skill.relative_to(REPO)}: cites `{short}`, which resolves to nothing under docs")
+
     # 6. Engine-surface completeness. Every file changed under src/ relative to master must be
     # matched in the inventory's ledger section, by path, by directory, or by stem (which is how
     # a brace form like screen.{h,cpp} matches screen.h). An unledgered engine touch fails here.
