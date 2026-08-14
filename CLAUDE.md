@@ -105,6 +105,8 @@ Each memory file declares what makes it true in an HTML comment, and every repos
 in prose is checked as well. **The single milestone table is `overview.md`'s "Where the project
 stands"; do not add a second one anywhere.**
 
+**A hands-on tutor skill exists**: invoke `agent-env-tutor` (`.claude/skills/agent-env-tutor/`) when the owner wants to learn the repo structure, the RL methods used here, or the component code interactively. It is built for fresh and remote sessions: headless exercises, worker auto-setup, and Artifact publishing for viewing away from this machine.
+
 ## Branch `play-harness` — Claude plays the game through the real UI
 
 A separate experiment: an opt-in engine patch that dumps rendered frames to `$FHEROES2_HARNESS/frame.bmp`
