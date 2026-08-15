@@ -20,4 +20,10 @@ Verification status: extracted in run 1 (structured-arrays rationale) but not am
 
 Where we use it: cost rationale background in [[../../archive/research-runs/2026-07-27-rl-approaches]] §1 (marked as gap there) and [[../../archive/research-runs/2026-07-29-spatial-observations]].
 
+## The self-play mixture, verified 2026-08-15
+
+This project's prose cited OpenAI Five against latest-self overfitting while this page only carried the structured-observation rationale, so the citation had no verified source behind it. Verified now, from the paper and its write-ups: training ran 80 percent of games against the current policy and 20 percent against past selves, explicitly to avoid *strategy collapse*, where an agent finds a narrow set of tactics that beats its current self and fails against anything else. Past opponents were selected by a quality score rather than sampled uniformly from history, so the mixture prioritised informative matchups.
+
+Where it binds here: `python/fheroes2_agent/selfplay.py`'s `OpponentPool` implements exactly this for the PPO path, frozen checkpoints with `None` meaning the built-in AI. The first self-play SEARCH collector shipped without a pool, mirror self-play only, which is the form this result warns against; `agent_play/experiments/selfplay_search_round.py` now takes `--past` and draws a past self for `PAST_FRACTION` of episodes. The quality-scored selection is not implemented, and uniform draws over the given checkpoints are the current approximation.
+
 Related: [[alphastar]], [[sc2le]]
