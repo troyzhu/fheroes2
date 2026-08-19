@@ -91,7 +91,7 @@ def play_episodes(worker: str, matchup, side: str, model, episodes: int, simulat
                 perplexities.append(float(np.exp(entropy)))
                 supports.append(int((diagnostic.probs.squeeze(0) >= 0.01).sum()))
                 legal_counts.append(legal)
-                if searched:
+                if searched and simulations > 0:
                     action, _, visits, _ = search_action_detail(
                         sim, model, prefix, observation, mask, simulations, c_puct, live=env,
                         allocator=allocator, candidates=candidates)
@@ -102,6 +102,12 @@ def play_episodes(worker: str, matchup, side: str, model, episodes: int, simulat
                     share = counts / counts.sum() if counts.sum() else counts
                     visit_entropies.append(float(-(share * np.log(share)).sum()) if len(share) else 0.0)
                 else:
+                    # Zero budget is unsearched play, and it must go through policy_action so the
+                    # deployment rule governs the move. Routing it through search_action_detail
+                    # returned the prior's ARGMAX, and every deployment rule here is a monotone
+                    # reshaping that cannot move an argmax, so all six rules played identically and
+                    # every "sample" stamp on a zero-budget report actually described greedy play
+                    # (found 2026-08-19 when six rules returned byte-identical results).
                     action = policy_action(model, observation, mask, env=env)
                 prefix.append(action)
                 step = env.step(action)
