@@ -161,7 +161,10 @@ def main() -> None:
                              "Zero admits every legal action, which at this budget leaves one visit "
                              "per candidate in phase one and degenerates into uniform coverage")
     parser.add_argument("--c-puct", type=float, default=1.5)
-    parser.add_argument("--deployment", default="sample", choices=("sample", "greedy", "adaptive"),
+    parser.add_argument("--deployment-p", type=float, default=0.8,
+                        help="nucleus mass for top_p, or the temperature for temperature")
+    parser.add_argument("--deployment", default="sample",
+                        choices=("sample", "greedy", "adaptive", "top_p", "temperature"),
                         help="how the network acts, both on its own and as the search prior. The policy "
                              "battery has had this since the deployment sweep; the search battery never "
                              "did, so search had only ever been measured under sampled actions")
@@ -197,7 +200,9 @@ def main() -> None:
         # A deployment rule is a logits transform wrapped around the checkpoint, matching the
         # policy battery, so the same rule governs the played move and the search prior.
         from sampling_policies import Sampler
-        model = Sampler(model, "greedy" if args.deployment == "greedy" else "adaptive")
+        # `--deployment-p` is the nucleus mass for top_p and the temperature for temperature; the
+        # other schemes ignore it. One knob keeps the report's stamped configuration unambiguous.
+        model = Sampler(model, args.deployment, p=args.deployment_p)
     model.eval()
     suites = build_suites(args.fresh)
     started = time.time()
@@ -212,7 +217,8 @@ def main() -> None:
               "dice": ("shared-with-live (CEILING, not comparable to the built-in AI)"
                        if args.simulations > 0 and args.search_combat_offset == 0
                        else "independent-of-live" if args.simulations > 0 else "unsearched"),
-              "deployment": args.deployment, "allocator": args.allocator,
+              "deployment": args.deployment, "deployment_p": args.deployment_p,
+              "allocator": args.allocator,
               "candidates": args.candidates,
               "simulations": args.simulations, "reward_margin": args.report_margin, "arms": {}}
 

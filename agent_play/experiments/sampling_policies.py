@@ -56,6 +56,13 @@ class Sampler(nn.Module):
             hard = torch.full_like(logits, -1e9)
             hard.scatter_(1, logits.argmax(-1, keepdim=True), 0.0)
             return hard, value
+        if self.scheme == "temperature":
+            # Rescale before the softmax: T>1 softens, T<1 sharpens. Added 2026-08-18 because the
+            # distillation arms differ enormously in prior sharpness (normalized entropy 0.281 to
+            # 0.315 at 9.4t), and temperature is the only deployment rule that moves along exactly
+            # that axis, so it separates "this policy plays better" from "this policy is at a good
+            # sharpness for greedy play". Illegal entries stay at MASK_FILL under any positive T.
+            return logits / max(self.p, 1e-3), value
         probs = torch.softmax(logits, dim=-1)
         if self.scheme == "adaptive":
             legal = mask.sum(-1, keepdim=True).clamp(min=2)
