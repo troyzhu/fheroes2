@@ -246,6 +246,32 @@ class BattleEnv:
         _, separator, tail = identifier.rpartition("-seed")
         return int(tail) if separator and tail.isdigit() else 0
 
+    @property
+    def pending_decision(self) -> dict | None:
+        """The decision record the worker is currently blocked on, or None between episodes.
+
+        The raw JSON the worker printed: `observation` as the engine serialized it, plus
+        `legal_actions`. `reset` and `step` hand back the ENCODED observation and mask, which is
+        what a policy consumes, so this is the seam for the handful of callers that need a named
+        field instead, such as which unit is acting. Six files reached into `_pending` directly
+        before this existed, which meant a reader had to verify by hand that a private attribute
+        still held what its name suggested.
+        """
+        return self._pending
+
+    @property
+    def acting_side(self) -> str | None:
+        """"attacker" or "defender" for the unit whose turn the worker is waiting on.
+
+        Four call sites re-derived this as
+        `bool(env._pending["observation"]["active_is_attacker"]) == (side == "attacker")`, each
+        having to get the comparison the right way round. One named accessor is both easier to
+        read and one place to be wrong rather than four.
+        """
+        if self._pending is None:
+            return None
+        return "attacker" if self._pending["observation"]["active_is_attacker"] else "defender"
+
     def step(self, action: int) -> Step:
         assert self._proc is not None and self._pending is not None
         self._proc.stdin.write(f"{int(action)}\n")
@@ -597,3 +623,13 @@ class MatchupPool:
     @property
     def _pending(self):
         return self._env._pending if self._env else None
+
+    @property
+    def pending_decision(self) -> dict | None:
+        """The wrapped environment's pending decision, so both env classes read alike."""
+        return self._env.pending_decision if self._env else None
+
+    @property
+    def acting_side(self) -> str | None:
+        """The wrapped environment's acting side, so both env classes read alike."""
+        return self._env.acting_side if self._env else None

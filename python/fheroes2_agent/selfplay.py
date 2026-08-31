@@ -100,9 +100,7 @@ class SelfPlayEnv:
         self._mode = mode
 
     def _learner_turn(self) -> bool:
-        raw = self._env._pending["observation"]
-        is_attacker_turn = bool(raw["active_is_attacker"])
-        return is_attacker_turn == (self._learner_side == "attacker")
+        return self._env.acting_side == self._learner_side
 
     def _opponent_decide(self, observation: np.ndarray, mask: np.ndarray) -> int:
         model = self._pool.current_model

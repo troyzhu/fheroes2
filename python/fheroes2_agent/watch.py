@@ -70,7 +70,7 @@ def main() -> None:
                 action = int(logits.argmax()) if args.greedy else int(distribution.sample())
                 probability = float(torch.softmax(logits, dim=-1)[0, action])
 
-            raw = env._pending["observation"]  # the record behind the encoded vector
+            raw = env.pending_decision["observation"]  # the record behind the encoded vector
             step += 1
             emit(f"### Decision {step}, round {raw['round']}")
             emit()

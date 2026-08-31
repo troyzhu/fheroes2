@@ -353,6 +353,19 @@ if os.environ.get("FACTS") == "1":
             if not any(c.exists() for c in candidates):
                 facts.append(f"{skill.relative_to(REPO)}: cites `{short}`, which resolves to nothing under docs")
 
+    # 5d. Module-map completeness. python/fheroes2_agent/README.md is the map a reviewer reads
+    # before the code, so a module missing from it is invisible and a listed module that no longer
+    # exists sends the reader somewhere empty. Both directions are checked.
+    module_map = REPO / "python" / "fheroes2_agent" / "README.md"
+    if module_map.exists():
+        listed = set(re.findall(r"`([a-z_]+\.py)`", module_map.read_text(encoding="utf-8")))
+        actual = {q.name for q in (REPO / "python" / "fheroes2_agent").glob("*.py")
+                  if q.name != "__init__.py"}
+        for name in sorted(actual - listed):
+            facts.append(f"python/fheroes2_agent/README.md: does not map `{name}`")
+        for name in sorted(listed - actual):
+            facts.append(f"python/fheroes2_agent/README.md: maps `{name}`, which does not exist")
+
     # 6. Engine-surface completeness. Every file changed under src/ relative to master must be
     # matched in the inventory's ledger section, by path, by directory, or by stem (which is how
     # a brace form like screen.{h,cpp} matches screen.h). An unledgered engine touch fails here.

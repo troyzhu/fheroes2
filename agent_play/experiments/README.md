@@ -6,6 +6,22 @@ These are separate from `../tests/` and the `../verify_*.sh` gates on purpose. A
 
 The scripts live here rather than being typed at a shell because the earlier round of this work ran from a temporary directory and lost every script when the directory was cleaned. The results survived only because they had been written into the archive, which left the conclusions standing on numbers nobody could reproduce.
 
+## Start here
+
+Fifty-eight scripts is a long tail, and most of it is one-question ablations kept for provenance. A reader arriving cold wants perhaps ten of them, grouped by what they are for. The full alphabet-free table follows this section and remains the complete index.
+
+| If you want to | Run |
+|---|---|
+| See how a checkpoint plays, on every metric that has ever changed a verdict | `validation_battery.py`, or `search_agent_battery.py` for the searched regime |
+| Know what the built-in AI scores on the same suites | `builtin_ai_baseline.py` |
+| Train a student on search labels | `soft_distill.py`, collected by `search_teacher.py` or `selfplay_search_round.py` |
+| Judge whether a training run had settled | `convergence_report.py` over its heartbeat |
+| Watch a battle, or play one yourself | `capture_replay.py` then `render_replay.py`; `play_vs.py` to take a chair |
+| Check that search is configured to mean what you think | `replay_divergence.py`, then [[../docs/decisions/0008-search-configuration]] |
+| Re-read a finished sweep without re-running it | `distillation_budget.py --from-reports`, `allocator_scaling.py --reports` |
+
+Three conventions bind every script here and are worth knowing before reading any of them: a searched run passes a nonzero `--search-combat-offset` or its number is a ceiling rather than a score; a three-seed comparison is a $t$ on two degrees of freedom and needs 4.30, not 2; and a verdict quotes the whole metric block, because the win rate alone has misreported this program's results more than once. The [[#Conventions]] section below states each one with the measurement that forced it.
+
 | Script | Question | Runtime |
 |---|---|---|
 | `generalization.py` | Does group-relative training transfer to matchups it never trained on? | about 8 min at the default split |
@@ -49,6 +65,7 @@ The scripts live here rather than being typed at a shell because the earlier rou
 | `evasion_stalemate.py` | Can a policy stall a battle by pure evasion, and what does a stall pay? The owner-predicted exploit, demonstrated and priced | seconds |
 | `tabula_rasa_pilot.py` | Could search bootstrap a policy from random initialization, with no demonstrations at all? Rounds of search play, distil, evaluate on a fixed matchup set | about 20 min for three rounds |
 | `convergence_report.py` | Had a training run settled when it stopped? Per-metric trend verdicts over a heartbeat's trailing third: converged, trending, or oscillating | seconds per heartbeat |
+| `replay_divergence.py` | How far does the side environment's replay drift from the live battle, and how many searched candidates can it not even offer? Honest offset against the shared-dice control | about 6 min at 6 matchups x 3 seeds |
 | `allocator_scaling.py` | Does the searched ladder saturate because search saturates, or because PUCT allocates? Budget curves per allocator, paired within seed, with every quality column and a drop-guard on shared-dice reports | seconds over a finished sweep |
 | `distillation_support.py` | Where do search's labels sit under the policy that must learn them? Loss-mass split, the prior's probability and rank on each labeled action, the KL the soft target actually asks for, and how much a trained student absorbed | seconds |
 | `distillation_budget.py` | How long should the student train, and how sharp may it get? Budgets and entropy bonuses on one table, each arm judged by agreement, held-out loss, both entropy forms and play | about 25 min per arm-seed, or seconds with `--from-reports` |

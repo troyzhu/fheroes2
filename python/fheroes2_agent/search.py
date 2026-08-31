@@ -19,10 +19,13 @@ the combat dice, so pinning it to the live episode is required for the prefix re
 live position, but pinning it without a `combat_seed_offset` also hands search the live battle's
 actual dice. The replay is bit-exact only in that shared-dice configuration, which ADR 0008 labels
 a ceiling; under the nonzero offset the same ADR mandates for honest numbers, different rolls mean
-different casualties, a prefix action can name a unit that no longer exists, and the controller
-skips such stale actions silently (`agent_external_controller.cpp`), so the sim state is a
-resampled trajectory under the same action prefix rather than a copy of the live one. See
-`agent_play/docs/rl/reward-design.md`.
+different casualties, so the sim state is a resampled trajectory under the same action prefix
+rather than a copy of the live one. A candidate that is legal in the live battle may therefore not
+exist at the replayed position, 21.6 percent of them over 256 measured decisions and 36 percent by
+depth twelve (`agent_play/experiments/replay_divergence.py`). The engine answers an illegal
+selection by skipping the acting unit's turn (`agent_external_controller.cpp`), so scoring such a
+candidate measures a different action; the rollouts return None instead and the search declines to
+score it. See `agent_play/docs/rl/reward-design.md`.
 """
 
 from __future__ import annotations
@@ -104,7 +107,7 @@ def sync_side_environment(sim: BattleEnv | None, live: BattleEnv, worker: str,
 
 
 def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int,
-                      agent_side: str, full_prefix: bool = False) -> float:
+                      agent_side: str, full_prefix: bool = False) -> float | None:
     """A playout in which the policy answers BOTH chairs, the owner's 2026-08-13 direction for
     self-play search: the opponent inside a playout should be the policy itself, not the engine's
     built-in AI, so the value estimates match the self-play objective rather than the engine.
@@ -121,7 +124,7 @@ def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], fi
     observation, mask = sim.reset()
     i, applied = 0, False
     while True:
-        ours = bool(sim._pending["observation"]["active_is_attacker"]) == (agent_side == "attacker")
+        ours = sim.acting_side == agent_side
         # full_prefix: the caller's prefix holds BOTH chairs' live actions (self-play collection,
         # where the live episode is itself both-sides), so replay consumes it unconditionally;
         # otherwise the prefix is the agent's own actions only (play_vs against a human).
@@ -132,27 +135,45 @@ def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], fi
         else:
             action = policy_action(model, observation, mask, env=sim)
         if not mask[action]:
-            # A stale prefix or candidate action after divergence: skip to the policy's own choice
-            # rather than let the worker reject it, so the playout keeps its decision count aligned.
+            if action == first and applied:
+                # The candidate itself does not exist at the replayed position. Substituting the
+                # policy's choice here is what the old code did, and it credited that value to the
+                # candidate; None says "unmeasurable" so the caller can decline to score it.
+                return None
+            # A stale PREFIX action: the replay has diverged. Continue under the policy so the
+            # playout still reaches a terminal, which is the accepted resampled semantics.
             action = policy_action(model, observation, mask, env=sim)
         step = sim.step(action)
         if step.done:
+            if not applied:
+                return None  # battle ended before the candidate was ever played
             return reward_from_record(step.info, agent_side, sim._reward_margin)
         observation, mask = step.observation, step.mask
 
 
-def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float:
+def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float | None:
     """Replay the prefix, apply the candidate, sample the policy to terminal; the return is the
-    episode's terminal reward. With the side environment on the live dice, determinism plus the
-    identical action sequence reproduces the prefix state exactly (the replay-rendering machinery's
-    guarantee); on an offset combat stream the prefix yields a resampled position instead, stale
-    actions silently skipped, which is the price ADR 0008 accepts for honest value estimates."""
+    episode's terminal reward, or None when the candidate could not be applied at all.
+
+    With the side environment on the live dice the replay reproduces the position exactly. Under
+    the offset combat stream ADR 0008 mandates for honest numbers it does not: different rolls kill
+    different units, so the replayed position drifts from the live one and a live-legal candidate
+    may not exist there. Measured 2026-08-23 on a mirror matchup, 38 percent of live-legal
+    candidates were un-appliable by depth eight under the offset, against 0 percent on shared dice.
+
+    Returning None is what makes that visible. The engine's contract for an illegal selection is to
+    skip the acting unit's turn (`agent_external_controller.cpp`), so the old code played a
+    DIFFERENT action and credited its value to the candidate, and a prefix that ended the battle
+    early returned a terminal the candidate never reached. Both silently corrupted the Q value the
+    search compares and the label a corpus records."""
     observation, mask = sim.reset()
     for action in prefix:
         step = sim.step(action)
         if step.done:
-            return step.reward  # prefix ended the battle; cannot happen when called mid-episode
+            return None  # the resampled battle ended before the candidate's position was reached
         observation, mask = step.observation, step.mask
+    if not mask[first]:
+        return None
     step = sim.step(first)
     while not step.done:
         action = policy_action(model, step.observation, step.mask, env=sim)
@@ -182,6 +203,7 @@ def _sequential_halving(do_rollout, prior: dict[int, float], simulations: int,
     `m`; zero admits every legal action. Returns the surviving arms, best mean first, because the
     schedule's answer is its last survivor rather than the most-visited action.
     """
+    unavailable: set[int] = set()
     survivors = sorted(prior, key=prior.get, reverse=True)
     if candidates:
         survivors = survivors[:candidates]
@@ -202,9 +224,18 @@ def _sequential_halving(do_rollout, prior: dict[int, float], simulations: int,
             for _ in range(per):
                 if spent >= simulations:
                     break
-                total_return[a] += do_rollout(a)
+                value = do_rollout(a)
+                if value is None:
+                    # Un-appliable at the replayed position: drop the arm rather than score it
+                    # with a substitute, and do not charge the budget for a playout that never ran.
+                    unavailable.add(a)
+                    survivors = [x for x in survivors if x != a]
+                    break
+                total_return[a] += value
                 visits[a] += 1
                 spent += 1
+        if not survivors:
+            break
         if len(survivors) <= 1:
             break
         means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in survivors}
@@ -221,8 +252,8 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                          c_puct: float, live: BattleEnv | None = None,
                          coverage_forced: bool = False, allocator: str = "puct",
                          candidates: int = 0, rollout_opponent: str = "ai",
-                         agent_side: str | None = None,
-                         full_prefix: bool = False) -> tuple[int, dict, dict, dict]:
+                         agent_side: str | None = None, full_prefix: bool = False,
+                         diagnostics: dict | None = None) -> tuple[int, dict, dict, dict]:
     """The search decision plus its whole measurement: per-candidate mean rollout values, visit
     counts, and the prior. The values are the counterfactuals only search produces (a real
     playout per candidate it tried), which is what makes them valid soft-distillation targets
@@ -280,21 +311,40 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
     if allocator != "puct":
         raise ValueError(f"unknown allocator {allocator!r}")
     sweep = sorted(actions, key=lambda a: -prior[a]) if coverage_forced else []
-    for n in range(simulations):
-        unvisited = [a for a in sweep if visits[a] == 0]
+    # Candidates the replayed position cannot offer. They are excluded from selection rather than
+    # scored with a substitute's value, and they cost no budget, because no playout ran.
+    unavailable: set[int] = set()
+    n = 0
+    while n < simulations:
+        pool = [a for a in actions if a not in unavailable]
+        if not pool:
+            break
+        unvisited = [a for a in sweep if visits[a] == 0 and a not in unavailable]
         if unvisited:
             chosen = unvisited[0]
         else:
             scores = {}
-            for a in actions:
+            for a in pool:
                 q = total_return[a] / visits[a] if visits[a] else 0.0
                 u = c_puct * prior[a] * math.sqrt(n + 1) / (1 + visits[a])
                 scores[a] = q + u
             chosen = max(scores, key=scores.get)
         value = do_rollout(chosen)
+        if value is None:
+            unavailable.add(chosen)
+            continue
         visits[chosen] += 1
         total_return[chosen] += value
+        n += 1
     means = {a: (total_return[a] / visits[a] if visits[a] else 0.0) for a in actions}
+    if diagnostics is not None:
+        diagnostics["unavailable"] = sorted(unavailable)
+        diagnostics["candidates"] = len(actions)
+        diagnostics["playouts_run"] = n
+    if not any(visits[a] for a in actions):
+        # Every candidate was un-appliable, so nothing was measured; the prior's pick stands rather
+        # than an argmax over an all-zero table, which would return the lowest legal index.
+        return max(prior, key=prior.get), means, visits, prior
     # Ties on visit count are broken by the mean rollout value, not by action index. `visits` is
     # keyed in ascending legal-action order, so a plain argmax over it returns the lowest index,
     # and under coverage forcing ties are the common case rather than the rare one: 11.12 percent

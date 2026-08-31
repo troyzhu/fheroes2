@@ -61,8 +61,18 @@ def load_soft(roots, lam: float, target_kind: str = "values") -> tuple:
                     if n > 0:
                         dense[int(a)] = float(n) ** (1.0 / lam)
             else:
+                # Only candidates search actually measured enter the target. A zero-visit entry
+                # carries a mean of 0.0, which is not a neutral value on any margin here (under
+                # `hit_points` it reads as an even battle, better than a loss), so treating it as a
+                # measurement invents evidence. That was 1.3 percent of the coverage-forced corpus
+                # and rises toward the 21.6 percent un-appliable rate once search declines to score
+                # candidates the replayed position cannot offer (`replay_divergence.py`), which is
+                # when it would start to matter. Grill's completed-Q would instead impute the
+                # policy's own value; that is the principled version and is not built.
+                visited = {int(a): v for a, v in record.get("search_visits", {}).items() if v > 0}
                 logits = {int(a): np.log(max(record["prior"][a], 1e-9)) + record["search_values"][a] / lam
-                          for a in record["search_values"]}
+                          for a in record["search_values"]
+                          if not visited or int(a) in visited}
                 peak = max(logits.values())
                 for a, l in logits.items():
                     dense[a] = np.exp(l - peak)

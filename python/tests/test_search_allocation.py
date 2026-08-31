@@ -111,5 +111,51 @@ best, visits, calls = run(5, 0, "puct", 0, {})
 check(len(calls) == 0 and best == 0, "zero budget returns the prior argmax with no rollouts",
       f"picked {best}, {len(calls)} rollouts")
 
+# Un-appliable candidates (2026-08-23). Under the offset combat stream ADR 0008 mandates, the
+# replayed position may not offer a live-legal candidate at all: measured at 21.6 percent of
+# candidates, 36 percent by depth twelve. The rollouts signal that with None, and the search must
+# decline to score such a candidate rather than credit it with a substitute action's value, which
+# is what the engine's skip-the-turn contract used to produce silently.
+obs_zero = np.zeros(634, dtype=np.float32)
+
+
+def run_dead(k, budget, dead, values):
+    calls = []
+    original = S.rollout
+
+    def stub(sim, model, prefix, a):
+        if a in dead:
+            return None
+        calls.append(a)
+        return values.get(a, 0.0)
+
+    S.rollout = stub
+    try:
+        mask = np.zeros(793, dtype=bool)
+        mask[:k] = True
+        diag = {}
+        best, _, visits, _ = S.search_action_detail(None, StubModel(), [], obs_zero, mask,
+                                                    budget, 1.5, diagnostics=diag)
+        return best, visits, calls, diag
+    finally:
+        S.rollout = original
+
+
+# The best-valued action is un-appliable, so it must never be returned and never be credited.
+best, visits, calls, diag = run_dead(6, 20, dead={3}, values={0: 0.1, 1: 0.2, 2: 0.3, 3: 0.99,
+                                                              4: 0.4, 5: 0.5})
+check(best != 3, "an un-appliable candidate is never returned", f"picked {best}")
+check(visits[3] == 0, "an un-appliable candidate is never credited a visit", f"visits {visits[3]}")
+check(3 not in calls, "no playout is charged to it", f"calls {sorted(set(calls))}")
+check(diag.get("unavailable") == [3], "it is reported as unavailable", f"{diag.get('unavailable')}")
+check(len(calls) == 20, "the budget still buys 20 real playouts", f"{len(calls)}")
+
+# Every candidate un-appliable: nothing was measured, so the prior's pick stands rather than an
+# argmax over an all-zero table, which would return the lowest legal index.
+best, visits, calls, diag = run_dead(5, 8, dead={0, 1, 2, 3, 4}, values={})
+check(len(calls) == 0, "a fully blind position runs no playouts", f"{len(calls)}")
+check(best == 0, "a fully blind position falls back to the prior's argmax", f"picked {best}")
+check(sum(visits.values()) == 0, "and credits nothing", f"{sum(visits.values())}")
+
 print(f"{passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

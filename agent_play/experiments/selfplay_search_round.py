@@ -9,10 +9,12 @@ are driven by search over the policy, every playout models the other chair with 
 (`rollout_self_play`), and every decision of both chairs becomes a label, so one episode yields
 roughly twice the decisions of a one-chair collection.
 
-Labels are scored by a record-only margin (`strength` by default), because a both-sides
-environment's step reward is unperspectived and `hit_points` has no record-only form. The combat
-offset keeps the label honest exactly as in the AI-opponent collector: nonzero, so search cannot
-see the live game's rolls.
+Labels are scored by a record-only margin, because a both-sides environment's step reward is not
+perspectived to either chair and `hit_points` has no record-only form. The default is `contested`,
+the plain strength difference: self-play is a zero-sum game and `contested` is the only margin here
+that is zero sum, so what one chair gains is exactly what the other loses. It also has no stall
+exploit, where `strength` pays an evading defender its maximum. The combat offset keeps the label
+honest exactly as in the AI-opponent collector: nonzero, so search cannot see the live game's rolls.
 
 Usage:
     ./selfplay_search_round.py WORKER CHECKPOINT --out-dir DIR [--matchups N] [--episodes 2]
@@ -81,24 +83,33 @@ def collect_matchup(worker, models, entry, out_dir, episodes, simulations, c_puc
             prefix: list[int] = []
             rows = []
             while True:
-                acting = "attacker" if live._pending["observation"]["active_is_attacker"] else "defender"
+                acting = live.acting_side
                 # The learner's chair is searched and labelled; the opposing chair is played by the
                 # drawn opponent (the current policy, or a past self) and is NOT labelled, because a
                 # past self's choices are not the target the student should imitate.
+                # Who plays this chair, and is the decision worth keeping as a label? The learner
+                # always is. The opposing chair is too whenever the drawn opponent IS the current
+                # policy, which is every episode of mirror self-play, because then both chairs are
+                # the same searched policy and labelling one of them would halve the yield for
+                # nothing. A past self's choices are not a target to imitate, so those are played
+                # but not recorded.
                 learner_turn = acting == learner_side
                 actor = model if learner_turn else opponent
+                keep_label = learner_turn or opponent is model
                 action, means, visits, prior = search_action_detail(
                     sim, actor, prefix, observation, mask, simulations, c_puct,
                     rollout_opponent="policy", agent_side=acting, full_prefix=True)
-                if learner_turn:
-                        rows.append({"record": "decision", "side": acting,
-                                 "observation": live._pending["observation"],
-                                 "legal_actions": [int(a) for a in np.flatnonzero(mask)],
-                                 "teacher_action": int(action),
-                                 "search_values": {str(a): float(v) for a, v in means.items()},
-                                 "search_visits": {str(a): int(v) for a, v in visits.items()},
-                                 "prior": {str(a): float(p) for a, p in prior.items()},
-                                 "opponent": opponent_name})
+                if keep_label:
+                    rows.append({
+                        "record": "decision", "side": acting,
+                        "observation": live.pending_decision["observation"],
+                        "legal_actions": [int(a) for a in np.flatnonzero(mask)],
+                        "teacher_action": int(action),
+                        "search_values": {str(a): float(v) for a, v in means.items()},
+                        "search_visits": {str(a): int(v) for a, v in visits.items()},
+                        "prior": {str(a): float(p) for a, p in prior.items()},
+                        "opponent": opponent_name,
+                    })
                 prefix.append(action)
                 step = live.step(action)
                 if step.done:
@@ -130,8 +141,15 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=2, help="per matchup; both chairs label every episode")
     parser.add_argument("--simulations", type=int, default=32)
     parser.add_argument("--c-puct", type=float, default=1.5)
-    parser.add_argument("--margin", default="strength",
-                        choices=[m for m in REWARD_MARGINS if m != "hit_points"])
+    parser.add_argument("--margin", default="contested",
+                        choices=[m for m in REWARD_MARGINS if m != "hit_points"],
+                        help="how a playout's terminal is scored. `contested` is the default "
+                             "because self-play is zero sum and it is the only record-computable "
+                             "margin that is: r(attacker) = -r(defender) at every terminal. The "
+                             "earlier default `strength` is neither, and it carries the stall "
+                             "exploit, paying an evading defender +2.0, its maximum, so a stalling "
+                             "playout returned the best value available. Corpora collected before "
+                             "2026-08-23 used `strength`; their manifests record it")
     parser.add_argument("--past", nargs="*", default=[],
                         help="frozen past-self checkpoints; PAST_FRACTION of episodes draw one as "
                              "the opposing chair, the OpenAI Five 80/20 remedy for strategy collapse")

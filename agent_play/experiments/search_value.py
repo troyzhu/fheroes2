@@ -105,7 +105,7 @@ def value_leaf_search(sim: BattleEnv, policy, value_model, prefix: list[int], ob
         # a successor where the opponent acts must be negated, exactly the negamax convention;
         # scoring it unsigned makes search prefer moves that are good for the opponent, which is
         # what the first run of this probe did.
-        actor_is_ours = bool(sim._pending["observation"]["active_is_attacker"]) == (sim.side == "attacker")
+        actor_is_ours = sim.acting_side == sim.side
         scores[action] = float(value) if actor_is_ours else -float(value)
     return max(scores, key=scores.get), steps
 

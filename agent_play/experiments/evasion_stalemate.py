@@ -80,7 +80,7 @@ def main() -> None:
             _, mask = env.reset()
             decisions = 0
             while True:
-                action = most_evasive_action(env._pending["observation"], mask)
+                action = most_evasive_action(env.pending_decision["observation"], mask)
                 step = env.step(action)
                 decisions += 1
                 if step.done:
