@@ -48,6 +48,16 @@ A direct budget sweep on 2026-08-12 contradicts the saturation that reading rest
 
 The claim that the dice matter is a claim about what a number means, not about the agent. A search given a perfect model including the randomness is a legitimate and useful diagnostic, and the ceiling it measures says this network's weakness lies more in evaluating positions than in the moves it can reach.
 
+## What the offset costs beyond unknown dice, found 2026-08-23
+
+The offset buys honesty at a price this record priced as one thing and which is really two. Not knowing the rolls is the intended cost. The second was invisible until it was looked for: the replay is a resampled trajectory, so different rolls kill different units and the replayed position drifts from the live one, and a candidate legal in the live battle may not exist there at all.
+
+Measured over 256 decisions on six mirror matchups at three seeds (`agent_play/experiments/replay_divergence.py`), 21.6 percent of live-legal candidates were un-appliable at the replayed position, 0 percent at the first decision rising to 36 percent by depth twelve. Seven decisions found the resampled battle already over, and fifty-four found a different unit acting. The shared-dice control reads exactly 0.0 percent, which is both the design's own claim and the check that the harness measures what it says.
+
+Until the fix, `rollout` played such a candidate regardless. The engine answers an illegal selection by skipping the acting unit's turn, so the playout measured a different action and credited its value to the candidate, and when the replayed battle had ended early every candidate received the same terminal and the tie-break fell through to the lowest legal action index. Roughly a fifth of the Q values this record's own measurements rest on were therefore values of something else, and the share grew with depth, so late decisions were the most corrupted.
+
+What this does not license is a restatement of the $+0.323$ dice price. That number compared two configurations and both are still what they were; what has changed is that part of the honest arm's deficit may have been this defect rather than the missing information, and the two are separable only by measurement. The paired comparison, the same checkpoint and suites under the old and fixed search, is the experiment that settles it and is not yet reported here.
+
 ## Costs
 
 Independent dice cost real strength, and that is the point rather than a side effect: the honest configuration reads about 0.32 lower on the mirror suite than the one that had been in use. Every search figure recorded before 2026-08-10 was produced under some combination of the wrong objective, the wrong battlefield and the live dice, so none of them is comparable to a number produced after it, and the archive keeps them with that stated rather than restating them.
@@ -63,4 +73,5 @@ grep    agent_play/experiments/search_agent_battery.py :: manual_seed
 exists  agent_play/experiments/search_objective.py
 exists  agent_play/experiments/search_leakage.py
 exists  agent_play/experiments/search_strength.py
+exists  agent_play/experiments/replay_divergence.py
 -->
