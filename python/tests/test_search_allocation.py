@@ -41,7 +41,7 @@ def run(k, budget, allocator, candidates, values):
     """Drive search_action_detail with a stubbed rollout returning values[action]."""
     calls = []
     original = S.rollout
-    S.rollout = lambda sim, model, prefix, a: (calls.append(a), values.get(a, 0.0))[1]
+    S.rollout = lambda sim, model, prefix, a, skip=False, *_: (calls.append(a), values.get(a, 0.0))[1]
     try:
         mask = np.zeros(793, dtype=bool)
         mask[:k] = True
@@ -70,7 +70,7 @@ check(second_phase_arms >= 2, "odd survivor count halves by ceiling, keeping two
 mask_shift_values = {3: 0.2, 4: 0.2, 5: 0.2}
 calls = []
 original = S.rollout
-S.rollout = lambda sim, model, prefix, a: (calls.append(a), mask_shift_values.get(a, 0.0))[1]
+S.rollout = lambda sim, model, prefix, a, skip=False, *_: (calls.append(a), mask_shift_values.get(a, 0.0))[1]
 try:
     mask = np.zeros(793, dtype=bool)
     mask[3:6] = True
@@ -120,10 +120,15 @@ obs_zero = np.zeros(634, dtype=np.float32)
 
 
 def run_dead(k, budget, dead, values):
+    """A search where `dead` actions are un-appliable, under the exclusion arm.
+
+    The stub stands in for `rollout(..., skip_unappliable=True)`: the default now substitutes,
+    because excluding measured worse, so the exclusion path is what these checks pin.
+    """
     calls = []
     original = S.rollout
 
-    def stub(sim, model, prefix, a):
+    def stub(sim, model, prefix, a, skip_unappliable=False, *_):
         if a in dead:
             return None
         calls.append(a)

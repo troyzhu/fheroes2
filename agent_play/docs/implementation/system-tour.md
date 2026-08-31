@@ -106,15 +106,14 @@ def rollout(sim, model, prefix, first):
         if step.done:
             return None                  # the resampled battle ended before this decision existed
         observation, mask = step.observation, step.mask
-    if not mask[first]:
-        return None                      # the candidate does not exist at the replayed position
-    step = sim.step(first)               # the candidate under test
+    step = sim.step(first)               # the candidate under test; if the replayed position
+                                         # cannot offer it the engine skips the unit's turn
     while not step.done:
         step = sim.step(policy_action(model, step.observation, step.mask, env=sim))
     return step.reward   # the side env's terminal reward; the built-in AI answered the other chair
 ```
 
-The two `None` returns are load-bearing rather than defensive. Under the offset the replay is a resampled trajectory, so a live-legal candidate may not exist at the replayed position: measured over 256 decisions on six mirror matchups, 21.6 percent of candidates were un-appliable, rising from 0 percent at the first decision to 36 percent by depth twelve, against exactly 0 percent on shared dice. The engine answers an illegal selection by skipping the acting unit's turn, so before 2026-08-23 the playout measured a different action and credited its value to the candidate. `search_action_detail` now excludes such candidates instead of scoring them, and `agent_play/experiments/replay_divergence.py` is the measurement.
+The `None` return is narrow and deliberate. Under the offset the replay is a resampled trajectory, so a live-legal candidate may not exist at the replayed position: measured over 256 decisions on six mirror matchups, 21.6 percent of candidates were un-appliable, rising to 36 percent by depth twelve, against exactly 0 percent on shared dice (`agent_play/experiments/replay_divergence.py`). Scoring such a candidate credits it with the value of the skip the engine substitutes, which is fabricated evidence, and declining to score it is measured worse by $-0.139$ win rate over three paired seeds, because those candidates are 19 percent of the legal set and search chooses one on 30 percent of decisions. So substitution stays the default, `exclude_unappliable` keeps the losing arm reproducible, and `None` is reserved for the case with no position at all, where the replayed battle has already ended.
 
 Two configuration choices decide what the numbers mean, both stamped on every report: the side environment's `reward_margin` is what search maximizes, and its `combat_seed_offset` must be nonzero for honest numbers, because a zero offset hands search the live battle's dice ([[../decisions/0008-search-configuration]]). A Sequential Halving allocator exists beside PUCT for simple-regret experiments; PUCT is the measured default. Deeper: `python/fheroes2_agent/search.py`, [[inference-walkthrough]] for one decision under the microscope.
 

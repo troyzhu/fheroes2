@@ -26,6 +26,12 @@ FILES = pathlib.Path(__file__).resolve().parents[1] / "docs" / "archive" / "expe
 
 # Ordered: the first pattern that matches a file names it, so put specific prefixes first.
 FAMILIES: list[tuple[str, str, str]] = [
+    ("play_fixed_*", "search_agent_battery.py under the exclusion arm",
+     "The searched agent with un-appliable candidates excluded rather than substituted, three seeds\n      on the mirrors with honest dice; the arm that measured -0.139 win rate and was not adopted"),
+    ("play_old_*", "search_agent_battery.py under the substituting default",
+     "The same three seeds with the standing behaviour, a candidate the replay cannot offer scored\n      by the skip the engine substitutes; the control the exclusion arm lost to"),
+    ("replay_divergence.json", "replay_divergence.py --report",
+     "How far the side environment's replay drifts from the live battle under the mandated offset:\n      21.6 percent of candidates un-appliable, 36 percent by depth twelve, 0 on shared dice"),
     ("b25_s*_soft.pt", "soft_distill.py, the standing 25-epoch arms of 2026-08-11",
      "The standing-configuration distillation checkpoints over three seeds: the control every budget,\n      entropy and allocator arm was paired against, vendored so those comparisons stay re-runnable"),
     ("band_*.pt", "soft_distill.py, the regret-band arms of 2026-08-09",

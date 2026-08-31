@@ -24,8 +24,10 @@ rather than a copy of the live one. A candidate that is legal in the live battle
 exist at the replayed position, 21.6 percent of them over 256 measured decisions and 36 percent by
 depth twelve (`agent_play/experiments/replay_divergence.py`). The engine answers an illegal
 selection by skipping the acting unit's turn (`agent_external_controller.cpp`), so scoring such a
-candidate measures a different action; the rollouts return None instead and the search declines to
-score it. See `agent_play/docs/rl/reward-design.md`.
+candidate measures a different action. Declining to score it is nonetheless measured worse, by
+$-0.139$ win rate over three paired seeds, because search picks such candidates on 30 percent of
+decisions and the live battle can play them; substitution is the default and `exclude_unappliable`
+keeps the losing arm reproducible. See `agent_play/docs/rl/reward-design.md`.
 """
 
 from __future__ import annotations
@@ -107,7 +109,8 @@ def sync_side_environment(sim: BattleEnv | None, live: BattleEnv, worker: str,
 
 
 def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int,
-                      agent_side: str, full_prefix: bool = False) -> float | None:
+                      agent_side: str, full_prefix: bool = False,
+                      skip_unappliable: bool = False) -> float | None:
     """A playout in which the policy answers BOTH chairs, the owner's 2026-08-13 direction for
     self-play search: the opponent inside a playout should be the policy itself, not the engine's
     built-in AI, so the value estimates match the self-play objective rather than the engine.
@@ -135,10 +138,9 @@ def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], fi
         else:
             action = policy_action(model, observation, mask, env=sim)
         if not mask[action]:
-            if action == first and applied:
-                # The candidate itself does not exist at the replayed position. Substituting the
-                # policy's choice here is what the old code did, and it credited that value to the
-                # candidate; None says "unmeasurable" so the caller can decline to score it.
+            if action == first and applied and skip_unappliable:
+                # The candidate does not exist at the replayed position. Declining to score it is
+                # the honest reading and is measured worse (see `rollout`), so it is opt-in.
                 return None
             # A stale PREFIX action: the replay has diverged. Continue under the policy so the
             # playout still reaches a terminal, which is the accepted resampled semantics.
@@ -151,7 +153,8 @@ def rollout_self_play(sim: BattleEnv, model: BattlePolicy, prefix: list[int], fi
         observation, mask = step.observation, step.mask
 
 
-def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) -> float | None:
+def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int,
+            skip_unappliable: bool = False) -> float | None:
     """Replay the prefix, apply the candidate, sample the policy to terminal; the return is the
     episode's terminal reward, or None when the candidate could not be applied at all.
 
@@ -172,8 +175,18 @@ def rollout(sim: BattleEnv, model: BattlePolicy, prefix: list[int], first: int) 
         if step.done:
             return None  # the resampled battle ended before the candidate's position was reached
         observation, mask = step.observation, step.mask
-    if not mask[first]:
+    if skip_unappliable and not mask[first]:
         return None
+    # Otherwise the candidate is played regardless. The engine answers an illegal selection by
+    # skipping the acting unit's turn, so the number that comes back is the value of skipping and
+    # playing on, credited to the candidate. That is fabricated evidence and it was found on
+    # 2026-08-23, but declining to score the candidate is MEASURED WORSE and by a wide margin:
+    # paired over three seeds on the mirrors, excluding cost -0.139 win rate, -0.267 reward and
+    # -0.128 strength margin, every seed negative. The reason is mechanical. Un-appliable
+    # candidates are 19.2 percent of the legal set but the search CHOSE one on 30.4 percent of
+    # decisions, so excluding them forbids the move search wants roughly a third of the time,
+    # and the live battle can play them perfectly well. A noisy value for every option beats an
+    # exact value for two thirds of them. `skip_unappliable` keeps the exclusion arm reproducible.
     step = sim.step(first)
     while not step.done:
         action = policy_action(model, step.observation, step.mask, env=sim)
@@ -253,7 +266,8 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
                          coverage_forced: bool = False, allocator: str = "puct",
                          candidates: int = 0, rollout_opponent: str = "ai",
                          agent_side: str | None = None, full_prefix: bool = False,
-                         diagnostics: dict | None = None) -> tuple[int, dict, dict, dict]:
+                         diagnostics: dict | None = None,
+                         exclude_unappliable: bool = False) -> tuple[int, dict, dict, dict]:
     """The search decision plus its whole measurement: per-candidate mean rollout values, visit
     counts, and the prior. The values are the counterfactuals only search produces (a real
     playout per candidate it tried), which is what makes them valid soft-distillation targets
@@ -272,9 +286,10 @@ def search_action_detail(sim: BattleEnv, model: BattlePolicy, prefix: list[int],
     if rollout_opponent == "policy":
         if agent_side not in ("attacker", "defender"):
             raise ValueError("rollout_opponent='policy' needs agent_side, and a side='both' sim")
-        do_rollout = lambda a: rollout_self_play(sim, model, prefix, a, agent_side, full_prefix)  # noqa: E731
+        do_rollout = lambda a: rollout_self_play(sim, model, prefix, a, agent_side, full_prefix,
+                                                 exclude_unappliable)  # noqa: E731
     elif rollout_opponent == "ai":
-        do_rollout = lambda a: rollout(sim, model, prefix, a)  # noqa: E731
+        do_rollout = lambda a: rollout(sim, model, prefix, a, exclude_unappliable)  # noqa: E731
     else:
         raise ValueError(f"unknown rollout_opponent {rollout_opponent!r}")
     if len(actions) == 1:
